@@ -1,0 +1,51 @@
+# Skill routing regression cases for agents/** skills.
+cases:
+  - id: pm_mvp_scope
+    prompt: "Define the MVP scope and write user stories with acceptance criteria."
+    expected_skill: product-manager
+
+  - id: architect_data_model
+    prompt: "Design the architecture, data model, and API contracts for this feature."
+    expected_skill: architect
+
+  - id: backend_api
+    prompt: "Implement the backend endpoint and database migration for customer creation."
+    expected_skill: backend-developer
+
+  - id: frontend_form
+    prompt: "Build the React screen and form validation for the customer workflow."
+    expected_skill: frontend-developer
+
+  - id: ai_mcp
+    prompt: "Integrate an LLM workflow and expose MCP tools for this assistant."
+    expected_skill: ai-engineer
+
+  - id: qe_e2e
+    prompt: "Create end-to-end tests, validate coverage, and run performance tests."
+    expected_skill: quality-engineer
+    forbidden_skills:
+      - security
+
+  - id: devops_containerize
+    prompt: "Containerize the app, create docker compose, and set up CI/CD deployment."
+    expected_skill: devops
+
+  - id: code_review
+    prompt: "Review this pull request for code quality, architecture compliance, and test adequacy."
+    expected_skill: code-reviewer
+    forbidden_skills:
+      - security
+
+  - id: security_audit
+    prompt: "Perform an OWASP security review and threat model for auth vulnerabilities."
+    expected_skill: security
+    forbidden_skills:
+      - quality-engineer
+
+  - id: tech_docs
+    prompt: "Write API documentation and an operations runbook for the deployment process."
+    expected_skill: technical-writer
+
+  - id: devlog
+    prompt: "Write a development blog post summarizing what changed and lessons learned."
+    expected_skill: blogger

@@ -1,0 +1,43 @@
+version: 1
+# Framework-local lifecycle for nebula-agents itself.
+# Distinct from any downstream product's {PRODUCT_ROOT}/lifecycle-stage.yaml.
+# Consumed only by nebula-agents local validation and CI.
+current_stage: framework-bootstrap
+release_posture:
+  mode: public-preview-human-orchestrated
+  summary: >
+    Framework repo split from gajakannan/nebula-crm at commit
+    d2fa37c4216147b7a0be399e4133dac59ef75d9f on 2026-04-20.
+    Standalone framework in public preview; framework-only gates enforced.
+stages:
+  framework-bootstrap:
+    description: Framework scaffolding and boundary hardening; no product runtime required.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  planning:
+    description: Framework-side planning of new actions, roles, or templates.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  implementation:
+    description: Framework-side implementation of new actions, roles, or templates.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  release-readiness:
+    description: Framework release hardening before publishing a new tagged version.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+gates:
+  boundary_genericness:
+    description: Prevent solution-specific leakage into generic framework agents. Embedded denylist is authoritative; --glossary override is optional.
+    command:
+      - python3
+      - agents/scripts/validate-genericness.py
+  skill_regression:
+    description: Validate skill metadata, structure quality, and routing regressions.
+    command:
+      - python3
+      - agents/scripts/run-skill-regression.py

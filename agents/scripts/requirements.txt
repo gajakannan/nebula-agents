@@ -1,0 +1,4 @@
+# Framework script dependencies for agents/**/scripts Python utilities.
+# Keep this file minimal and aligned with actual imports.
+pyyaml==6.0.2
+pytest==9.0.3

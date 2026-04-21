@@ -1,0 +1,326 @@
+---
+# OpenAPI 3.0 API Contract Template
+# Use this template to define REST API endpoints for your project
+
+openapi: 3.0.0
+info:
+  title: [Module Name] API
+  description: API for [brief description of what this API does]
+  version: 1.0.0
+  contact:
+    name: Project Team
+
+servers:
+  - url: https://api.local.example
+    description: Local development
+  - url: https://api-staging.example.com
+    description: Staging environment
+  - url: https://api.example.com
+    description: Production environment
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: [EntityName]
+    description: Operations related to [entity description]
+
+paths:
+  /[entities]:
+    get:
+      summary: List/search [entities]
+      description: Retrieve a paginated list of [entities] with optional filtering and sorting
+      operationId: list[Entities]
+      tags:
+        - [EntityName]
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-indexed)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          required: false
+          schema:
+            type: string
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: search
+          in: query
+          description: Search term
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/[Entity]Response'
+                  pagination:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new [entity]
+      description: Create a new [entity] with the provided data
+      operationId: create[Entity]
+      tags:
+        - [EntityName]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Create[Entity]Request'
+            example:
+              name: "Example Name"
+              field1: "value1"
+              field2: "value2"
+
+      responses:
+        '201':
+          description: [Entity] created successfully
+          headers:
+            Location:
+              description: URI of the created resource
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/[Entity]Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /[entities]/{id}:
+    get:
+      summary: Get [entity] by ID
+      description: Retrieve detailed information about a specific [entity]
+      operationId: get[Entity]ById
+      tags:
+        - [EntityName]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the [entity]
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/[Entity]DetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update [entity]
+      description: Update an existing [entity]
+      operationId: update[Entity]
+      tags:
+        - [EntityName]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the [entity]
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Update[Entity]Request'
+
+      responses:
+        '200':
+          description: [Entity] updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/[Entity]Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete [entity]
+      description: Delete or soft-delete an existing [entity]
+      operationId: delete[Entity]
+      tags:
+        - [EntityName]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the [entity]
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '204':
+          description: [Entity] deleted successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    ProblemDetails:
+      type: object
+      description: RFC 7807 problem details payload with framework extension fields.
+      required:
+        - type
+        - title
+        - status
+        - code
+        - traceId
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        code:
+          type: string
+        traceId:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalCount:
+          type: integer
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Forbidden:
+      description: Not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Conflict:
+      description: Conflict (duplicate or invalid state)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'

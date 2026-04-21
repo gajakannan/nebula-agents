@@ -1,0 +1,60 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE to an immutable tag}
+    container_name: app-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-5000}:5000"
+    environment:
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-production}
+      - APP_DB_CONNECTION_STRING=${APP_DB_CONNECTION_STRING:?Set APP_DB_CONNECTION_STRING}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE to an immutable tag}
+    container_name: app-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-http://backend:5000}
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16.2-alpine
+    container_name: app-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-app}
+      - POSTGRES_USER=${POSTGRES_USER:-app_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--auth=scram-sha-256
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app_user} -d ${POSTGRES_DB:-app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
+
+# Customization notes:
+# - Set BACKEND_IMAGE/FRONTEND_IMAGE with immutable tags (avoid ':latest').
+# - Add auth/cache/queue services as required by your architecture.
+# - Keep DB unexposed by default; only add DB port mapping for local debugging.
+# - Do not commit real credentials; use .env.example placeholders and secret managers.

@@ -1,0 +1,34 @@
+version: 1
+current_stage: framework-bootstrap
+stages:
+  framework-bootstrap:
+    description: Framework scaffolding and boundary hardening before solution implementation starts.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  planning:
+    description: Planning artifacts are being authored; implementation may still be placeholder.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  implementation:
+    description: Application runtime artifacts exist and implementation quality gates run.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+  release-readiness:
+    description: Public-release hardening stage with strict quality/security gate evidence.
+    required_gates:
+      - boundary_genericness
+      - skill_regression
+gates:
+  boundary_genericness:
+    description: Prevent solution-specific leakage into generic framework agents.
+    command:
+      - python3
+      - agents/scripts/validate-genericness.py
+  skill_regression:
+    description: Validate skill metadata, structure quality, and routing regressions.
+    command:
+      - python3
+      - agents/scripts/run-skill-regression.py

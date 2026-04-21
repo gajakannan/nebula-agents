@@ -1,0 +1,393 @@
+# ──────────────────────────────────────────────────────────────
+# Agent Map — Structural wiring for the Agent-Driven Builder Framework
+# ──────────────────────────────────────────────────────────────
+# This file is the AUTHORITATIVE source for action→agent wiring.
+# Action .md files remain human-readable documentation;
+# orchestrators and LLMs resolve execution plans from this map.
+# ──────────────────────────────────────────────────────────────
+version: 1
+
+# ═══════════════════════════════════════════════════════════════
+# AGENTS — global declarations (role, skill file, read/write boundaries)
+# ═══════════════════════════════════════════════════════════════
+#
+# Shared feature artifacts (multiple agents write, each to their section):
+#   STATUS.md          — PM creates skeleton; architect sets signoff roles;
+#                        implementers update progress + evidence; reviewers
+#                        add signoff provenance; PM handles closeout/archive
+#   GETTING-STARTED.md — PM creates skeleton; implementers add key files,
+#                        seed data, and verification steps
+#   PRD.md             — PM authors requirements; architect adds architecture
+#                        traceability + solution design sections
+#   README.md          — PM creates index; architect adds feature ERD + C4
+# ──────────────────────────────────────────────────────────────
+agents:
+  product-manager:
+    skill: agents/product-manager/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/domain/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - agents/templates/**
+    writes:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md          # Sections 3.x only
+      - {PRODUCT_ROOT}/planning-mds/features/**           # PRDs, stories, STATUS, trackers, archive
+      - {PRODUCT_ROOT}/planning-mds/examples/personas/**
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # minimal feature/story stub only
+
+  architect:
+    skill: agents/architect/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - {PRODUCT_ROOT}/planning-mds/domain/**
+      - {PRODUCT_ROOT}/planning-mds/architecture/**
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - agents/templates/**
+      - agents/architect/references/**
+    writes:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md          # Sections 4.x only
+      - {PRODUCT_ROOT}/planning-mds/architecture/**       # ADRs, data model, C4 diagrams, umbrella assembly plan
+      - {PRODUCT_ROOT}/planning-mds/api/*.yaml            # OpenAPI contracts
+      - {PRODUCT_ROOT}/planning-mds/schemas/*.json        # shared JSON Schemas
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml  # shared canonical nodes when Phase B introduces shared semantics
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # finalize feature/story bindings
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml # only when ontology vocabulary itself changes
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml       # implementation bindings from canonical IDs into {PRODUCT_ROOT}/engine/experience code
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml  # generated via `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
+      - {PRODUCT_ROOT}/planning-mds/features/**/feature-assembly-plan.md  # per-feature execution plan
+      - {PRODUCT_ROOT}/planning-mds/features/**/PRD.md    # architecture traceability + solution design sections
+      - {PRODUCT_ROOT}/planning-mds/features/**/README.md # feature ERD (Mermaid + ASCII), C4 component diagrams
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # signoff role matrix, architecture signoff
+
+  backend-developer:
+    skill: agents/backend-developer/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/api/*.yaml
+      - {PRODUCT_ROOT}/planning-mds/schemas/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+    writes:
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md          # backend progress, validation evidence
+      - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, seed data, verification steps
+
+  frontend-developer:
+    skill: agents/frontend-developer/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/api/*.yaml
+      - {PRODUCT_ROOT}/planning-mds/schemas/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - agents/frontend-developer/references/ux-audit-ruleset.md
+    writes:
+      - {PRODUCT_ROOT}/experience/**
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md          # frontend progress, validation evidence
+      - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, verification steps
+
+  ai-engineer:
+    skill: agents/ai-engineer/SKILL.md
+    condition: scope includes AI, LLM, MCP, or {PRODUCT_ROOT}/neuron/
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - agents/ai-engineer/references/**
+    writes:
+      - {PRODUCT_ROOT}/neuron/**
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md          # AI progress, validation evidence
+      - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, verification steps
+
+  quality-engineer:
+    skill: agents/quality-engineer/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+      - {PRODUCT_ROOT}/neuron/**
+    writes:
+      - {PRODUCT_ROOT}/engine/tests/**
+      - {PRODUCT_ROOT}/experience/tests/**
+      - {PRODUCT_ROOT}/neuron/tests/**
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # QE signoff, validation evidence
+      # also: test infrastructure configs, coverage reports, CI test pipelines
+
+  devops:
+    skill: agents/devops/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/**
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+      - {PRODUCT_ROOT}/neuron/**
+      - agents/devops/references/**
+      - agents/templates/deployment-architecture-template.md
+    writes:
+      - docker-compose*.yml
+      - "*/Dockerfile"
+      - .env.example
+      - scripts/**
+      - .github/workflows/**
+      - {PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # deployability evidence
+
+  code-reviewer:
+    skill: agents/code-reviewer/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - agents/frontend-developer/references/ux-audit-ruleset.md
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+      - {PRODUCT_ROOT}/neuron/**
+    writes:
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # code review signoff provenance
+
+  security:
+    skill: agents/security/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/security/**
+      - agents/security/references/**
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+      - {PRODUCT_ROOT}/neuron/**
+    writes:
+      - {PRODUCT_ROOT}/planning-mds/security/**           # threat models, review reports
+      - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # security signoff provenance
+
+  technical-writer:
+    skill: agents/technical-writer/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/**
+      - {PRODUCT_ROOT}/planning-mds/api/**
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+    writes:
+      - docs/**
+      - "*/README.md"
+
+  blogger:
+    skill: agents/blogger/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/decisions/**
+      - {PRODUCT_ROOT}/planning-mds/features/**
+      - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/experience/**
+    writes:
+      - docs/blog/**
+      - blog/**
+
+# ═══════════════════════════════════════════════════════════════
+# ACTIONS — execution flows (sequence, parallelism, gates)
+# ═══════════════════════════════════════════════════════════════
+#
+# Step types:
+#   agent:    single agent execution
+#   parallel: concurrent agents (array)
+#   gate:     approval | self-review | quality | editorial | tracker-sync | ontology-sync | signoff
+#
+# Gate behaviors:
+#   approval:      user decides (approve / fix / reject); critical findings block
+#   self-review:   each preceding agent validates own work
+#   quality:       pass-rate + coverage thresholds; failing tests block
+#   editorial:     user reviews content (blog/docs)
+#   tracker-sync:  planning trackers synchronized; validation script must pass
+#   ontology-sync: feature mapping aligned with shared solution ontology; references and ownership boundaries verified; MUST run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` and pass before closeout (coverage-report.yaml must be fresh — regenerate via `--write-coverage-report`)
+#   signoff:       required role signoffs verified before closeout
+#   clarification: PM identifies underspecified requirements for user input
+# ──────────────────────────────────────────────────────────────
+
+actions:
+
+  init:
+    doc: agents/actions/init.md
+    description: Bootstrap project structure and planning artifacts
+    prerequisites: [empty or new repository]
+    steps:
+      - agent: product-manager
+        mode: initialization
+
+  plan:
+    doc: agents/actions/plan.md
+    description: Complete planning — requirements (Phase A) + architecture (Phase B) + ontology synchronization
+    prerequisites: [{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md exists with Sections 0-2]
+    steps:
+      - agent: product-manager
+        phase: A
+      - gate: clarification
+      - gate: tracker-sync
+      - gate: approval
+        name: phase-a-review
+      - agent: architect
+        phase: B
+      - gate: ontology-sync
+        name: phase-b-ontology-sync
+        script: {PRODUCT_ROOT}/scripts/kg/validate.py
+      - gate: approval
+        name: phase-b-review
+
+  build:
+    doc: agents/actions/build.md
+    description: Implement all planned features with review, signoff, PM closeout, and tracker sync gates
+    prerequisites: [plan action completed, SOLUTION-PATTERNS.md exists]
+    steps:
+      - agent: architect
+        role: assembly-planning
+      - gate: self-review
+        name: assembly-plan-validation
+      - parallel:
+          - backend-developer
+          - frontend-developer
+          - ai-engineer              # conditional — see agent definition
+          - quality-engineer
+          - devops
+      - gate: self-review
+        name: implementation-validation
+      - agent: code-reviewer
+      - gate: approval
+        name: code-review
+      - agent: security
+      - gate: approval
+        name: security-review
+      - gate: signoff
+        name: build-signoff
+      - agent: product-manager
+        role: closeout
+      - gate: tracker-sync
+        name: build-closeout-sync
+
+  feature:
+    doc: agents/actions/feature.md
+    description: Build single vertical slice with review, signoff, PM closeout, and tracker sync
+    prerequisites: [plan action completed for this feature, SOLUTION-PATTERNS.md exists]
+    steps:
+      - agent: architect
+        role: feature-assembly-planning
+      - gate: self-review
+        name: assembly-plan-validation
+      - parallel:
+          - backend-developer
+          - frontend-developer
+          - ai-engineer              # conditional — see agent definition
+          - quality-engineer
+          - devops
+      - gate: self-review
+        name: implementation-validation
+      - parallel:
+          - code-reviewer
+          - security
+      - gate: approval
+        name: feature-review
+      - gate: signoff
+        name: feature-signoff
+      - agent: product-manager
+        role: closeout
+      - gate: tracker-sync
+        name: feature-closeout-sync
+
+  review:
+    doc: agents/actions/review.md
+    description: Code quality + security review with approval gate
+    prerequisites: [implementation completed, tests passing]
+    steps:
+      - parallel:
+          - code-reviewer
+          - security
+      - gate: approval
+        name: review-approval
+
+  validate:
+    doc: agents/actions/validate.md
+    description: Requirements + architecture alignment check (read-only)
+    prerequisites: [{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md exists]
+    steps:
+      - parallel:
+          - product-manager
+          - architect
+      - gate: self-review
+        name: report-quality
+      - gate: approval
+        name: validation-results
+
+  test:
+    doc: agents/actions/test.md
+    description: Comprehensive test suites — plan, implement, execute, report
+    prerequisites: [implementation code exists, test framework configured]
+    steps:
+      - agent: quality-engineer
+      - gate: self-review
+        name: test-quality
+      - gate: quality
+        name: coverage-and-pass-rate
+        thresholds:
+          unit_coverage_pct: 80
+          pass_rate_pct: 100
+
+  document:
+    doc: agents/actions/document.md
+    description: Generate technical documentation — API docs, READMEs, runbooks, guides
+    prerequisites: [implementation code exists, API endpoints stable]
+    steps:
+      - agent: technical-writer
+      - gate: self-review
+        name: documentation-quality
+      - gate: approval
+        name: documentation-review
+
+  blog:
+    doc: agents/actions/blog.md
+    description: Write dev logs, technical articles, decision posts
+    prerequisites: [something worth writing about]
+    steps:
+      - agent: blogger
+      - gate: self-review
+        name: content-quality
+      - gate: editorial
+        name: user-review
+
+# ═══════════════════════════════════════════════════════════════
+# BOUNDARY POLICY — cross-cutting enforcement rules
+# ═══════════════════════════════════════════════════════════════
+boundary:
+  doc: BOUNDARY-POLICY.md
+  rules:
+    - agents/ is generic and reusable — no solution-specific content
+    - {PRODUCT_ROOT}/planning-mds/ is solution-specific — no generic best practices
+    - agents must not invent requirements (PM owns scope)
+    - agents must not change architecture (Architect owns decisions)
+    - implementation agents write only to their layer ({PRODUCT_ROOT}/engine/ | {PRODUCT_ROOT}/experience/ | {PRODUCT_ROOT}/neuron/) + STATUS.md
+    - review agents (code-reviewer, security) produce reports, not code; write signoff provenance to STATUS.md
+    - STATUS.md is the shared progress/signoff artifact — all agents update their section only
+    - tracker-sync is mandatory before any action completion that changes features
+    - product-manager may seed only minimal feature/story ontology stubs; architect owns final shared-semantic bindings and canonical node updates
+    - planning changes that introduce or refine shared solution semantics must complete ontology-sync before plan action closeout
+    - feature and build actions must complete signoff before PM closeout, and PM closeout before final tracker-sync
+    - critical gate findings block approval — no override
+    - high findings require explicit user justification to proceed
+
+# ═══════════════════════════════════════════════════════════════
+# LIFECYCLE — project stage gates
+# ═══════════════════════════════════════════════════════════════
+lifecycle:
+  config: lifecycle-stage.yaml
+  gates:
+    - boundary_genericness: agents/scripts/validate-genericness.py
+    - skill_regression: agents/scripts/run-skill-regression.py
+    - knowledge_graph_sync: {PRODUCT_ROOT}/scripts/kg/validate.py
