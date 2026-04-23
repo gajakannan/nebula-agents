@@ -139,6 +139,7 @@ Run in this order:
    - Write user stories with clear acceptance criteria
    - Specify screen list and responsibilities
    - Map key workflows across screens
+   - Produce ASCII screen layouts in the PRD `## Screen Layouts (ASCII)` section whenever the feature introduces or materially modifies a user-visible screen or multi-step flow (Desktop + one narrow variant minimum). Skip only when the feature has no UI surface; record the reason in the section.
    - Seed a minimal feature mapping stub in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` for any new or materially changed feature in scope
 
 4. **Produce outputs:**
@@ -157,6 +158,7 @@ Run in this order:
    - [ ] Features listed with MVP prioritization
    - [ ] User stories have acceptance criteria
    - [ ] Screen responsibilities specified
+   - [ ] ASCII screen layouts present in `## Screen Layouts (ASCII)` for every UI-bearing feature (Desktop + narrow variant), or a written "No UI" justification if omitted
    - [ ] Minimal ontology stub exists for each touched feature (`id`, `path`, `status`, obvious dependencies/high-confidence affected nodes)
    - [ ] No invented business rules (all traced to user needs)
    - [ ] No TODOs remain in Section 3
@@ -396,6 +398,7 @@ Before Phase A approval, synchronize and validate planning trackers:
    - [ ] Features are well-scoped (not too big or too small)
    - [ ] User stories have testable acceptance criteria
    - [ ] Screen responsibilities are clear
+   - [ ] ASCII screen layouts present for UI-bearing features (Desktop + narrow variant) or "No UI" justified
    - [ ] No ambiguities or TODOs remain
    - [ ] Scope is realistic for MVP
    ```

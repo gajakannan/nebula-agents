@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 /mnt/c/Users/gajap/sandbox/nebula/nebula-agents/agents/scripts/validate_templates.py)",
+      "Bash(node scripts/check-theme-semantic-classes.mjs)"
+    ]
+  }
+}

@@ -64,6 +64,40 @@ List screens and key interactions this feature introduces or modifies.
 **Key Workflows:**
 1. [Workflow name] — [Brief description of steps]
 
+## Screen Layouts (ASCII)
+
+**Required when** this feature introduces or materially modifies a screen, a new zone/section, or a multi-step flow. Omit only for back-office / API-only features with no user-visible surface (state the reason explicitly, e.g. "No UI — integration job only").
+
+Provide one ASCII layout per screen introduced or changed. For multi-breakpoint screens (dashboard, list, detail), include at minimum a Desktop variant and one narrow variant (Mobile or iPad). For flows that span screens, add a simple step-to-step ASCII showing screen transitions.
+
+Conventions:
+- Use box-drawing characters (`┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ ─ │`) or `+ - |` — be consistent within a diagram.
+- Label zones/regions (e.g. `NUDGE ZONE`, `KPI BAND`, `TASK CARD`) so the architect and frontend engineer can map components.
+- Show primary controls (buttons, filters, tabs) inline in the diagram with `[Label]`.
+- Mark dynamic content with placeholders (e.g. `{count}`, `{status}`) rather than baking in fake data.
+- Annotate non-obvious interactions with footnotes below the diagram.
+
+### [Screen Name] — Desktop
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  [Header / nav]                                              │
+├─────────────────────────────────────────────────────────────┤
+│  [Zone / primary content]                                    │
+│  ...                                                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### [Screen Name] — Mobile / iPad
+
+```text
+┌──────────────────────┐
+│  [Stacked layout]    │
+└──────────────────────┘
+```
+
+Cross-reference: detailed per-screen specs (components, states, validation, accessibility) live in `{PRODUCT_ROOT}/planning-mds/screens/S-*.md`.
+
 ## Data Requirements
 
 **Core Entities:**

@@ -59,6 +59,93 @@ See [agents/actions/README.md](agents/actions/README.md) for the action catalogu
 
 ## Framework architecture
 
+The framework has two views: a **composition model** (how actions compose agents, and how agents read/write product planning artifacts) and a **consumption model** (how a product repo sits as a sibling to `nebula-agents/`).
+
+### Composition model
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Nebula Agent-Driven Builder Framework                    │
+│                Plan (Spec + Design) → Build → Verify → Ship                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ACTION FLOW (User-Facing Compositions)                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  init       │ Bootstrap project structure                                   │
+│  plan       │ Phase A (PM) → Phase B (Architect) [2 approval gates]         │
+│  build      │ Backend + Frontend + AI* + QA + DevOps → Review [2 gates]     │
+│  feature    │ Single vertical slice (Backend + Frontend + AI* + QA + DevOps)│
+│  review     │ Code Reviewer + Security [1 gate]                             │
+│  validate   │ Architect + PM validation (read-only)                         │
+│  test       │ Quality Engineer testing workflow                             │
+│  document   │ Technical Writer documentation                                │
+│  blog       │ Blogger dev logs & articles                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+* AI Engineer runs when stories include AI/LLM/MCP scope. Architect owns implementation orchestration.
+                                        ↓
+                              Actions compose Agents
+                                        ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  AGENTS (Role-Based Specialists) — 11 Agents                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Planning Phase (Phase A-B)                                                 │
+│  ├─ product-manager    │ Requirements, stories, acceptance criteria         │
+│  └─ architect          │ Design, data model, API contracts, patterns        │
+│                                                                             │
+│  Implementation Phase (Phase C)                                             │
+│  ├─ backend-developer  │ Backend APIs, domain logic                         │
+│  ├─ frontend-developer │ UI components, forms, client state                 │
+│  ├─ ai-engineer        │ LLMs, agents, MCP, AI workflows                    │
+│  ├─ quality-engineer   │ Unit, integration, E2E tests                       │
+│  └─ devops             │ Containers, compose, deployment                    │
+│                                                                             │
+│  Quality & Documentation                                                    │
+│  ├─ code-reviewer      │ Code quality, standards, patterns                  │
+│  ├─ security           │ OWASP, auth/authz, vulnerabilities                 │
+│  ├─ technical-writer   │ API docs, README, runbooks                         │
+│  └─ blogger            │ Dev logs, technical articles                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                        Agents read from & write to
+                                        ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PRODUCT PLANNING ARTIFACTS  ({PRODUCT_ROOT}/planning-mds/)                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Single Source of Truth                                                     │
+│  └─ BLUEPRINT.md       │ Master product specification                       │
+│                                                                             │
+│  Domain Knowledge                                                           │
+│  └─ domain/            │ Glossary, competitive analysis                     │
+│                                                                             │
+│  Architecture                                                               │
+│  ├─ architecture/                                                           │
+│  │  ├─ SOLUTION-PATTERNS.md  │ Product-specific patterns                    │
+│  │  ├─ decisions/            │ ADRs                                         │
+│  │  └─ ...                   │ Data model, testing strategy, patterns       │
+│                                                                             │
+│  API Contracts                                                              │
+│  └─ api/               │ OpenAPI specifications (*.yaml)                    │
+│                                                                             │
+│  Examples & Artifacts                                                       │
+│  ├─ examples/          │ Personas, features, stories, screens               │
+│  ├─ security/          │ Threat models, security reviews                    │
+│  └─ ...                                                                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+─────────────────────────────────────────────────────────────────────────────
+
+  9 Actions · 11 Agents · 1 Source of Truth (BLUEPRINT.md, per product)
+```
+
+### Consumption model
+
 ```
 ┌────────────────────────────────────────────────┐
 │          nebula-agents (this repo)             │

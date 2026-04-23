@@ -115,6 +115,7 @@ When any prioritization framework is used, include:
 4) **Screens & Workflows**
 - Define screen list and purposes
 - Map key workflows across screens
+- Include ASCII screen layouts in the PRD's `## Screen Layouts (ASCII)` section whenever the feature introduces or materially modifies a user-visible screen, zone, or multi-step flow. Provide at minimum a Desktop variant plus one narrow variant (Mobile or iPad) for responsive screens. Omit only for features with no UI surface, and state the reason explicitly (e.g. "No UI — integration job only").
 
 5) **Validation**
 - Ensure requirements trace to user needs
@@ -318,7 +319,7 @@ Before declaring work complete, verify deliverables:
 - [ ] Vision + non-goals documented
 - [ ] Personas defined
 - [ ] Features/stories written with acceptance criteria
-- [ ] Screens specified
+- [ ] Screens specified (with ASCII layouts in PRD `## Screen Layouts (ASCII)` for UI-bearing features, or explicit "No UI" justification)
 - [ ] REGISTRY/ROADMAP/STORY-INDEX/BLUEPRINT are in sync
 - [ ] Completed feature moved to `{PRODUCT_ROOT}/planning-mds/features/archive/` and links updated
 - [ ] Post-session knowledge capture completed (non-obvious decisions and gotchas saved to KG notes, feature docs, or STATUS.md)

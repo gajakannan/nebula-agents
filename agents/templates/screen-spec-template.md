@@ -20,6 +20,31 @@ Use this template to describe UI screens in a domain-neutral way. Project-specif
 - **Primary Users:** [Persona(s)]
 - **Goal:** [What user accomplishes here]
 
+## Layout (ASCII)
+
+Provide an ASCII wireframe showing regions, primary controls, and content zones. Required for every screen spec. Use box-drawing characters (`┌ ┐ └ ┘ ├ ┤ ─ │`) or `+ - |` consistently. Label each zone so engineers can map to components.
+
+### Desktop
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  [Header]                                                    │
+├─────────────────────────────────────────────────────────────┤
+│  [Primary region]                      [Secondary region]   │
+│  ...                                                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Mobile / Narrow
+
+```text
+┌──────────────────────┐
+│  [Stacked layout]    │
+└──────────────────────┘
+```
+
+Add footnotes below the diagram for any non-obvious interaction (e.g. sticky headers, collapse behavior, modal overlays).
+
 ## Primary Data
 
 - [Field 1]
