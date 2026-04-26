@@ -1,7 +1,7 @@
 # Blogging Best Practices
 
 Generic craft guide for technical blog posts and amplification content.
-For publication-specific voice, domain, and channel configuration, see `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md` when a product publication profile exists.
+For publication-specific voice, domain, and channel configuration, see `../nebula-blog/publication-profile.md` when a product publication profile exists.
 
 ---
 
@@ -109,7 +109,7 @@ Channel derivatives are not summaries. They are translations.
 
 **dev.to**: Technical depth is welcome. This is the closest to the primary post in tone. Always set the canonical URL to the primary to avoid duplicate content issues with search engines.
 
-**Bluesky / X / Twitter thread**: Each post must stand alone. If post 3 requires post 2 to make sense, split or rewrite. The hook post is the most important — it determines whether anyone reads the thread. Platform-specific tone, link placement, and hashtag rules are defined in `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md` when a product publication profile exists.
+**Bluesky / X / Twitter thread**: Each post must stand alone. If post 3 requires post 2 to make sense, split or rewrite. The hook post is the most important — it determines whether anyone reads the thread. Platform-specific tone, link placement, and hashtag rules are defined in `../nebula-blog/publication-profile.md` when a product publication profile exists.
 
 ---
 

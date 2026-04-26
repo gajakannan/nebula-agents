@@ -24,7 +24,7 @@ Your job operates in two phases:
 
 You do not invent accomplishments or metrics. You write from evidence in code, planning artifacts, decisions, and release outputs.
 
-If a `publication-profile.md` is present at `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md`, load it before writing. It overrides generic defaults for voice, domain, audience, and channel configuration.
+If a `publication-profile.md` is present at `../nebula-blog/publication-profile.md`, load it before writing. It overrides generic defaults for voice, domain, audience, and channel configuration.
 
 Series planning, draft posts, and amplification artifacts belong in the private companion repo at `../nebula-blog/` by default. Use this public repo for source material and publication guidance; use the private repo for editorial state and generated content.
 
@@ -77,6 +77,7 @@ Series planning, draft posts, and amplification artifacts belong in the private 
 | Area | Freedom | Guidance |
 |------|---------|----------|
 | Factual accuracy | **Low** | All assertions must map to evidence in repo artifacts. Never fabricate metrics. |
+| Content length | **Medium** | Favor depth over brevity, but use judgment based on content and reader value. |
 | Sensitive data handling | **Low** | Never publish secrets, credentials, customer data, or exploit details. Zero tolerance. |
 | Post type selection | **Medium** | Match post type to evidence available and user intent. Suggest alternatives if mismatch. |
 | Narrative structure | **Medium** | Follow recommended default structure but adapt to content type and story arc. |
@@ -114,7 +115,7 @@ Before drafting, gather:
 Optional context:
 - `agents/actions/blog.md`
 - `agents/blogger/references/blogging-best-practices.md`
-- `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md` ← loads voice, domain, audience, and channel config
+- `../nebula-blog/publication-profile.md` ← loads voice, domain, audience, and channel config
 
 ### Content Types
 
@@ -441,7 +442,7 @@ When uncertain:
 ```bash
 # 1) Read role, profile, and action guidance
 cat agents/blogger/SKILL.md
-cat {PRODUCT_ROOT}/planning-mds/examples/publication-profile.md   # if present
+cat ../nebula-blog/publication-profile.md   # if present
 cat agents/actions/blog.md
 
 # 2) Gather planning and decision context
@@ -489,4 +490,4 @@ rg --files ../nebula-blog planning-mds agents | sort
 - `agents/actions/blog.md`
 - `agents/actions/document.md`
 - `agents/blogger/references/blogging-best-practices.md`
-- `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md` ← owner-specific, not committed in forks without replacement
+- `../nebula-blog/publication-profile.md` ← owner-specific, not committed in forks without replacement

@@ -40,7 +40,7 @@ Blog Complete
 Load these before the discovery conversation begins:
 
 1. `agents/blogger/SKILL.md` — agent capabilities, two-phase model, quality gates
-2. `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md` — voice, domain, audience, channel config (optional product override)
+2. `../nebula-blog/publication-profile.md` — voice, domain, audience, channel config (optional product override)
 3. `../nebula-blog/SERIES-PLAN.md` — full series roadmap, published posts, planned posts
 4. `agents/blogger/references/blogging-best-practices.md` — craft reference
 
@@ -262,6 +262,6 @@ Remind the user to update `../nebula-blog/SERIES-PLAN.md` with the post status a
 ## Related Files
 
 - `agents/blogger/SKILL.md`
-- `{PRODUCT_ROOT}/planning-mds/examples/publication-profile.md`
+- `../nebula-blog/publication-profile.md`
 - `agents/blogger/references/blogging-best-practices.md`
 - `../nebula-blog/SERIES-PLAN.md`
