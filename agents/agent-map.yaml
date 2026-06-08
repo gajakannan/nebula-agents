@@ -66,12 +66,17 @@ agents:
     reads:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
       - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/context-map.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/communication-topology.md
+      - {PRODUCT_ROOT}/planning-mds/architecture/saga-designs.md
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
       - {PRODUCT_ROOT}/planning-mds/api/*.yaml
       - {PRODUCT_ROOT}/planning-mds/schemas/**
       - {PRODUCT_ROOT}/planning-mds/features/**
+      - {PRODUCT_ROOT}/services/**
     writes:
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md          # backend progress, validation evidence
       - {PRODUCT_ROOT}/planning-mds/features/**/GETTING-STARTED.md  # key files, seed data, verification steps
 
@@ -112,10 +117,12 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
       - {PRODUCT_ROOT}/planning-mds/features/**
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
       - {PRODUCT_ROOT}/neuron/**
     writes:
       - {PRODUCT_ROOT}/engine/tests/**
+      - {PRODUCT_ROOT}/services/**/tests/**
       - {PRODUCT_ROOT}/experience/tests/**
       - {PRODUCT_ROOT}/neuron/tests/**
       - {PRODUCT_ROOT}/planning-mds/features/**/STATUS.md # QE signoff, validation evidence
@@ -128,6 +135,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/architecture/**
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
       - {PRODUCT_ROOT}/neuron/**
       - agents/devops/references/**
@@ -150,6 +158,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/features/**
       - agents/frontend-developer/references/ux-audit-ruleset.md
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
       - {PRODUCT_ROOT}/neuron/**
     writes:
@@ -164,6 +173,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/security/**
       - agents/security/references/**
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
       - {PRODUCT_ROOT}/neuron/**
     writes:
@@ -177,6 +187,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/architecture/**
       - {PRODUCT_ROOT}/planning-mds/api/**
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
     writes:
       - docs/**
@@ -189,6 +200,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/architecture/decisions/**
       - {PRODUCT_ROOT}/planning-mds/features/**
       - {PRODUCT_ROOT}/engine/**
+      - {PRODUCT_ROOT}/services/**
       - {PRODUCT_ROOT}/experience/**
     writes:
       - docs/blog/**

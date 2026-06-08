@@ -72,6 +72,14 @@ local prompt-loading router. When it exists:
   through exact-file, KG, changed-path, manifest, or explicit-user routing.
 - Run the product validator when available, usually
   `python3 {PRODUCT_ROOT}/scripts/validate-context-map.py`.
+After `.agentignore`, check for `{PRODUCT_ROOT}/planning-mds/context-map.yaml`.
+When present, use it as the product-local prompt-loading strategy: load default
+layers first, prefer target feature files, KG lookup/hint output, and exact
+changed files, and treat archives, historical evidence, full source trees,
+full specs/schemas, screenshots, logs, and generated artifacts as on-demand.
+Exact-file access remains allowed for audit, validation, closeout, failure
+triage, security review, changed-path routing, KG routing, exact contract
+checks, and explicit user requests. See `agents/docs/PRODUCT-CONTEXT-MAP.md`.
 
 ### What `{PRODUCT_ROOT}` prefixes
 
