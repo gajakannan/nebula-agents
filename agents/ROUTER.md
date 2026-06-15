@@ -16,10 +16,6 @@ when the full reference corpus is explicitly requested.
 4. If no row matches, load nothing — the SKILL.md and solution-specific
    artifacts in `{PRODUCT_ROOT}/planning-mds/` are usually sufficient.
 
-When `{PRODUCT_ROOT}/planning-mds/context-map.yaml` exists, load it immediately
-after `{PRODUCT_ROOT}/.agentignore` and follow its default/on-demand layering
-before broad product reads. See `agents/docs/PRODUCT-CONTEXT-MAP.md`.
-
 ---
 
 ## Architect (expanded reference set → ~500–1,000 per task)
@@ -85,21 +81,14 @@ All paths relative to `agents/product-manager/`.
 
 All paths relative to `agents/devops/`.
 
-## Backend Developer (dual-stack references → ~400-900 per task)
+## Backend Developer (701 lines → ~665 per task)
 
 | Task | References to Load |
 |------|--------------------|
-| Clean architecture (both stacks) | `references/clean-architecture-guide.md` |
-| .NET implementation | `references/dotnet-best-practices.md` |
-| EF Core / database (.NET) | `references/ef-core-patterns.md` |
-| Python / FastAPI implementation | `references/fastapi-best-practices.md` |
-| SQLAlchemy / Alembic (Python) | `references/sqlalchemy-patterns.md` |
-| Enterprise microservices (both stacks) | `references/enterprise-patterns.md` |
-| Code patterns (dual-stack examples) | `references/code-patterns.md` |
-
-Loading rules: always load clean architecture and enterprise patterns. Load
-stack-specific references based on `SOLUTION-PATTERNS.md`. Load code patterns
-for implementation examples.
+| Domain entities, services, endpoints | `references/code-patterns.md` |
+| Clean architecture patterns | `references/clean-architecture-guide.md` |
+| .NET best practices | `references/dotnet-best-practices.md` |
+| EF Core, database patterns | `references/ef-core-patterns.md` |
 
 All paths relative to `agents/backend-developer/`.
 

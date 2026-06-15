@@ -1,708 +1,665 @@
-# Code Patterns (Dual-Stack Reference)
+# Backend Developer Code Patterns
 
-Use these examples as implementation shapes, not as requirements. The active
-stack comes from `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`.
-Keep domain examples generic: customers, orders, and products only.
+Reference patterns extracted from the main SKILL.md for detailed implementation guidance.
 
-## 1. Domain Entity
+## Best Practices
 
-### Python
+### Domain Entity with Audit Fields
+```csharp
+using System;
 
-```python
-from __future__ import annotations
+namespace MyApp.Domain.Entities;
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from decimal import Decimal
-from uuid import UUID, uuid4
+public class Customer
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public CustomerStatus Status { get; set; }
 
+    // Audit fields (required on all entities)
+    public DateTime CreatedAt { get; set; }
+    public Guid CreatedBy { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public Guid UpdatedBy { get; set; }
 
-class DomainError(Exception):
-    pass
+    // Soft delete (required on all entities)
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
 
+    // Business logic
+    public void Activate()
+    {
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot activate deleted customer");
 
-@dataclass(frozen=True)
-class OrderSubmitted:
-    aggregate_id: UUID
-    total: Decimal
-    occurred_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+        Status = CustomerStatus.Active;
+    }
+}
 
-
-@dataclass
-class Order:
-    """Aggregate root. Domain code has no FastAPI or SQLAlchemy imports."""
-
-    customer_id: UUID
-    id: UUID = field(default_factory=uuid4)
-    status: str = "draft"
-    total: Decimal = Decimal("0.00")
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime | None = None
-    version: int = 0
-
-    def add_item(self, product_id: UUID, quantity: int, unit_price: Decimal) -> None:
-        if quantity <= 0:
-            raise DomainError("Quantity must be positive")
-        self.total += unit_price * quantity
-        self.updated_at = datetime.now(timezone.utc)
-
-    def submit(self) -> list[OrderSubmitted]:
-        if self.status != "draft":
-            raise DomainError("Only draft orders can be submitted")
-        if self.total <= Decimal("0.00"):
-            raise DomainError("Cannot submit empty order")
-        self.status = "submitted"
-        self.updated_at = datetime.now(timezone.utc)
-        self.version += 1
-        return [OrderSubmitted(aggregate_id=self.id, total=self.total)]
+public enum CustomerStatus
+{
+    Active,
+    Inactive
+}
 ```
 
-### .NET
-
+### JSON Schema Validation with NJsonSchema
 ```csharp
-public sealed class Order : BaseEntity
+using NJsonSchema;
+using NJsonSchema.Validation;
+using Microsoft.AspNetCore.Mvc;
+
+namespace MyApp.Api.Endpoints;
+
+public static class CustomerEndpoints
 {
-    private readonly List<LineItem> _lineItems = new();
+    // Load schema from shared location
+    private static readonly JsonSchema CustomerSchema =
+        JsonSchema.FromFileAsync("../../planning-mds/schemas/customer.schema.json").Result;
 
-    public Guid CustomerId { get; private set; }
-    public OrderStatus Status { get; private set; } = OrderStatus.Draft;
-    public decimal Total { get; private set; }
-    public int Version { get; private set; }
-    public IReadOnlyList<LineItem> LineItems => _lineItems.AsReadOnly();
-
-    private Order() { }
-
-    public Order(Guid customerId)
+    public static void MapCustomerEndpoints(this WebApplication app)
     {
-        CustomerId = customerId;
+        app.MapPost("/api/customers", CreateCustomer)
+            .RequireAuthorization();
     }
 
-    public void AddItem(Guid productId, int quantity, decimal unitPrice)
+    private static async Task<IResult> CreateCustomer(
+        CreateCustomerDto dto,
+        ICustomerService customerService,
+        IAuthorizationService authz,
+        HttpContext context)
     {
-        if (quantity <= 0)
-            throw new DomainException("Quantity must be positive");
+        // 1. Validate against JSON Schema
+        var validator = new JsonSchemaValidator();
+        var validationResult = validator.Validate(
+            System.Text.Json.JsonSerializer.Serialize(dto),
+            CustomerSchema);
 
-        _lineItems.Add(new LineItem(productId, quantity, unitPrice));
-        Total += quantity * unitPrice;
-    }
+        if (validationResult.Count > 0)
+        {
+            // Return RFC 7807 ProblemDetails
+            var errors = validationResult
+                .Select(e => new { Field = e.Path, Error = e.ToString() })
+                .ToList();
 
-    public IReadOnlyList<DomainEvent> Submit()
-    {
-        if (Status != OrderStatus.Draft)
-            throw new DomainException("Only draft orders can be submitted");
-        if (Total <= 0)
-            throw new DomainException("Cannot submit empty order");
+            return Results.ValidationProblem(
+                errors.ToDictionary(e => e.Field, e => new[] { e.Error }));
+        }
 
-        Status = OrderStatus.Submitted;
-        Version += 1;
-        return new[] { new OrderSubmitted(Id, Total) };
+        // 2. Authorize
+        if (!await authz.CanCreate(context.User, "customer"))
+        {
+            return Results.Problem(
+                statusCode: 403,
+                title: "Forbidden",
+                detail: "You do not have permission to create customers");
+        }
+
+        // 3. Create customer
+        var customer = await customerService.CreateAsync(dto);
+
+        // 4. Return 201 Created
+        return Results.Created($"/api/customers/{customer.Id}", customer);
     }
 }
 ```
 
-## 2. Command Handler
-
-### Python
-
-```python
-from dataclasses import dataclass
-from decimal import Decimal
-from uuid import UUID
-
-
-@dataclass(frozen=True)
-class CreateOrderCommand:
-    customer_id: UUID
-    items: list[LineItemInput]
-
-
-@dataclass(frozen=True)
-class LineItemInput:
-    product_id: UUID
-    quantity: int
-    unit_price: Decimal
-
-
-class CreateOrderHandler:
-    def __init__(self, unit_of_work: UnitOfWork, outbox: OutboxPublisher):
-        self._unit_of_work = unit_of_work
-        self._outbox = outbox
-
-    async def execute(self, command: CreateOrderCommand) -> UUID:
-        order = Order(customer_id=command.customer_id)
-        for item in command.items:
-            order.add_item(item.product_id, item.quantity, item.unit_price)
-
-        events = order.submit()
-        async with self._unit_of_work as uow:
-            await uow.orders.save(order)
-            await self._outbox.stage(uow.session, events)
-            await uow.commit()
-        return order.id
-```
-
-### .NET
-
+### Alternative: Validation Attribute
 ```csharp
-public sealed record CreateOrderCommand(Guid CustomerId, IReadOnlyList<LineItemDto> Items);
+using NJsonSchema;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
-public sealed class CreateOrderHandler : IRequestHandler<CreateOrderCommand, Guid>
+// Custom validation attribute
+public class ValidateJsonSchemaAttribute : ActionFilterAttribute
 {
-    private readonly IOrderRepository _orders;
-    private readonly IOutboxPublisher _outbox;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly string _schemaPath;
 
-    public CreateOrderHandler(
-        IOrderRepository orders,
-        IOutboxPublisher outbox,
-        IUnitOfWork unitOfWork)
+    public ValidateJsonSchemaAttribute(string schemaPath)
     {
-        _orders = orders;
-        _outbox = outbox;
-        _unitOfWork = unitOfWork;
+        _schemaPath = schemaPath;
     }
 
-    public async Task<Guid> Handle(CreateOrderCommand command, CancellationToken ct)
+    public override async Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next)
     {
-        var order = new Order(command.CustomerId);
-        foreach (var item in command.Items)
-            order.AddItem(item.ProductId, item.Quantity, item.UnitPrice);
+        var schema = await JsonSchema.FromFileAsync(_schemaPath);
+        var validator = new JsonSchemaValidator();
 
-        var events = order.Submit();
-        await _orders.SaveAsync(order, ct);
-        await _outbox.StageAsync(events, ct);
-        await _unitOfWork.CommitAsync(ct);
-        return order.Id;
+        // Get request body
+        var body = context.ActionArguments.Values.FirstOrDefault();
+        var json = System.Text.Json.JsonSerializer.Serialize(body);
+
+        var errors = validator.Validate(json, schema);
+        if (errors.Count > 0)
+        {
+            context.Result = new BadRequestObjectResult(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Validation failed",
+                Detail = string.Join(", ", errors.Select(e => e.ToString()))
+            });
+            return;
+        }
+
+        await next();
+    }
+}
+
+// Usage
+[HttpPost]
+[ValidateJsonSchema("schemas/customer.schema.json")]
+public async Task<IActionResult> CreateCustomer(CreateCustomerDto dto)
+{
+    // Validation already done by attribute
+    // ...
+}
+```
+
+### EF Core Configuration with Audit Fields
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MyApp.Domain.Entities;
+
+namespace MyApp.Infrastructure.Persistence.Configurations;
+
+public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
+{
+    public void Configure(EntityTypeBuilder<Customer> builder)
+    {
+        builder.ToTable("Customers");
+
+        builder.HasKey(b => b.Id);
+
+        builder.Property(b => b.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(b => b.Email)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.Property(b => b.Phone)
+            .HasMaxLength(20);
+
+        // Audit fields
+        builder.Property(b => b.CreatedAt)
+            .IsRequired();
+
+        builder.Property(b => b.CreatedBy)
+            .IsRequired();
+
+        builder.Property(b => b.UpdatedAt)
+            .IsRequired();
+
+        builder.Property(b => b.UpdatedBy)
+            .IsRequired();
+
+        // Soft delete
+        builder.Property(b => b.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.HasQueryFilter(b => !b.IsDeleted); // Global query filter
+
+        // Indexes
+        builder.HasIndex(b => b.Email);
+        builder.HasIndex(b => b.IsDeleted);
     }
 }
 ```
 
-## 3. Repository
-
-### Python
-
-```python
-from typing import Protocol
-from uuid import UUID
-
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-
-class OrderRepository(Protocol):
-    async def get(self, order_id: UUID) -> Order | None:
-        ...
-
-    async def save(self, order: Order) -> None:
-        ...
-
-
-class SqlAlchemyOrderRepository:
-    def __init__(self, session: AsyncSession):
-        self._session = session
-
-    async def get(self, order_id: UUID) -> Order | None:
-        result = await self._session.execute(
-            select(OrderModel).where(OrderModel.id == order_id)
-        )
-        model = result.scalar_one_or_none()
-        return model.to_domain() if model is not None else None
-
-    async def save(self, order: Order) -> None:
-        model = OrderModel.from_domain(order)
-        await self._session.merge(model)
-        await self._session.flush()
-```
-
-### .NET
-
+## Repository Pattern
 ```csharp
-public interface IOrderRepository
+// Application layer - Interface
+namespace MyApp.Application.Interfaces;
+
+public interface ICustomerRepository
 {
-    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    Task SaveAsync(Order order, CancellationToken ct = default);
+    Task<Customer?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IEnumerable<Customer>> ListAsync(CancellationToken ct = default);
+    Task<Customer> AddAsync(Customer customer, CancellationToken ct = default);
+    Task UpdateAsync(Customer customer, CancellationToken ct = default);
+    Task DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
-public sealed class OrderRepository : IOrderRepository
+// Infrastructure layer - Implementation
+namespace MyApp.Infrastructure.Persistence.Repositories;
+
+public class CustomerRepository : ICustomerRepository
 {
     private readonly AppDbContext _context;
 
-    public OrderRepository(AppDbContext context)
+    public CustomerRepository(AppDbContext context)
     {
         _context = context;
     }
 
-    public Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => _context.Orders
-            .Include(order => order.LineItems)
-            .FirstOrDefaultAsync(order => order.Id == id, ct);
-
-    public async Task SaveAsync(Order order, CancellationToken ct = default)
+    public async Task<Customer?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        _context.Orders.Update(order);
+        return await _context.Customers
+            .FirstOrDefaultAsync(b => b.Id == id, ct);
+    }
+
+    public async Task<IEnumerable<Customer>> ListAsync(CancellationToken ct = default)
+    {
+        return await _context.Customers
+            .OrderBy(b => b.Name)
+            .ToListAsync(ct);
+    }
+
+    public async Task<Customer> AddAsync(Customer customer, CancellationToken ct = default)
+    {
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync(ct);
+        return customer;
+    }
+
+    public async Task UpdateAsync(Customer customer, CancellationToken ct = default)
+    {
+        _context.Customers.Update(customer);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var customer = await GetByIdAsync(id, ct);
+        if (customer != null)
+        {
+            customer.IsDeleted = true;
+            customer.DeletedAt = DateTime.UtcNow;
+            // DeletedBy set by SaveChanges interceptor
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+}
+```
+
+## Audit Interceptor (Auto-set Audit Fields)
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
+namespace MyApp.Infrastructure.Persistence;
+
+public class AuditInterceptor : SaveChangesInterceptor
+{
+    private readonly ICurrentUserService _currentUser;
+
+    public AuditInterceptor(ICurrentUserService currentUser)
+    {
+        _currentUser = currentUser;
+    }
+
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData,
+        InterceptionResult<int> result)
+    {
+        UpdateAuditFields(eventData.Context);
+        return base.SavingChanges(eventData, result);
+    }
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken ct = default)
+    {
+        UpdateAuditFields(eventData.Context);
+        return base.SavingChangesAsync(eventData, result, ct);
+    }
+
+    private void UpdateAuditFields(DbContext? context)
+    {
+        if (context == null) return;
+
+        var userId = _currentUser.UserId;
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in context.ChangeTracker.Entries())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Property("CreatedAt").CurrentValue = now;
+                entry.Property("CreatedBy").CurrentValue = userId;
+                entry.Property("UpdatedAt").CurrentValue = now;
+                entry.Property("UpdatedBy").CurrentValue = userId;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Property("UpdatedAt").CurrentValue = now;
+                entry.Property("UpdatedBy").CurrentValue = userId;
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                // Soft delete
+                entry.State = EntityState.Modified;
+                entry.Property("IsDeleted").CurrentValue = true;
+                entry.Property("DeletedAt").CurrentValue = now;
+                entry.Property("DeletedBy").CurrentValue = userId;
+            }
+        }
+    }
+}
+```
+
+## Timeline Service (Create Audit Events)
+```csharp
+namespace MyApp.Infrastructure.Services;
+
+public class TimelineService : ITimelineService
+{
+    private readonly AppDbContext _context;
+    private readonly ICurrentUserService _currentUser;
+
+    public TimelineService(AppDbContext context, ICurrentUserService currentUser)
+    {
+        _context = context;
+        _currentUser = currentUser;
+    }
+
+    public async Task CreateEventAsync(
+        string entityType,
+        Guid entityId,
+        string eventType,
+        string description,
+        object? metadata = null,
+        CancellationToken ct = default)
+    {
+        var timelineEvent = new ActivityTimelineEvent
+        {
+            Id = Guid.NewGuid(),
+            EntityType = entityType,
+            EntityId = entityId,
+            EventType = eventType,
+            Description = description,
+            PerformedBy = _currentUser.UserId,
+            PerformedAt = DateTime.UtcNow,
+            Metadata = metadata != null
+                ? System.Text.Json.JsonSerializer.Serialize(metadata)
+                : null
+        };
+
+        _context.ActivityTimelineEvents.Add(timelineEvent);
         await _context.SaveChangesAsync(ct);
     }
 }
-```
 
-## 4. API Endpoint
-
-### Python
-
-```python
-from uuid import UUID
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict
-
-router = APIRouter(prefix="/api/v1/orders", tags=["orders"])
-
-
-class LineItemDto(BaseModel):
-    product_id: UUID
-    quantity: int
-    unit_price: str
-
-
-class CreateOrderRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    customer_id: UUID
-    items: list[LineItemDto]
-
-
-class CreateOrderResponse(BaseModel):
-    id: UUID
-    status: str
-
-
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=CreateOrderResponse)
-async def create_order(
-    request: CreateOrderRequest,
-    handler: CreateOrderHandler = Depends(get_create_order_handler),
-    user: AuthUser = Depends(get_current_user),
-    enforcer: CasbinEnforcer = Depends(get_enforcer),
-) -> CreateOrderResponse:
-    allowed = enforcer.enforce(user.subject, "orders", "create", {"tenant": user.tenant_id})
-    if not allowed:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-
-    command = CreateOrderCommand(
-        customer_id=request.customer_id,
-        items=[
-            LineItemInput(item.product_id, item.quantity, Decimal(item.unit_price))
-            for item in request.items
-        ],
-    )
-    order_id = await handler.execute(command)
-    return CreateOrderResponse(id=order_id, status="submitted")
-```
-
-### .NET
-
-```csharp
-public static class OrderEndpoints
+// Usage in service
+public async Task<Customer> UpdateCustomerAsync(Guid id, UpdateCustomerDto dto)
 {
-    public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
-    {
-        app.MapPost("/api/v1/orders", CreateOrder)
-            .RequireAuthorization();
-        return app;
-    }
+    var customer = await _repository.GetByIdAsync(id);
+    if (customer == null)
+        throw new NotFoundException("Customer not found");
 
-    private static async Task<IResult> CreateOrder(
-        CreateOrderRequest request,
-        IRequestHandler<CreateOrderCommand, Guid> handler,
-        ICasbinEnforcer enforcer,
-        HttpContext context,
-        CancellationToken ct)
-    {
-        var subject = context.User.FindFirst("sub")?.Value ?? string.Empty;
-        if (!enforcer.Enforce(subject, "orders", "create"))
-            return Results.Forbid();
+    customer.Name = dto.Name;
+    customer.Email = dto.Email;
 
-        var orderId = await handler.Handle(
-            new CreateOrderCommand(request.CustomerId, request.Items),
-            ct);
+    await _repository.UpdateAsync(customer);
 
-        return Results.Created($"/api/v1/orders/{orderId}", new { id = orderId });
-    }
+    // Create timeline event (required!)
+    await _timelineService.CreateEventAsync(
+        entityType: "Customer",
+        entityId: id,
+        eventType: "CustomerUpdated",
+        description: $"Customer {customer.Name} updated",
+        metadata: new { Changes = dto });
+
+    return customer;
 }
 ```
 
-## 5. Transactional Outbox
-
-### Python
-
-```python
-from datetime import datetime, timezone
-from uuid import UUID, uuid4
-
-from sqlalchemy import Boolean, DateTime, String, Text
-from sqlalchemy.dialects.postgresql import UUID as PgUuid
-from sqlalchemy.orm import Mapped, mapped_column
-
-
-class OutboxMessage(Base):
-    __tablename__ = "outbox_messages"
-
-    id: Mapped[UUID] = mapped_column(PgUuid(as_uuid=True), primary_key=True, default=uuid4)
-    aggregate_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    aggregate_id: Mapped[str] = mapped_column(String(100), nullable=False)
-    event_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    payload: Mapped[str] = mapped_column(Text, nullable=False)
-    occurred_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-    published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-
-
-class OutboxPublisher:
-    async def stage(self, session: AsyncSession, events: list[DomainEvent]) -> None:
-        for event in events:
-            session.add(
-                OutboxMessage(
-                    aggregate_type=event.aggregate_type,
-                    aggregate_id=str(event.aggregate_id),
-                    event_type=event.event_type,
-                    payload=event.to_json(),
-                )
-            )
-```
-
-### .NET
-
+## Authorization with Casbin
 ```csharp
-public sealed class OutboxMessage
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string AggregateType { get; set; } = string.Empty;
-    public string AggregateId { get; set; } = string.Empty;
-    public string EventType { get; set; } = string.Empty;
-    public string Payload { get; set; } = string.Empty;
-    public DateTime OccurredAt { get; set; } = DateTime.UtcNow;
-    public bool Published { get; set; }
-}
+using Casbin;
+using Casbin.AspNetCore.Authorization;
 
-public sealed class OutboxPublisher : IOutboxPublisher
-{
-    private readonly AppDbContext _context;
+namespace MyApp.Infrastructure.Services;
 
-    public OutboxPublisher(AppDbContext context)
+public class AuthorizationService : IAuthorizationService
+{
+    private readonly IEnforcer _enforcer;
+
+    public AuthorizationService(IEnforcer enforcer)
     {
-        _context = context;
+        _enforcer = enforcer;
     }
 
-    public Task StageAsync(IEnumerable<DomainEvent> events, CancellationToken ct)
+    public async Task<bool> CanCreate(ClaimsPrincipal user, string resource)
     {
-        foreach (var evt in events)
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value);
+
+        // Check ABAC policy
+        foreach (var role in roles)
         {
-            _context.OutboxMessages.Add(new OutboxMessage
-            {
-                AggregateType = evt.AggregateType,
-                AggregateId = evt.AggregateId.ToString(),
-                EventType = evt.EventType,
-                Payload = JsonSerializer.Serialize(evt),
-            });
+            if (await _enforcer.EnforceAsync(role, resource, "create"))
+                return true;
         }
 
-        return Task.CompletedTask;
+        return false;
+    }
+
+    public async Task<bool> CanRead(ClaimsPrincipal user, object entity)
+    {
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value);
+
+        // Check attribute-based rules
+        // Example: Can only read if entity is in user's region
+
+        return true; // Implement based on ABAC rules
+    }
+}
+
+// Casbin policy file (conf/policy.csv)
+// p, admin, customer, create
+// p, admin, customer, read
+// p, admin, customer, update
+// p, admin, customer, delete
+// p, user, customer, read
+```
+
+## Common Patterns
+
+### CRUD Service Pattern
+```csharp
+public class CustomerService : ICustomerService
+{
+    private readonly ICustomerRepository _repository;
+    private readonly ITimelineService _timeline;
+    private readonly IAuthorizationService _authz;
+
+    public async Task<Customer> CreateAsync(CreateCustomerDto dto)
+    {
+        var customer = new Customer
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Email = dto.Email,
+            Phone = dto.Phone,
+            Status = CustomerStatus.Active
+            // Audit fields set by interceptor
+        };
+
+        await _repository.AddAsync(customer);
+
+        await _timeline.CreateEventAsync(
+            "Customer", customer.Id, "CustomerCreated",
+            $"Customer {customer.Name} created");
+
+        return customer;
     }
 }
 ```
 
-## 6. Resilient External Call
-
-### Python
-
-```python
-import httpx
-from circuitbreaker import circuit
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
-
-
-class ProductClient:
-    def __init__(self, base_url: str):
-        self._client = httpx.AsyncClient(base_url=base_url, timeout=5.0)
-
-    @circuit(failure_threshold=5, recovery_timeout=30)
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential_jitter(initial=0.2, max=5),
-        retry=retry_if_exception_type((httpx.TimeoutException, httpx.ConnectError)),
-    )
-    async def get_product(self, product_id: str) -> dict[str, object]:
-        response = await self._client.get(f"/api/v1/products/{product_id}")
-        response.raise_for_status()
-        return response.json()
-```
-
-### .NET
-
+### Error Handling with ProblemDetails
 ```csharp
-builder.Services.AddHttpClient<IProductClient, ProductClient>(client =>
+// Custom exception
+public class NotFoundException : Exception
 {
-    client.BaseAddress = new Uri("http://product-service");
-    client.Timeout = TimeSpan.FromSeconds(5);
-})
-.AddResilienceHandler("product-service", resilience =>
+    public NotFoundException(string message) : base(message) { }
+}
+
+// Global exception handler
+app.UseExceptionHandler(exceptionHandlerApp =>
 {
-    resilience.AddRetry(new HttpRetryStrategyOptions
+    exceptionHandlerApp.Run(async context =>
     {
-        MaxRetryAttempts = 3,
-        BackoffType = DelayBackoffType.Exponential,
-        UseJitter = true,
-    });
-    resilience.AddCircuitBreaker(new HttpCircuitBreakerStrategyOptions
-    {
-        FailureRatio = 0.5,
-        SamplingDuration = TimeSpan.FromSeconds(10),
-        BreakDuration = TimeSpan.FromSeconds(30),
-    });
-    resilience.AddTimeout(TimeSpan.FromSeconds(5));
-});
-```
+        var exception = context.Features
+            .Get<IExceptionHandlerFeature>()?.Error;
 
-## 7. OpenTelemetry Setup
-
-### Python
-
-```python
-from fastapi import FastAPI
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-
-
-def setup_tracing(app: FastAPI, service_name: str) -> None:
-    provider = TracerProvider(resource=Resource.create({"service.name": service_name}))
-    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
-    trace.set_tracer_provider(provider)
-    FastAPIInstrumentor.instrument_app(app)
-    SQLAlchemyInstrumentor().instrument()
-    HTTPXClientInstrumentor().instrument()
-```
-
-### .NET
-
-```csharp
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService("order-service"))
-    .WithTracing(tracing => tracing
-        .AddAspNetCoreInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter())
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
-        .AddPrometheusExporter());
-```
-
-## 8. Health Checks
-
-### Python
-
-```python
-from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
-from redis.asyncio import Redis
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
-
-router = APIRouter(tags=["health"])
-
-
-@router.get("/health/live", status_code=status.HTTP_200_OK)
-async def liveness() -> dict[str, str]:
-    return {"status": "alive"}
-
-
-@router.get("/health/ready")
-async def readiness(
-    db: AsyncSession = Depends(get_session),
-    redis: Redis = Depends(get_redis),
-) -> JSONResponse:
-    checks = {}
-    try:
-        await db.execute(text("SELECT 1"))
-        checks["database"] = "ok"
-    except Exception:
-        checks["database"] = "failed"
-
-    try:
-        await redis.ping()
-        checks["redis"] = "ok"
-    except Exception:
-        checks["redis"] = "failed"
-
-    all_ok = all(value == "ok" for value in checks.values())
-    return JSONResponse(content=checks, status_code=200 if all_ok else 503)
-```
-
-### .NET
-
-```csharp
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString, name: "database")
-    .AddRedis(redisConnection, name: "redis");
-
-app.MapHealthChecks("/health/live", new HealthCheckOptions
-{
-    Predicate = _ => false
-});
-app.MapHealthChecks("/health/ready");
-```
-
-## 9. Idempotent Event Consumer
-
-### Python
-
-```python
-import json
-from collections.abc import Awaitable, Callable
-
-from confluent_kafka import Consumer
-
-EventHandler = Callable[[dict[str, object]], Awaitable[None]]
-
-
-class EventConsumer:
-    def __init__(
-        self,
-        consumer: Consumer,
-        handlers: dict[str, EventHandler],
-        processed: ProcessedEventStore,
-    ):
-        self._consumer = consumer
-        self._handlers = handlers
-        self._processed = processed
-
-    async def run(self, topics: list[str]) -> None:
-        self._consumer.subscribe(topics)
-        while True:
-            message = self._consumer.poll(1.0)
-            if message is None or message.error():
-                continue
-
-            event = json.loads(message.value().decode("utf-8"))
-            event_id = str(event["event_id"])
-            if await self._processed.contains(event_id):
-                self._consumer.commit(message)
-                continue
-
-            handler = self._handlers.get(str(event["event_type"]))
-            if handler is not None:
-                await handler(event)
-
-            await self._processed.add(event_id)
-            self._consumer.commit(message)
-```
-
-### .NET
-
-```csharp
-public sealed class EventConsumerService : BackgroundService
-{
-    private readonly IConsumer<string, string> _consumer;
-    private readonly IServiceProvider _services;
-
-    protected override async Task ExecuteAsync(CancellationToken ct)
-    {
-        _consumer.Subscribe(new[] { "events.orders" });
-
-        while (!ct.IsCancellationRequested)
+        var problemDetails = exception switch
         {
-            var result = _consumer.Consume(ct);
-            var envelope = JsonSerializer.Deserialize<EventEnvelope>(result.Message.Value);
-            if (envelope is null)
-                continue;
-
-            using var scope = _services.CreateScope();
-            var processed = scope.ServiceProvider.GetRequiredService<IProcessedEvents>();
-            if (await processed.ContainsAsync(envelope.EventId, ct))
+            NotFoundException => new ProblemDetails
             {
-                _consumer.Commit(result);
-                continue;
+                Status = 404,
+                Title = "Not Found",
+                Detail = exception.Message
+            },
+            ValidationException => new ProblemDetails
+            {
+                Status = 400,
+                Title = "Validation Error",
+                Detail = exception.Message
+            },
+            _ => new ProblemDetails
+            {
+                Status = 500,
+                Title = "Internal Server Error",
+                Detail = "An unexpected error occurred"
             }
+        };
 
-            var handler = scope.ServiceProvider.GetRequiredKeyedService<IEventHandler>(envelope.EventType);
-            await handler.HandleAsync(envelope, ct);
-            await processed.AddAsync(envelope.EventId, ct);
-            _consumer.Commit(result);
-        }
-    }
-}
+        context.Response.StatusCode = problemDetails.Status ?? 500;
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    });
+});
 ```
 
-## 10. Unit Test
+## Security Considerations
 
-### Python
+### Input Validation
+- **Always validate** with JSON Schema before processing
+- **Never trust** client input
+- **Sanitize** all inputs before database operations
+- **Use parameterized queries** (EF Core does this automatically)
 
-```python
-from decimal import Decimal
-from uuid import uuid4
+### Authorization
+- **Check permissions** on every operation
+- **Never rely** on client-side authorization
+- **Log authorization failures** for audit
+- **Use ABAC** for fine-grained control
 
-import pytest
+### Secrets Management
+- **Never hardcode** connection strings, API keys, passwords
+- **Use configuration** (appsettings.json, environment variables)
+- **Use secret management** (Azure Key Vault, AWS Secrets Manager)
+- **Rotate secrets** regularly
 
-
-def test_submit_draft_order_succeeds() -> None:
-    order = Order(customer_id=uuid4())
-    order.add_item(product_id=uuid4(), quantity=2, unit_price=Decimal("10.00"))
-
-    events = order.submit()
-
-    assert order.status == "submitted"
-    assert len(events) == 1
-    assert events[0].aggregate_id == order.id
-
-
-def test_submit_empty_order_raises() -> None:
-    order = Order(customer_id=uuid4())
-
-    with pytest.raises(DomainError, match="Cannot submit empty order"):
-        order.submit()
-```
-
-### .NET
-
+### SQL Injection Prevention
 ```csharp
-public sealed class OrderTests
+// GOOD - EF Core uses parameterized queries
+var customer = await _context.Customers
+    .Where(b => b.Email == email)
+    .FirstOrDefaultAsync();
+
+// BAD - Never use raw SQL with string interpolation
+// var customer = await _context.Customers
+//     .FromSqlRaw($"SELECT * FROM Customers WHERE Email = '{email}'")
+//     .FirstOrDefaultAsync();
+```
+
+## Testing Strategy
+
+### Unit Tests (Domain & Application)
+```csharp
+using Xunit;
+using Shouldly;
+
+public class CustomerTests
 {
     [Fact]
-    public void Submit_DraftOrderWithItems_ShouldSucceed()
+    public void Activate_ShouldSetStatusToActive()
     {
-        var order = new Order(Guid.NewGuid());
-        order.AddItem(Guid.NewGuid(), 2, 10.00m);
+        // Arrange
+        var customer = new Customer { Status = CustomerStatus.Inactive };
 
-        var events = order.Submit();
+        // Act
+        customer.Activate();
 
-        order.Status.ShouldBe(OrderStatus.Submitted);
-        events.ShouldHaveSingleItem();
-        events[0].ShouldBeOfType<OrderSubmitted>();
+        // Assert
+        customer.Status.ShouldBe(CustomerStatus.Active);
     }
 
     [Fact]
-    public void Submit_EmptyOrder_ShouldThrow()
+    public void Activate_WhenDeleted_ShouldThrowException()
     {
-        var order = new Order(Guid.NewGuid());
+        // Arrange
+        var customer = new Customer { IsDeleted = true };
 
-        Should.Throw<DomainException>(() => order.Submit());
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => customer.Activate());
     }
 }
 ```
 
-## Checklist
+### Integration Tests (API)
+```csharp
+using Microsoft.AspNetCore.Mvc.Testing;
+using Xunit;
+using Shouldly;
 
-- Domain layer stays framework-free in both stacks.
-- Application handlers own orchestration, transaction boundaries, and outbox staging.
-- Infrastructure adapters implement repository protocols or interfaces.
-- API endpoints validate input, authorize before mutation, and map domain errors to problem responses.
-- External calls have explicit timeout, retry, and circuit breaker behavior.
-- Event consumers deduplicate by `event_id`.
+public class CustomerEndpointTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly HttpClient _client;
+
+    public CustomerEndpointTests(WebApplicationFactory<Program> factory)
+    {
+        _client = factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WithValidData_ReturnsCreated()
+    {
+        // Arrange
+        var dto = new CreateCustomerDto
+        {
+            Name = "Test Customer",
+            Email = "test@example.com",
+            Phone = "1234567890"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/customers", dto);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var customer = await response.Content.ReadFromJsonAsync<Customer>();
+        customer.ShouldNotBeNull();
+        customer!.Name.ShouldBe("Test Customer");
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WithInvalidEmail_ReturnsBadRequest()
+    {
+        // Arrange
+        var dto = new CreateCustomerDto
+        {
+            Name = "Test Customer",
+            Email = "invalid-email",
+            Phone = "1234567890"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/customers", dto);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+}
+```
