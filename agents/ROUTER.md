@@ -133,6 +133,13 @@ All paths relative to `agents/security/`.
 
 These roles have minimal references. Load on demand — no routing needed.
 
+## Integrator (no references)
+
+`agents/integrator/SKILL.md` plus `agents/actions/integrate.md` are the full
+contract. Tool semantics live in the product repo's `scripts/kg/README.md`
+(merge3, tracker merge, canonical serialization) and
+`agents/docs/KNOWLEDGE-GRAPH.md`.
+
 ---
 
 ## KG Tools
@@ -146,6 +153,7 @@ triggers, and failure modes live in `agents/docs/KNOWLEDGE-GRAPH.md`.
 | Before editing shared entities/workflows | `python3 {PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>` |
 | Starting feature work | `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` (see KNOWLEDGE-GRAPH.md for `--tier`, `--fields`, `--allow-missing`) |
 | After ontology changes | `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` |
+| Merging KG YAML across branches (never by hand/git) | `python3 {PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base <ref> --ours <ref> --theirs <ref>` (also REGISTRY.md/ROADMAP.md; see `scripts/kg/README.md`) |
 | Long session start / decisions / escalations / post-compaction | `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py …` (see KNOWLEDGE-GRAPH.md for subcommands) |
 | Hub / risk / undeclared-edge analysis | `pagerank.py`, `risk.py`, `cochange.py --coverage-gaps` (see KNOWLEDGE-GRAPH.md) |
 

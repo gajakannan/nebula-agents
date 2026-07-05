@@ -205,6 +205,30 @@ agents:
       - docs/blog/**
       - blog/**
 
+  integrator:
+    model_tier: balanced    # deliberately mechanical: tool invocation + report assembly, no semantic decisions
+    skill: agents/integrator/SKILL.md
+    reads:
+      - {PRODUCT_ROOT}/**                # merge context: code, planning, KG, trackers
+      - agents/templates/**
+    writes:
+      # Integration-branch context only; never on contributor branches, never main.
+      # Curated KG files + trackers change only via merge3/tracker-merge mechanical
+      # convergence; generated projections are regenerated, never merged.
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml     # via merge3 only
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml    # via merge3 only
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml          # via merge3 only
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml        # regenerated
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/unbound-but-referenced.yaml  # regenerated
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml     # regenerated
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml     # regenerated
+      - {PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md                  # regenerated
+      - {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md                     # via tracker merge only
+      - {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md                      # via tracker merge only
+      - {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/**              # integration evidence runs
+    # Explicit non-writes (abort + self-report on violation): feature docs,
+    # architecture/**, schemas, api, application code, kg-source/** (Phase B).
+
 # ═══════════════════════════════════════════════════════════════
 # ACTIONS — execution flows (sequence, parallelism, gates)
 # ═══════════════════════════════════════════════════════════════
@@ -225,6 +249,8 @@ agents:
 #   ontology-sync: feature mapping aligned with shared solution ontology; references and ownership boundaries verified; MUST run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` and pass before closeout (coverage-report.yaml must be fresh — regenerate via `--write-coverage-report`)
 #   signoff:       required role signoffs verified before closeout
 #   clarification: PM identifies underspecified requirements for user input
+#   review-verdict: feature-review done-review verdict (or maintainer waiver
+#                  with recorded rationale) verified before integration starts
 # ──────────────────────────────────────────────────────────────
 
 actions:
@@ -351,6 +377,17 @@ actions:
         name: feature-review-report-quality
       - gate: done-review
         name: feature-done-review
+
+  integrate:
+    doc: agents/actions/integrate.md
+    description: Integrate one contributor branch into the integration branch — semantic KG/tracker merge, unconditional regeneration, validation, evidence; bracketed by two maintainer gates
+    prerequisites: [merge3/tracker tooling present in {PRODUCT_ROOT}/scripts/kg/, feature-review verdict or maintainer waiver for the source branch]
+    steps:
+      - gate: review-verdict
+        name: integrate-gate-1-feature-review
+      - agent: integrator
+      - gate: approval
+        name: integrate-gate-2-human-test-validation
 
   review:
     doc: agents/actions/review.md

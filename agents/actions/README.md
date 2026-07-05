@@ -37,6 +37,9 @@ An action is a **composition recipe** that:
 - **[feature](./feature.md)** - Single vertical slice end-to-end (including AI when in scope, with code + security reviews)
 - **[feature-review](./feature-review.md)** - Independently answer whether a completed feature is truly done
 
+### Integration Actions
+- **[integrate](./integrate.md)** - Merge one contributor branch into the integration branch: semantic KG/tracker merge, unconditional regeneration, validation, evidence — bracketed by two maintainer gates
+
 ### Quality Actions
 - **[review](./review.md)** - Comprehensive review: code quality + security + standards
 - **[test](./test.md)** - Test suite development and execution
@@ -127,6 +130,7 @@ Phase C (Implementation Mode)
   └─ build action    → Architect (orchestration) → (Backend Developer + Frontend Developer + AI Engineer* + DevOps + Quality Engineer)
   └─ feature action  → Architect (orchestration) → (Backend Developer + Frontend Developer + AI Engineer* + Quality Engineer + DevOps)
   └─ feature-review  → Product Manager + Architect + Quality Engineer + Code Reviewer + Security (+ DevOps*)
+  └─ integrate action → Integrator (maintainer-invoked, serial; gates before and after)
   └─ review action   → Code Reviewer + Security
   └─ test action     → Quality Engineer
   └─ document action → Technical Writer

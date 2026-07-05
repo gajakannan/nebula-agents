@@ -156,10 +156,14 @@ curated trio (S0001) + tracker rows (S0002), then regenerate all derived outputs
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Model tier for the integrator in `agent-map.yaml`: the work is mechanical (tool invocation +
-      report assembly) — a standard tier may suffice; decide during implementation.
-- [ ] Evidence home in the product repo (mirror the feature evidence-run layout vs a dedicated
-      `integration-runs/` root).
+- [x] Model tier for the integrator in `agent-map.yaml`: **decided `balanced`** (2026-07-05) —
+      the work is mechanical tool invocation + report assembly; no semantic decisions.
+- [x] Evidence home in the product repo: **decided** (2026-07-05) — the standard base-run profile
+      at `planning-mds/operations/evidence/runs/integrate-YYYYMMDD-HHMMSS/` plus
+      `integration-report.json` and per-file merge reports (template:
+      `agents/templates/integration-evidence-template.md`). No new root; keeps integration runs
+      out of feature-package validation (incl. the 2026-07-05 KG-regeneration rules, which key
+      off feature evidence manifests).
 
 **Assumptions (to be validated):**
 - The seven open PRs' code merges stay clean (verified for #47 and by overlap scan for #48–#51 at

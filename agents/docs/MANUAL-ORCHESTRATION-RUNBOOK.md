@@ -113,6 +113,31 @@ A manual run is complete only if:
 - lifecycle gate execution output is recorded
 - artifact trace is complete and path-accurate
 
+## Integration Runs (integrate action)
+
+Maintainer procedure for merging a contributor branch (`agents/actions/integrate.md`
+is authoritative; this is the operator checklist). Serial: one run at a time.
+
+1. **Gate 1 — feature review.** Confirm a passing `feature-review` verdict for
+   the source branch's feature, or decide and write a waiver with rationale.
+   No verdict and no waiver → do not start the run.
+2. **Run the integrator** via
+   `agents/templates/prompts/evidence-contract/integrate-operator-friendly.md`
+   with `SOURCE`, `INTEGRATION_BRANCH` (never `main`), and the verdict/waiver.
+3. **Review the evidence run** (`integration-report.json`, merge reports,
+   validator output). Bounces go back to the contributor; typed conflicts go
+   to the named owning role (architect or PM); re-runs after fixes are new runs.
+4. **Gate 2 — human test validation.** Exercise the delivered feature on the
+   prepared merge worktree (start the app; verify the feature's headline
+   behavior). Record pass/fail in `gate-decisions.md` and
+   `integration-report.json`.
+5. **Push** the prepared merge to the integration branch only on a recorded
+   pass; then set `pushed: true` in the report. Confirm the integration branch
+   is green before the next run.
+6. **Promotion:** after the whole train completes, merge the integration
+   branch to `main` once — that promotion merge is the only thing that ever
+   touches `main`.
+
 ## Release Usage
 
 Before publishing a preview release, verify manual-run completeness with:
