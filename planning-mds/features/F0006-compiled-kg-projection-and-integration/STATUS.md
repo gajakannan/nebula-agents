@@ -8,7 +8,7 @@
 | Story | Title | Phase | Status |
 |-------|-------|-------|--------|
 | F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
-| F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [ ] Not Started |
+| F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
 | F0006-S0003 | Integrator role and `integrate` action | A | [ ] Not Started |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
@@ -35,7 +35,7 @@
 
 - [x] Canonical serializer in `kg_common.py` (+ one-time no-semantic-change canonicalization commit, ID-level-diff verified via `merge3.py --semantic-diff`: 0 semantic differences per file)
 - [x] `merge3.py`: record merge, field rules, taxonomy, all-or-nothing output, conflict report (text + JSON; `--semantic-diff` mode; generated-input guard; exit codes 0/1/2)
-- [ ] Tracker-row merge for REGISTRY/ROADMAP feature tables
+- [x] Tracker-row merge for REGISTRY/ROADMAP feature tables (`tracker_merge.py` via the `merge3.py` CLI; per-table order config incl. manual/operator order with both-added weave; counter max-merge; exclusive-section check; STORY-INDEX rejected; 18 tests; PR #47 replay clean with F0038 above F0021 per the published rule)
 - [ ] `compile.py` deterministic (double-compile byte-identical; no committed timestamps)
 - [ ] Logical-ref resolver wired into `validate.py` / `lookup.py` / `eval.py` call sites
 - [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical
