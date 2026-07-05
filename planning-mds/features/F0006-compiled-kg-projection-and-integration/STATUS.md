@@ -9,7 +9,7 @@
 |-------|-------|-------|--------|
 | F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
 | F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
-| F0006-S0003 | Integrator role and `integrate` action | A | [ ] Not Started |
+| F0006-S0003 | Integrator role and `integrate` action | A | [~] In Progress (contract authored; dry run emitted; live-train items + signoffs pending) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
@@ -21,7 +21,7 @@
 
 - [x] `merge3.py` replays the PR #47 resolution: re-serialization hunks converge to zero conflicts (2026-07-05: canonical-nodes 9,656 changed lines → 0 conflicts, 528→548 records; code-index clean with both sides' additions)
 - [x] Known PR #47 real deltas surface as typed items — replay outcome per delta: `excluded_features` regression (PR re-adds stale F0038 exclusion) → `UniqueViolation` routed to product-manager+architect; F0038 archive repoint → converged one-sidedly to the archived path, no typed item needed; stale F0038 `status` (`architecture-complete` on an archived feature) → identical on both sides so correctly not a merge conflict — flagged as a PM data fix before the integrator run
-- [ ] Integrator dry-run on PR #47 emits a complete integration evidence run
+- [x] Integrator dry-run on PR #47 emits a complete integration evidence run (`integrate-20260705-195057`, mode=dry-run, simulated gate-1 waiver labeled; outcome halted-conflicts with the F0038-exclusion UniqueViolation routed to PM+architect; poisoned-clean-merge proof on code-index captured)
 - [ ] Per-PR gate 1: `feature-review` verdict (or recorded maintainer waiver with rationale) captured before each integrator run
 - [ ] Per-PR gate 2: maintainer human test validation recorded on each prepared merge before push
 - [ ] PR #47 merged via integrator
@@ -46,10 +46,10 @@
 
 ## Framework-Contract Progress (`nebula-agents`)
 
-- [ ] `agents/integrator/SKILL.md` persona (duties, hard boundary, routing)
-- [ ] `agents/agent-map.yaml`: integrator registered; Phase-B shard write scopes for architect/PM
-- [ ] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause) + `actions/README.md` + `ROUTER.md` routing
-- [ ] Integration evidence template + `integrate-operator-friendly.md` prompt
+- [x] `agents/integrator/SKILL.md` persona (duties, hard boundary, routing) — 2026-07-05
+- [~] `agents/agent-map.yaml`: integrator registered (balanced tier) + `integrate` action wired with `review-verdict`/`approval` gates; Phase-B shard write scopes remain (S0004+)
+- [x] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause, gates I0–I6, branch strategy) + `actions/README.md` + `ROUTER.md` routing
+- [x] Integration evidence template + `integrate-operator-friendly.md` prompt (evidence home decided: base-run profile at `operations/evidence/runs/integrate-*`)
 - [ ] `agents/actions/feature.md` G7/G8 reconciled (no off-book repoint narrative)
 - [ ] `feature-operator-friendly.md` prompt reconciled
 - [ ] `agents/docs/KNOWLEDGE-GRAPH.md` / `ORCHESTRATION-CONTRACT.md` / `MANUAL-ORCHESTRATION-RUNBOOK.md` updated

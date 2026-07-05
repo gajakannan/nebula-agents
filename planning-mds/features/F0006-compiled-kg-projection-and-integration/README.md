@@ -49,7 +49,7 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 |----|-------|--------|
 | [F0006-S0001](./F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | In Progress |
 | [F0006-S0002](./F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | In Progress |
-| [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Not Started |
+| [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | In Progress |
 | [F0006-S0004](./F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Not Started |
 | [F0006-S0005](./F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Not Started |
 | [F0006-S0006](./F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Not Started |
