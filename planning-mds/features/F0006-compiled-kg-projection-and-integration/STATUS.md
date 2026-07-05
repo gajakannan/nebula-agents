@@ -1,13 +1,13 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
-**Overall Status:** Draft
-**Last Updated:** 2026-07-05
+**Overall Status:** In Progress
+**Last Updated:** 2026-07-05 (S0001 implementation + PR #47 replay on `feat/F0006-S0001-semantic-kg-merge` in `nebula-insurance-crm`)
 
 ## Story Checklist
 
 | Story | Title | Phase | Status |
 |-------|-------|-------|--------|
-| F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [ ] Not Started |
+| F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
 | F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [ ] Not Started |
 | F0006-S0003 | Integrator role and `integrate` action | A | [ ] Not Started |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
@@ -19,8 +19,8 @@
 
 ## Phase-A Exit (merge-train) Progress
 
-- [ ] `merge3.py` replays the PR #47 resolution: re-serialization hunks converge to zero conflicts
-- [ ] Known PR #47 real deltas surface as typed items (F0038 archive repoints, `excluded_features` regression, stale F0038 `status`)
+- [x] `merge3.py` replays the PR #47 resolution: re-serialization hunks converge to zero conflicts (2026-07-05: canonical-nodes 9,656 changed lines → 0 conflicts, 528→548 records; code-index clean with both sides' additions)
+- [x] Known PR #47 real deltas surface as typed items — replay outcome per delta: `excluded_features` regression (PR re-adds stale F0038 exclusion) → `UniqueViolation` routed to product-manager+architect; F0038 archive repoint → converged one-sidedly to the archived path, no typed item needed; stale F0038 `status` (`architecture-complete` on an archived feature) → identical on both sides so correctly not a merge conflict — flagged as a PM data fix before the integrator run
 - [ ] Integrator dry-run on PR #47 emits a complete integration evidence run
 - [ ] Per-PR gate 1: `feature-review` verdict (or recorded maintainer waiver with rationale) captured before each integrator run
 - [ ] Per-PR gate 2: maintainer human test validation recorded on each prepared merge before push
@@ -33,8 +33,8 @@
 
 ## Reference-Implementation Progress (product repo `scripts/kg/`)
 
-- [ ] Canonical serializer in `kg_common.py` (+ one-time no-semantic-change canonicalization commit, ID-level-diff verified)
-- [ ] `merge3.py`: record merge, field rules, taxonomy, all-or-nothing output, conflict report
+- [x] Canonical serializer in `kg_common.py` (+ one-time no-semantic-change canonicalization commit, ID-level-diff verified via `merge3.py --semantic-diff`: 0 semantic differences per file)
+- [x] `merge3.py`: record merge, field rules, taxonomy, all-or-nothing output, conflict report (text + JSON; `--semantic-diff` mode; generated-input guard; exit codes 0/1/2)
 - [ ] Tracker-row merge for REGISTRY/ROADMAP feature tables
 - [ ] `compile.py` deterministic (double-compile byte-identical; no committed timestamps)
 - [ ] Logical-ref resolver wired into `validate.py` / `lookup.py` / `eval.py` call sites
@@ -58,7 +58,7 @@
 
 ## Cross-Cutting
 
-- [ ] merge3 unit tests: converge-identical, one-side, field-recurse, ordered-list conflict, delete-vs-update, orphan edge, unique violation, all-or-nothing
+- [x] merge3 unit tests: converge-identical, one-side, field-recurse, ordered-list conflict, delete-vs-update, orphan edge, unique violation, all-or-nothing (27 tests incl. idempotent canonicalization, object-form edge refs, full-validate rollback, determinism)
 - [ ] Integrator human-gate tests: missing-verdict halt, waiver re-run proceeds, validation-fail leaves merge unpushed
 - [ ] Determinism tests: double-compile, cross-machine byte-identical
 - [ ] Migration idempotency + round-trip test

@@ -47,7 +47,7 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 
 | ID | Title | Status |
 |----|-------|--------|
-| [F0006-S0001](./F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | Not Started |
+| [F0006-S0001](./F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | In Progress |
 | [F0006-S0002](./F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Not Started |
 | [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Not Started |
 | [F0006-S0004](./F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Not Started |
