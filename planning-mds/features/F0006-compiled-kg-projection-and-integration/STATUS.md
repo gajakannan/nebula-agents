@@ -25,8 +25,8 @@
 - [~] Per-PR gate 1: maintainer decision 2026-07-05 — feature-review WAIVED for all train PRs, recorded per run (#47 ✓, #51 ✓; remaining runs record theirs at run time)
 - [~] Per-PR gate 2: maintainer human test validation recorded per prepared merge (#47 PASS 2026-07-05; #51 pending)
 - [x] PR #47 merged via integrator (runs integrate-20260705-195057 dry → 203038 live; F0038-exclusion fixup 500ab17; gate-2 pass; landed c6ccaa0 on local chore/merge-PRs)
-- [~] PR #51 merged via integrator (stacked on #47 — delta replay): attempt integrate-20260705-205309 halted with 22 DivergentInserts (stale pre-archive F0038/Neuron records) → fixup 6f7c7ff → re-run integrate-20260705-235757 clean, prepared merge 4b0c52f awaiting gate 2
-- [ ] PRs #50 / #48 / #49 merged via integrator
+- [x] PR #51 merged via integrator (stacked on #47 — delta replay): attempt integrate-20260705-205309 halted with 22 DivergentInserts (stale pre-archive F0038/Neuron records) → fixup 6f7c7ff → re-run integrate-20260705-235757 clean; gate-2 PASS 2026-07-06 (incl. Neuron env fix note); landed 4ce85fe
+- [~] PRs #50 / #48 / #49 merged via integrator (batch on integrate/batch-50-48-49 per maintainer decision; runs integrate-20260706-012415 / -012853 / -013307; all semantic merges clean — 2 ROADMAP prose unions + code grafts recorded per run; validators + builds green; prepared tip b54821c awaiting single batch gate 2)
 - [ ] PRs #53 / #54 merged via integrator (F0022 work queues, F0008 broker insights — joined the queue 2026-07-04, identical KG/tracker footprint)
 - [ ] Integration branch (`chore/merge-PRs`) green after each merge (`validate.py`, orphan check, story-index zero-diff)
 - [ ] Promotion merge `chore/merge-PRs` → `main` after the train completes — the only change that touches `main`
