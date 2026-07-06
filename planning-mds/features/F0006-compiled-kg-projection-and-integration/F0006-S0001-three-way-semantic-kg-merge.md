@@ -83,6 +83,18 @@ registry (ordered lists, unique fields); repo checkout for merged-result validat
 - Exit codes distinguish clean-merge / conflicts / usage-error for scripting.
 - No partial writes under any failure mode.
 
+## Role-Based Visibility
+
+**Roles that can run this tool / act on its output:**
+- Maintainer / integrator — runs `merge3.py`; consumes the merged file or the typed conflict report.
+- Architect — owns and resolves conflicts routed for node/binding/policy/ontology kinds.
+- Product Manager — owns and resolves conflicts routed for feature/tracker kinds.
+- CI — runs the tool non-interactively (exit codes drive the pipeline).
+
+**Data Visibility:** N/A — local planning-doc tooling over committed KG YAML; no server-side auth
+surface and no internal/external data exposure (matches the Security Reviewer "No" rationale in the
+feature `STATUS.md`).
+
 ## Dependencies
 
 **Depends On:** none (first story; operates on current monolithic graph).

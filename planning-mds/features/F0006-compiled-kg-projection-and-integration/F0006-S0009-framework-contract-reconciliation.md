@@ -10,7 +10,7 @@
 
 ## User Story
 
-**As an** operator or role agent following the framework's written contract
+**As a** framework operator or role agent following the written contract
 **I want** every action, prompt, ownership boundary, template, and doc updated to describe the shipped compiled-projection and integrator behavior — with no remaining description of hand-maintained graph files or off-book repoints
 **So that** a strict agent obeying the letter of the contract performs correctly at every gate, and the contract stops being aspirational in exactly the places F0038 and PR #47 proved it wrong.
 
@@ -81,6 +81,17 @@ S0001–S0008.
   hand-maintained REGISTRY/ROADMAP feature tables (post-S0007), physical feature-doc refs in
   authoring guidance.
 - `agent-map.yaml` write scopes match S0004's ownership map exactly.
+
+## Role-Based Visibility
+
+**Roles that read / own the reconciled contract:**
+- All role agents (architect, PM, integrator, maintainer, implementers) — read the contract at
+  action time; the reconciliation makes each gate's written instruction match shipped behavior.
+- Architect — owns the reconciliation; Code Reviewer signs it off.
+- `agent-map.yaml` write scopes encode every "X owns Y" statement (testable ownership).
+
+**Data Visibility:** N/A — framework documentation and configuration; no auth surface and no
+internal/external data exposure.
 
 ## Dependencies
 

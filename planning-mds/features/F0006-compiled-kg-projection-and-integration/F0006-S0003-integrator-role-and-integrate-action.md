@@ -125,6 +125,20 @@ curated trio (S0001) + tracker rows (S0002), then regenerate all derived outputs
   is *not* an authoring change and is permitted (it is the integrator's Phase-A merge function).
 - Every halt names the owning role and the exact records/fields at issue.
 
+## Role-Based Visibility
+
+**Roles that can run / are bound by this action:**
+- Maintainer — sole invoker; runs the integrator serially, owns both human gates, pushes the
+  prepared merge.
+- Integrator (agent) — executes the run; sole writer of generated files on the mainline; never
+  authors source (hard boundary).
+- Architect / PM — receive routed semantic collisions (architect: nodes/bindings/policies/ontology;
+  PM: features/trackers; co-sign: exclusions).
+
+**Data Visibility:** N/A — operates on a local merge worktree and appends evidence runs; no
+server-side auth surface and no internal/external data exposure. The agent's write scope is
+constrained in `agents/agent-map.yaml` (generated outputs + evidence dir only).
+
 ## Dependencies
 
 **Depends On:** F0006-S0001 (merge3), F0006-S0002 (tracker merge).

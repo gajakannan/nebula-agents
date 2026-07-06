@@ -11,8 +11,8 @@
 ## User Story
 
 **As a** framework maintainer cutting the reference graph over to the shard model
-**I want** a mechanical decompiler that explodes the current monolithic graph into `kg-source/` shards, with proof that compiling those shards reproduces the pre-migration graph byte-identically
-**So that** the migration cannot silently lose or alter graph semantics, requires no hand-transcription of ~550 nodes, and is a single revert away from rollback.
+**I want** a mechanical decompiler that explodes the current monolithic graph **and the REGISTRY/ROADMAP feature tables** into `kg-source/` shards, with proof that compiling those shards reproduces the pre-migration graph byte-identically
+**So that** the migration cannot silently lose or alter graph semantics, requires no hand-transcription of ~550 nodes **or of every feature's tracker fields**, and is a single revert away from rollback.
 
 ## Context & Background
 
@@ -22,6 +22,18 @@ existing (already canonicalized, post-merge-train) `canonical-nodes.yaml`,
 `feature-mappings.yaml`, `code-index.yaml`, plus `solution-ontology.yaml` into per-concept shards —
 rewriting physical feature-doc refs to logical `F####/...` form (absorbing F0005-S0002's migration)
 — and the cutover gate is `compile(decompile(graph)) == graph`.
+
+The decompiler also partitions the **REGISTRY.md and ROADMAP.md feature tables** into each feature
+shard's presentation fields (`name`, `phase`, roadmap section, `Why Now`/`Why Next` rationale,
+validation/entry gate, supersession, retirement/archive dates — the S0004 tracker-field set), using
+the same column↔field mapping S0007's generator renders with. This is why the migration is
+decompile-first for trackers too: those fields exist today only in the hand-maintained tables and in
+no KG file, so hand-authoring them into ~40 feature shards would be exactly the error-prone
+transcription this story exists to avoid. Ordering note: the graph round trip
+(`compile(decompile(graph)) == graph`) is proven **here** (the compiler exists from S0005); the
+**byte-identical tracker round trip closes at S0007** when the tracker generator lands. S0006
+populates and schema-validates the presentation fields (completeness + count reconciliation);
+S0007 proves they render back to the original tables.
 
 Hard precondition: **the merge train is complete** (Phase A exit — 7 PRs as of 2026-07-05, plus
 any that arrive before the train finishes). The migration rewrites exactly the files every open PR
@@ -42,12 +54,22 @@ touches; migrating with open contributor PRs invalidates them all.
 - **Then** both become `F####/rel-path` form, resolving (per S0005) to the same physical files as
   before — including the F0038 archive paths that previously needed hand-repointing.
 
+**Tracker-field migration:**
+- **Given** the current REGISTRY.md / ROADMAP.md feature tables
+- **When** `decompile.py` partitions them (using the S0004 column↔field mapping)
+- **Then** every feature shard carries the presentation fields its REGISTRY status table and ROADMAP
+  section require (`name`, `phase`, section, rationale, gate, supersession, dates), each shard passes
+  S0004 completeness validation, and REGISTRY-row / ROADMAP-section counts reconcile exactly (nothing
+  dropped, nothing invented). The byte-identical re-render is S0007's gate; here the gate is
+  **populated + schema-valid + count-reconciled**.
+
 **Alternative Flows / Edge Cases:**
 - `--check` dry-run reports the intended shard partition and ref rewrites without writing.
 - Idempotency: decompiling twice produces identical shards.
 - Unpartitionable content (node kind with no directory home, orphan mapping entry, ref to a
-  feature absent from mappings) → loud failure listing every instance; nothing written. Resolve by
-  fixing the source graph first (pre-existing drift is fixed in the graph, not paperied over in
+  feature absent from mappings, a tracker row whose feature has no shard, or a feature with no
+  tracker row/section) → loud failure listing every instance; nothing written. Resolve by fixing
+  the source graph/tracker first (pre-existing drift is fixed at the source, not papered over in
   shards).
 - Stable-root refs are not rewritten (byte-preserved through the round trip).
 - `solution-ontology.yaml` moves to `kg-source/ontology/` content-identical (home change only).
@@ -64,24 +86,43 @@ N/A — migration CLI; no interactive surface.
 
 ## Data Requirements
 
-**Inputs:** the four curated/monolithic files; feature-mappings for ref rewriting; S0004 schema.
-**Outputs:** populated `kg-source/**`; migration report (shard count per directory, refs rewritten,
-anomalies).
+**Inputs:** the four curated/monolithic files; feature-mappings for ref rewriting; the
+**REGISTRY.md + ROADMAP.md feature tables** for feature-shard presentation fields; the S0004 schema
+and its tracker column↔field mapping.
+**Outputs:** populated `kg-source/**` (feature shards carry both technical **and** presentation
+fields); migration report (shard count per directory, refs rewritten, tracker fields mapped per
+feature, anomalies).
 
 **Validation Rules:**
-- Round-trip byte-identity is the cutover gate — no manual "close enough."
-- Every emitted shard passes S0004 validation.
-- Node/mapping/binding counts reconcile exactly (nothing dropped, nothing invented).
+- Round-trip byte-identity is the cutover gate **for the KG files here**; for REGISTRY/ROADMAP it is
+  proven at S0007 (the generator) — S0006 gates on presentation-field completeness + count
+  reconciliation.
+- Every emitted shard passes S0004 validation (technical **and** presentation fields).
+- Node/mapping/binding **and REGISTRY-row / ROADMAP-section** counts reconcile exactly (nothing
+  dropped, nothing invented).
+
+## Role-Based Visibility
+
+**Roles that can run this migration tool:**
+- Maintainer — runs `decompile.py` once per repo at cutover (and retains it for future repo adoptions).
+- Architect / PM — review the emitted shards for their owned directories before cutover.
+- No contributor/agent runs it in the normal flow (migration-only tool).
+
+**Data Visibility:** N/A — one-time local migration over committed KG/tracker files; no auth surface
+and no internal/external data exposure.
 
 ## Dependencies
 
 **Depends On:** F0006-S0004 (shard contract), F0006-S0005 (compiler + `--check`), Phase A complete
 (merge train landed — hard precondition).
-**Related Stories:** F0006-S0008 (reproducibility check flips blocking after this lands).
+**Related Stories:** F0006-S0007 (tracker generator closes the byte-identical tracker round trip
+this story sets up; both share S0004's column↔field mapping), F0006-S0008 (reproducibility check
+flips blocking after this lands).
 
 ## Business Rules
 
-1. No shard is hand-authored during migration; the decompiler is the only writer.
+1. No shard is hand-authored during migration — including feature-shard presentation fields
+   decompiled from the trackers; the decompiler is the only writer.
 2. Pre-existing graph drift discovered during decompilation is fixed in the monolith first (as its
    own reviewed commit), then re-decompiled — the migration never launders errors into shards.
 3. After cutover, the monolithic files are generated outputs; the decompiler is retired from the
@@ -108,7 +149,10 @@ anomalies).
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met; round-trip byte-identity proven and recorded in evidence
+- [ ] Acceptance criteria met; graph round-trip byte-identity proven and recorded in evidence
+- [ ] Tracker decompile: REGISTRY/ROADMAP feature tables partitioned into feature-shard
+      presentation fields; completeness + count-reconciliation tests; anomaly failure on
+      tracker/shard mismatch (byte-identical tracker round trip closes at S0007)
 - [ ] Dry-run, idempotency, anomaly-failure, and count-reconciliation tests
 - [ ] Migration executed on `nebula-insurance-crm` (tagged cutover commit)
 - [ ] Migration report archived with the feature evidence

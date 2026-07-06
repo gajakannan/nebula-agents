@@ -37,10 +37,10 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
 
 - [F0005 - Move-Invariant Knowledge-Graph Feature-Doc References](features/archive/F0005-move-invariant-kg-doc-references/README.md) - Superseded by F0006 (2026-07-04; folder archived at supersession; see `features/REGISTRY.md` Retired Features)
 
-- [F0006 - Compiled Knowledge-Graph Projection and Governed Integration](features/F0006-compiled-kg-projection-and-integration/README.md) - Planned / Now (Platform Hardening)
-  - [F0006-S0001 - Three-way semantic KG merge tool (`merge3.py`)](features/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) - Not Started
-  - [F0006-S0002 - Tracker-table three-way merge (REGISTRY/ROADMAP rows)](features/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) - Not Started
-  - [F0006-S0003 - Integrator role and `integrate` action](features/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) - Not Started
+- [F0006 - Compiled Knowledge-Graph Projection and Governed Integration](features/F0006-compiled-kg-projection-and-integration/README.md) - In Progress / Now (Platform Hardening; Phase A complete + promoted 2026-07-06)
+  - [F0006-S0001 - Three-way semantic KG merge tool (`merge3.py`)](features/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) - Done
+  - [F0006-S0002 - Tracker-table three-way merge (REGISTRY/ROADMAP rows)](features/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) - Done
+  - [F0006-S0003 - Integrator role and `integrate` action](features/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) - Done
   - [F0006-S0004 - `kg-source/` shard schema, layout, and ownership](features/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md) - Not Started
   - [F0006-S0005 - Deterministic KG compiler with logical doc refs](features/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) - Not Started
   - [F0006-S0006 - Decompiler-first migration with round-trip proof](features/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) - Not Started

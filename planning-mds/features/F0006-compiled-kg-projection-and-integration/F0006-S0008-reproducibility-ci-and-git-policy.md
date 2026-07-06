@@ -87,6 +87,17 @@ convention documented.
   CI check fails if `.gitattributes` drifts from the manifest).
 - Override use is visible: CI annotates the run; the integrator records it in evidence.
 
+## Role-Based Visibility
+
+**Roles that can act on this surface:**
+- DevOps — owns the reproducibility workflow, `.gitattributes` merge driver, and branch protection.
+- Maintainer — may apply the documented override trailer (logged, emergencies only).
+- Integrator — consumes the same `generated_paths.yaml` manifest and enforces the same check at merge.
+- All contributors — the check runs on every PR (blocking post-cutover).
+
+**Data Visibility:** N/A — CI + git configuration over a local repo / GitHub Actions on a personal
+account; no application auth surface and no internal/external data exposure.
+
 ## Dependencies
 
 **Depends On:** F0006-S0005 (`--check`), F0006-S0006 (cutover gates the blocking flip),

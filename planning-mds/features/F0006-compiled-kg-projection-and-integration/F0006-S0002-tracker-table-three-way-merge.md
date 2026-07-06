@@ -72,6 +72,16 @@ monotonic fields).
 - Table structure (columns) must match across the three versions; column changes conflict.
 - Row rendering is canonical (consistent cell padding/trim) so re-merges are stable.
 
+## Role-Based Visibility
+
+**Roles that can run this tool / act on its output:**
+- Maintainer / integrator — runs the tracker merge; consumes the merged tracker or conflict report.
+- Product Manager — owns every tracker conflict (REGISTRY/ROADMAP rows route to PM).
+- CI — runs it non-interactively.
+
+**Data Visibility:** N/A — local planning-doc tooling over committed tracker markdown; no auth
+surface and no internal/external data exposure.
+
 ## Dependencies
 
 **Depends On:** F0006-S0001 (record-merge engine, conflict report format).

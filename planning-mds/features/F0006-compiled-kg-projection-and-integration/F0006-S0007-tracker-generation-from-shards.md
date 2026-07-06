@@ -23,9 +23,12 @@ projection model for trackers. The feature shard (S0004) is already the single h
 
 Trackers are *partially* generated: the generator owns fenced table regions
 (`<!-- generated:begin ... -->` / `<!-- generated:end -->`); surrounding prose (purpose, update
-rules, notes, numbering rules) stays PM-authored. Fields the tables need beyond current shard
-schema (phase, "Why Now", validation gate, archive dates) extend the feature shard schema — they
-are feature facts, so the shard is their correct home.
+rules, notes, numbering rules) stays PM-authored. The fields the tables need beyond the graph
+(`name`, `phase`, roadmap section, `Why Now`/`Why Next` rationale, validation/entry gate,
+supersession, archive/retirement dates) are **defined in the S0004 feature-shard schema and
+populated at migration by S0006's tracker decompile** — they are feature facts, so the shard is
+their home. This story *renders* them (and proves the render round-trips byte-identically); it does
+not introduce them.
 
 ## Acceptance Criteria
 
@@ -36,11 +39,14 @@ are feature facts, so the shard is their correct home.
   tables are rendered inside their fenced regions, ordered by the per-table sort rules (archived:
   date desc, ID-desc tiebreak), prose outside regions byte-untouched.
 
-**Cutover parity:**
-- **Given** the hand-maintained tracker state on cutover day
-- **When** generated output is diffed against it
-- **Then** discrepancies are enumerated, reconciled once (shards fixed, or table corrected) with PM
-  review, and the post-reconcile diff is empty.
+**Cutover parity (byte-identical round trip):**
+- **Given** the REGISTRY/ROADMAP feature tables and the feature shards S0006 decompiled from them
+- **When** the generator renders the tables from those shards
+- **Then** the output is **byte-identical** to the pre-migration tables (modulo the documented
+  canonicalization pass) — this closes the tracker round trip S0006 set up
+  (`compile(decompile(trackers)) == trackers`). Any residual diff is a decompile/generate mapping
+  bug fixed in the tool, not a hand-edit of shards or tables; PM reviews the (expected-empty) diff
+  and signs the cutover.
 
 **Alternative Flows / Edge Cases:**
 - `Next Available Feature Number` derives as max(existing IDs) + 1.
@@ -63,8 +69,8 @@ N/A — generator CLI; no interactive surface.
 
 ## Data Requirements
 
-**Inputs:** `kg-source/features/**` (extended schema), story files (for story index), fenced-region
-markers in tracker files.
+**Inputs:** `kg-source/features/**` (with the S0004 presentation fields, populated by S0006), the
+S0004 column↔field mapping, story files (for story index), fenced-region markers in tracker files.
 **Outputs:** re-rendered table regions in `REGISTRY.md` / `ROADMAP.md`.
 
 **Validation Rules:**
@@ -72,10 +78,21 @@ markers in tracker files.
 - Deterministic rendering (stable column widths/escaping) so re-runs are zero-diff.
 - Every feature shard appears in exactly one REGISTRY status table and one ROADMAP section.
 
+## Role-Based Visibility
+
+**Roles that can run the generator / own its inputs:**
+- Any branch owner — runs it via `compile.py`; the integrator regenerates the fenced regions at merge.
+- Product Manager — owns the feature shards (the facts) and the surrounding tracker prose.
+- The generator writes only fenced table regions; PM-authored prose outside them is untouched.
+
+**Data Visibility:** N/A — local tooling over committed tracker markdown; no auth surface and no
+internal/external data exposure.
+
 ## Dependencies
 
-**Depends On:** F0006-S0004 (+ shard schema extension), F0006-S0005 (compile driver),
-F0006-S0006 (shards populated).
+**Depends On:** F0006-S0004 (feature-shard schema **and** the REGISTRY/ROADMAP column↔field mapping
+this generator renders with), F0006-S0005 (compile driver), F0006-S0006 (feature shards populated
+with presentation fields by the tracker decompile).
 **Related Stories:** F0006-S0002 (retires to transition/non-generated tables),
 F0006-S0008 (enforces region integrity), F0006-S0009 (TRACKER-GOVERNANCE update).
 
@@ -106,8 +123,9 @@ F0006-S0008 (enforces region integrity), F0006-S0009 (TRACKER-GOVERNANCE update)
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met including cutover parity reconciliation with PM signoff
-- [ ] Feature-shard schema extension reviewed (S0004 spec updated)
+- [ ] Acceptance criteria met including the byte-identical cutover round trip with PM signoff
+- [ ] Generator renders every S0004 presentation field; the column↔field mapping matches the one
+      S0006 decompiled with (shared definition, verified by the byte-identical round trip)
 - [ ] Region-integrity, ordering, counter, and zero-diff tests
 - [ ] `compile.py` driver invokes tracker generation; integrator flow picks it up automatically
 - [ ] TRACKER-GOVERNANCE.md implications handed to S0009

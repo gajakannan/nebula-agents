@@ -20,9 +20,17 @@ This story is the specification half of Phase B: the shard schema and ownership 
 before the compiler (S0005) or the migration (S0006) is built against them. It also settles the
 classification questions earlier drafts left open: `solution-ontology.yaml` is curated source and
 rehomes to `kg-source/ontology/` (keeping its embedded architect/PM ownership matrix authoritative
-for its sections); `decisions-index.yaml` is confirmed generated. It records the `depends_on`
-decision: the feature shard is the **single home** for feature dependencies; ROADMAP's dependency
-mentions become projections.
+for its sections); `decisions-index.yaml` is confirmed generated. It records the **single-home**
+decision for feature facts: the feature shard is the sole authored home not only for `path`,
+`status`, and `depends_on`, but for **every fact the REGISTRY and ROADMAP tables project** — display
+`name`, `phase`, roadmap section, the `Why Now`/`Why Next` rationale and the validation/entry gate,
+supersession, and retirement/archive dates. None of these presentation fields live in the current KG
+files (`feature-mappings.yaml` carries only `status`/`path`/`affects`/`depends_on`/`supersedes`), so
+the schema must define them here or S0007's tracker generator has nothing to render and S0006's
+decompiler has no target to populate. The tracker **column↔field mapping** is part of this schema
+contract — one definition consumed by *both* the S0006 decompiler (trackers → shard fields) and the
+S0007 generator (shard fields → trackers), so the migration round trip is symmetric. ROADMAP's
+dependency mentions and every other table cell become projections from the shard.
 
 Layout (per PRD §3): `nodes/{entities,capabilities,workflows,endpoints}/`, `features/`,
 `bindings/`, `policies/`, `exclusions/`, `ontology/`. Semantic-ID strategy per PRD §4 (no sequence
@@ -46,6 +54,9 @@ numbers except REGISTRY-governed `F####`; no GUIDs for concepts). Logical doc re
   `endpoint:resource-action`, `adr:NNN`, `schema:name`, `feature:F####`).
 - Cross-shard references (`affects`, `governed_by`, `uses_schema`) are declared by ID only —
   resolution is the compiler's job, so shards never embed paths to other shards.
+- A feature shard missing a field its REGISTRY status table or ROADMAP section requires (e.g. a
+  `now`-section feature with no `rationale`, or a retired feature with no `retired_date`/`reason`)
+  fails validation — S0007's tracker projection must never have to invent a cell.
 
 ## Interaction Contract
 
@@ -60,6 +71,11 @@ N/A — specification + validation rules; no interactive surface.
 **Deliverables:**
 - Schema spec document (product repo `planning-mds/kg-source/README.md` + JSON Schemas per kind
   under `planning-mds/schemas/kg-source/`).
+- Feature-shard schema enumerating the **full tracker-projected field set** — `id`, `name`, `path`,
+  `status`, `phase`, `roadmap_section`, `rationale` (Why Now/Why Next), `validation_gate`/entry
+  criteria, `affects`, `depends_on`, `supersedes`/`superseded_by`, `retired_date`, `reason`,
+  `archived_date` (retirement/archive fields present only when they apply) — plus the REGISTRY and
+  ROADMAP **column↔field mapping**, so S0006 (decompile) and S0007 (generate) share one contract.
 - Ownership map: directory → primary owner (+ co-sign), encoded both in docs and in
   `agents/agent-map.yaml` write scopes:
     - Primary architect: `nodes/`, `bindings/`, `policies/`, `ontology/`
@@ -72,11 +88,26 @@ N/A — specification + validation rules; no interactive surface.
 - Every shard: parseable YAML, required `id`, kind/directory agreement, single owner.
 - Referential fields ID-only; doc refs logical-only; binding globs syntactically valid.
 
+## Role-Based Visibility
+
+**Roles that can author each shard directory (the ownership map this story defines):**
+- Architect — `nodes/`, `bindings/`, `policies/`, `ontology/`.
+- Product Manager — `features/`.
+- Co-sign — `exclusions/` (PM + architect), `ontology/` (+ PM per its embedded matrix), `policies/`
+  (+ security on `authorization-*.yaml`).
+- Compiler / `validate.py` — read-only consumers that enforce owner-resolvability.
+
+**Data Visibility:** N/A — source-shard schema for local planning docs; no auth surface and no
+internal/external data exposure. Directory ownership is encoded as write scopes in
+`agents/agent-map.yaml`, not as end-user ABAC.
+
 ## Dependencies
 
 **Depends On:** F0006-S0003 (routing table consumes the ownership map; Phase A complete).
 **Related Stories:** F0006-S0005 (compiler consumes this contract), F0006-S0006 (migration emits
-shards in this shape), F0006-S0009 (agent-map/docs encode the ownership).
+shards in this shape and populates the presentation fields), F0006-S0007 (tracker generator renders
+the presentation fields and column↔field mapping defined here), F0006-S0009 (agent-map/docs encode
+the ownership).
 
 ## Business Rules
 
@@ -88,7 +119,10 @@ shards in this shape), F0006-S0009 (agent-map/docs encode the ownership).
    - `ontology/` — architect primary; PM co-sign on the sections its embedded ownership matrix
      assigns to PM.
    - `policies/` — architect primary; security co-sign where applicable (e.g. `authorization-*.yaml`).
-3. Feature shards are the single home for feature `path`, `status`, and `depends_on`.
+3. Feature shards are the single home for **every fact the trackers project**: `path`, `status`,
+   `depends_on`, `affects`, display `name`, `phase`, roadmap section, the `Why Now`/`Why Next`
+   rationale, the validation/entry gate, supersession, and retirement/archive dates. A tracker
+   table cell that is not derivable from a feature-shard field is a schema gap, not a table edit.
 4. No shard may reference another shard by file path — IDs only.
 
 ## Out of Scope
@@ -117,7 +151,10 @@ shards in this shape), F0006-S0009 (agent-map/docs encode the ownership).
 - [ ] Ownership map encoded in docs and `agent-map.yaml`
 - [ ] Shard validation implemented (standalone or in `validate.py`) with tests for every edge case
       above
-- [ ] `depends_on` single-home decision recorded (here and in KNOWLEDGE-GRAPH.md via S0009)
+- [ ] Single-home decision recorded for the **full tracker-projected field set** (not just
+      `depends_on`): schema enumerates `name`, `phase`, roadmap section, rationale, validation/entry
+      gate, supersession, and retirement/archive dates, plus the REGISTRY/ROADMAP column↔field
+      mapping (here and in KNOWLEDGE-GRAPH.md via S0009)
 - [ ] Story filename matches `Story ID` prefix
 - [ ] Story index regenerated or updated
 

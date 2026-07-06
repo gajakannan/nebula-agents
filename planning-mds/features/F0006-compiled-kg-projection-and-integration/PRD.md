@@ -129,8 +129,9 @@ until S0004–S0009 land.
       `solution-ontology.yaml` has an explicit home in the classification.
 - [ ] `compile.py` is deterministic (stable ordering/formatting, no committed timestamps): same
       sources → byte-identical outputs, proven by double-compile in CI.
-- [ ] Migration round-trip is proven: decompile current graph → shards → compile → byte-identical
-      to the pre-migration graph (modulo the documented canonicalization pass).
+- [ ] Migration round-trip is proven: decompile current graph **and REGISTRY/ROADMAP feature
+      tables** → shards → compile → byte-identical to the pre-migration graph (at B3) **and to the
+      pre-migration trackers (at B4)**, modulo the documented canonicalization pass.
 - [ ] Committed projections equal `compile(source)` on every PR (CI reproducibility check,
       blocking after Phase B cutover); hand-edits to generated files fail CI with an actionable
       message.
@@ -225,18 +226,34 @@ uses_schema:
   - schema:service-case
 ```
 
-Example feature shard (the **single home** for feature path, status, and dependencies — the
-`depends_on` previously duplicated in ROADMAP becomes a projection from here):
+Example feature shard (the **single home** for every fact the REGISTRY/ROADMAP tables project — not
+just path/status/dependencies but display name, phase, roadmap section, rationale, gates,
+supersession, and dates; each tracker cell becomes a projection from here, so the `depends_on`
+previously duplicated in ROADMAP is now one authored place):
 
 ```yaml
 id: feature:F0024
+name: Claims and service case tracking       # REGISTRY / ROADMAP display name
 path: planning-mds/features/F0024-claims-and-service-case-tracking
 status: in-progress          # → archived-done flips this AND the path, nothing else
+phase: Brokerage Platform Expansion
+roadmap_section: now         # now | next | later | completed | abandoned
+rationale: >-                # ROADMAP "Why Now" / "Why Next" cell
+  Claims handling is the next core workflow after policy issuance.
+validation_gate: >-          # ROADMAP gate / entry-criteria cell
+  Adjuster can open, triage, and resolve a service case end to end.
 affects:
   - capability:claims-service-case-tracking
 depends_on:
   - feature:F0021
+# retirement/archive fields appear only when they apply:
+#   superseded_by: feature:F0099    retired_date: 2026-07-04    reason: "…"
+#   archived_date: 2026-08-01
 ```
+
+Every presentation field above lives in the current REGISTRY/ROADMAP tables and in **no** KG file;
+S0004 defines them, S0006's decompiler populates them from the tables at migration, and S0007's
+generator renders them back — the round trip is what proves nothing was lost.
 
 Example binding shard:
 
@@ -426,21 +443,23 @@ open contributor PRs touch; migrating first would invalidate every open PR.
 | A3 (operational) | Drain the queue: #47 → #51 → #50/#48/#49 → #53/#54 | 7 merged PRs, 9 integration evidence runs (more runs than PRs — dry-runs, halts, and re-runs each leave an append-only run) — each merge recording a feature-review verdict/waiver and a maintainer test-validation pass — mainline green |
 | B1 (S0004) | Shard schema + ownership spec; source/generated classification | Spec reviewed; every generated path classified (reproducibility enforcement deferred to B5) |
 | B2 (S0005) | `compile.py` + logical refs (F0005 absorbed) | Deterministic double-compile; resolver test matrix green |
-| B3 (S0006) | Decompiler: explode current graph → shards; round-trip proof | `compile(decompile(graph))` byte-identical; shards become truth; monolith becomes output |
-| B4 (S0007) | Tracker generation (REGISTRY/ROADMAP tables) | Generated tables match hand-maintained state on cutover day |
+| B3 (S0006) | Decompiler: explode current graph **and REGISTRY/ROADMAP feature tables** → shards; round-trip proof | `compile(decompile(graph))` byte-identical; feature shards carry the tracker presentation fields (name/phase/section/rationale/gate/dates), schema-valid and count-reconciled; shards become truth; monolith becomes output |
+| B4 (S0007) | Tracker generation (REGISTRY/ROADMAP tables) | `compile(decompile(trackers)) == trackers` byte-identical from the S0006-populated shards (closes the tracker round trip) |
 | B5 (S0008) | Stand up reproducibility CI (warn-only shake-out → **blocking** post-cutover); hand-edit guard; `.gitattributes` | CI red on synthetic hand-edit; green on compliant PR |
 | B6 (S0009) | Contract/docs/templates reconciliation | No doc describes an off-book step; F0005 gap closed in prose |
 
-Rollback: Phase A tools are additive (no data change) — rollback is "stop using them." Phase B
-cutover (B3) is the only rewrite; its round-trip proof plus a pre-migration tag make rollback a
-single revert.
+Rollback: Phase A tools are additive (no data change) — rollback is "stop using them." Phase B has
+two tagged, individually-revertable rewrites: **B3** (graph + feature-table fields → shards; graph
+round-trip proof) and **B4** (REGISTRY/ROADMAP feature tables → generated regions; tracker
+round-trip proof). A pre-migration tag plus each step's byte-identical proof makes rollback of
+either a single revert.
 
 ## Role-Based Ownership
 
 | Role | Responsibility |
 |------|----------------|
 | Architect | Authors `nodes/`, `bindings/`, `policies/`, `ontology/` shards (G7); owns merge semantics for those kinds; resolves architect-routed conflicts |
-| Product Manager | Authors `features/` shards (path/status/depends_on — the single home); owns tracker prose; resolves PM-routed conflicts; archive = one shard edit |
+| Product Manager | Authors `features/` shards (path/status/depends_on + tracker presentation fields: name/phase/section/rationale/gate/dates — the single home); owns tracker prose; resolves PM-routed conflicts; archive = one shard edit |
 | **Integrator (new)** | Runs integration: semantic merge, unconditional recompile, validation, evidence; sole writer of generated files on mainline; never authors sources (mechanical merge3/tracker convergence only; never writes feature docs or `kg-source/` shards); verifies the feature-review gate before running and pauses for maintainer test validation before push |
 | Maintainer (human) | Runs the integrator serially; owns both human gates (feature-review waivers, test validation of the prepared merge); pushes the prepared merge; owns overrides |
 | Quality Engineer / Code Reviewer | Signoff on tools (merge determinism, round-trip, CI guards) |
@@ -476,7 +495,7 @@ single revert.
 | `scripts/kg/merge3.py` | **New** (Phase A): three-way semantic merge + conflict report |
 | `scripts/kg/kg_common.py` | Canonical serializer; logical-ref resolver (`resolve_doc_ref`) |
 | `scripts/kg/compile.py` | **New** (Phase B): shard→projection compiler + generator driver |
-| `scripts/kg/decompile.py` | **New** (Phase B, migration-only): graph→shards exploder with `--check` dry-run |
+| `scripts/kg/decompile.py` | **New** (Phase B, migration-only): graph **and REGISTRY/ROADMAP feature-table** → shards exploder (populates feature-shard presentation fields via the S0004 column↔field mapping) with `--check` dry-run |
 | `scripts/kg/validate.py` | Reproducibility mode (`--check-reproducible`); logical-ref resolution at existence/coverage call sites; new rules (physical-path ban, alias-collision ledger, glob-overlap, archived⇒no-stale-path) |
 | `scripts/kg/lookup.py`, `eval.py` | Resolve logical refs for display/aggregation (F0005 call sites) |
 | `scripts/kg/decisions.py`, `symbols.py`, `generate-story-index.py` | Invoked by compiler/integrator; unchanged semantics, listed as generated-output producers |

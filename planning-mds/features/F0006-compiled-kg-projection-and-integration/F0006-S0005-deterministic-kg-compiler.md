@@ -80,6 +80,17 @@ report (duplicates, similarities, overlaps).
 - No committed timestamps; versions/counts derived from content only.
 - Emitted comments limited to generated section banners.
 
+## Role-Based Visibility
+
+**Roles that can run the compiler / act on its output:**
+- Any branch owner (contributor, role agent) — runs `compile.py` to keep committed projections coherent.
+- Integrator — runs it in `--strict` mode at merge (analysis severities become blocking).
+- Architect / PM — own the shards it reads and resolve blocking analysis findings for their kinds.
+- CI — runs `--check` non-interactively.
+
+**Data Visibility:** N/A — local build tooling over committed shards/projections; no auth surface
+and no internal/external data exposure.
+
 ## Dependencies
 
 **Depends On:** F0006-S0004 (shard contract), F0006-S0001 (canonical serializer).

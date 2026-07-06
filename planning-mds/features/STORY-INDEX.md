@@ -1,6 +1,6 @@
 # Story Index
 
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-06
 **Total Stories:** 36
 
 ## F0001 - Tmux-Native Agent Cockpit
@@ -59,9 +59,9 @@
 
 | Story | Title | Status | Priority |
 |-------|-------|--------|----------|
-| [F0006-S0001](./F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | Not Started | Critical |
-| [F0006-S0002](./F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Not Started | High |
-| [F0006-S0003](./F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Not Started | Critical |
+| [F0006-S0001](./F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | Done | Critical |
+| [F0006-S0002](./F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Done | High |
+| [F0006-S0003](./F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Done | Critical |
 | [F0006-S0004](./F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Not Started | Critical |
 | [F0006-S0005](./F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Not Started | Critical |
 | [F0006-S0006](./F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Not Started | Critical |

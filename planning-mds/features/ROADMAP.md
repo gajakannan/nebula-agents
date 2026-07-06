@@ -1,6 +1,6 @@
 # Feature Roadmap (Now / Next / Later)
 
-**Last Reviewed:** 2026-07-04
+**Last Reviewed:** 2026-07-06
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
-| [F0006 - Compiled KG Projection and Governed Integration](./F0006-compiled-kg-projection-and-integration/) | Planned | Five open contributor PRs in the reference product repo are blocked on hand-merging knowledge-graph/tracker YAML — the framework has no sanctioned integration owner and every future multi-contributor merge hits the same wall. Phase A (semantic merge tool + integrator role) must land before any of them can merge safely. | Phase A: all 5 `nebula-insurance-crm` PRs merged via integrator runs with green validators and integration evidence. Phase B: compile round-trip byte-identical, reproducibility CI blocking, contract docs reconciled. |
+| [F0006 - Compiled KG Projection and Governed Integration](./F0006-compiled-kg-projection-and-integration/) | In Progress | Seven open contributor PRs in the reference product repo (`nebula-insurance-crm`) were blocked on hand-merging knowledge-graph/tracker YAML with no sanctioned integration owner — every future multi-contributor merge hit the same wall. Phase A (semantic merge tool + integrator role) has landed and drained the queue; Phase B (compiled projection) removes the problem class structurally. | Phase A (met 2026-07-06): all 7 `nebula-insurance-crm` PRs merged via integrator runs with green validators and integration evidence, promoted to `main`. Phase B: compile round-trip byte-identical, reproducibility CI blocking, contract docs reconciled. |
 | [F0001 - Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/) | Planned | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
 
 ## Next
@@ -44,4 +44,4 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 - F0002 may support SDK and exec-based providers, but it must keep a tmux fallback until managed orchestration proves equivalent engineering quality.
 - F0004 is a context-engineering layer, not a runtime path. It depends on F0003 evidence/telemetry being available to reflect from, and it never mutates `SKILL.md` or applies an unapproved change.
 - F0005 was superseded by F0006 on 2026-07-04 (see `REGISTRY.md` Retired Features): its logical doc-ref design is fully absorbed as the compiled-projection compiler's reference format.
-- F0006 is independent of the F0001 → F0003 → F0002 runtime line and does not displace F0001; it is in `Now` because it unblocks the reference product repo's open contributor PRs. Its Phase B (shard migration) must not start until Phase A's merge train completes.
+- F0006 is independent of the F0001 → F0003 → F0002 runtime line and does not displace F0001; it is in `Now` because it unblocked the reference product repo's contributor PRs. Its Phase-A merge train completed and promoted to `main` on 2026-07-06 (S0001–S0003 done); Phase B (shard migration) may now proceed.

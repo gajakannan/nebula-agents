@@ -38,9 +38,9 @@
 - [x] Tracker-row merge for REGISTRY/ROADMAP feature tables (`tracker_merge.py` via the `merge3.py` CLI; per-table order config incl. manual/operator order with both-added weave; counter max-merge; exclusive-section check; STORY-INDEX rejected; 18 tests; PR #47 replay clean with F0038 above F0021 per the published rule)
 - [ ] `compile.py` deterministic (double-compile byte-identical; no committed timestamps)
 - [ ] Logical-ref resolver wired into `validate.py` / `lookup.py` / `eval.py` call sites
-- [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical
+- [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical; feature-table decompile populates feature-shard presentation fields (name/phase/section/rationale/gate/dates), schema-valid + count-reconciled (tracker round trip closes at S0007)
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
-- [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions
+- [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions (byte-identical round trip from decompiled shards)
 - [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
 - [ ] `.gitattributes` (linguist-generated + merge driver) and CI workflow (warn → blocking)
 
@@ -87,8 +87,11 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 > S0005–S0008); the schema/spec story (S0004) and the role/contract stories (S0003, S0009) require
 > Architect + Code Reviewer but no QE — S0004 defines the `kg-source/` shard schema and ownership,
 > which is design + contract review rather than testable merge tooling. This is why S0002 has no
-> Architect row (it inherits S0001's merge semantics) and S0003/S0004 have no QE row. Feature-level
-> closeout still requires every role in "Required Signoff Roles" to hold at least one story-level PASS.
+> Architect row (it inherits S0001's merge semantics) and S0003/S0004 have no QE row. S0008
+> additionally carries a Code Reviewer row: it ships `validate.py` enforcement-rule code and the
+> merge driver (code correctness), which DevOps's CI / `.gitattributes` / branch-protection scope
+> does not cover. Feature-level closeout still requires every role in "Required Signoff Roles" to
+> hold at least one story-level PASS.
 
 | Story | Role | Reviewer | Verdict | Evidence | Date | Notes |
 |-------|------|----------|---------|----------|------|-------|
@@ -109,6 +112,7 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0007 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | DevOps | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
 | F0006-S0009 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0009 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 
@@ -136,8 +140,10 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 ## Tracker Sync Checklist
 
-- [ ] `planning-mds/features/REGISTRY.md` status/path aligned (incl. F0005 superseded record)
-- [ ] `planning-mds/features/ROADMAP.md` section aligned
-- [ ] `planning-mds/features/STORY-INDEX.md` regenerated or updated
-- [ ] `planning-mds/BLUEPRINT.md` feature/story status links aligned
-- [ ] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence
+Aligned 2026-07-06 to Phase-A completion (S0001–S0003 Done, F0006 In Progress); re-verify at closeout.
+
+- [x] `planning-mds/features/REGISTRY.md` status/path aligned (F0006 → In Progress; F0005 superseded record present)
+- [x] `planning-mds/features/ROADMAP.md` section aligned (F0006 → In Progress; PR count corrected 5 → 7; Phase-A-complete framing)
+- [x] `planning-mds/features/STORY-INDEX.md` regenerated or updated (S0001–S0003 → Done)
+- [x] `planning-mds/BLUEPRINT.md` feature/story status links aligned (F0006 In Progress; S0001–S0003 Done)
+- [ ] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence (Phase-B roles pending)
