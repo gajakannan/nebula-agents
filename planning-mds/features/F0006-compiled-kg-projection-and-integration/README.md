@@ -47,9 +47,9 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 
 | ID | Title | Status |
 |----|-------|--------|
-| [F0006-S0001](./F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | In Progress |
-| [F0006-S0002](./F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | In Progress |
-| [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | In Progress |
+| [F0006-S0001](./F0006-S0001-three-way-semantic-kg-merge.md) | Three-way semantic KG merge tool (`merge3.py`) | Done |
+| [F0006-S0002](./F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Done |
+| [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Done |
 | [F0006-S0004](./F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Not Started |
 | [F0006-S0005](./F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Not Started |
 | [F0006-S0006](./F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Not Started |
@@ -58,7 +58,7 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 | [F0006-S0009](./F0006-S0009-framework-contract-reconciliation.md) | Framework contract, roles, and docs reconciliation | Not Started |
 
 **Total Stories:** 9
-**Completed:** 0 / 9
+**Completed:** 3 / 9 (Phase A complete — merge train executed and promoted 2026-07-06)
 
 ## Phasing
 

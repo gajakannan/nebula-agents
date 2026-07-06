@@ -7,9 +7,9 @@
 
 | Story | Title | Phase | Status |
 |-------|-------|-------|--------|
-| F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
-| F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [~] In Progress (implemented + replay proven; signoffs pending) |
-| F0006-S0003 | Integrator role and `integrate` action | A | [~] In Progress (contract authored; dry run emitted; live-train items + signoffs pending) |
+| F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [x] Done (signed off 2026-07-06) |
+| F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [x] Done (signed off 2026-07-06) |
+| F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; two contract paths remain exercised-by-text-only, see provenance notes) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
@@ -84,13 +84,13 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Story | Role | Reviewer | Verdict | Evidence | Date | Notes |
 |-------|------|----------|---------|----------|------|-------|
-| F0006-S0001 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0001 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0001 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0002 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0002 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0003 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0003 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0001 | Quality Engineer | quality-engineer (delegated, maintainer-sanctioned session) | PASS | 27/27 merge3 tests green on promoted `main` (converge/one-side/field-recurse/ordered-list/delete-vs-update/orphan/unique/all-or-nothing/idempotent-canonicalization/edge-refs/rollback/determinism); PR #47 replay: 9,656-line noise → 0 conflicts + the 1 known real delta typed | 2026-07-06 | Cross-machine determinism deferred (single-machine verified) |
+| F0006-S0001 | Code Reviewer | code-reviewer (delegated) | PASS | `merge3.py`/`kg_common.py` on `main`; all-or-nothing via atomic tmp+rename; typed taxonomy complete; edge-ref definitions-vs-references fix (cd2c692) reviewed with regression tests | 2026-07-06 | `--full-validate` transient-write window documented in scripts/kg README; `--validate-cmd` naive .split() noted |
+| F0006-S0001 | Architect | architect (delegated) | PASS | Merge semantics conform to PRD §7 tables; canonical serializer idempotent on all 3 curated files; canonicalization commit ID-level no-change proven (a718046); ORDERED_LIST_FIELDS registry matches schema | 2026-07-06 | — |
+| F0006-S0002 | Quality Engineer | quality-engineer (delegated) | PASS | 18/18 tracker tests green on `main`; PR #47 tracker replay reproduced the PM-published union (F0038 above F0021, date-desc/ID-desc); rendering idempotence verified | 2026-07-06 | — |
+| F0006-S0002 | Code Reviewer | code-reviewer (delegated) | PASS | `tracker_merge.py` reuses S0001 engine (no duplicated merge logic); per-table config incl. manual-order weave; STORY-INDEX rejection; fail-loud on unconfigured tables/unkeyed rows | 2026-07-06 | Prose unions during the train were maintainer-delegate weaves recorded per evidence run (PM-routed by design) |
+| F0006-S0003 | Architect | architect (delegated) | PASS | Contract shipped (SKILL/integrate.md/agent-map/templates/runbook, 1cacb7e); 7-PR train executed: 10 evidence runs, 2 halts routed per taxonomy (22 stale-record DivergentInserts → fixup; real ADR-029 collision → architect renumber to ADR-031); both human gates recorded every run; promotion e2f78be | 2026-07-06 | Gate-1 missing-verdict halt never exercised live (train-wide waiver used); gate-2 fail path never exercised (all passes) — both remain contract-text-only, revisit in first post-train integration |
+| F0006-S0003 | Code Reviewer | code-reviewer (delegated) | PASS | integrate.md I0–I6 procedure matches executed runs; evidence template fields all populated in 10 real runs; branch strategy (never `main`) held — `main` touched only by promotion merge | 2026-07-06 | Integration ran operator-driven (Claude as integrator + maintainer gates), not yet via the operator prompt end-to-end |
 | F0006-S0004 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0005 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0005 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
@@ -115,11 +115,11 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | TBD |
-| Closeout review date | TBD |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: TBD |
+| Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 0 / 9 |
-| Test count (unit + integration) | TBD |
+| Stories completed | 3 / 9 |
+| Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 10 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |
 | Residual risks | TBD |
