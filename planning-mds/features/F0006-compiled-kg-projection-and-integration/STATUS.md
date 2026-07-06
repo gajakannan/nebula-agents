@@ -9,7 +9,7 @@
 |-------|-------|-------|--------|
 | F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [x] Done (signed off 2026-07-06) |
 | F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [x] Done (signed off 2026-07-06) |
-| F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; two contract paths remain exercised-by-text-only, see provenance notes) |
+| F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; three enforcement paths remain exercised-by-text-only — gate-1 halt, gate-2 fail, self-abort; see provenance notes) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
@@ -48,11 +48,12 @@
 
 - [x] `agents/integrator/SKILL.md` persona (duties, hard boundary, routing) — 2026-07-05
 - [~] `agents/agent-map.yaml`: integrator registered (balanced tier) + `integrate` action wired with `review-verdict`/`approval` gates; Phase-B shard write scopes remain (S0004+)
-- [x] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause, gates I0–I6, branch strategy) + `actions/README.md` + `ROUTER.md` routing
+- [x] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause, steps I0–I6 with human gates at I0 and I6, branch strategy) + `actions/README.md` + `ROUTER.md` routing
 - [x] Integration evidence template + `integrate-operator-friendly.md` prompt (evidence home decided: base-run profile at `operations/evidence/runs/integrate-*`)
 - [ ] `agents/actions/feature.md` G7/G8 reconciled (no off-book repoint narrative)
 - [ ] `feature-operator-friendly.md` prompt reconciled
-- [ ] `agents/docs/KNOWLEDGE-GRAPH.md` / `ORCHESTRATION-CONTRACT.md` / `MANUAL-ORCHESTRATION-RUNBOOK.md` updated
+- [ ] `agents/docs/KNOWLEDGE-GRAPH.md` / `ORCHESTRATION-CONTRACT.md` updated (no integrator/shard content yet)
+- [~] `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`: integration procedure + both human gates landed in S0003; Phase-B compile-flow additions pending (S0009)
 - [ ] Templates updated: `kg-reconciliation`, `feature-assembly-plan`, `tracker-governance`, `feature-registry`, `ci-gates`
 - [ ] 2026-07-05 KG-regeneration enforcement surfaces reconciled for Phase B: `build.md`, `plan.md`, feature/build/plan prompt variants; `validate-feature-evidence.py` matchers learn `compile.py` (+ tests)
 
@@ -90,8 +91,12 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 > Architect row (it inherits S0001's merge semantics) and S0003/S0004 have no QE row. S0008
 > additionally carries a Code Reviewer row: it ships `validate.py` enforcement-rule code and the
 > merge driver (code correctness), which DevOps's CI / `.gitattributes` / branch-protection scope
-> does not cover. Feature-level closeout still requires every role in "Required Signoff Roles" to
-> hold at least one story-level PASS.
+> does not cover. Every story that ships executable tooling carries a Code Reviewer row for code
+> correctness — S0001, S0002, S0005, S0006, S0007, S0008 — so S0007 has one (its tracker generator,
+> with fenced-region markers, cell escaping, deterministic ordering, and a byte-identical round
+> trip, is as much code as S0002's table merge); S0009 (contract/docs) carries Code Reviewer for the
+> `validate-feature-evidence.py` matcher change it ships. Feature-level closeout still requires every
+> role in "Required Signoff Roles" to hold at least one story-level PASS.
 
 | Story | Role | Reviewer | Verdict | Evidence | Date | Notes |
 |-------|------|----------|---------|----------|------|-------|
@@ -100,7 +105,7 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0001 | Architect | architect (delegated) | PASS | Merge semantics conform to PRD §7 tables; canonical serializer idempotent on all 3 curated files; canonicalization commit ID-level no-change proven (a718046); ORDERED_LIST_FIELDS registry matches schema | 2026-07-06 | — |
 | F0006-S0002 | Quality Engineer | quality-engineer (delegated) | PASS | 18/18 tracker tests green on `main`; PR #47 tracker replay reproduced the PM-published union (F0038 above F0021, date-desc/ID-desc); rendering idempotence verified | 2026-07-06 | — |
 | F0006-S0002 | Code Reviewer | code-reviewer (delegated) | PASS | `tracker_merge.py` reuses S0001 engine (no duplicated merge logic); per-table config incl. manual-order weave; STORY-INDEX rejection; fail-loud on unconfigured tables/unkeyed rows | 2026-07-06 | Prose unions during the train were maintainer-delegate weaves recorded per evidence run (PM-routed by design) |
-| F0006-S0003 | Architect | architect (delegated) | PASS | Contract shipped (SKILL/integrate.md/agent-map/templates/runbook, 1cacb7e); 7-PR train executed: 9 evidence runs, 2 halts routed per taxonomy (22 stale-record DivergentInserts → fixup; real ADR-029 collision → architect renumber to ADR-031); both human gates recorded every run; promotion e2f78be | 2026-07-06 | Gate-1 missing-verdict halt never exercised live (train-wide waiver used); gate-2 fail path never exercised (all passes) — both are untested failure-branches (the self-abort path is separately allowlist-backed in `agent-map.yaml`, abort-untested). Maintainer decision 2026-07-06: the first post-train integration runs with **no blanket waiver**, so gate-1's halt fires and is recorded there (see Deferred Non-Blocking Follow-ups). |
+| F0006-S0003 | Architect | architect (delegated) | PASS | Contract shipped (SKILL/integrate.md/agent-map/templates/runbook, 1cacb7e); 7-PR train executed: 9 evidence runs, 2 halts routed per taxonomy (22 stale-record DivergentInserts → fixup; real ADR-029 collision → architect renumber to ADR-031); both human gates recorded every run; promotion e2f78be | 2026-07-06 | Gate-1 missing-verdict halt never exercised live (train-wide waiver used); gate-2 fail path never exercised (all passes) — both are untested failure-branches (the self-abort path is separately allowlist-backed in `agent-map.yaml`, abort-untested). Maintainer decision 2026-07-06: the first post-train integration runs with **no blanket waiver**; the missing-verdict halt is recorded by deliberately starting one run with **neither verdict nor waiver** (per `integrate.md` I0 — a supplied verdict passes gate 1, so dropping the blanket waiver alone does not fire the halt), then obtaining the verdict and re-running (see Deferred Non-Blocking Follow-ups). |
 | F0006-S0003 | Code Reviewer | code-reviewer (delegated) | PASS | integrate.md I0–I6 procedure matches executed runs; evidence template fields all populated in 9 real runs; branch strategy (never `main`) held — `main` touched only by promotion merge | 2026-07-06 | Integration ran operator-driven (Claude as integrator + maintainer gates), not yet via the operator prompt end-to-end |
 | F0006-S0004 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0004 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
@@ -110,6 +115,7 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0006 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0006 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0007 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0007 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (tracker-generator code: region markers, cell escaping, ordering, byte-identical round trip) |
 | F0006-S0008 | DevOps | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
@@ -123,7 +129,7 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | Roll compiler + shard migration to other product repos | Each repo adopts independently after the reference implementation is proven | TBD | Framework maintainer |
 | Re-evaluate OmniGraph (or similar) if live multi-agent graph writes are ever needed | Out of scope; serial integrator suffices at current scale | TBD | Architect |
 | Central `F####` reservation tooling for contributors | Process rule suffices now (REGISTRY reservation before branching) | TBD | PM |
-| Exercise S0003's untested enforcement paths: gate-1 missing-verdict halt, gate-2 validation-fail-leaves-merge-unpushed, and the contract-violation self-abort (integrator would write a source file) | Train-wide feature-review waiver + all-pass validations + no attempted source write meant none fired live. Self-abort is already allowlist-backed (`agents/agent-map.yaml` integrator scope excludes feature docs + `kg-source/**`, "abort + self-report on violation"), so its gap is verifying the abort *fires*, not a missing guard; gate-1/gate-2 are untested failure-branches. | **First post-train integration runs with NO blanket waiver** (maintainer decision 2026-07-06) → gate-1's missing-verdict halt fires and is recorded in that run's evidence. Gate-2-fail injection stays optional (catch on the first real validation failure). Self-abort scenario test folded into S0009 when integrator tooling is next touched. | Maintainer + Quality Engineer |
+| Exercise S0003's untested enforcement paths: gate-1 missing-verdict halt, gate-2 validation-fail-leaves-merge-unpushed, and the contract-violation self-abort (integrator would write a source file) | Train-wide feature-review waiver + all-pass validations + no attempted source write meant none fired live. Self-abort is already allowlist-backed (`agents/agent-map.yaml` integrator scope excludes feature docs + `kg-source/**`, "abort + self-report on violation"), so its gap is verifying the abort *fires*, not a missing guard; gate-1/gate-2 are untested failure-branches. | **First post-train integration** runs with **no blanket waiver** (maintainer decision 2026-07-06); to record the missing-verdict halt, one run is deliberately started with **neither verdict nor waiver** (per `integrate.md` I0), the halt fires and is captured in that run's evidence, then the verdict is obtained and the run re-run. (Merely supplying a real verdict passes gate 1 and leaves the halt untested — dropping the blanket waiver alone does not trigger it.) Gate-2-fail injection stays optional (catch on the first real validation failure). Self-abort scenario test folded into S0009 when integrator tooling is next touched. | Maintainer + Quality Engineer |
 
 ## Closeout Summary
 

@@ -183,7 +183,10 @@ Notes:
 - `decisions-index.yaml` and `solution-ontology.yaml` were unclassified in every earlier draft of
   this design; they are classified above and must appear in all tooling file lists.
 - REGISTRY/ROADMAP are *partially* generated: the feature tables are projections; surrounding
-  prose (purpose, rules, notes) stays authored. The generator owns only the fenced table regions.
+  prose (purpose, rules, notes) stays authored. The generator owns only the fenced table regions —
+  so in `generated_paths.yaml` (S0008) they carry a `fenced-region` granularity marker (vs
+  `whole-file` for every other output), which excludes them from the `.gitattributes` merge driver
+  and scopes their reproducibility check to the fenced regions.
 - During Phase A (pre-compiler), the curated trio (`canonical-nodes`, `feature-mappings`,
   `code-index`) is still source-authored — merged via `merge3.py`, not regenerated.
 
@@ -356,9 +359,12 @@ Generated files are **never merge inputs**.
 - **Merge-time regeneration is unconditional.** A textually clean git merge of generated files is
   *more* dangerous than a conflicting one — git's line-union of two projections is not the compile
   of merged sources. The integrator always discards both sides and recompiles.
-- `.gitattributes`: generated paths get `linguist-generated` (collapse PR diffs) and a merge
-  driver (`merge=ours` or equivalent) so textual conflicts on them never block anyone — the
-  recompile overwrites the result regardless.
+- `.gitattributes`: **whole-file** generated paths get `linguist-generated` (collapse PR diffs) and
+  a merge driver (`merge=ours` or equivalent) so textual conflicts on them never block anyone — the
+  recompile overwrites the result regardless. The two **partially-generated** trackers
+  (`REGISTRY.md`/`ROADMAP.md`) are excluded from the merge driver: only their fenced table regions
+  are recompiled, so a whole-file `merge=ours` would silently drop the PM-authored prose the
+  recompile does not restore — that prose merges as ordinary text and routes to the PM (S0002/S0007).
 - **Integration never targets `main` directly** (maintainer decision, 2026-07-05). Integrator
   merges land on a designated **integration branch**: for the Phase-A train, the existing
   `chore/merge-PRs` (the de facto mainline — `main` is stale and is not a valid merge base).
@@ -470,7 +476,7 @@ either a single revert.
 | Surface | Change |
 |---------|--------|
 | `agents/integrator/SKILL.md` | **New** persona: duties 1–6, hard boundary, routing table, evidence contract |
-| `agents/agent-map.yaml` | Register `integrator` (reads: everything; writes: `{PRODUCT_ROOT}/planning-mds/knowledge-graph/**` generated outputs, tracker table regions, integration evidence dir — mainline context only). Phase B: add `kg-source/` write scopes to architect (`nodes/`,`bindings/`,`policies/`,`ontology/`) and PM (`features/`); narrow PM's `feature-mappings.yaml` write (becomes generated) |
+| `agents/agent-map.yaml` | Register `integrator` (reads: everything; writes: `{PRODUCT_ROOT}/planning-mds/knowledge-graph/**` generated outputs, tracker table regions, integration evidence dir — mainline context only). Phase B: add `kg-source/` write scopes to architect (`nodes/`,`bindings/`,`policies/`,`ontology/`) and PM (`features/`); **remove every direct write scope to a now-generated file, symmetrically** — PM's `feature-mappings.yaml` **and** the architect's `canonical-nodes.yaml`/`feature-mappings.yaml`/`code-index.yaml` (all three become `compile.py` outputs); **relocate** the architect's `solution-ontology.yaml` scope to `kg-source/ontology/**` (rehome, not removal). `coverage-report.yaml` stays (a `--write-coverage-report` regeneration, not a hand-edit). Flip the integrator's Phase-A scope annotations — the curated trio ("via merge3 only") and REGISTRY/ROADMAP ("via tracker merge only") — to the Phase-B reality ("regenerated via `compile.py`"). After this, no `knowledge-graph/*.yaml` appears in any authoring role's write scope; only the integrator's generated-output scope (mainline) and the compiler (branches) produce them |
 | `agents/actions/integrate.md` | **New** action: the integration run procedure, inputs, gates (feature-review precondition, human-test-validation pause), bounce rules |
 | `agents/actions/README.md`, `agents/ROUTER.md` | Route/announce the new action |
 | `agents/actions/feature.md` | G7: architect authors shards (logical refs only); G8: archive = feature-shard `path:`/`status:` edit + recompile — delete the off-book repoint narrative |
@@ -502,8 +508,8 @@ either a single revert.
 | `planning-mds/kg-source/**` | **New** source layer (Phase B migration) |
 | `planning-mds/knowledge-graph/*` | Becomes fully generated (Phase B); `solution-ontology.yaml` rehomed to `kg-source/ontology/` |
 | `planning-mds/features/REGISTRY.md`, `ROADMAP.md` | Feature tables become generated regions (Phase B) |
-| `scripts/kg/generated_paths.yaml` | **New** (Phase B, S0008): single authoritative list of every generated path (content per §2); consumed by CI, `.gitattributes` generation, and the integrator |
-| `.gitattributes` | `linguist-generated` + merge driver on generated paths (generated from `generated_paths.yaml`, never hand-listed) |
+| `scripts/kg/generated_paths.yaml` | **New** (Phase B, S0008): single authoritative list of every generated path, each with a `whole-file`/`fenced-region` granularity marker (content per §2); consumed by CI, `.gitattributes` generation, and the integrator |
+| `.gitattributes` | `linguist-generated` + merge driver on `whole-file` generated paths (generated from `generated_paths.yaml`, never hand-listed); the `fenced-region` trackers get `linguist-generated` but **not** the merge driver |
 | `.github/workflows/` | Reproducibility check — stood up at B5 (S0008); warn-only shake-out, then blocking post-cutover |
 | `CONTRIBUTING.md` / contributor docs | Shard-authoring flow; "never edit `knowledge-graph/*` by hand" |
 

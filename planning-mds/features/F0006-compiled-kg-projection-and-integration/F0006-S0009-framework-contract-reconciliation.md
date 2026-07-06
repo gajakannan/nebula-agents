@@ -36,11 +36,19 @@ specified now so every edit target is inventoried up front (PRD "Framework Edit 
 **Alternative Flows / Edge Cases:**
 - `agents/agent-map.yaml`: integrator registered (S0003); architect is primary writer of
   `kg-source/{nodes,bindings,policies,ontology}/**`; PM writes `kg-source/features/**` and tracker
-  prose; PM's direct `feature-mappings.yaml` write is **removed** (file becomes generated).
+  prose. **Every direct write scope to a now-generated file is removed, symmetrically** — PM's
+  `feature-mappings.yaml` **and** the architect's `canonical-nodes.yaml`, `feature-mappings.yaml`,
+  and `code-index.yaml` (all three become `compile.py` outputs); the architect's
+  `solution-ontology.yaml` scope is **relocated** to `kg-source/ontology/**` (rehome, not removal).
+  `coverage-report.yaml` remains (a `--write-coverage-report` regeneration, not a hand-edit). The
+  integrator's Phase-A scope annotations flip to Phase-B reality: the curated trio from "via merge3
+  only" and REGISTRY/ROADMAP from "via tracker merge only" to "regenerated via `compile.py`".
   Co-sign encoded on the primary scopes per S0004's ownership map: `exclusions/` (PM + architect),
   `ontology/` (architect + PM per its embedded matrix), `policies/` (architect + security where
-  applicable). Every "X owns Y" line traces to exactly one primary scope plus zero-or-more co-sign
-  requirements (S0004 Business Rule 2).
+  applicable). After reconciliation no `knowledge-graph/*.yaml` remains in any authoring role's
+  write scope (only the integrator's generated-output scope), so every "X owns Y" line traces to
+  exactly one primary scope plus zero-or-more co-sign requirements (S0004 Business Rule 2) and the
+  map matches S0004's ownership map exactly (Validation Rule below).
 - `agents/actions/feature.md`: G7 = author/update shards + compile + validate; G8 archive = feature
   shard `path:`/`status:` edit + recompile; exit validation includes `--check-reproducible`.
 - Prompts: `feature-operator-friendly.md` reconciled; `integrate-operator-friendly.md` exists
@@ -52,7 +60,9 @@ specified now so every edit target is inventoried up front (PRD "Framework Edit 
   on a new `contract_effective_date` so earlier evidence stays valid), with tests updated.
 - Docs: `KNOWLEDGE-GRAPH.md` (classification, shard schema, compile flow, logical refs, merge
   taxonomy, `depends_on` single-home), `ORCHESTRATION-CONTRACT.md` (integrator role + sole-writer
-  rule + routing), `MANUAL-ORCHESTRATION-RUNBOOK.md` (maintainer integration procedure).
+  rule + routing), `MANUAL-ORCHESTRATION-RUNBOOK.md` (the integration procedure + both human gates
+  already landed in S0003; this story adds only the Phase-B compile-flow steps to the maintainer
+  procedure — it does not re-author the integration section).
 - Templates: `kg-reconciliation`, `feature-assembly-plan`, `tracker-governance`,
   `feature-registry` (generated-region markers), `ci-gates` (S0008 job) — examples use shards and
   logical refs.
@@ -81,6 +91,10 @@ S0001–S0008.
   hand-maintained REGISTRY/ROADMAP feature tables (post-S0007), physical feature-doc refs in
   authoring guidance.
 - `agent-map.yaml` write scopes match S0004's ownership map exactly.
+- The one documented sub-file ownership split is `REGISTRY.md`/`ROADMAP.md`: PM owns the prose (via
+  `features/**`), the integrator regenerates the fenced table regions — encoded by the
+  `fenced-region` granularity marker in `generated_paths.yaml` (S0008), not by two conflicting
+  whole-file scopes. Every other "X owns Y" statement still maps to exactly one whole-path scope.
 
 ## Role-Based Visibility
 

@@ -45,9 +45,12 @@ PR #47 postmortem: archived feature ⇒ no non-archive feature path anywhere in 
 **Alternative Flows / Edge Cases:**
 - Stale derived output (shard changed, contributor forgot to recompile) → same failure, "run
   compile.py" remediation — this is the CI twin of the integrator's bounce.
-- `.gitattributes` merge driver on generated paths prevents textual conflict-marker deadlocks on
-  generated files during any local merge; the integrator's unconditional recompile overwrites the
-  driver's result anyway (defense in depth — the driver is convenience, never correctness).
+- `.gitattributes` merge driver on **whole-file** generated paths prevents textual conflict-marker
+  deadlocks during any local merge; the integrator's unconditional recompile overwrites the driver's
+  result anyway (defense in depth — the driver is convenience, never correctness). The
+  partially-generated trackers (`REGISTRY.md`/`ROADMAP.md`) are **excluded** from the driver: only
+  their fenced regions are recompiled, so a whole-file `merge=ours` would silently drop incoming
+  PM-authored prose edits — that prose merges as ordinary text (S0002/S0007) and routes to the PM.
 - Tracker fenced-region integrity: markers missing/moved/hand-edited inside → reproducibility fail.
 - Rollout: this workflow is a B5 deliverable, landing *after* the S0006 cutover (B3). It runs
   **warn-only** for a shake-out window, then flips blocking (branch protection) — a one-line change.
@@ -74,17 +77,25 @@ N/A — CI + git configuration; no interactive surface.
 
 ## Data Requirements
 
-**Deliverables:** a single shared generated-path manifest, `scripts/kg/generated_paths.yaml` (a
-flat list of every generated path; the PRD §2 "Generated projections" table is its authoritative
-content) — the one home the three consumers below read from; workflow file (from a new
-`ci-gates-template.yml` job template in `nebula-agents`); `.gitattributes` entries for every
-generated path, produced from the manifest (never hand-listed); validator rules; override-trailer
-convention documented.
+**Deliverables:** a single shared generated-path manifest, `scripts/kg/generated_paths.yaml` (every
+generated path with a **granularity** marker — `whole-file` for the projection/derived files,
+`fenced-region` for the partially-generated trackers `REGISTRY.md`/`ROADMAP.md`; the PRD §2
+"Generated projections" table is its authoritative content) — the one home the three consumers
+below read from; workflow file (from a new `ci-gates-template.yml` job template in `nebula-agents`);
+`.gitattributes` entries produced from the manifest (never hand-listed), applying `linguist-generated`
++ the merge driver **only to `whole-file` paths** — `fenced-region` trackers are excluded from the
+`merge=ours` driver (a whole-file take-ours would drop the PM-authored prose the recompile does not
+restore) while still getting `linguist-generated`; validator rules; override-trailer convention
+documented.
 
 **Validation Rules:**
 - The generated-path list has one authoritative home — `scripts/kg/generated_paths.yaml` — consumed
   by CI, `.gitattributes` generation, and the integrator; no second hand-maintained copy exists (a
   CI check fails if `.gitattributes` drifts from the manifest).
+- Granularity is honored end-to-end: `whole-file` paths are compared byte-for-byte by
+  `--check-reproducible`; `fenced-region` paths (`REGISTRY.md`/`ROADMAP.md`) are checked only inside
+  their `generated:begin`/`generated:end` markers, get `linguist-generated` but **not** the
+  `merge=ours` driver, and their surrounding PM-authored prose is never collapsed or clobbered.
 - Override use is visible: CI annotates the run; the integrator records it in evidence.
 
 ## Role-Based Visibility
@@ -135,8 +146,10 @@ F0006-S0007 (region integrity).
 ## Definition of Done
 
 - [ ] Acceptance criteria met; red test (synthetic hand-edit) and green test recorded in CI
-- [ ] `scripts/kg/generated_paths.yaml` manifest landed; `.gitattributes` generated from it; CI and
-      the integrator consume the same manifest (no second hand-maintained copy)
+- [ ] `scripts/kg/generated_paths.yaml` manifest landed **with per-path granularity**
+      (`whole-file`/`fenced-region`); `.gitattributes` generated from it (merge driver on
+      `whole-file` paths only); CI and the integrator consume the same manifest (no second
+      hand-maintained copy)
 - [ ] Validator rules landed with tests (physical-path ban, archived-consistency, ledger
       rationale, glob-match)
 - [ ] Warn-only shake-out → blocking flip executed once the CI lands (post-cutover)
