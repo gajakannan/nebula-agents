@@ -32,8 +32,9 @@ PR #47 postmortem: archived feature ⇒ no non-archive feature path anywhere in 
 - **Given** a PR whose shards compile to exactly its committed projections
 - **When** the reproducibility workflow runs (`validate.py --check-reproducible`, wrapping
   S0005's `--check`)
-- **Then** the check passes, generated-file diffs render collapsed (`linguist-generated`), and no
-  reviewer sees projection churn by default.
+- **Then** the check passes, whole-file generated-path diffs render collapsed
+  (`linguist-generated`), and no reviewer sees projection churn by default while
+  partially-generated tracker prose remains visible for review.
 
 **Hand-edit rejection:**
 - **Given** a PR that edits `canonical-nodes.yaml` directly (no shard change compiles to it)
@@ -48,9 +49,10 @@ PR #47 postmortem: archived feature ⇒ no non-archive feature path anywhere in 
 - `.gitattributes` merge driver on **whole-file** generated paths prevents textual conflict-marker
   deadlocks during any local merge; the integrator's unconditional recompile overwrites the driver's
   result anyway (defense in depth — the driver is convenience, never correctness). The
-  partially-generated trackers (`REGISTRY.md`/`ROADMAP.md`) are **excluded** from the driver: only
-  their fenced regions are recompiled, so a whole-file `merge=ours` would silently drop incoming
-  PM-authored prose edits — that prose merges as ordinary text (S0002/S0007) and routes to the PM.
+  partially-generated trackers (`REGISTRY.md`/`ROADMAP.md`) are **excluded** from both the driver and
+  `linguist-generated`: only their fenced regions are recompiled, so whole-file `merge=ours` would
+  silently drop incoming PM-authored prose edits, and Linguist would collapse prose diffs because its
+  attributes are file-scoped. That prose merges as ordinary text (S0002/S0007) and routes to the PM.
 - Tracker fenced-region integrity: markers missing/moved/hand-edited inside → reproducibility fail.
 - Rollout: this workflow is a B5 deliverable, landing *after* the S0006 cutover (B3). It runs
   **warn-only** for a shake-out window, then flips blocking (branch protection) — a one-line change.
@@ -83,9 +85,9 @@ generated path with a **granularity** marker — `whole-file` for the projection
 "Generated projections" table is its authoritative content) — the one home the three consumers
 below read from; workflow file (from a new `ci-gates-template.yml` job template in `nebula-agents`);
 `.gitattributes` entries produced from the manifest (never hand-listed), applying `linguist-generated`
-+ the merge driver **only to `whole-file` paths** — `fenced-region` trackers are excluded from the
-`merge=ours` driver (a whole-file take-ours would drop the PM-authored prose the recompile does not
-restore) while still getting `linguist-generated`; validator rules; override-trailer convention
+and the merge driver **only to `whole-file` paths** — `fenced-region` trackers are excluded from both
+`linguist-generated` and the `merge=ours` driver because both are file-scoped controls that would hide
+or drop PM-authored prose the recompile does not restore; validator rules; override-trailer convention
 documented.
 
 **Validation Rules:**
@@ -94,7 +96,7 @@ documented.
   CI check fails if `.gitattributes` drifts from the manifest).
 - Granularity is honored end-to-end: `whole-file` paths are compared byte-for-byte by
   `--check-reproducible`; `fenced-region` paths (`REGISTRY.md`/`ROADMAP.md`) are checked only inside
-  their `generated:begin`/`generated:end` markers, get `linguist-generated` but **not** the
+  their `generated:begin`/`generated:end` markers, get neither `linguist-generated` nor the
   `merge=ours` driver, and their surrounding PM-authored prose is never collapsed or clobbered.
 - Override use is visible: CI annotates the run; the integrator records it in evidence.
 

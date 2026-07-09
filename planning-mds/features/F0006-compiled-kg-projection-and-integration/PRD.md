@@ -88,7 +88,7 @@ ever corrupt or silently stale the graph.
 - Tracker generation: `REGISTRY.md` and `ROADMAP.md` feature tables (and `STORY-INDEX.md`, already
   generated) become projections from feature shards.
 - Git policy and CI: reproducibility check, hand-edit guard on generated files, `.gitattributes`
-  (merge driver + `linguist-generated`).
+  (merge driver + `linguist-generated` for whole-file generated paths only).
 - Framework-contract reconciliation: actions, prompts, KG docs, templates, ownership boundaries —
   absorbs F0005 S0004.
 
@@ -362,9 +362,9 @@ Generated files are **never merge inputs**.
 - `.gitattributes`: **whole-file** generated paths get `linguist-generated` (collapse PR diffs) and
   a merge driver (`merge=ours` or equivalent) so textual conflicts on them never block anyone — the
   recompile overwrites the result regardless. The two **partially-generated** trackers
-  (`REGISTRY.md`/`ROADMAP.md`) are excluded from the merge driver: only their fenced table regions
-  are recompiled, so a whole-file `merge=ours` would silently drop the PM-authored prose the
-  recompile does not restore — that prose merges as ordinary text and routes to the PM (S0002/S0007).
+  (`REGISTRY.md`/`ROADMAP.md`) are excluded from both `linguist-generated` and the merge driver:
+  only their fenced table regions are recompiled, and their surrounding PM-authored prose remains a
+  visible, ordinary text diff that routes to the PM (S0002/S0007).
 - **Integration never targets `main` directly** (maintainer decision, 2026-07-05). Integrator
   merges land on a designated **integration branch**: for the Phase-A train, the existing
   `chore/merge-PRs` (the de facto mainline — `main` is stale and is not a valid merge base).
@@ -509,7 +509,7 @@ either a single revert.
 | `planning-mds/knowledge-graph/*` | Becomes fully generated (Phase B); `solution-ontology.yaml` rehomed to `kg-source/ontology/` |
 | `planning-mds/features/REGISTRY.md`, `ROADMAP.md` | Feature tables become generated regions (Phase B) |
 | `scripts/kg/generated_paths.yaml` | **New** (Phase B, S0008): single authoritative list of every generated path, each with a `whole-file`/`fenced-region` granularity marker (content per §2); consumed by CI, `.gitattributes` generation, and the integrator |
-| `.gitattributes` | `linguist-generated` + merge driver on `whole-file` generated paths (generated from `generated_paths.yaml`, never hand-listed); the `fenced-region` trackers get `linguist-generated` but **not** the merge driver |
+| `.gitattributes` | `linguist-generated` + merge driver on `whole-file` generated paths only (generated from `generated_paths.yaml`, never hand-listed); the `fenced-region` trackers get neither because GitHub Linguist and merge drivers are file-scoped |
 | `.github/workflows/` | Reproducibility check — stood up at B5 (S0008); warn-only shake-out, then blocking post-cutover |
 | `CONTRIBUTING.md` / contributor docs | Shard-authoring flow; "never edit `knowledge-graph/*` by hand" |
 

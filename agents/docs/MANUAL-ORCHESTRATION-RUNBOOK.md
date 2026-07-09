@@ -120,9 +120,13 @@ is authoritative; this is the operator checklist). Serial: one run at a time.
 
 1. **Gate 1 — feature review.** Confirm a passing `feature-review` verdict for
    the source branch's feature, or decide and write a waiver with rationale.
-   No verdict and no waiver → do not start the run.
-   *First post-train integration: no blanket waiver — use a real verdict so the
-   gate is exercised, not waived (maintainer decision 2026-07-06; F0006 STATUS).*
+   Missing both → halt before merging and record the missing gate; do not
+   proceed to the merge steps. *First post-train integration: no blanket waiver.
+   Deliberately start one evidence run with neither verdict nor waiver, confirm
+   the gate-1 halt is recorded, then obtain the verdict (or one-run waiver with
+   rationale) and rerun. Supplying a real verdict on the first attempt exercises
+   the pass path only and does not close the missing-verdict evidence gap
+   (maintainer decision 2026-07-06; F0006 STATUS).*
 2. **Run the integrator** via
    `agents/templates/prompts/evidence-contract/integrate-operator-friendly.md`
    with `SOURCE`, `INTEGRATION_BRANCH` (never `main`), and the verdict/waiver.
