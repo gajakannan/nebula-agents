@@ -12,7 +12,7 @@
 | F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; three enforcement paths remain exercised-by-text-only — gate-1 halt, gate-2 fail, self-abort; see provenance notes) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
-| F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
+| F0006-S0006 | Decompiler-first migration with round-trip proof | B | [~] In Progress (tooling built + round-trip proven byte-identical 2026-07-10; **cutover paused for maintainer drift review**) |
 | F0006-S0007 | Tracker generation from feature shards | B | [ ] Not Started |
 | F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [ ] Not Started |
 | F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
@@ -40,7 +40,7 @@
 - [x] `compile.py` deterministic (S0005): double-compile + path-independent byte-identical; shards→trio via `canonical_dump`; verbatim ontology mirror; analysis (dup/name-similarity/glob); `--check`/`--strict`; all-or-nothing; empty-source no-op; 22 tests (2026-07-09)
 - [x] Logical-ref resolver `resolve_doc_ref` in `kg_common.py` (S0005) — resolves at **compile time** (generated projections store physical paths, so `validate.py`/`lookup.py`/`eval.py` read them as-is and need no wiring); F0005 matrix green (live/archive-flip/unmapped/missing/malformed/stable-root/physical-reject)
 - [x] Driver-strips `generated_at` (S0005-D1): `compile.py --generators` drives decisions/coverage/story-index then strips timestamps (generator internals untouched)
-- [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical; feature-table decompile populates feature-shard presentation fields (name/phase/section/rationale/gate/dates), schema-valid + count-reconciled (tracker round trip closes at S0007)
+- [~] `decompile.py` with `--check` **built + tested** (S0006): dry-run reconciles counts (631 nodes / 216 bindings / 40 features [33+7] / 164 stories) and writes nothing; `compile(decompile(graph))` **proven byte-identical** for all 4 files (0 anomalies) after one source-drift fix (6 mis-filed glossary/capability records); feature presentation fields populated best-effort + schema-valid; 6 `test_decompile.py` tests green. **Real cutover paused for maintainer drift review (D-cutover / D-drift).**
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
 - [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions (byte-identical round trip from decompiled shards)
 - [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
