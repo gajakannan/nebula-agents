@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-06 (Phase-A merge-train complete — all 7 contributor PRs integrated and promoted to `main`; S0001–S0003 signed off)
+**Last Updated:** 2026-07-09 (Phase B started — S0004 shard schema + validator done and signed off; B1 of B1–B6. Phase A complete 2026-07-06: all 7 contributor PRs integrated and promoted to `main`; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -10,7 +10,7 @@
 | F0006-S0001 | Three-way semantic KG merge tool (`merge3.py`) | A | [x] Done (signed off 2026-07-06) |
 | F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [x] Done (signed off 2026-07-06) |
 | F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; three enforcement paths remain exercised-by-text-only — gate-1 halt, gate-2 fail, self-abort; see provenance notes) |
-| F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [ ] Not Started |
+| F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
 | F0006-S0007 | Tracker generation from feature shards | B | [ ] Not Started |
@@ -36,6 +36,7 @@
 - [x] Canonical serializer in `kg_common.py` (+ one-time no-semantic-change canonicalization commit, ID-level-diff verified via `merge3.py --semantic-diff`: 0 semantic differences per file)
 - [x] `merge3.py`: record merge, field rules, taxonomy, all-or-nothing output, conflict report (text + JSON; `--semantic-diff` mode; generated-input guard; exit codes 0/1/2)
 - [x] Tracker-row merge for REGISTRY/ROADMAP feature tables (`tracker_merge.py` via the `merge3.py` CLI; per-table order config incl. manual/operator order with both-added weave; counter max-merge; exclusive-section check; STORY-INDEX rejected; 18 tests; PR #47 replay clean with F0038 above F0021 per the published rule)
+- [x] Shard schema + validator (S0004): `kg-source/README.md` spec, `schemas/kg-source/{node,feature,binding,exclusion}.schema.json`, `scripts/kg/shard_validate.py` (importable), 29 tests green (2026-07-09)
 - [ ] `compile.py` deterministic (double-compile byte-identical; no committed timestamps)
 - [ ] Logical-ref resolver wired into `validate.py` / `lookup.py` / `eval.py` call sites
 - [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical; feature-table decompile populates feature-shard presentation fields (name/phase/section/rationale/gate/dates), schema-valid + count-reconciled (tracker round trip closes at S0007)
@@ -47,7 +48,7 @@
 ## Framework-Contract Progress (`nebula-agents`)
 
 - [x] `agents/integrator/SKILL.md` persona (duties, hard boundary, routing) — 2026-07-05
-- [~] `agents/agent-map.yaml`: integrator registered (balanced tier) + `integrate` action wired with `review-verdict`/`approval` gates; Phase-B shard write scopes remain (S0004+)
+- [~] `agents/agent-map.yaml`: integrator registered (balanced tier) + `integrate` action wired with `review-verdict`/`approval` gates; **Phase-B `kg-source/` write scopes added (S0004, 2026-07-09)** — architect: `nodes/bindings/policies/ontology`, PM: `features/exclusions` (co-sign annotated); removal of the now-generated `knowledge-graph/*.yaml` scopes + integrator annotation flip deferred to S0009 (post-cutover)
 - [x] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause, steps I0–I6 with human gates at I0 and I6, branch strategy) + `actions/README.md` + `ROUTER.md` routing
 - [x] Integration evidence template + `integrate-operator-friendly.md` prompt (evidence home decided: base-run profile at `operations/evidence/runs/integrate-*`)
 - [ ] `agents/actions/feature.md` G7/G8 reconciled (no off-book repoint narrative)
@@ -107,8 +108,8 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0002 | Code Reviewer | code-reviewer (delegated) | PASS | `tracker_merge.py` reuses S0001 engine (no duplicated merge logic); per-table config incl. manual-order weave; STORY-INDEX rejection; fail-loud on unconfigured tables/unkeyed rows | 2026-07-06 | Prose unions during the train were maintainer-delegate weaves recorded per evidence run (PM-routed by design) |
 | F0006-S0003 | Architect | architect (delegated) | PASS | Contract shipped (SKILL/integrate.md/agent-map/templates/runbook, 1cacb7e); 7-PR train executed: 9 evidence runs, 2 halts routed per taxonomy (22 stale-record DivergentInserts → fixup; real ADR-029 collision → architect renumber to ADR-031); both human gates recorded every run; promotion e2f78be | 2026-07-06 | Gate-1 missing-verdict halt never exercised live (train-wide waiver used); gate-2 fail path never exercised (all passes) — both are untested failure-branches (the self-abort path is separately allowlist-backed in `agent-map.yaml`, abort-untested). Maintainer decision 2026-07-06: the first post-train integration runs with **no blanket waiver**; the missing-verdict halt is recorded by deliberately starting one run with **neither verdict nor waiver** (per `integrate.md` I0 — a supplied verdict passes gate 1, so dropping the blanket waiver alone does not fire the halt), then obtaining the verdict and re-running (see Deferred Non-Blocking Follow-ups). |
 | F0006-S0003 | Code Reviewer | code-reviewer (delegated) | PASS | integrate.md I0–I6 procedure matches executed runs; evidence template fields all populated in 9 real runs; branch strategy (never `main`) held — `main` touched only by promotion merge | 2026-07-06 | Integration ran operator-driven (Claude as integrator + maintainer gates), not yet via the operator prompt end-to-end |
-| F0006-S0004 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0004 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0004 | Architect | architect (delegated) | PASS | Corrected shard taxonomy to the real census (15 node kinds / ~631 nodes / 19 ontology `node_types`, not PRD §3's 4-subdir sketch); `kg-source/README.md` schema spec + layout + ownership map + REGISTRY/ROADMAP column↔field mapping; feature-shard full tracker-projected field set; ownership map encoded in `agent-map.yaml` (architect `nodes/bindings/policies/ontology`, PM `features/exclusions`, co-sign annotated) — `validate_agent_map.py` green | 2026-07-09 | Removal of now-generated `knowledge-graph/*.yaml` scopes + integrator annotation flip deferred to S0009 (post-cutover); shard population is S0006 |
+| F0006-S0004 | Code Reviewer | code-reviewer (delegated) | PASS | `scripts/kg/shard_validate.py` (standalone, importable by S0005) reuses `kg_common` (`SECTION_TYPES`/`type_regex_map`/`REF_FIELDS`) + `jsonschema` draft-07; per-kind JSON Schemas (node/feature/binding/exclusion); 29/29 `test_shard_validate.py` green covering all 11 acceptance edge cases (kind↔dir, logical-ref hint, one-per-file/bundle D2, unmapped dir, ID grammar, ID-only refs, feature required-field conditionals, unparseable/missing-id, binding-glob, owner-resolvability); CLI exit 0/1/2 | 2026-07-09 | Pre-existing `test_lookup_tier` failure confirmed unrelated (real-graph snapshot drift; reproduces without S0004 files) |
 | F0006-S0005 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0005 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0005 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
@@ -135,10 +136,10 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: TBD |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 2026-07-09) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 3 / 9 |
+| Stories completed | 4 / 9 |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |

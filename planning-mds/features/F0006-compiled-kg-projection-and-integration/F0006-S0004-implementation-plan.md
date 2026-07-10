@@ -8,7 +8,7 @@
 |-------|-------|
 | Story | F0006-S0004 (PRD row **B1**) |
 | Phase | B — Compiled projection |
-| Status | **Planned — awaiting approval** (esp. decision **D2**) |
+| Status | **Done — signed off 2026-07-09** (Architect + Code Reviewer PASS; 29 validator tests green) |
 | Created | 2026-07-09 |
 | Branch (both repos) | `feat/F0006-phase-B-compiled-projection` |
 | Signoff required | Architect + Code Reviewer (**no QE** for S0004, per `STATUS.md`) |
@@ -166,7 +166,7 @@ importable). Actionable errors naming file + field + rule + fix.
 ## 7. Decisions (flag if you disagree)
 
 - **D1 — taxonomy:** expand `nodes/` to the real 14 node kinds + top-level `policies/bindings/features/exclusions/ontology/`. *(forced by §1)* — **decided**
-- **D2 — file granularity:** one-concept-per-file for the collision-prone kinds (`capabilities`, `entities`, `workflows`) and **all features**; allow per-kind **bundle** files for thin high-count kinds (`endpoints`, `schemas`, `policy_rules`, `adrs`, `roles`, `config_keys`, `events`, `glossary_terms`, `migrations`, `api_contracts`, `ui_routes`, `evidence`). Bundles stay mergeable via `merge3`. **⇐ the one call most worth confirming; sets S0006 migration granularity.** — **PENDING CONFIRMATION**
+- **D2 — file granularity:** one-concept-per-file for the collision-prone kinds (`capabilities`, `entities`, `workflows`) and **all features**; allow per-kind **bundle** files for thin high-count kinds (`endpoints`, `schemas`, `policy_rules`, `adrs`, `roles`, `config_keys`, `events`, `glossary_terms`, `migrations`, `api_contracts`, `ui_routes`, `evidence`). Bundles stay mergeable via `merge3`. Sets S0006 migration granularity. — **CONFIRMED 2026-07-09** (encoded in `shard_validate.ONE_PER_FILE_NODE_SECTIONS` + README §2)
 - **D3 — validator home:** standalone `shard_validate.py`, not folded into `validate.py`. — **decided**
 - **D4 — ID grammar:** reuse ontology `id_patterns` rather than a new list. — **decided**
 - **D5 — closeout style:** record S0004 signoff in `STATUS.md` provenance (Architect + Code Reviewer) with the green validator test run as evidence — Phase-A delegated-signoff style, not a full `feature.md` evidence run. — **decided**
@@ -183,16 +183,16 @@ importable). Actionable errors naming file + field + rule + fix.
 
 ## 9. Progress checklist (maps to story DoD)
 
-- [ ] D2 confirmed with maintainer (unblocks migration granularity)
-- [ ] `kg-source/README.md` schema spec + layout + ownership map + column↔field mapping landed
-- [ ] Per-kind JSON Schemas under `planning-mds/schemas/kg-source/` landed
-- [ ] `shard_validate.py` implemented (reuses `kg_common` + `jsonschema`)
-- [ ] `test_shard_validate.py` — all 11 edge cases green
-- [ ] Fixture shards (valid + failing) under `tests/fixtures/kg-source/`
-- [ ] Ownership map encoded in `agent-map.yaml` (additive) — verified against §2
-- [ ] Single-home decision recorded for the full tracker-projected field set + column↔field mapping
-- [ ] Story filename matches `Story ID` prefix (already true)
-- [ ] Story index regenerated / updated
-- [ ] `STATUS.md` — S0004 → Done; Architect + Code Reviewer provenance rows
-- [ ] Architect signoff
-- [ ] Code Reviewer signoff
+- [x] D2 confirmed with maintainer (unblocks migration granularity)
+- [x] `kg-source/README.md` schema spec + layout + ownership map + column↔field mapping landed
+- [x] Per-kind JSON Schemas under `planning-mds/schemas/kg-source/` landed
+- [x] `shard_validate.py` implemented (reuses `kg_common` + `jsonschema`)
+- [x] `test_shard_validate.py` — all 11 edge cases green
+- [x] Fixture shards (valid + failing) under `tests/fixtures/kg-source/`
+- [x] Ownership map encoded in `agent-map.yaml` (additive) — verified against §2
+- [x] Single-home decision recorded for the full tracker-projected field set + column↔field mapping
+- [x] Story filename matches `Story ID` prefix (already true)
+- [x] Story index regenerated / updated
+- [x] `STATUS.md` — S0004 → Done; Architect + Code Reviewer provenance rows
+- [x] Architect signoff
+- [x] Code Reviewer signoff

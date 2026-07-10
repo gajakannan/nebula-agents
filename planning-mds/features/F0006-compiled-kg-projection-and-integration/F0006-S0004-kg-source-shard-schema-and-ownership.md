@@ -147,16 +147,16 @@ the ownership).
 
 ## Definition of Done
 
-- [ ] Schema spec + JSON Schemas reviewed and landed
-- [ ] Ownership map encoded in docs and `agent-map.yaml`
-- [ ] Shard validation implemented (standalone or in `validate.py`) with tests for every edge case
-      above
-- [ ] Single-home decision recorded for the **full tracker-projected field set** (not just
+- [x] Schema spec + JSON Schemas reviewed and landed (`kg-source/README.md`; `schemas/kg-source/{node,feature,binding,exclusion}.schema.json`)
+- [x] Ownership map encoded in docs and `agent-map.yaml` (architect `nodes/bindings/policies/ontology`, PM `features/exclusions`, co-sign annotated; `validate_agent_map.py` green)
+- [x] Shard validation implemented (`scripts/kg/shard_validate.py`, standalone) with tests for every edge case
+      above (29 tests green)
+- [x] Single-home decision recorded for the **full tracker-projected field set** (not just
       `depends_on`): schema enumerates `name`, `phase`, roadmap section, rationale, validation/entry
       gate, supersession, and retirement/archive dates, plus the REGISTRY/ROADMAP column↔field
-      mapping (here and in KNOWLEDGE-GRAPH.md via S0009)
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+      mapping (`kg-source/README.md` §4/§4.1; KNOWLEDGE-GRAPH.md encoding lands via S0009)
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0004 → Done)
 
 ## Review Provenance
 

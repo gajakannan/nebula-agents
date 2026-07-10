@@ -30,12 +30,16 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/domain/**
       - {PRODUCT_ROOT}/planning-mds/features/**
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/kg-source/**          # Phase B: authored shard layer (read all for cross-refs)
       - agents/templates/**
     writes:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md          # Sections 3.x only
       - {PRODUCT_ROOT}/planning-mds/features/**           # PRDs, stories, STATUS, trackers, archive
       - {PRODUCT_ROOT}/planning-mds/examples/personas/**
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # minimal feature/story stub only
+      # ── Phase B: kg-source/ authored shard layer (F0006-S0004 ownership map) ──
+      - {PRODUCT_ROOT}/planning-mds/kg-source/features/**    # feature shards: technical + tracker presentation fields (single home)
+      - {PRODUCT_ROOT}/planning-mds/kg-source/exclusions/**  # excluded-feature shards; co-sign: architect (symmetric)
 
   architect:
     model_tier: advanced    # architecture / system design
@@ -46,6 +50,7 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/domain/**
       - {PRODUCT_ROOT}/planning-mds/architecture/**
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/**
+      - {PRODUCT_ROOT}/planning-mds/kg-source/**          # Phase B: authored shard layer (read all for cross-refs)
       - agents/templates/**
       - agents/architect/references/**
     writes:
@@ -58,6 +63,11 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml # only when ontology vocabulary itself changes
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml       # implementation bindings from canonical IDs into {PRODUCT_ROOT}/engine/experience code
       - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml  # generated via `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
+      # ── Phase B: kg-source/ authored shard layer (F0006-S0004 ownership map) ──
+      - {PRODUCT_ROOT}/planning-mds/kg-source/nodes/**       # canonical node shards (all kinds)
+      - {PRODUCT_ROOT}/planning-mds/kg-source/bindings/**    # node→code path bindings (compiles to code-index.yaml)
+      - {PRODUCT_ROOT}/planning-mds/kg-source/policies/**    # policy_rule shards; co-sign: security on authorization-*.yaml
+      - {PRODUCT_ROOT}/planning-mds/kg-source/ontology/**    # solution-ontology.yaml home; co-sign: PM per its embedded ownership matrix
       - {PRODUCT_ROOT}/planning-mds/features/**/feature-assembly-plan.md  # per-feature execution plan
       - {PRODUCT_ROOT}/planning-mds/features/**/PRD.md    # architecture traceability + solution design sections
       - {PRODUCT_ROOT}/planning-mds/features/**/README.md # feature ERD (Mermaid + ASCII), C4 component diagrams
