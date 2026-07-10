@@ -51,14 +51,14 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 | [F0006-S0002](./F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Done |
 | [F0006-S0003](./F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Done |
 | [F0006-S0004](./F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Done |
-| [F0006-S0005](./F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Not Started |
+| [F0006-S0005](./F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Done |
 | [F0006-S0006](./F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Not Started |
 | [F0006-S0007](./F0006-S0007-tracker-generation-from-shards.md) | Tracker generation from feature shards | Not Started |
 | [F0006-S0008](./F0006-S0008-reproducibility-ci-and-git-policy.md) | Reproducibility CI, enforcement, and git policy | Not Started |
 | [F0006-S0009](./F0006-S0009-framework-contract-reconciliation.md) | Framework contract, roles, and docs reconciliation | Not Started |
 
 **Total Stories:** 9
-**Completed:** 4 / 9 (Phase A complete 2026-07-06; Phase B started — S0004 shard schema + validator done 2026-07-09)
+**Completed:** 5 / 9 (Phase A complete 2026-07-06; Phase B — S0004 shard schema/validator + S0005 deterministic compiler done 2026-07-09)
 
 ## Phasing
 
@@ -77,9 +77,10 @@ the integrator creates a dedicated integration branch per train; the promotion r
 
 ## Architecture Review
 
-**Phase B status:** In Progress (B1/S0004 done 2026-07-09; B2–B6 pending)
+**Phase B status:** In Progress (B1/S0004 + B2/S0005 done 2026-07-09; B3–B6 pending)
 **Execution Plan:** [PRD.md](./PRD.md) §Sequencing & Migration Plan, rows B1–B6 (S0004→S0009 with
-per-step exit proofs). Per-story build tracker: [F0006-S0004-implementation-plan.md](./F0006-S0004-implementation-plan.md).
+per-step exit proofs). Per-story build trackers:
+[S0004](./F0006-S0004-implementation-plan.md) · [S0005](./F0006-S0005-implementation-plan.md).
 
 ### Key Findings
 

@@ -129,14 +129,14 @@ regeneration entry point — today they match only `validate.py --regenerate-*` 
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met; determinism proven by double-compile and a cross-machine check
-- [ ] F0005 resolver test matrix green (live, archived, unmapped, missing, malformed, stable-root
-      passthrough)
-- [ ] Analysis report + suppression ledger implemented with strict/advisory modes
-- [ ] `--check` mode diffs committed projections correctly
-- [ ] Unit + golden-file tests; documented in `scripts/kg/` README
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met; determinism proven by double-compile **and** a path-independent (cross-machine proxy) compile — byte-identical
+- [x] F0005 resolver test matrix green (live, archive-flip, unmapped, missing, malformed, stable-root
+      passthrough, physical-path reject)
+- [x] Analysis report + suppression ledger (`kg-source/exclusions/suppressions.yaml`, rationale-gated) implemented with strict/advisory modes
+- [x] `--check` mode diffs committed projections correctly (fresh / drift / tamper)
+- [x] Unit + golden-file tests (`test_compile.py`, 24); documented in `scripts/kg/README.md`
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0005 → Done)
 
 ## Review Provenance
 

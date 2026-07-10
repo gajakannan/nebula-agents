@@ -63,7 +63,7 @@
 | [F0006-S0002](./F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | Done | High |
 | [F0006-S0003](./F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) | Integrator role and `integrate` action | Done | Critical |
 | [F0006-S0004](./F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md) | `kg-source/` shard schema, layout, and ownership | Done | Critical |
-| [F0006-S0005](./F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Not Started | Critical |
+| [F0006-S0005](./F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Done | Critical |
 | [F0006-S0006](./F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Not Started | Critical |
 | [F0006-S0007](./F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md) | Tracker generation from feature shards | Not Started | High |
 | [F0006-S0008](./F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md) | Reproducibility CI, enforcement, and git policy | Not Started | High |

@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-09 (Phase B started — S0004 shard schema + validator done and signed off; B1 of B1–B6. Phase A complete 2026-07-06: all 7 contributor PRs integrated and promoted to `main`; S0001–S0003 signed off)
+**Last Updated:** 2026-07-09 (Phase B: **S0004 + S0005 done and signed off** — shard schema/validator + deterministic compiler; B1–B2 of B1–B6. Phase A complete 2026-07-06: all 7 contributor PRs integrated and promoted to `main`; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -11,7 +11,7 @@
 | F0006-S0002 | Tracker-table three-way merge (REGISTRY/ROADMAP rows) | A | [x] Done (signed off 2026-07-06) |
 | F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; three enforcement paths remain exercised-by-text-only — gate-1 halt, gate-2 fail, self-abort; see provenance notes) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [x] Done (signed off 2026-07-09) |
-| F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [ ] Not Started |
+| F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [ ] Not Started |
 | F0006-S0007 | Tracker generation from feature shards | B | [ ] Not Started |
 | F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [ ] Not Started |
@@ -37,8 +37,9 @@
 - [x] `merge3.py`: record merge, field rules, taxonomy, all-or-nothing output, conflict report (text + JSON; `--semantic-diff` mode; generated-input guard; exit codes 0/1/2)
 - [x] Tracker-row merge for REGISTRY/ROADMAP feature tables (`tracker_merge.py` via the `merge3.py` CLI; per-table order config incl. manual/operator order with both-added weave; counter max-merge; exclusive-section check; STORY-INDEX rejected; 18 tests; PR #47 replay clean with F0038 above F0021 per the published rule)
 - [x] Shard schema + validator (S0004): `kg-source/README.md` spec, `schemas/kg-source/{node,feature,binding,exclusion}.schema.json`, `scripts/kg/shard_validate.py` (importable), 29 tests green (2026-07-09)
-- [ ] `compile.py` deterministic (double-compile byte-identical; no committed timestamps)
-- [ ] Logical-ref resolver wired into `validate.py` / `lookup.py` / `eval.py` call sites
+- [x] `compile.py` deterministic (S0005): double-compile + path-independent byte-identical; shards→trio via `canonical_dump`; verbatim ontology mirror; analysis (dup/name-similarity/glob); `--check`/`--strict`; all-or-nothing; empty-source no-op; 22 tests (2026-07-09)
+- [x] Logical-ref resolver `resolve_doc_ref` in `kg_common.py` (S0005) — resolves at **compile time** (generated projections store physical paths, so `validate.py`/`lookup.py`/`eval.py` read them as-is and need no wiring); F0005 matrix green (live/archive-flip/unmapped/missing/malformed/stable-root/physical-reject)
+- [x] Driver-strips `generated_at` (S0005-D1): `compile.py --generators` drives decisions/coverage/story-index then strips timestamps (generator internals untouched)
 - [ ] `decompile.py` with `--check`; round-trip `compile(decompile(graph))` byte-identical; feature-table decompile populates feature-shard presentation fields (name/phase/section/rationale/gate/dates), schema-valid + count-reconciled (tracker round trip closes at S0007)
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
 - [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions (byte-identical round trip from decompiled shards)
@@ -110,9 +111,9 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0003 | Code Reviewer | code-reviewer (delegated) | PASS | integrate.md I0–I6 procedure matches executed runs; evidence template fields all populated in 9 real runs; branch strategy (never `main`) held — `main` touched only by promotion merge | 2026-07-06 | Integration ran operator-driven (Claude as integrator + maintainer gates), not yet via the operator prompt end-to-end |
 | F0006-S0004 | Architect | architect (delegated) | PASS | Corrected shard taxonomy to the real census (15 node kinds / ~631 nodes / 19 ontology `node_types`, not PRD §3's 4-subdir sketch); `kg-source/README.md` schema spec + layout + ownership map + REGISTRY/ROADMAP column↔field mapping; feature-shard full tracker-projected field set; ownership map encoded in `agent-map.yaml` (architect `nodes/bindings/policies/ontology`, PM `features/exclusions`, co-sign annotated) — `validate_agent_map.py` green | 2026-07-09 | Removal of now-generated `knowledge-graph/*.yaml` scopes + integrator annotation flip deferred to S0009 (post-cutover); shard population is S0006 |
 | F0006-S0004 | Code Reviewer | code-reviewer (delegated) | PASS | `scripts/kg/shard_validate.py` (standalone, importable by S0005) reuses `kg_common` (`SECTION_TYPES`/`type_regex_map`/`REF_FIELDS`) + `jsonschema` draft-07; per-kind JSON Schemas (node/feature/binding/exclusion); 29/29 `test_shard_validate.py` green covering all 11 acceptance edge cases (kind↔dir, logical-ref hint, one-per-file/bundle D2, unmapped dir, ID grammar, ID-only refs, feature required-field conditionals, unparseable/missing-id, binding-glob, owner-resolvability); CLI exit 0/1/2 | 2026-07-09 | Pre-existing `test_lookup_tier` failure confirmed unrelated (real-graph snapshot drift; reproduces without S0004 files) |
-| F0006-S0005 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0005 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0005 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0005 | Quality Engineer | quality-engineer (delegated) | PASS | Determinism proven: double-compile + path-independent (cross-machine proxy) byte-identical; golden-file trio match; `--check` detects fresh/drift/tamper; all-or-nothing (dup-id build writes nothing); F0005 resolver matrix green (live/archive-flip/unmapped/missing/malformed/stable-root passthrough/physical-reject); 22 `test_compile.py` + 3 story-block `test_shard_validate.py` cases; empty-source no-op verified (real graph untouched) | 2026-07-09 | Downstream generators driven behind `--generators` (needs toolchain); real-tree end-to-end generator run deferred to S0006 when kg-source is populated |
+| F0006-S0005 | Code Reviewer | code-reviewer (delegated) | PASS | `compile.py` reuses `kg_common.canonical_dump`/`canonicalize_document` + `merge3.collect_records`/`_atomic_write` (no reimplementation); `resolve_doc_ref` added to `kg_common`; feature-mappings emits only the technical subset (presentation fields excluded), stories expanded with `feature` key (D3); analysis reuses merge3's normalized-name fingerprint (D2); timestamp strip is driver-level, generators untouched (D1); ontology mirror verbatim (D4) | 2026-07-09 | S0004 feature schema amended additively with a `stories:` block (D3) — shard tests still green |
+| F0006-S0005 | Architect | architect (delegated) | PASS | Compiler is a pure function of `kg-source/`; logical refs resolve through feature `path:` at compile time (archive-flip proven); generated projections carry physical paths so validate/lookup/eval need no rewiring; empty-source no-op prevents clobbering a real graph; header sourcing (version/status/coverage_note) parameterized for S0006 | 2026-07-09 | — |
 | F0006-S0006 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0006 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0007 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
@@ -136,10 +137,10 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 2026-07-09) |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 4 / 9 |
+| Stories completed | 5 / 9 |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |
