@@ -9,7 +9,7 @@
 |-------|-------|
 | Story | F0006-S0006 (PRD row **B3**) |
 | Phase | B — Compiled projection |
-| Status | **Dry-run checkpoint reached 2026-07-10** — tooling built + tested; round-trip byte-identical **proven** after one source-drift fix; **awaiting go/no-go for the source fix + tagged cutover** |
+| Status | **Done — cutover landed 2026-07-10** (drift-fix `0c0d0e4`, cutover `712acd6`, tags `pre-kg-cutover`→`kg-cutover`; Architect + Code Reviewer + QE PASS) |
 | Created | 2026-07-09 |
 | Branch (both repos) | `feat/F0006-phase-B-compiled-projection` |
 | Signoff required | Architect + Code Reviewer + Quality Engineer |
@@ -200,8 +200,8 @@ and list every instance; count reconciliation (nodes/bindings/40 features/164 st
 - [x] `--check` dry-run + migration report; anomaly gate (nothing written on failure)
 - [x] `test_decompile.py`: real-graph round-trip, idempotency, anomaly, count-reconciliation green (6 tests)
 - [x] Dry-run on the **real** graph; drift list identified (**1 item: 6 mis-filed glossary/capability records**); round-trip **proven byte-identical** after the fix (hermetic)
-- [ ] **⏸ AWAITING GO/NO-GO:** apply source-drift fix (move 6 records glossary_terms→capabilities) as a reviewed commit, then run `decompile.py` (write real shards) + tagged cutover commit
-- [ ] Migration report archived; STATUS provenance (Architect + Code Reviewer + QE); story index updated
+- [x] Source-drift fix applied (6 records glossary_terms→capabilities, reviewed commit `0c0d0e4`); `decompile.py` wrote 182 real shards; tagged cutover commit `712acd6`; `compile.py --check` byte-identical
+- [x] Migration report recorded; STATUS provenance (Architect + Code Reviewer + QE PASS); story index updated (S0006 → Done)
 
 ## Dry-run checkpoint (2026-07-10)
 

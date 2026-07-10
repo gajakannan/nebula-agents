@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-09 (Phase B: **S0004 + S0005 done and signed off** — shard schema/validator + deterministic compiler; B1–B2 of B1–B6. Phase A complete 2026-07-06: all 7 contributor PRs integrated and promoted to `main`; S0001–S0003 signed off)
+**Last Updated:** 2026-07-10 (Phase B: **S0004 + S0005 + S0006 done and signed off** — shard schema/validator, deterministic compiler, and the **decompiler-first migration cutover** (`kg-source/` is now authoring truth; 182 shards; byte-identical round trip); B1–B3 of B1–B6. Phase A complete 2026-07-06; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -12,7 +12,7 @@
 | F0006-S0003 | Integrator role and `integrate` action | A | [x] Done (signed off 2026-07-06; three enforcement paths remain exercised-by-text-only — gate-1 halt, gate-2 fail, self-abort; see provenance notes) |
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
-| F0006-S0006 | Decompiler-first migration with round-trip proof | B | [~] In Progress (tooling built + round-trip proven byte-identical 2026-07-10; **cutover paused for maintainer drift review**) |
+| F0006-S0006 | Decompiler-first migration with round-trip proof | B | [x] Done (cutover landed 2026-07-10; signed off) |
 | F0006-S0007 | Tracker generation from feature shards | B | [ ] Not Started |
 | F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [ ] Not Started |
 | F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
@@ -40,7 +40,8 @@
 - [x] `compile.py` deterministic (S0005): double-compile + path-independent byte-identical; shards→trio via `canonical_dump`; verbatim ontology mirror; analysis (dup/name-similarity/glob); `--check`/`--strict`; all-or-nothing; empty-source no-op; 22 tests (2026-07-09)
 - [x] Logical-ref resolver `resolve_doc_ref` in `kg_common.py` (S0005) — resolves at **compile time** (generated projections store physical paths, so `validate.py`/`lookup.py`/`eval.py` read them as-is and need no wiring); F0005 matrix green (live/archive-flip/unmapped/missing/malformed/stable-root/physical-reject)
 - [x] Driver-strips `generated_at` (S0005-D1): `compile.py --generators` drives decisions/coverage/story-index then strips timestamps (generator internals untouched)
-- [~] `decompile.py` with `--check` **built + tested** (S0006): dry-run reconciles counts (631 nodes / 216 bindings / 40 features [33+7] / 164 stories) and writes nothing; `compile(decompile(graph))` **proven byte-identical** for all 4 files (0 anomalies) after one source-drift fix (6 mis-filed glossary/capability records); feature presentation fields populated best-effort + schema-valid; 6 `test_decompile.py` tests green. **Real cutover paused for maintainer drift review (D-cutover / D-drift).**
+- [x] `decompile.py` with `--check` + **cutover landed** (S0006, 2026-07-10, tags `pre-kg-cutover`→`kg-cutover`, commits: drift-fix `0c0d0e4`, cutover `712acd6`): 182 shards written; `compile(decompile(graph)) == graph` byte-identical on the real graph (`compile.py --check` green); feature presentation fields populated + schema-valid; counts reconciled (631 nodes / 216 bindings / 40 features [33+7] / 164 stories); 6 `test_decompile.py` tests green. Drift fixed at source first (6 mis-filed `capability:document-*` records moved glossary_terms→capabilities, zero refs broken). `kg-source/` is now authoring truth; monolith is generated output. `.gitattributes`/CI enforcement → S0008.
+- [x] `kg-source/**` populated (182 shards); `solution-ontology.yaml` rehomed under `kg-source/ontology/` (S0006 cutover)
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
 - [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions (byte-identical round trip from decompiled shards)
 - [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
@@ -114,8 +115,9 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0005 | Quality Engineer | quality-engineer (delegated) | PASS | Determinism proven: double-compile + path-independent (cross-machine proxy) byte-identical; golden-file trio match; `--check` detects fresh/drift/tamper; all-or-nothing (dup-id build writes nothing); F0005 resolver matrix green (live/archive-flip/unmapped/missing/malformed/stable-root passthrough/physical-reject); 22 `test_compile.py` + 3 story-block `test_shard_validate.py` cases; empty-source no-op verified (real graph untouched) | 2026-07-09 | Downstream generators driven behind `--generators` (needs toolchain); real-tree end-to-end generator run deferred to S0006 when kg-source is populated |
 | F0006-S0005 | Code Reviewer | code-reviewer (delegated) | PASS | `compile.py` reuses `kg_common.canonical_dump`/`canonicalize_document` + `merge3.collect_records`/`_atomic_write` (no reimplementation); `resolve_doc_ref` added to `kg_common`; feature-mappings emits only the technical subset (presentation fields excluded), stories expanded with `feature` key (D3); analysis reuses merge3's normalized-name fingerprint (D2); timestamp strip is driver-level, generators untouched (D1); ontology mirror verbatim (D4) | 2026-07-09 | S0004 feature schema amended additively with a `stories:` block (D3) — shard tests still green |
 | F0006-S0005 | Architect | architect (delegated) | PASS | Compiler is a pure function of `kg-source/`; logical refs resolve through feature `path:` at compile time (archive-flip proven); generated projections carry physical paths so validate/lookup/eval need no rewiring; empty-source no-op prevents clobbering a real graph; header sourcing (version/status/coverage_note) parameterized for S0006 | 2026-07-09 | — |
-| F0006-S0006 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0006 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0006 | Quality Engineer | quality-engineer (delegated) | PASS | Cutover gate met on the **real** graph: `compile(decompile(graph)) == graph` byte-identical for all 4 files (`compile.py --check` green post-cutover); counts reconciled exactly (631 nodes / 216 bindings / 40 features [33 mapped + 7 coverage-excluded] / 164 stories); idempotent re-decompile; anomaly gate writes nothing on failure; `validate.py` graph-integrity green; 182 shards `shard_validate`-clean; 6 `test_decompile.py` tests (real-graph round-trip, idempotency, count-reconciliation, ref-rewrite, ontology-verbatim, anomaly) | 2026-07-10 | `.gitattributes`/CI reproducibility enforcement is S0008; tracker byte-identical re-render is S0007 |
+| F0006-S0006 | Code Reviewer | code-reviewer (delegated) | PASS | `decompile.py` is a clean inverse of `compile.py` (reuses `tracker_merge.parse_tracker`, `kg_common.canonical_dump`, `shard_validate`); presentation-blacklist-over-verbatim projection handles heterogeneous feature records; `story_mappings` named distinctly from the real per-feature `stories` id-list; drift fixed at source (reviewed commit `0c0d0e4`), never laundered into shards; schema relaxations (open technical fields, object-form refs, free `method`) justified by real data; tagged, single-revert rollback | 2026-07-10 | S0004/S0005 suites still green after the additive schema/projection changes |
+| F0006-S0006 | Architect | architect (delegated) | PASS | Migration modeling sound: shard taxonomy covers all 15 node kinds at the D2 granularity; 40 features = 33 mapped + 7 `coverage_excluded`; logical-ref rewrite reversible (byte-identical round trip proves it); `projections-meta.yaml` sources the non-record headers; cutover keeps projections unchanged (shards added, `compile(source)` == committed) so rollback is a single revert to `pre-kg-cutover` | 2026-07-10 | — |
 | F0006-S0007 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0007 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (tracker-generator code: region markers, cell escaping, ordering, byte-identical round trip) |
 | F0006-S0008 | DevOps | TBD | TBD | TBD | TBD | Pending implementation |
@@ -137,10 +139,10 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09) |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 5 / 9 |
+| Stories completed | 6 / 9 |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |

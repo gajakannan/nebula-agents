@@ -149,15 +149,15 @@ flips blocking after this lands).
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met; graph round-trip byte-identity proven and recorded in evidence
-- [ ] Tracker decompile: REGISTRY/ROADMAP feature tables partitioned into feature-shard
-      presentation fields; completeness + count-reconciliation tests; anomaly failure on
-      tracker/shard mismatch (byte-identical tracker round trip closes at S0007)
-- [ ] Dry-run, idempotency, anomaly-failure, and count-reconciliation tests
-- [ ] Migration executed on `nebula-insurance-crm` (tagged cutover commit)
-- [ ] Migration report archived with the feature evidence
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met; graph round-trip byte-identity proven on the real graph (`compile.py --check` green post-cutover) and recorded
+- [x] Tracker decompile: REGISTRY/ROADMAP feature tables partitioned into feature-shard
+      presentation fields (via `tracker_merge.parse_tracker` + §4.1 mapping); count-reconciliation
+      (40 = 33 + 7); anomaly failure on tracker/shard mismatch (byte-identical tracker round trip closes at S0007)
+- [x] Dry-run, idempotency, anomaly-failure, and count-reconciliation tests (`test_decompile.py`, 6)
+- [x] Migration executed on `nebula-insurance-crm` (tagged cutover commit `712acd6`; tags `pre-kg-cutover`→`kg-cutover`; drift-fix `0c0d0e4`)
+- [x] Migration report recorded (report in commit `712acd6` + STATUS; 182 shards)
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0006 → Done)
 
 ## Review Provenance
 
