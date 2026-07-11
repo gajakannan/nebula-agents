@@ -123,14 +123,14 @@ F0006-S0008 (enforces region integrity), F0006-S0009 (TRACKER-GOVERNANCE update)
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met including the byte-identical cutover round trip with PM signoff
-- [ ] Generator renders every S0004 presentation field; the column↔field mapping matches the one
-      S0006 decompiled with (shared definition, verified by the byte-identical round trip)
-- [ ] Region-integrity, ordering, counter, and zero-diff tests
-- [ ] `compile.py` driver invokes tracker generation; integrator flow picks it up automatically
-- [ ] TRACKER-GOVERNANCE.md implications handed to S0009
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met including the byte-identical round trip with PM signoff (zero-diff regeneration; one-time canonicalization = markers + 3 documented ROADMAP rows, PM-approved)
+- [x] Generator renders the S0004 presentation fields via the §4.1 column↔field mapping S0006 decompiled with (shared definition, verified by the byte-identical round trip)
+- [x] Region-integrity, ordering, counter, and zero-diff tests (`test_tracker_gen.py`, 11)
+- [x] `compile.py` driver invokes tracker generation (`compile --check` validates regions); integrator flow picks it up automatically
+- [x] TRACKER-GOVERNANCE.md implications handed to S0009 (S0002→transition-only; BLUEPRINT defer recorded)
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0007 → Done)
+- [~] BLUEPRINT.md feature-plan list: **deferred** (D-blueprint 2026-07-11) — bespoke prose + stale duplicates, not a clean projection; tracked in Deferred Non-Blocking Follow-ups
 
 ## Review Provenance
 

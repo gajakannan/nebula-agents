@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-10 (Phase B: **S0004 + S0005 + S0006 done and signed off** — shard schema/validator, deterministic compiler, and the **decompiler-first migration cutover** (`kg-source/` is now authoring truth; 182 shards; byte-identical round trip); B1–B3 of B1–B6. Phase A complete 2026-07-06; S0001–S0003 signed off)
+**Last Updated:** 2026-07-11 (Phase B: **S0004–S0007 done and signed off** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, and **tracker generation** (REGISTRY/ROADMAP generated from shards; byte-identical round trip closed); B1–B4 of B1–B6. Phase A complete 2026-07-06; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -13,7 +13,7 @@
 | F0006-S0004 | `kg-source/` shard schema, layout, and ownership | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [x] Done (cutover landed 2026-07-10; signed off) |
-| F0006-S0007 | Tracker generation from feature shards | B | [ ] Not Started |
+| F0006-S0007 | Tracker generation from feature shards | B | [x] Done (2026-07-11; REGISTRY/ROADMAP generated + zero-diff round trip; BLUEPRINT deferred) |
 | F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [ ] Not Started |
 | F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
 
@@ -43,7 +43,7 @@
 - [x] `decompile.py` with `--check` + **cutover landed** (S0006, 2026-07-10, tags `pre-kg-cutover`→`kg-cutover`, commits: drift-fix `0c0d0e4`, cutover `712acd6`): 182 shards written; `compile(decompile(graph)) == graph` byte-identical on the real graph (`compile.py --check` green); feature presentation fields populated + schema-valid; counts reconciled (631 nodes / 216 bindings / 40 features [33+7] / 164 stories); 6 `test_decompile.py` tests green. Drift fixed at source first (6 mis-filed `capability:document-*` records moved glossary_terms→capabilities, zero refs broken). `kg-source/` is now authoring truth; monolith is generated output. `.gitattributes`/CI enforcement → S0008.
 - [x] `kg-source/**` populated (182 shards); `solution-ontology.yaml` rehomed under `kg-source/ontology/` (S0006 cutover)
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
-- [ ] Tracker generator owns fenced REGISTRY/ROADMAP table regions (byte-identical round trip from decompiled shards)
+- [x] Tracker generator owns fenced REGISTRY/ROADMAP table regions (S0007): `tracker_gen.py` renders from feature shards into `<!-- generated:begin -->` regions; zero-diff regeneration (byte-identical round trip closed); driven by `compile.py`; BLUEPRINT deferred
 - [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
 - [ ] `.gitattributes` (linguist-generated + merge driver) and CI workflow (warn → blocking)
 
@@ -118,8 +118,9 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0006 | Quality Engineer | quality-engineer (delegated) | PASS | Cutover gate met on the **real** graph: `compile(decompile(graph)) == graph` byte-identical for all 4 files (`compile.py --check` green post-cutover); counts reconciled exactly (631 nodes / 216 bindings / 40 features [33 mapped + 7 coverage-excluded] / 164 stories); idempotent re-decompile; anomaly gate writes nothing on failure; `validate.py` graph-integrity green; 182 shards `shard_validate`-clean; 6 `test_decompile.py` tests (real-graph round-trip, idempotency, count-reconciliation, ref-rewrite, ontology-verbatim, anomaly) | 2026-07-10 | `.gitattributes`/CI reproducibility enforcement is S0008; tracker byte-identical re-render is S0007 |
 | F0006-S0006 | Code Reviewer | code-reviewer (delegated) | PASS | `decompile.py` is a clean inverse of `compile.py` (reuses `tracker_merge.parse_tracker`, `kg_common.canonical_dump`, `shard_validate`); presentation-blacklist-over-verbatim projection handles heterogeneous feature records; `story_mappings` named distinctly from the real per-feature `stories` id-list; drift fixed at source (reviewed commit `0c0d0e4`), never laundered into shards; schema relaxations (open technical fields, object-form refs, free `method`) justified by real data; tagged, single-revert rollback | 2026-07-10 | S0004/S0005 suites still green after the additive schema/projection changes |
 | F0006-S0006 | Architect | architect (delegated) | PASS | Migration modeling sound: shard taxonomy covers all 15 node kinds at the D2 granularity; 40 features = 33 mapped + 7 `coverage_excluded`; logical-ref rewrite reversible (byte-identical round trip proves it); `projections-meta.yaml` sources the non-record headers; cutover keeps projections unchanged (shards added, `compile(source)` == committed) so rollback is a single revert to `pre-kg-cutover` | 2026-07-10 | — |
-| F0006-S0007 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0007 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (tracker-generator code: region markers, cell escaping, ordering, byte-identical round trip) |
+| F0006-S0007 | Quality Engineer | quality-engineer (delegated) | PASS | Byte-identical tracker round trip closed: `tracker_gen.py --check` zero-diff on the real trackers; REGISTRY content byte-identical (29 archived / 9 planned / 2 retired / 0 active reproduced exactly), ROADMAP diff = markers + 3 documented rows; every feature in exactly one REGISTRY table + one ROADMAP section; `compile.py --check` (KG trio) still byte-identical (roadmap_order blacklisted); 11 `test_tracker_gen.py` tests (zero-diff regen, region integrity, ordering, counter, count reconciliation, prose-untouched) | 2026-07-11 | Region *enforcement* (CI) is S0008 |
+| F0006-S0007 | Code Reviewer | code-reviewer (delegated) | PASS | `tracker_gen.py` writes only between fenced markers (prose untouched, verified by test); REGISTRY placement/sort derived by documented rules (rule-first, D-registry-derivation) — no stored display field needed; ROADMAP order captured as an additive `roadmap_order` presentation field (does not leak to feature-mappings); distinct Abandoned rationale preserved (not lost to canonicalization); `Next Available` = max+1; wired into the compile driver | 2026-07-11 | S0002 tracker-merge → transition-only; TRACKER-GOVERNANCE update handed to S0009 |
+| F0006-S0007 | Product Manager | product-manager (delegated) | PASS | One-time canonicalization diff reviewed + approved (D-canon): REGISTRY markers-only; ROADMAP markers + F0010/F0011 fuller Abandoned link names (matching REGISTRY) + F0014 PRD→README (README present). BLUEPRINT.md §3.3 generation **deferred** (bespoke prose + stale F0021/F0022 duplicates — not a clean projection) | 2026-07-11 | BLUEPRINT defer + duplicate cleanup tracked in Deferred Non-Blocking Follow-ups |
 | F0006-S0008 | DevOps | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
@@ -133,16 +134,17 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | Roll compiler + shard migration to other product repos | Each repo adopts independently after the reference implementation is proven | TBD | Framework maintainer |
 | Re-evaluate OmniGraph (or similar) if live multi-agent graph writes are ever needed | Out of scope; serial integrator suffices at current scale | TBD | Architect |
 | Central `F####` reservation tooling for contributors | Process rule suffices now (REGISTRY reservation before branching) | TBD | PM |
+| Generate BLUEPRINT.md §3.3 feature list from shards + clean its stale duplicates (F0021/F0022 appear twice with contradictory status) | S0007 D-blueprint decision (2026-07-11): §3.3 is a bespoke prose list, not a clean projection; generating it would drop per-feature descriptions. Not needed to close the REGISTRY/ROADMAP round trip (the story's gate). | TBD | PM |
 | Exercise S0003's untested enforcement paths: gate-1 missing-verdict halt, gate-2 validation-fail-leaves-merge-unpushed, and the contract-violation self-abort (integrator would write a source file) | Train-wide feature-review waiver + all-pass validations + no attempted source write meant none fired live. Self-abort is already allowlist-backed (`agents/agent-map.yaml` integrator scope excludes feature docs + `kg-source/**`, "abort + self-report on violation"), so its gap is verifying the abort *fires*, not a missing guard; gate-1/gate-2 are untested failure-branches. | **First post-train integration** runs with **no blanket waiver** (maintainer decision 2026-07-06); to record the missing-verdict halt, one run is deliberately started with **neither verdict nor waiver** (per `integrate.md` I0), the halt fires and is captured in that run's evidence, then the verdict is obtained and the run re-run. (Merely supplying a real verdict passes gate 1 and leaves the halt untested — dropping the blanket waiver alone does not trigger it.) Gate-2-fail injection stays optional (catch on the first real validation failure). Self-abort scenario test folded into S0009 when integrator tooling is next touched. | Maintainer + Quality Engineer |
 
 ## Closeout Summary
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10) |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10; B4/S0007 2026-07-11) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 6 / 9 |
+| Stories completed | 7 / 9 |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |
