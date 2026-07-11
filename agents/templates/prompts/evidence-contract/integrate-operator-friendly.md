@@ -1,9 +1,13 @@
 This prompt runs the integrate action (`agents/actions/integrate.md`): merge ONE contributor branch into the integration branch with semantic KG/tracker merging, unconditional regeneration, validation, and an append-only integration evidence run — bracketed by two maintainer gates.
 
 REQUIRED INPUTS (you must set):
-- `SOURCE={branch or PR number}`
+- The contributor SOURCE — set EITHER (a) or (b):
+  - (a) `PR_URL={GitHub PR URL}` — the usual case. `gh pr checkout <PR#>` to materialize the contributor branch locally, then `gh pr view <PR_URL> --json headRefName,baseRefName,state` → `SOURCE={headRefName}` (the contributor branch). Echo the resolved values.
+  - (b) `SOURCE={branch or PR number}` — when not starting from a PR URL.
 - `INTEGRATION_BRANCH={branch}` — never `main`; current train: the maintainer-designated branch (e.g. `chore/merge-PRs`); steady state: create `integrate/<date>-train`
 - ONE OF: `REVIEW_VERDICT_REF={feature-review run reference}` or `WAIVER="{rationale}"` (maintainer-authorized, this run only)
+
+Explicit `SOURCE` always overrides anything derived from `PR_URL`.
 
 OPTIONAL INPUTS (defaults apply when omitted):
 - `PRODUCT_ROOT=` — default: sister-repo per `agents/docs/AGENT-USE.md` → Session Setup

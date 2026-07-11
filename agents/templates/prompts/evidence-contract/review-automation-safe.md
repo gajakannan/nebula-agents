@@ -6,13 +6,18 @@ CONTRACT SCOPE: Review can run in two modes:
 
 REQUIRED INPUTS (operator must set before SESSION_SETUP):
   MODE:                 {feature-scoped | standalone}
-  SCOPE:                {feature | path-set | codebase}        # what is being reviewed
-  # When MODE=feature-scoped, also REQUIRED:
-  FEATURE_ID:           {F####}                                # required when MODE=feature-scoped
+  # Review TARGET — set EITHER (a) PR_URL OR (b) SCOPE (+ PATHS / FEATURE_ID+RUN_ID):
+  # (a) reviewing a PR (usual): `gh pr checkout <PR#>` + `gh pr view --json title,headRefName,baseRefName,files`
+  #     → SCOPE=path-set, PATHS<-files[].path, DIFF_RANGE=origin/{baseRefName}..{headRefName},
+  #       FEATURE_ID<-F#### in title/branch (feature-scoped). Explicit values override derived ones.
+  PR_URL:               {GitHub PR URL}
+  # (b) no PR: set SCOPE (+ PATHS for path-set; + FEATURE_ID/RUN_ID for feature-scoped) instead.
+  SCOPE:                {feature | path-set | codebase}        # required unless PR_URL is set
+  PATHS:                [path, path, ...]                      # required when SCOPE=path-set (auto from PR_URL)
+  FEATURE_ID:           {F####}                                # required when MODE=feature-scoped (from PR_URL when set)
   RUN_ID:               {YYYY-MM-DD-[a-z0-9]{8}}               # required when MODE=feature-scoped; the parent feature run ID
 
 OPTIONAL INPUTS (defaults apply when omitted):
-  PATHS:                [path, path, ...]                      # required only when SCOPE=path-set
   PRODUCT_ROOT:         absolute product repo root             # default: sister-repo per agents/docs/AGENT-USE.md
 
 AUTO-RESOLVED (do not set; SESSION_SETUP and the orchestrator compute these):

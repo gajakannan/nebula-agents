@@ -2,11 +2,13 @@ This prompt encodes the review action under the Feature Evidence Contract in `CO
 
 REQUIRED INPUTS (you must set):
 - `MODE={feature-scoped | standalone}`
-- `SCOPE={feature | path-set | codebase}`
-- When `MODE=feature-scoped`, also REQUIRED: `FEATURE_ID={F####}` and `RUN_ID={parent feature run ID}`
+- The review TARGET — set EITHER (a) or (b):
+  - (a) `PR_URL={GitHub PR URL}` — the usual case. `gh pr checkout <PR#>`, then `gh pr view <PR_URL> --json title,headRefName,baseRefName,files` → `SCOPE=path-set` + `PATHS` from `files[].path`, `DIFF_RANGE=origin/{baseRefName}..{headRefName}`, and (feature-scoped) `FEATURE_ID` from the `F####` token in the title/`headRefName`. Echo the resolved values.
+  - (b) `SCOPE={feature | path-set | codebase}` — with `PATHS=[…]` for `path-set`; and `FEATURE_ID={F####}` + `RUN_ID={parent feature run ID}` when `MODE=feature-scoped`.
+
+Explicit values always override anything derived from `PR_URL`.
 
 OPTIONAL INPUTS (defaults apply when omitted):
-- `PATHS=[path, path, ...]` — required only when `SCOPE=path-set`
 - `PRODUCT_ROOT=` — default: sister-repo per `agents/docs/AGENT-USE.md` → Session Setup; override only for non-standard layouts
 
 AUTO-RESOLVED (do not set; SESSION_SETUP and the orchestrator compute these):

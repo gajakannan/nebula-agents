@@ -2,10 +2,16 @@ ACTION: agents/actions/feature-review.md
 CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
 CONTRACT SCOPE: Feature review is a read-only post-feature completion audit. It answers "Is this feature truly done?" and writes a base run evidence package with feature-review-report.md. It reads, but never writes, the canonical feature evidence package.
 
-REQUIRED INPUTS (operator must set before SESSION_SETUP):
-  FEATURE_ID:           {F####}
-  MODE:                 {closeout-audit | candidate-audit}
-  DIFF_RANGE:           {base..head | working-tree | explicit changed-file set}
+REQUIRED INPUTS — set the review target as EITHER (a) PR_URL OR (b) the explicit trio:
+  # (a) reviewing a PR (usual): resolve everything from it via `gh pr checkout <PR#>` +
+  #     `gh pr view --json title,headRefName,baseRefName,state` → FEATURE_ID<-F#### in title/branch,
+  #     DIFF_RANGE=origin/{baseRefName}..{headRefName}, MODE=candidate-audit if OPEN else closeout-audit.
+  PR_URL:               {GitHub PR URL}
+  # (b) no PR: set all three explicitly instead.
+  FEATURE_ID:           {F####}                                # required unless PR_URL is set
+  MODE:                 {closeout-audit | candidate-audit}     # required unless PR_URL is set
+  DIFF_RANGE:           {base..head | working-tree | ...}       # required unless PR_URL is set
+  # Explicit values override anything derived from PR_URL.
 
 OPTIONAL INPUTS (defaults apply when omitted):
   FEATURE_RUN_ID:       {YYYY-MM-DD-[a-z0-9]{8}}              # required for candidate-audit or older-run review

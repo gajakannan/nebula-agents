@@ -1,9 +1,10 @@
 This prompt encodes the feature-review action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Feature review is a read-only post-feature completion audit. It answers: `Is this feature truly done?` It produces a base run evidence package per section 8 with `feature-review-report.md`; it reads the feature evidence package but does NOT write into it.
 
-REQUIRED INPUTS (you must set):
-- `FEATURE_ID={F####}`
-- `MODE={closeout-audit | candidate-audit}`
-- `DIFF_RANGE={base..head | working-tree | explicit changed-file set}`
+REQUIRED INPUTS — set the review target as EITHER (a) or (b):
+- (a) `PR_URL={GitHub PR URL}` — the usual case. The agent derives everything else from the PR: `gh pr checkout <PR#>`, then `gh pr view <PR_URL> --json title,headRefName,baseRefName,state` → `FEATURE_ID` = the `F####` token in the title/`headRefName`, `DIFF_RANGE` = `origin/{baseRefName}..{headRefName}`, `MODE` = `candidate-audit` when the PR is OPEN else `closeout-audit`. Echo the resolved values.
+- (b) `FEATURE_ID={F####}` + `MODE={closeout-audit | candidate-audit}` + `DIFF_RANGE={base..head | working-tree | explicit changed-file set}` — when NOT reviewing a PR.
+
+Explicit values always override anything derived from `PR_URL`.
 
 OPTIONAL INPUTS (defaults apply when omitted):
 - `FEATURE_RUN_ID={YYYY-MM-DD-[a-z0-9]{8}}` - required only when `MODE=candidate-audit` or when `latest-run.json` should not be used
