@@ -54,11 +54,11 @@ supersedes **F0005** (move-invariant logical doc refs become the compiler's refe
 | [F0006-S0005](./F0006-S0005-deterministic-kg-compiler.md) | Deterministic KG compiler with logical doc refs | Done |
 | [F0006-S0006](./F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Done |
 | [F0006-S0007](./F0006-S0007-tracker-generation-from-shards.md) | Tracker generation from feature shards | Done |
-| [F0006-S0008](./F0006-S0008-reproducibility-ci-and-git-policy.md) | Reproducibility CI, enforcement, and git policy | Not Started |
+| [F0006-S0008](./F0006-S0008-reproducibility-ci-and-git-policy.md) | Reproducibility CI, enforcement, and git policy | Done |
 | [F0006-S0009](./F0006-S0009-framework-contract-reconciliation.md) | Framework contract, roles, and docs reconciliation | Not Started |
 
 **Total Stories:** 9
-**Completed:** 7 / 9 (Phase A complete 2026-07-06; Phase B — S0004 schema/validator + S0005 compiler 2026-07-09; S0006 migration cutover 2026-07-10 (`kg-source/` is authoring truth); S0007 tracker generation 2026-07-11 (REGISTRY/ROADMAP round trip closed))
+**Completed:** 8 / 9 (Phase A complete 2026-07-06; Phase B — S0004 schema/validator + S0005 compiler 2026-07-09; S0006 migration cutover 2026-07-10; S0007 tracker generation 2026-07-11; S0008 reproducibility CI + git policy 2026-07-11 (blocking `reproducibility` check on `main`). Only S0009 (contract/docs) remains.)
 
 ## Phasing
 
@@ -77,7 +77,7 @@ the integrator creates a dedicated integration branch per train; the promotion r
 
 ## Architecture Review
 
-**Phase B status:** In Progress (B1/S0004 + B2/S0005 + B3/S0006 + B4/S0007 done; B5–B6 pending)
+**Phase B status:** In Progress (B1/S0004 + B2/S0005 + B3/S0006 + B4/S0007 + B5/S0008 done; **only B6/S0009 remains**)
 **Execution Plan:** [PRD.md](./PRD.md) §Sequencing & Migration Plan, rows B1–B6 (S0004→S0009 with
 per-step exit proofs). Per-story build trackers:
 [S0004](./F0006-S0004-implementation-plan.md) · [S0005](./F0006-S0005-implementation-plan.md) · [S0006](./F0006-S0006-implementation-plan.md) · [S0007](./F0006-S0007-implementation-plan.md).

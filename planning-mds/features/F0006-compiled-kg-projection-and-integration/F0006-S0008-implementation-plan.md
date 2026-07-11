@@ -10,7 +10,7 @@
 |-------|-------|
 | Story | F0006-S0008 (PRD row **B5**) |
 | Phase | B — Compiled projection |
-| Status | **Approved 2026-07-11 — ready to build** (all §4 decisions resolved) |
+| Status | **Done — 2026-07-11** (CI green on GitHub; `reproducibility` blocking required check on `main`; DevOps + QE + Code Reviewer PASS). **D-ci-scope reverted full→fast-core** on CI evidence (cross-machine symbol/decision/coverage nondeterminism). Commits product `fdc916c`→`a60ff06` |
 | Created | 2026-07-11 |
 | Branch (both repos) | `feat/F0006-phase-B-compiled-projection` |
 | Signoff required | **DevOps** + Quality Engineer + Code Reviewer |
@@ -193,13 +193,14 @@ correctly; workflow runs in low single-digit minutes.
 ## 9. Progress checklist
 
 - [x] Decisions D-check-entry / D-ci-scope / D-ci-mode / D-merge-driver / D-override resolved (2026-07-11)
-- [ ] `generated_paths.yaml` manifest (9 whole-file + 2 fenced-region, per PRD §2)
-- [ ] `.gitattributes` generated from manifest (`merge=ours` + `linguist-generated` on whole-file only) + drift check
-- [ ] `validate.py --check-reproducible` orchestration — **FULL**: compile-check + shard-validate + symbols/decisions/coverage + the 4 rules
-- [ ] Regenerate + strip `generated_at` from committed symbol-index/decisions/coverage (one-time, DevOps-reviewed)
-- [ ] `.github/workflows/kg-reproducibility.yml` — **blocking**, with .NET/Node/pnpm toolchain setup; red/green proof recorded
-- [ ] `agents/templates/ci-gates-template.yml` (framework)
-- [ ] Override-trailer convention documented + honored
-- [ ] `test_reproducibility.py` green; `scripts/kg/README.md` updated
-- [ ] **Branch protection**: add the required status check on `nebula-insurance-crm` main (via `gh api`, after first green run — I'll confirm before applying)
-- [ ] STATUS provenance (DevOps + QE + Code Reviewer); story index updated
+- [x] `generated_paths.yaml` manifest (9 whole-file + 2 fenced-region, per PRD §2)
+- [x] `.gitattributes` generated from manifest (`merge=ours` + `linguist-generated` on whole-file only) + drift check
+- [x] `validate.py --check-reproducible` orchestration (`reproducibility.py`): compile-check + shard-validate + the 4 rules + gitattributes drift + override trailer
+- [x] Stripped `generated_at` from committed symbol-index/decisions/unbound (S0005-D1)
+- [x] `.github/workflows/kg-reproducibility.yml` — **blocking, green on GitHub**; red/green proven
+- [x] `agents/templates/ci-gates-template.yml` (framework)
+- [x] Override-trailer convention (`KG-Reproducibility-Override:`) documented + honored + tested
+- [x] `test_reproducibility.py` green (11); `scripts/kg/README.md` updated
+- [x] **Branch protection applied**: `reproducibility` required status check on `nebula-insurance-crm` main (maintainer-approved 2026-07-11)
+- [x] STATUS provenance (DevOps + QE + Code Reviewer PASS); story index updated
+- [~] **D-ci-scope reverted full→fast-core** (CI evidence): symbol/decision/coverage byte-reproducibility not achievable cross-machine — stays integrator-gated (existing `--check-symbols`/`--check-decisions`). The full-surface regenerate-and-diff step was removed from the workflow.

@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-11 (Phase B: **S0004–S0007 done and signed off** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, and **tracker generation** (REGISTRY/ROADMAP generated from shards; byte-identical round trip closed); B1–B4 of B1–B6. Phase A complete 2026-07-06; S0001–S0003 signed off)
+**Last Updated:** 2026-07-11 (Phase B: **S0004–S0008 done and signed off** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, tracker generation (byte-identical round trip closed), and **reproducibility CI + git policy** (`reproducibility` is a blocking required check on `nebula-insurance-crm` `main`); B1–B5 of B1–B6. Only S0009 (contract/docs) remains. Phase A complete 2026-07-06; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -14,7 +14,7 @@
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [x] Done (cutover landed 2026-07-10; signed off) |
 | F0006-S0007 | Tracker generation from feature shards | B | [x] Done (2026-07-11; REGISTRY/ROADMAP generated + zero-diff round trip; BLUEPRINT deferred) |
-| F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [~] In Progress (tooling + CI committed 2026-07-11; **blocking flip via branch protection pending maintainer**) |
+| F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [x] Done (2026-07-11; CI green on GitHub + `reproducibility` required status check on `main` — blocking) |
 | F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
 
 ## Phase-A Exit (merge-train) Progress
@@ -42,10 +42,9 @@
 - [x] Driver-strips `generated_at` (S0005-D1): `compile.py --generators` drives decisions/coverage/story-index then strips timestamps (generator internals untouched)
 - [x] `decompile.py` with `--check` + **cutover landed** (S0006, 2026-07-10, tags `pre-kg-cutover`→`kg-cutover`, commits: drift-fix `0c0d0e4`, cutover `712acd6`): 182 shards written; `compile(decompile(graph)) == graph` byte-identical on the real graph (`compile.py --check` green); feature presentation fields populated + schema-valid; counts reconciled (631 nodes / 216 bindings / 40 features [33+7] / 164 stories); 6 `test_decompile.py` tests green. Drift fixed at source first (6 mis-filed `capability:document-*` records moved glossary_terms→capabilities, zero refs broken). `kg-source/` is now authoring truth; monolith is generated output. `.gitattributes`/CI enforcement → S0008.
 - [x] `kg-source/**` populated (182 shards); `solution-ontology.yaml` rehomed under `kg-source/ontology/` (S0006 cutover)
-- [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
 - [x] Tracker generator owns fenced REGISTRY/ROADMAP table regions (S0007): `tracker_gen.py` renders from feature shards into `<!-- generated:begin -->` regions; zero-diff regeneration (byte-identical round trip closed); driven by `compile.py`; BLUEPRINT deferred
-- [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
-- [~] `.gitattributes` (linguist-generated + `merge=ours`) generated from `generated_paths.yaml`, and CI workflow (S0008, product `fdc916c`): `validate.py --check-reproducible` (compile-check + shard-validate + 4 rules + gitattributes drift; override trailer) green on the real repo; red on synthetic hand-edit; blocking `.github/workflows/kg-reproducibility.yml` (full scope: toolchain regenerate-and-diff); `ci-gates-template.yml` job added; 11 tests. **Branch-protection required-check flip pending maintainer (outward-facing).**
+- [x] `validate.py --check-reproducible` + rules (S0008): physical-path ban (via `shard_validate`), suppression-ledger rationale, binding-glob-match, archived⇒no-stale-path — each tested; orchestration in `reproducibility.py` (see the `.gitattributes`/CI line below)
+- [x] `.gitattributes` (linguist-generated + `merge=ours`) generated from `generated_paths.yaml`, and CI workflow (S0008, product `fdc916c`→`a60ff06`): `validate.py --check-reproducible` (compile-check + shard-validate + 4 rules + gitattributes drift; override trailer) green on the runner; red on synthetic hand-edit; blocking `.github/workflows/kg-reproducibility.yml` **GREEN on GitHub**; `reproducibility` set as a **required status check on `main`** (branch protection applied 2026-07-11); `ci-gates-template.yml` job added; 11 tests. **D-ci-scope reverted full→fast-core** on CI evidence: symbol/decision/coverage indexes are not byte-reproducible cross-machine (symbol_count 4656→3863, coverage `last_modified` mtime), so those stay integrator-gated; the blocking gate is the deterministic compiled-projection invariant.
 
 ## Framework-Contract Progress (`nebula-agents`)
 
@@ -121,7 +120,9 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0007 | Quality Engineer | quality-engineer (delegated) | PASS | Byte-identical tracker round trip closed: `tracker_gen.py --check` zero-diff on the real trackers; REGISTRY content byte-identical (29 archived / 9 planned / 2 retired / 0 active reproduced exactly), ROADMAP diff = markers + 3 documented rows; every feature in exactly one REGISTRY table + one ROADMAP section; `compile.py --check` (KG trio) still byte-identical (roadmap_order blacklisted); 11 `test_tracker_gen.py` tests (zero-diff regen, region integrity, ordering, counter, count reconciliation, prose-untouched) | 2026-07-11 | Region *enforcement* (CI) is S0008 |
 | F0006-S0007 | Code Reviewer | code-reviewer (delegated) | PASS | `tracker_gen.py` writes only between fenced markers (prose untouched, verified by test); REGISTRY placement/sort derived by documented rules (rule-first, D-registry-derivation) — no stored display field needed; ROADMAP order captured as an additive `roadmap_order` presentation field (does not leak to feature-mappings); distinct Abandoned rationale preserved (not lost to canonicalization); `Next Available` = max+1; wired into the compile driver | 2026-07-11 | S0002 tracker-merge → transition-only; TRACKER-GOVERNANCE update handed to S0009 |
 | F0006-S0007 | Product Manager | product-manager (delegated) | PASS | One-time canonicalization diff reviewed + approved (D-canon): REGISTRY markers-only; ROADMAP markers + F0010/F0011 fuller Abandoned link names (matching REGISTRY) + F0014 PRD→README (README present). BLUEPRINT.md §3.3 generation **deferred** (bespoke prose + stale F0021/F0022 duplicates — not a clean projection) | 2026-07-11 | BLUEPRINT defer + duplicate cleanup tracked in Deferred Non-Blocking Follow-ups |
-| F0006-S0008 | DevOps | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0008 | DevOps | devops (delegated) | PASS | `.gitattributes` generated from `generated_paths.yaml` (whole-file → `linguist-generated`+`merge=ours`; fenced-region trackers excluded); blocking `.github/workflows/kg-reproducibility.yml` **green on GitHub**; `reproducibility` applied as a required status check on `nebula-insurance-crm` `main`; `ci-gates-template.yml` job template added | 2026-07-11 | D-ci-scope reverted full→fast-core on a real CI run (symbol/decision/coverage indexes not byte-reproducible cross-machine); those stay integrator-gated |
+| F0006-S0008 | Quality Engineer | quality-engineer (delegated) | PASS | Red (synthetic hand-edit of canonical-nodes → fail naming file + remediation) and green (compliant repo → pass) proven locally and on GitHub; each rule (archived-no-stale-path, suppression-rationale, binding-glob-match) + `.gitattributes` drift + override-trailer downgrade has a test; 11 `test_reproducibility.py` | 2026-07-11 | — |
+| F0006-S0008 | Code Reviewer | code-reviewer (delegated) | PASS | `reproducibility.py` reuses `compile`/`tracker_gen`/`shard_validate`; `.gitattributes` generated from the single manifest (no second hand-maintained copy — drift-checked); `validate.py --check-reproducible` is a thin early-exit delegation; committed symbol/decision/unbound stripped of `generated_at` (S0005-D1) | 2026-07-11 | Physical-path ban is `shard_validate`'s (S0004), wired into the reproducibility path |
 | F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
 | F0006-S0009 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
@@ -141,10 +142,10 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10; B4/S0007 2026-07-11) |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10; B4/S0007 + B5/S0008 2026-07-11) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 7 / 9 |
+| Stories completed | 8 / 9 |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |

@@ -147,17 +147,16 @@ F0006-S0007 (region integrity).
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met; red test (synthetic hand-edit) and green test recorded in CI
-- [ ] `scripts/kg/generated_paths.yaml` manifest landed **with per-path granularity**
+- [x] Acceptance criteria met; red test (synthetic hand-edit → fail with remediation) + green test recorded (locally and on GitHub — run `29152720294` green)
+- [x] `scripts/kg/generated_paths.yaml` manifest landed **with per-path granularity**
       (`whole-file`/`fenced-region`); `.gitattributes` generated from it (merge driver on
-      `whole-file` paths only); CI and the integrator consume the same manifest (no second
-      hand-maintained copy)
-- [ ] Validator rules landed with tests (physical-path ban, archived-consistency, ledger
-      rationale, glob-match)
-- [ ] Warn-only shake-out → blocking flip executed once the CI lands (post-cutover)
-- [ ] `ci-gates-template.yml` job template added in `nebula-agents`
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+      `whole-file` paths only); one manifest, drift-checked (no second hand-maintained copy)
+- [x] Validator rules landed with tests (physical-path ban via `shard_validate`, archived-consistency,
+      ledger rationale, glob-match) in `reproducibility.py`
+- [x] Blocking flip executed: `reproducibility` required status check applied on `nebula-insurance-crm` `main` (D-ci-mode). **D-ci-scope reverted full→fast-core** on CI evidence (symbol/decision/coverage not byte-reproducible cross-machine); those stay integrator-gated
+- [x] `ci-gates-template.yml` job template added in `nebula-agents`
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0008 → Done)
 
 ## Review Provenance
 
