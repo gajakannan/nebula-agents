@@ -12,7 +12,7 @@
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
 | F0001 | Tmux-Native Agent Cockpit | Planned | MVP | `F0001-tmux-native-agent-cockpit/` |
-| F0006 | Compiled Knowledge-Graph Projection and Governed Integration | In Progress | Platform Hardening | `F0006-compiled-kg-projection-and-integration/` |
+| F0006 | Compiled Knowledge-Graph Projection and Governed Integration | Done | Platform Hardening | `F0006-compiled-kg-projection-and-integration/` |
 
 ## Retired Features
 

@@ -1,6 +1,21 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
-**Overall Status:** In Progress
+**Overall Status:** Done — all 9 stories implemented + signed off; feature-review PASS 2026-07-11. Promotion of the `feat/F0006-phase-B-compiled-projection` branches to `main` (both repos) is the one remaining maintainer step (main merges need explicit ask).
+
+## Feature-Review Verdict (2026-07-11)
+
+**PASS** (delegated, maintainer-sanctioned). Independent re-verification at closeout:
+- **Reference implementation (`nebula-insurance-crm`) green:** 186/187 `scripts/kg/` tests pass (the 1
+  failure is the pre-existing `test_lookup_tier` snapshot drift — a product lookup test, outside F0006
+  scope); `validate.py --check-reproducible` OK; `compile.py --check` byte-identical; `validate.py`
+  graph-integrity OK; the blocking `reproducibility` CI is **green on GitHub** and a required check on `main`.
+- **Contract (`nebula-agents`) reconciled:** `audit-contract.py` clean (ownership invariant + zero stale
+  phrases); `validate_agent_map.py` OK; evidence-matcher + evidence-validator tests green.
+- **Signoff matrix complete:** every required role (Architect, Quality Engineer, Code Reviewer, DevOps)
+  holds ≥1 story-level PASS; Security not required (no auth/secret/external surface — local tooling).
+- **Phase-B exit proofs met:** shard model is the only authored layer; `compile(decompile(graph)) == graph`
+  and the tracker round trip are byte-identical; reproducibility CI is blocking; the contract matches
+  shipped behavior. No framework file instructs an off-book step (audit-enforced).
 **Last Updated:** 2026-07-11 (Phase B: **S0004–S0009 done and signed off — all 9 F0006 stories implemented** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, tracker generation (byte-identical round trip closed), reproducibility CI + git policy, and **contract/docs reconciliation** (agent-map scopes removed, docs match shipped behavior, contract audit clean); B1–B6 COMPLETE. **All 9 stories done** (feature closeout is a separate step). Phase A complete 2026-07-06; S0001–S0003 signed off)
 
 ## Story Checklist
@@ -124,8 +139,6 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0008 | DevOps | devops (delegated) | PASS | `.gitattributes` generated from `generated_paths.yaml` (whole-file → `linguist-generated`+`merge=ours`; fenced-region trackers excluded); blocking `.github/workflows/kg-reproducibility.yml` **green on GitHub**; `reproducibility` applied as a required status check on `nebula-insurance-crm` `main`; `ci-gates-template.yml` job template added | 2026-07-11 | D-ci-scope reverted full→fast-core on a real CI run (symbol/decision/coverage indexes not byte-reproducible cross-machine); those stay integrator-gated |
 | F0006-S0008 | Quality Engineer | quality-engineer (delegated) | PASS | Red (synthetic hand-edit of canonical-nodes → fail naming file + remediation) and green (compliant repo → pass) proven locally and on GitHub; each rule (archived-no-stale-path, suppression-rationale, binding-glob-match) + `.gitattributes` drift + override-trailer downgrade has a test; 11 `test_reproducibility.py` | 2026-07-11 | — |
 | F0006-S0008 | Code Reviewer | code-reviewer (delegated) | PASS | `reproducibility.py` reuses `compile`/`tracker_gen`/`shard_validate`; `.gitattributes` generated from the single manifest (no second hand-maintained copy — drift-checked); `validate.py --check-reproducible` is a thin early-exit delegation; committed symbol/decision/unbound stripped of `generated_at` (S0005-D1) | 2026-07-11 | Physical-path ban is `shard_validate`'s (S0004), wired into the reproducibility path |
-| F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
 | F0006-S0009 | Architect | architect (delegated) | PASS | `agent-map.yaml` authoring scopes for the generated trio + ontology removed symmetrically (PM + architect); integrator annotations flipped to "regenerated via compile.py"; ownership invariant holds (only integrator writes generated files, + coverage-report). `feature.md` G7/G8 + role ownership reconciled to shard-authoring + compile.py (off-book repoint narrative gone; F0005 payoff stated). `KNOWLEDGE-GRAPH.md` compiled-projection section (source/generated classification, shard schema, compile flow, logical refs, `depends_on` single-home, F0005 gap closed) + `ORCHESTRATION-CONTRACT.md` integrator sole-writer §6.1 + `MANUAL-ORCHESTRATION-RUNBOOK.md` compile-flow note. Re-runnable `audit-contract.py` (D-audit-form) **clean**: ownership + zero stale authoring phrases | 2026-07-11 | nebula-agents self-adoption deferred (D-self-adoption); documented in TRACKER-GOVERNANCE |
 | F0006-S0009 | Code Reviewer | code-reviewer (delegated) | PASS | `validate-feature-evidence.py` learns `compile.py` as the projection-regeneration command, gated on `KG_COMPILE_PROJECTION_EFFECTIVE_DATE = 2026-07-11` (earlier evidence keeps the `--regenerate-*` contract; symbols/decisions matchers unchanged); 4 new tests + existing 18 evidence tests green. Prompts (feature-operator-friendly/automation-safe) + templates (kg-reconciliation, feature-registry, tracker-governance) reconciled to shards; `validate_agent_map.py` green; genericness unchanged (pre-existing flags only) | 2026-07-11 | — |
 
@@ -143,21 +156,21 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10; B4/S0007 + B5/S0008 2026-07-11) |
-| Closeout review date | TBD (feature closes after Phase B) |
+| Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B (B1–B6): **complete 2026-07-11** (S0004/S0005 2026-07-09; S0006 cutover 2026-07-10; S0007/S0008/S0009 2026-07-11) |
+| Closeout review date | 2026-07-11 (feature-review PASS — delegated, maintainer-sanctioned) |
 | Total stories | 9 |
-| Stories completed | 9 / 9 (all stories implemented; feature-level closeout pending — D-closeout) |
-| Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
-| Defects found during review | TBD |
-| Defects fixed before closeout | TBD |
-| Residual risks | TBD |
+| Stories completed | 9 / 9 (all implemented + signed off; every required role holds ≥1 story-level PASS) |
+| Test count (unit + integration) | Product `scripts/kg/`: **186 tests** green (merge3 27, tracker_merge 18, shard_validate 32, compile 24, decompile 6, tracker_gen 11, reproducibility 11, + existing lookup/eval/etc.) + 9 Phase-A integration evidence runs. Framework `nebula-agents`: evidence-matcher 4 + evidence-validator 18 + audit-contract + validate_agent_map. Reproducibility CI green on GitHub |
+| Defects found during review | (1) S0006 source drift — 6 `capability:document-*` records mis-filed in `glossary_terms`; (2) S0008 — symbol/decision/coverage indexes not byte-reproducible cross-machine (surfaced by a real CI run); (3) pre-existing `test_lookup_tier` failure (product lookup-test snapshot drift, **outside F0006 scope**) |
+| Defects fixed before closeout | (1) FIXED at source pre-cutover (`0c0d0e4`: moved the 6 records → `capabilities`, zero refs broken; byte-identical round trip proven); (2) RESOLVED by scoping the CI gate to the deterministic compiled-projection invariant (D-ci-scope fast-core), those indexes stay integrator-gated |
+| Residual risks | Pre-existing `test_lookup_tier` (product QE to update the stale expectation; unrelated to compiled projection). Symbol/decision/coverage cross-machine reproducibility deferred (integrator-gated). S0003's gate-1/gate-2/self-abort enforcement paths still text-exercised only (deferred follow-up). BLUEPRINT §3.3 generation deferred (bespoke prose + stale duplicates). `nebula-agents` self-adoption of the shard model deferred. **Branches not yet promoted to `main`** — a separate maintainer step |
 
 ## Tracker Sync Checklist
 
-Aligned 2026-07-06 to Phase-A completion (S0001–S0003 Done, F0006 In Progress); re-verify at closeout.
+Re-aligned 2026-07-11 at feature closeout (F0006 → Done, all 9 stories Done).
 
-- [x] `planning-mds/features/REGISTRY.md` status/path aligned (F0006 → In Progress; F0005 superseded record present)
-- [x] `planning-mds/features/ROADMAP.md` section aligned (F0006 → In Progress; PR count corrected 5 → 7; Phase-A-complete framing)
-- [x] `planning-mds/features/STORY-INDEX.md` regenerated or updated (S0001–S0003 → Done)
-- [x] `planning-mds/BLUEPRINT.md` feature/story status links aligned (F0006 In Progress; S0001–S0003 Done)
-- [ ] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence (Phase-B roles pending)
+- [x] `planning-mds/features/REGISTRY.md` status aligned (F0006 → Done; F0005 superseded record present)
+- [x] `planning-mds/features/ROADMAP.md` section aligned (F0006 → Completed section)
+- [x] `planning-mds/features/STORY-INDEX.md` (S0001–S0009 → Done)
+- [x] `planning-mds/BLUEPRINT.md` feature/story status links aligned (F0006 Done; S0001–S0009 Done)
+- [x] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence (Architect, QE, Code Reviewer, DevOps — verified at closeout)
