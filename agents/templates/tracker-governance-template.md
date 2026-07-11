@@ -15,7 +15,7 @@ This document defines how planning trackers stay current and trustworthy.
 
 ## Authoritative Tracker Roles
 
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`: authoritative feature inventory, status, and folder paths.
+- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`: authoritative feature inventory, status, and folder paths. (In a compiled-projection repo, the feature **tables** are generated fenced regions from the feature shards via `tracker_gen.py`; the surrounding prose stays authored.)
 - `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`: authoritative sequencing view (`Now / Next / Later / Completed`).
 - `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`: auto-generated story rollup from strict story filenames.
 - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md`: authoritative feature execution state and deferred follow-ups.

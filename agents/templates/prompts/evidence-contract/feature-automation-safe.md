@@ -185,7 +185,7 @@ G6 CANDIDATE EVIDENCE VALIDATION (no PM closeout artifacts yet)
 
 G7 ARCHITECT KG RECONCILIATION (Architect agent role switch is mandatory; runs after G6, before G8 closeout)
      - MUST read agents/architect/SKILL.md before executing (explicit role switch)
-     - Reconcile the SEMANTIC graph against the as-built source: add/update code-index.yaml bindings (directory-glob, not file-by-file; confirm existing-glob coverage rather than duplicating) and canonical-nodes.yaml for new capabilities/shared semantics; diff against the G0 "Knowledge-Graph Binding Plan" baseline
+     - Reconcile the SEMANTIC graph against the as-built source by AUTHORING SHARDS: add/update kg-source/bindings/** (directory-glob, not file-by-file; confirm existing-glob coverage) and kg-source/nodes/** for new capabilities/shared semantics (logical F####/ doc refs only); diff against the G0 "Knowledge-Graph Binding Plan" baseline; then run compile.py to regenerate the projection trio + trackers (never hand-edit knowledge-graph/*.yaml)
      - Bind CODE paths only (stable across the G8 archive move); do NOT run `--write-coverage-report` here (path-sensitive; deferred to G8 after the move)
      - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions` exit 0 (refreshes symbol-index.yaml, unbound-but-referenced.yaml, and decisions-index.yaml; cannot be skipped)
      - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` exit 0
@@ -197,7 +197,7 @@ G8 PM CLOSEOUT (PM agent role switch is mandatory)
      - VERIFY (do not re-author) the G7 semantic graph: kg-reconciliation.md present + its symbol/drift checks green. A binding gap found here routes back to the Architect for a G7 delta pass, not a closeout edit
      - Write {RUN_FOLDER}/pm-closeout.md (Result: APPROVED|APPROVED WITH RECOMMENDATIONS|REJECTED)
      - Finalize {RUN_FOLDER}/evidence-manifest.json: status="approved", feature_state in {Done|Completed|Archived}, feature_path_at_closeout resolved, all gate_results present (incl. kg_reconciliation, pm_closeout, tracker_sync)
-     - Move the feature folder to features/archive/ and update feature-mappings.yaml status/path (lifecycle-coupled, PM-owned)
+     - Move the feature folder to features/archive/ and edit the feature shard kg-source/features/F####.yaml path:/status: (lifecycle-coupled, PM-owned), then run compile.py — it regenerates feature-mappings.yaml + trackers; archiving is one shard path: edit with no repoint anywhere
      - AFTER the archive move, regenerate the path-sensitive coverage layer: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (running it before the move re-stales it), then `--check-drift` exit 0
      - Run `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}`; it is idempotent and patches all prior approved manifests for the same feature to `status="superseded"` (rule two_approved_runs_without_supersession_fails)
      - Write {FEATURE_INDEX_ROOT}/latest-run.json (schema per §12) pointing to {RUN_FOLDER} only after patch-prior-manifest.py exits 0
@@ -220,7 +220,7 @@ Checklist for G8 (PM Closeout) — run after G6 + tracker sync:
 - Update {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md: feature/story status labels and links
 - IF overall_status in {Done|Completed}: move {FEATURE_PATH} to {ARCHIVE_FEATURE_PATH}/ and fix impacted links
 - Update {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml: feature path, status, story status
-- Do NOT author code-index.yaml / canonical-nodes.yaml in closeout — the Architect's G7 pass must already have reconciled them; route any gap back to G7
+- Do NOT hand-edit the generated knowledge-graph/*.yaml or tracker tables in closeout — the Architect's G7 shard pass + compile.py must already have produced them; route any gap back to G7 (author shards, recompile)
 - Capture orphaned stories and deferred follow-ups in pm-closeout.md
 - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (mandatory after the G8 archive move)
 - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` MUST exit 0

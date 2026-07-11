@@ -1,7 +1,7 @@
 # F0006 - Compiled Knowledge-Graph Projection and Governed Integration - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-11 (Phase B: **S0004–S0008 done and signed off** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, tracker generation (byte-identical round trip closed), and **reproducibility CI + git policy** (`reproducibility` is a blocking required check on `nebula-insurance-crm` `main`); B1–B5 of B1–B6. Only S0009 (contract/docs) remains. Phase A complete 2026-07-06; S0001–S0003 signed off)
+**Last Updated:** 2026-07-11 (Phase B: **S0004–S0009 done and signed off — all 9 F0006 stories implemented** — shard schema/validator, deterministic compiler, decompiler-first migration cutover, tracker generation (byte-identical round trip closed), reproducibility CI + git policy, and **contract/docs reconciliation** (agent-map scopes removed, docs match shipped behavior, contract audit clean); B1–B6 COMPLETE. **All 9 stories done** (feature closeout is a separate step). Phase A complete 2026-07-06; S0001–S0003 signed off)
 
 ## Story Checklist
 
@@ -15,7 +15,7 @@
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [x] Done (cutover landed 2026-07-10; signed off) |
 | F0006-S0007 | Tracker generation from feature shards | B | [x] Done (2026-07-11; REGISTRY/ROADMAP generated + zero-diff round trip; BLUEPRINT deferred) |
 | F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [x] Done (2026-07-11; CI green on GitHub + `reproducibility` required status check on `main` — blocking) |
-| F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
+| F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [x] Done (2026-07-11; agent-map scopes removed, docs/prompts/templates reconciled, contract audit clean) |
 
 ## Phase-A Exit (merge-train) Progress
 
@@ -49,15 +49,16 @@
 ## Framework-Contract Progress (`nebula-agents`)
 
 - [x] `agents/integrator/SKILL.md` persona (duties, hard boundary, routing) — 2026-07-05
-- [~] `agents/agent-map.yaml`: integrator registered (balanced tier) + `integrate` action wired with `review-verdict`/`approval` gates; **Phase-B `kg-source/` write scopes added (S0004, 2026-07-09)** — architect: `nodes/bindings/policies/ontology`, PM: `features/exclusions` (co-sign annotated); removal of the now-generated `knowledge-graph/*.yaml` scopes + integrator annotation flip deferred to S0009 (post-cutover)
+- [x] `agents/agent-map.yaml`: integrator registered + `integrate` wired; Phase-B `kg-source/` write scopes added (S0004); **now-generated `knowledge-graph/{canonical-nodes,feature-mappings,code-index,solution-ontology}.yaml` authoring scopes REMOVED symmetrically + integrator annotations flipped to "regenerated via compile.py" (S0009)** — ownership invariant verified by `audit-contract.py`
 - [x] `agents/actions/integrate.md` (incl. feature-review precondition + human test-validation pause, steps I0–I6 with human gates at I0 and I6, branch strategy) + `actions/README.md` + `ROUTER.md` routing
 - [x] Integration evidence template + `integrate-operator-friendly.md` prompt (evidence home decided: base-run profile at `operations/evidence/runs/integrate-*`)
-- [ ] `agents/actions/feature.md` G7/G8 reconciled (no off-book repoint narrative)
-- [ ] `feature-operator-friendly.md` prompt reconciled
-- [ ] `agents/docs/KNOWLEDGE-GRAPH.md` / `ORCHESTRATION-CONTRACT.md` updated (no integrator/shard content yet)
-- [~] `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`: integration procedure + both human gates landed in S0003; Phase-B compile-flow additions pending (S0009)
-- [ ] Templates updated: `kg-reconciliation`, `feature-assembly-plan`, `tracker-governance`, `feature-registry`, `ci-gates`
-- [ ] 2026-07-05 KG-regeneration enforcement surfaces reconciled for Phase B: `build.md`, `plan.md`, feature/build/plan prompt variants; `validate-feature-evidence.py` matchers learn `compile.py` (+ tests)
+- [x] `agents/actions/feature.md` G7/G8 reconciled (S0009): shard-authoring + compile.py; off-book repoint narrative gone; F0005 payoff stated
+- [x] `feature-operator-friendly.md` + `feature-automation-safe.md` prompts reconciled to the shard/compile flow (S0009)
+- [x] `agents/docs/KNOWLEDGE-GRAPH.md` (compiled-projection section: classification, shard schema, compile flow, logical refs, `depends_on` single-home, **F0005 gap closed**) / `ORCHESTRATION-CONTRACT.md` (integrator sole-writer §6.1) updated (S0009)
+- [x] `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`: integration procedure (S0003) + Phase-B compile-flow note (S0009)
+- [x] Templates reconciled (S0009): `kg-reconciliation`, `feature-registry`, `tracker-governance` → shards + generated fenced regions; `ci-gates` job (S0008). (`feature-assembly-plan` reads the compiled graph — read-only, unchanged)
+- [x] 2026-07-05 KG-regeneration surfaces reconciled (S0009): `validate-feature-evidence.py` learns `compile.py` gated on `contract_effective_date >= 2026-07-11` (+ 4 tests); `feature.md`/prompts carry compile.py. (`build.md`/`plan.md` symbol/decision regen commands are unchanged — still valid)
+- [x] Contract audit `agents/scripts/audit-contract.py` (S0009-D-audit-form): ownership invariant + stale-phrase sweep — **clean (zero violations)**
 
 ## Cross-Cutting
 
@@ -125,8 +126,8 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0006-S0008 | Code Reviewer | code-reviewer (delegated) | PASS | `reproducibility.py` reuses `compile`/`tracker_gen`/`shard_validate`; `.gitattributes` generated from the single manifest (no second hand-maintained copy — drift-checked); `validate.py --check-reproducible` is a thin early-exit delegation; committed symbol/decision/unbound stripped of `generated_at` (S0005-D1) | 2026-07-11 | Physical-path ban is `shard_validate`'s (S0004), wired into the reproducibility path |
 | F0006-S0008 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0006-S0008 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation (validator rule code + merge driver) |
-| F0006-S0009 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
-| F0006-S0009 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
+| F0006-S0009 | Architect | architect (delegated) | PASS | `agent-map.yaml` authoring scopes for the generated trio + ontology removed symmetrically (PM + architect); integrator annotations flipped to "regenerated via compile.py"; ownership invariant holds (only integrator writes generated files, + coverage-report). `feature.md` G7/G8 + role ownership reconciled to shard-authoring + compile.py (off-book repoint narrative gone; F0005 payoff stated). `KNOWLEDGE-GRAPH.md` compiled-projection section (source/generated classification, shard schema, compile flow, logical refs, `depends_on` single-home, F0005 gap closed) + `ORCHESTRATION-CONTRACT.md` integrator sole-writer §6.1 + `MANUAL-ORCHESTRATION-RUNBOOK.md` compile-flow note. Re-runnable `audit-contract.py` (D-audit-form) **clean**: ownership + zero stale authoring phrases | 2026-07-11 | nebula-agents self-adoption deferred (D-self-adoption); documented in TRACKER-GOVERNANCE |
+| F0006-S0009 | Code Reviewer | code-reviewer (delegated) | PASS | `validate-feature-evidence.py` learns `compile.py` as the projection-regeneration command, gated on `KG_COMPILE_PROJECTION_EFFECTIVE_DATE = 2026-07-11` (earlier evidence keeps the `--regenerate-*` contract; symbols/decisions matchers unchanged); 4 new tests + existing 18 evidence tests green. Prompts (feature-operator-friendly/automation-safe) + templates (kg-reconciliation, feature-registry, tracker-governance) reconciled to shards; `validate_agent_map.py` green; genericness unchanged (pre-existing flags only) | 2026-07-11 | — |
 
 ## Deferred Non-Blocking Follow-ups
 
@@ -145,7 +146,7 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | Implementation completed | Phase A: 2026-07-06 (S0001–S0003); Phase B: in progress (B1/S0004 + B2/S0005 2026-07-09; B3/S0006 cutover 2026-07-10; B4/S0007 + B5/S0008 2026-07-11) |
 | Closeout review date | TBD (feature closes after Phase B) |
 | Total stories | 9 |
-| Stories completed | 8 / 9 |
+| Stories completed | 9 / 9 (all stories implemented; feature-level closeout pending — D-closeout) |
 | Test count (unit + integration) | 45 unit (merge3 27 + tracker 18) + 9 integration evidence runs |
 | Defects found during review | TBD |
 | Defects fixed before closeout | TBD |

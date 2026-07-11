@@ -6,7 +6,7 @@ applies_to: product-manager
 
 # Feature Registry Template
 
-Tracks all features by ID, name, and status. Place as `REGISTRY.md` at `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`.
+Tracks all features by ID, name, and status. Place as `REGISTRY.md` at `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`. In a compiled-projection repo (F0006), the feature **tables** are generated from `kg-source/features/**` into fenced `<!-- generated:begin … -->` regions by `scripts/kg/tracker_gen.py` — edit the feature shard, not the table; surrounding prose stays authored.
 
 ---
 

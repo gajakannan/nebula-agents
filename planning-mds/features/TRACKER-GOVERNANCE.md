@@ -1,6 +1,14 @@
 # Tracker Governance
 
-**Last Updated:** 2026-06-18
+**Last Updated:** 2026-07-11
+
+> **Compiled-projection note (F0006-S0009).** In a product repo that has adopted the compiled-projection
+> model (reference: `nebula-insurance-crm`), the **REGISTRY.md and ROADMAP.md feature tables are
+> generated** from `kg-source/features/**` by `scripts/kg/tracker_gen.py` — the generator owns the
+> fenced `<!-- generated:begin … -->` regions; surrounding prose stays PM-authored. Never hand-edit a
+> generated table region; edit the feature shard and recompile. **This repo (`nebula-agents`) has not
+> yet adopted the shard model for its own planning graph** (it has no populated KG); its trackers below
+> remain hand-authored. Adopting it here is a tracked follow-up.
 
 ## Authoritative Trackers
 

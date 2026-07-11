@@ -67,7 +67,7 @@
 | [F0006-S0006](./F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) | Decompiler-first migration with round-trip proof | Done | Critical |
 | [F0006-S0007](./F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md) | Tracker generation from feature shards | Done | High |
 | [F0006-S0008](./F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md) | Reproducibility CI, enforcement, and git policy | Done | High |
-| [F0006-S0009](./F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md) | Framework contract, roles, and docs reconciliation | Not Started | High |
+| [F0006-S0009](./F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md) | Framework contract, roles, and docs reconciliation | Done | High |
 
 ## Maintenance Rules
 

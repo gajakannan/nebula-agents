@@ -61,6 +61,22 @@ It can be used with any agent runtime that can read markdown contracts and follo
 - Treat `{PRODUCT_ROOT}/planning-mds/` as solution-specific content.
 - Do not introduce solution-specific requirements into `agents/`.
 
+### 6.1 Generated knowledge-graph files — integrator is the sole mainline writer (F0006)
+
+- The knowledge graph is a **compiled projection** (see `KNOWLEDGE-GRAPH.md`): roles author
+  `kg-source/**` shards; `compile.py` produces every `knowledge-graph/*.yaml` and the REGISTRY/ROADMAP
+  fenced table regions. **No role hand-edits a generated file** — the `agent-map.yaml` write scopes
+  encode this (no authoring role lists the generated trio/ontology).
+- At integration, the **integrator** is the sole writer of the generated files on the mainline: it
+  semantically merges the shards (`merge3.py`), recompiles unconditionally (`compile.py`), validates
+  (`validate.py --check-reproducible`), and prepares the merge. It never authors shards or resolves
+  semantic collisions itself — a typed conflict routes to the owning role (architect for
+  `nodes/bindings/policies/ontology`, PM for `features/`). Two human gates bracket each run
+  (feature-review verdict/waiver before; maintainer test-validation before push). See
+  `agents/actions/integrate.md` and `MANUAL-ORCHESTRATION-RUNBOOK.md`.
+- A textually clean git merge of a generated file is **never** trusted — integration always recompiles.
+  CI (`.github/workflows/kg-reproducibility.yml`) enforces the same invariant on every PR.
+
 ## 7. Failure Handling
 
 ### 7.1 Failure Classification

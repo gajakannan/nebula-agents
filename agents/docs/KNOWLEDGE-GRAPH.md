@@ -6,6 +6,35 @@ what populates it, and how agents query it during planning and implementation.
 This is the single source of truth for the KG model. Role SKILLs, action
 docs, ROUTER, and AGENT-USE link here instead of restating it.
 
+## Compiled projection (Phase B — F0006)
+
+The knowledge graph is a **compiled database projection**, not a hand-maintained set of files.
+
+- **Authored source — the only layer roles edit:** `planning-mds/kg-source/**` shards — one concept
+  per small file, typed by directory, each directory owned by exactly one role
+  (`nodes/` `bindings/` `policies/` `ontology/` → Architect; `features/` → PM; `exclusions/` → PM +
+  Architect co-sign). See `kg-source/README.md` (in the product repo) for the schema, the per-kind ID
+  grammar, and the REGISTRY/ROADMAP column↔field mapping.
+- **Doc references are move-invariant:** a shard cites a feature doc **only** by its logical
+  `F####/relative/path` form; the compiler resolves it through that feature shard's `path:`. Archiving a
+  feature is **one `path:` edit + recompile** — no doc-ref repoint anywhere (this closes the F0005 gap;
+  physical `planning-mds/features/…` paths in shards are rejected). Stable-root refs
+  (`architecture/`, `api/`, `schemas/`, `security/`, `engine/`, `experience/`) pass through physical.
+- **Generated projections — never hand-edit:** `scripts/kg/compile.py` deterministically emits the
+  trio (`canonical-nodes.yaml`, `feature-mappings.yaml`, `code-index.yaml`), mirrors
+  `solution-ontology.yaml`, and regenerates the REGISTRY/ROADMAP fenced table regions from the shards;
+  `symbols.py`/`decisions.py`/`--write-coverage-report`/`generate-story-index.py` produce the remaining
+  derived layers. The committed projection always equals `compile(source)` — CI enforces it
+  (`validate.py --check-reproducible`; `.gitattributes` marks generated paths). **If a projection looks
+  wrong, fix the shard (or the compiler) and recompile — never edit the generated file.**
+- **`depends_on` and every tracker fact have a single home:** the feature shard. REGISTRY/ROADMAP feature
+  tables are generated views of the feature shards (surrounding prose stays PM-authored).
+- **Semantic merge, never text merge:** contributor branches merge shards by semantic ID via
+  `merge3.py` (typed conflict taxonomy: divergent insert/update, delete-vs-update, orphan edge,
+  uniqueness) — the **integrator** is the sole writer of generated files on the mainline and recompiles
+  unconditionally (a textually clean git merge of a generated file is never trusted). See
+  `ORCHESTRATION-CONTRACT.md`.
+
 ## Why It Exists
 
 Every product built with this framework accumulates a large web of

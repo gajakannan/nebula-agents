@@ -139,13 +139,14 @@ internal/external data exposure.
 
 ## Definition of Done
 
-- [ ] Every PRD-inventoried surface edited; audit checklist complete with zero violations
-- [ ] `agent-map.yaml` scopes verified against S0004 ownership map
-- [ ] Sweep for uninventoried stale references clean
-- [ ] F0005 gap formally closed in prose (KNOWLEDGE-GRAPH.md documents logical refs as the only
-      authoring form; the off-book-repoint narrative is gone)
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Every PRD-inventoried surface edited (agent-map, feature.md, KNOWLEDGE-GRAPH/ORCHESTRATION-CONTRACT/RUNBOOK docs, feature prompts, templates, validate-feature-evidence.py); `audit-contract.py` **clean (zero violations)**
+- [x] `agent-map.yaml` scopes verified against S0004 ownership map (no authoring role writes a generated projection; `validate_agent_map.py` green; ownership invariant asserted by the audit)
+- [x] Sweep for uninventoried stale references clean (audit stale-phrase sweep over 13 authoring surfaces → 0)
+- [x] F0005 gap formally closed in prose (`KNOWLEDGE-GRAPH.md` documents logical `F####/` refs as the only
+      authoring form; archive = one shard `path:` edit + recompile; the off-book-repoint narrative is gone)
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated (S0009 → Done)
+- [~] `validate-feature-evidence.py` learns `compile.py` gated on `contract_effective_date >= 2026-07-11` (+ 4 tests); nebula-agents self-adoption deferred (D-self-adoption, documented in TRACKER-GOVERNANCE)
 
 ## Review Provenance
 

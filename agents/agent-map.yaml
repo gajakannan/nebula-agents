@@ -36,7 +36,8 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md          # Sections 3.x only
       - {PRODUCT_ROOT}/planning-mds/features/**           # PRDs, stories, STATUS, trackers, archive
       - {PRODUCT_ROOT}/planning-mds/examples/personas/**
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # minimal feature/story stub only
+      # knowledge-graph/feature-mappings.yaml scope REMOVED (F0006-S0009): it is a compile.py output;
+      # PM authors feature facts in kg-source/features/** (single home) — never the generated file.
       # ── Phase B: kg-source/ authored shard layer (F0006-S0004 ownership map) ──
       - {PRODUCT_ROOT}/planning-mds/kg-source/features/**    # feature shards: technical + tracker presentation fields (single home)
       - {PRODUCT_ROOT}/planning-mds/kg-source/exclusions/**  # excluded-feature shards; co-sign: architect (symmetric)
@@ -58,11 +59,10 @@ agents:
       - {PRODUCT_ROOT}/planning-mds/architecture/**       # ADRs, data model, C4 diagrams, umbrella assembly plan
       - {PRODUCT_ROOT}/planning-mds/api/*.yaml            # OpenAPI contracts
       - {PRODUCT_ROOT}/planning-mds/schemas/*.json        # shared JSON Schemas
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml  # shared canonical nodes when Phase B introduces shared semantics
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml # finalize feature/story bindings
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml # only when ontology vocabulary itself changes
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml       # implementation bindings from canonical IDs into {PRODUCT_ROOT}/engine/experience code
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml  # generated via `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
+      # knowledge-graph/{canonical-nodes,feature-mappings,code-index,solution-ontology}.yaml scopes
+      # REMOVED (F0006-S0009): all are compile.py outputs. The architect authors kg-source/{nodes,
+      # bindings,policies,ontology}/** (below); solution-ontology.yaml is rehomed to kg-source/ontology/.
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml  # KEPT: a `validate.py --write-coverage-report` regeneration, not a hand-edit
       # ── Phase B: kg-source/ authored shard layer (F0006-S0004 ownership map) ──
       - {PRODUCT_ROOT}/planning-mds/kg-source/nodes/**       # canonical node shards (all kinds)
       - {PRODUCT_ROOT}/planning-mds/kg-source/bindings/**    # node→code path bindings (compiles to code-index.yaml)
@@ -223,18 +223,20 @@ agents:
       - agents/templates/**
     writes:
       # Integration-branch context only; never on contributor branches, never main.
-      # Curated KG files + trackers change only via merge3/tracker-merge mechanical
-      # convergence; generated projections are regenerated, never merged.
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml     # via merge3 only
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml    # via merge3 only
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml          # via merge3 only
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml        # regenerated
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/unbound-but-referenced.yaml  # regenerated
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml     # regenerated
-      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml     # regenerated
-      - {PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md                  # regenerated
-      - {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md                     # via tracker merge only
-      - {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md                      # via tracker merge only
+      # Phase B (F0006-S0009): the integrator regenerates the whole generated surface via compile.py
+      # (compile.py merges nothing — sources are shard-merged with merge3 first, then compiled). All
+      # of these are compile.py / driven-generator outputs; none is hand-edited or line-merged.
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml     # regenerated via compile.py
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml    # regenerated via compile.py
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml          # regenerated via compile.py
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml   # regenerated via compile.py (ontology mirror)
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml        # regenerated (symbols.py)
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/unbound-but-referenced.yaml  # regenerated (symbols.py)
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml     # regenerated (decisions.py)
+      - {PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml     # regenerated (--write-coverage-report)
+      - {PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md                  # regenerated (generate-story-index.py)
+      - {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md                     # fenced table regions regenerated via tracker_gen.py (compile.py)
+      - {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md                      # fenced table regions regenerated via tracker_gen.py (compile.py)
       - {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/**              # integration evidence runs
     # Explicit non-writes (abort + self-report on violation): feature docs,
     # architecture/**, schemas, api, application code, kg-source/** (Phase B).

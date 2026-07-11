@@ -1,6 +1,6 @@
 # Knowledge-Graph Reconciliation — F####-{slug} run {run-id}
 
-> Required at gate `G7` per §10. Authored by the **Architect** after signoff (`G5`) and candidate validation (`G6`), before PM closeout (`G8`). Reconciles the **semantic** knowledge-graph (`code-index.yaml` bindings, `canonical-nodes.yaml`) against the **as-built** source — what actually shipped — so the graph the next feature's architect reads at G0 is correct. Architect-owned. Binds **code** paths only (stable across the closeout archive move); the path-sensitive `coverage-report.yaml` regeneration is a `G8` step, after the move.
+> Required at gate `G7` per §10. Authored by the **Architect** after signoff (`G5`) and candidate validation (`G6`), before PM closeout (`G8`). Reconciles the **semantic** knowledge-graph by **authoring shards** — `kg-source/bindings/**` (code bindings) and `kg-source/nodes/**` (canonical nodes, logical `F####/` doc refs only) — against the **as-built** source, then running `compile.py` to regenerate `code-index.yaml`/`canonical-nodes.yaml` (never hand-edit the generated projections). This keeps the compiled graph the next feature's architect reads at G0 correct. Architect-owned. Binds **code** paths only (stable across the archive move — logical refs resolve through the shard `path:`, so archiving needs no repoint); the path-sensitive `coverage-report.yaml` regeneration is a `G8` step, after the move.
 
 ## Scope
 

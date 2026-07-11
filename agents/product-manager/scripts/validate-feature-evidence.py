@@ -47,6 +47,13 @@ KG_RECONCILIATION_EFFECTIVE_DATE = date(2026, 6, 1)
 # previously committed snapshot. Earlier evidence packages stay valid under
 # their original weaker contract.
 KG_GENERATED_REGEN_EFFECTIVE_DATE = date(2026, 7, 5)
+# Runs whose contract_effective_date is on/after this date author the graph as
+# kg-source/** shards and regenerate the projection trio + trackers via
+# `compile.py` (F0006 compiled-projection cutover). The generated-KG matcher
+# accepts `compile.py` (and `validate.py --check-reproducible`) as the sanctioned
+# regeneration entry point for those runs; earlier runs keep the
+# `validate.py --regenerate-*` contract so their evidence stays valid.
+KG_COMPILE_PROJECTION_EFFECTIVE_DATE = date(2026, 7, 11)
 RUN_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-[a-z0-9]{8}$")
 FEATURE_ID_RE = re.compile(r"^F\d{4}$")
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -136,6 +143,19 @@ def kg_generated_regeneration_required(manifest: dict[str, Any], stage: str) -> 
         and manifest_effective is not None
         and manifest_effective >= KG_GENERATED_REGEN_EFFECTIVE_DATE
     )
+
+
+def compile_projection_contract(manifest: dict[str, Any]) -> bool:
+    """Whether this run is under the compiled-projection contract (F0006): the graph is authored as
+    kg-source/** shards and the trio+trackers are regenerated via compile.py."""
+    manifest_effective = parse_iso_date(str(manifest.get("contract_effective_date", "")))
+    return manifest_effective is not None and manifest_effective >= KG_COMPILE_PROJECTION_EFFECTIVE_DATE
+
+
+def _command_compiles_projection(command: str) -> bool:
+    """A command that regenerates the compiled projection trio + tracker regions (F0006-S0009)."""
+    c = command.casefold()
+    return "compile.py" in c or ("validate.py" in c and "--check-reproducible" in c)
 
 
 # §10 / §17 — which run-folder files must exist for a given stage.

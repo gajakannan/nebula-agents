@@ -118,6 +118,14 @@ A manual run is complete only if:
 Maintainer procedure for merging a contributor branch (`agents/actions/integrate.md`
 is authoritative; this is the operator checklist). Serial: one run at a time.
 
+> **Compiled-projection flow (F0006).** In a repo on the shard model, the integrator's "merge" is:
+> semantically merge the `kg-source/**` shards (`merge3.py`), then **recompile** (`compile.py`
+> regenerates the projection trio + tracker regions; `symbols.py`/`decisions.py`/`--write-coverage-report`
+> the rest) and verify with `validate.py --check-reproducible` — the same invariant CI enforces. The
+> integrator is the sole writer of the generated files on the mainline and never hand-edits them; a
+> textually clean git merge of a generated file is never trusted (always recompile). Semantic
+> collisions route to the owning role (architect for nodes/bindings/policies/ontology, PM for features).
+
 1. **Gate 1 — feature review.** Confirm a passing `feature-review` verdict for
    the source branch's feature, or decide and write a waiver with rationale.
    Missing both → halt before merging and record the missing gate; do not
