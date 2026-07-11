@@ -35,3 +35,41 @@ jobs:
 
       - name: Run required gates for current lifecycle stage (stage-scoped)
         run: python3 agents/scripts/run-lifecycle-gates.py
+
+  # ── Knowledge-graph reproducibility gate (F0006-S0008) ──
+  # Proves committed generated files == compile(source) and enforces the git policy. Add this as a
+  # required status check in branch protection to make it blocking (D-ci-mode). Reference
+  # implementation: nebula-insurance-crm/.github/workflows/kg-reproducibility.yml.
+  kg-reproducibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: product }
+      # Only if the story-index generator lives in a separate framework repo:
+      - uses: actions/checkout@v4
+        with: { repository: "{FRAMEWORK_REPO}", path: framework }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pyyaml jsonschema
+
+      # Core invariant (always; fast, no build toolchain):
+      - name: Reproducibility + git-policy check
+        working-directory: product
+        run: python3 scripts/kg/validate.py --check-reproducible
+
+      # Full surface (D-ci-scope=full; uncomment + set the toolchain for the repo's languages):
+      # - uses: actions/setup-dotnet@v4
+      #   with: { dotnet-version: "{DOTNET_VERSION}" }
+      # - uses: actions/setup-node@v4
+      #   with: { node-version: "{NODE_VERSION}" }
+      # - run: corepack enable
+      # - name: Regenerate + diff the generated surface
+      #   working-directory: product
+      #   run: |
+      #     rm -f .kg-state/symbols-cache.json     # avoid the poisoned-cache trap
+      #     python3 scripts/kg/validate.py --regenerate-symbols --regenerate-decisions
+      #     python3 scripts/kg/validate.py --write-coverage-report
+      #     python3 scripts/kg/compile.py --generators --framework-root ../framework
+      #     python3 scripts/kg/reproducibility.py --strip-generated-at
+      #     git diff --exit-code -- planning-mds/knowledge-graph planning-mds/features/STORY-INDEX.md \
+      #       planning-mds/features/REGISTRY.md planning-mds/features/ROADMAP.md

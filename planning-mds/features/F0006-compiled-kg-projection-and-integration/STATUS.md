@@ -14,7 +14,7 @@
 | F0006-S0005 | Deterministic KG compiler with logical doc refs | B | [x] Done (signed off 2026-07-09) |
 | F0006-S0006 | Decompiler-first migration with round-trip proof | B | [x] Done (cutover landed 2026-07-10; signed off) |
 | F0006-S0007 | Tracker generation from feature shards | B | [x] Done (2026-07-11; REGISTRY/ROADMAP generated + zero-diff round trip; BLUEPRINT deferred) |
-| F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [ ] Not Started |
+| F0006-S0008 | Reproducibility CI, enforcement, and git policy | B | [~] In Progress (tooling + CI committed 2026-07-11; **blocking flip via branch protection pending maintainer**) |
 | F0006-S0009 | Framework contract, roles, and docs reconciliation | B | [ ] Not Started |
 
 ## Phase-A Exit (merge-train) Progress
@@ -45,7 +45,7 @@
 - [ ] `kg-source/**` populated; `solution-ontology.yaml` rehomed under `kg-source/ontology/`
 - [x] Tracker generator owns fenced REGISTRY/ROADMAP table regions (S0007): `tracker_gen.py` renders from feature shards into `<!-- generated:begin -->` regions; zero-diff regeneration (byte-identical round trip closed); driven by `compile.py`; BLUEPRINT deferred
 - [ ] `validate.py --check-reproducible` + new rules (physical-path ban, alias ledger, glob overlap, archived⇒no-stale-path)
-- [ ] `.gitattributes` (linguist-generated + merge driver) and CI workflow (warn → blocking)
+- [~] `.gitattributes` (linguist-generated + `merge=ours`) generated from `generated_paths.yaml`, and CI workflow (S0008, product `fdc916c`): `validate.py --check-reproducible` (compile-check + shard-validate + 4 rules + gitattributes drift; override trailer) green on the real repo; red on synthetic hand-edit; blocking `.github/workflows/kg-reproducibility.yml` (full scope: toolchain regenerate-and-diff); `ci-gates-template.yml` job added; 11 tests. **Branch-protection required-check flip pending maintainer (outward-facing).**
 
 ## Framework-Contract Progress (`nebula-agents`)
 
