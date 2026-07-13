@@ -207,6 +207,8 @@ Run in this order. Steps are grouped by gate; the `G7` architect group binds **c
 9. **[G8]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` — run **after** the archive move, because it binds the (now-moved) feature-doc paths; running it earlier re-stales on the move
 10. **[G8]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (final confirmation the post-move graph is green)
 11. `python3 agents/scripts/validate_templates.py`
+12. **[G8]** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` - bare, last; runs the coverage-staleness check that flagged invocations skip (this is what CI runs). Stale -> re-runs 
+step 9, then this.
 
 ---
 

@@ -144,6 +144,7 @@ Close the run by executing these in order (evidence paths recorded under `{PRODU
 - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
 - `python3 agents/scripts/validate_templates.py`
 - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout --json` and capture the output to `{RUN_FOLDER}/artifacts/feature-evidence-validation.json` for post-hoc analysis
+- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` (bare, last - the CI gate incl. coverage-staleness; stale -> re-run --write-coverage-report, then this)
 
 Resolve conflicts like this:
 - `raw artifact vs KG mapping → raw wins; repair KG in same change set`
