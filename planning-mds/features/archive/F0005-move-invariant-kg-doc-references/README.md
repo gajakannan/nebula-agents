@@ -1,6 +1,6 @@
 # F0005 - Move-Invariant Knowledge-Graph Feature-Doc References
 
-**Status:** Superseded by [F0006](../../F0006-compiled-kg-projection-and-integration/README.md) (2026-07-04)
+**Status:** Superseded by [F0006](../F0006-compiled-kg-projection-and-integration/README.md) (2026-07-04)
 **Priority:** High
 **Phase:** Platform Hardening
 

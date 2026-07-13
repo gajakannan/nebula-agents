@@ -1,0 +1,5 @@
+Recovery observation 2026-07-12
+182 passed, 5 failed in 40.66s
+Four failures are post-F0006 expectation drift: decompile story count, lookup source-doc ordering,
+tracker registry counts, and roadmap captured order. One MCP workstate test was unable to write to
+the sandboxed reference checkout. Full failure output was reviewed during recovery.

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "feature_id": "F0006",
+  "run_id": "2026-07-12-207a311b",
+  "run_path": "planning-mds/operations/evidence/runs/2026-07-12-207a311b",
+  "manifest_path": "planning-mds/operations/evidence/runs/2026-07-12-207a311b/evidence-manifest.json",
+  "status": "approved",
+  "approved_on": "2026-07-12"
+}

@@ -1,6 +1,6 @@
 # Feature Roadmap (Now / Next / Later)
 
-**Last Reviewed:** 2026-07-06
+**Last Reviewed:** 2026-07-12
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
-| [F0006 - Compiled KG Projection and Governed Integration](./F0006-compiled-kg-projection-and-integration/) | Done | Seven open contributor PRs in the reference product repo (`nebula-insurance-crm`) were blocked on hand-merging knowledge-graph/tracker YAML with no sanctioned integration owner — every future multi-contributor merge hit the same wall. Phase A (semantic merge tool + integrator role) drained the queue; Phase B (compiled projection) removed the problem class structurally. | Phase A (2026-07-06): all 7 `nebula-insurance-crm` PRs merged via integrator, promoted to `main`. **Phase B complete 2026-07-11** (all 9 stories, feature-review PASS): decompiler cutover landed (`kg-source/` is authoring truth); `compile(decompile(graph)) == graph` + tracker round trip byte-identical; blocking `reproducibility` CI on `main`; contract docs reconciled (audit clean). Branch promotion to `main` pending. |
+| [F0007 - Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
 | [F0001 - Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/) | Planned | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
 
 ## Next
@@ -36,6 +36,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 
 | Feature | Completed Date | Evidence |
 |---------|----------------|----------|
+| [F0006 - Compiled KG Projection and Governed Integration](./archive/F0006-compiled-kg-projection-and-integration/) | 2026-07-11 | All 9 stories Done; feature-review PASS; framework Phase-B PRs #42-#46 and product PR #59 landed on `main`; compiled-projection and reproducibility gates green; recovery G8 archive completed 2026-07-12. |
 
 ## Notes
 
@@ -44,4 +45,5 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 - F0002 may support SDK and exec-based providers, but it must keep a tmux fallback until managed orchestration proves equivalent engineering quality.
 - F0004 is a context-engineering layer, not a runtime path. It depends on F0003 evidence/telemetry being available to reflect from, and it never mutates `SKILL.md` or applies an unapproved change.
 - F0005 was superseded by F0006 on 2026-07-04 (see `REGISTRY.md` Retired Features): its logical doc-ref design is fully absorbed as the compiled-projection compiler's reference format.
-- F0006 is independent of the F0001 → F0003 → F0002 runtime line and does not displace F0001; it is in `Now` because it unblocked the reference product repo's contributor PRs. Its Phase-A merge train completed and promoted to `main` on 2026-07-06 (S0001–S0003 done); Phase B (shard migration) may now proceed.
+- F0006 is independent of the F0001 → F0003 → F0002 runtime line and does not displace F0001. Phase A promoted on 2026-07-06; Phase B completed and promoted on 2026-07-11; recovery G8 closeout archived it on 2026-07-12.
+- F0007 is framework hardening and may proceed alongside F0001 because it reduces prompt/contract maintenance risk without changing the runtime product sequence.

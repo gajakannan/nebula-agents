@@ -1,6 +1,6 @@
 # Nebula Agents Planning Blueprint
 
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-12
 
 ## Purpose
 
@@ -37,16 +37,27 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
 
 - [F0005 - Move-Invariant Knowledge-Graph Feature-Doc References](features/archive/F0005-move-invariant-kg-doc-references/README.md) - Superseded by F0006 (2026-07-04; folder archived at supersession; see `features/REGISTRY.md` Retired Features)
 
-- [F0006 - Compiled Knowledge-Graph Projection and Governed Integration](features/F0006-compiled-kg-projection-and-integration/README.md) - Done (Platform Hardening; all 9 stories, Phase A + Phase B complete 2026-07-11, feature-review PASS; branch promotion to `main` pending)
-  - [F0006-S0001 - Three-way semantic KG merge tool (`merge3.py`)](features/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) - Done
-  - [F0006-S0002 - Tracker-table three-way merge (REGISTRY/ROADMAP rows)](features/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) - Done
-  - [F0006-S0003 - Integrator role and `integrate` action](features/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) - Done
-  - [F0006-S0004 - `kg-source/` shard schema, layout, and ownership](features/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md) - Done
-  - [F0006-S0005 - Deterministic KG compiler with logical doc refs](features/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) - Done
-  - [F0006-S0006 - Decompiler-first migration with round-trip proof](features/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) - Done
-  - [F0006-S0007 - Tracker generation from feature shards](features/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md) - Done
-  - [F0006-S0008 - Reproducibility CI, enforcement, and git policy](features/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md) - Done
-  - [F0006-S0009 - Framework contract, roles, and docs reconciliation](features/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md) - Done
+- [F0006 - Compiled Knowledge-Graph Projection and Governed Integration](features/archive/F0006-compiled-kg-projection-and-integration/README.md) - Archived (implementation and promotion complete 2026-07-11; recovery G8 closeout 2026-07-12)
+  - [F0006-S0001 - Three-way semantic KG merge tool (`merge3.py`)](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md) - Done
+  - [F0006-S0002 - Tracker-table three-way merge (REGISTRY/ROADMAP rows)](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md) - Done
+  - [F0006-S0003 - Integrator role and `integrate` action](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md) - Done
+  - [F0006-S0004 - `kg-source/` shard schema, layout, and ownership](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md) - Done
+  - [F0006-S0005 - Deterministic KG compiler with logical doc refs](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md) - Done
+  - [F0006-S0006 - Decompiler-first migration with round-trip proof](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md) - Done
+  - [F0006-S0007 - Tracker generation from feature shards](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md) - Done
+  - [F0006-S0008 - Reproducibility CI, enforcement, and git policy](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md) - Done
+  - [F0006-S0009 - Framework contract, roles, and docs reconciliation](features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md) - Done
+
+- [F0007 - Spec-Driven Orchestration and Prompt Compilation](features/F0007-spec-driven-orchestration-and-prompt-compilation/README.md) - Planned / Now
+  - [F0007-S0001 - Versioned action policy and schema](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0001-versioned-action-policy-and-schema.md) - Not Started
+  - [F0007-S0002 - Contract conformance and behavioral diff](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0002-contract-conformance-and-behavioral-diff.md) - Not Started
+  - [F0007-S0003 - Run initialization and product scaffolding](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0003-run-initialization-and-product-scaffolding.md) - Not Started
+  - [F0007-S0004 - Typed command runtime and complete telemetry](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0004-typed-command-runtime-and-telemetry.md) - Not Started
+  - [F0007-S0005 - Gate driver, durable checkpoints, and severity policy](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0005-gate-driver-checkpoints-and-severity-policy.md) - Not Started
+  - [F0007-S0006 - Generated evidence prompts and drift gate](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0006-generated-evidence-prompts-and-drift-gate.md) - Not Started
+  - [F0007-S0007 - Version-aware validator convergence](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0007-version-aware-validator-convergence.md) - Not Started
+  - [F0007-S0008 - Shared policy consumers and prose thinning](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0008-shared-policy-consumers-and-prose-thinning.md) - Not Started
+  - [F0007-S0009 - Governed rollout and compatibility pilot](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0009-governed-rollout-and-compatibility-pilot.md) - Not Started
 
 ## Validation Policy
 

@@ -1,0 +1,28 @@
+# Lifecycle Gate Run
+
+## Command
+
+Recovery validation set: audit-contract, validate-agent-map, validate-templates,
+validate-trackers tracker-sync, and scoped feature closeout validation.
+
+## Stage
+
+G8 / closeout recovery
+
+## Exit Code
+
+0 after archive/tracker reconciliation
+
+## Result
+
+PASS - tracker-sync and closeout validation complete.
+
+## Output References
+
+- `artifacts/test-results/framework-pytest.txt`
+- `artifacts/test-results/reference-product-kg-pytest.txt`
+
+## Skipped Gates
+
+No required recovery closeout gate skipped. Historical implementation gates are referenced through
+the archived STATUS provenance rather than re-executed as new delivery work.

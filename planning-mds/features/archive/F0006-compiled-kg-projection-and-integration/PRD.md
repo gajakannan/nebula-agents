@@ -6,7 +6,7 @@
 **Feature Name:** Compiled Knowledge-Graph Projection and Governed Integration
 **Priority:** Critical
 **Phase:** Platform Hardening
-**Status:** In Progress
+**Status:** Archived (recovery G8 closeout 2026-07-12)
 **Supersedes:** F0005 (Move-Invariant Knowledge-Graph Feature-Doc References — absorbed as the compiler's reference format)
 
 ## Feature Statement

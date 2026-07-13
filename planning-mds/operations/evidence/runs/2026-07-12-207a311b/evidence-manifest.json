@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "feature_id": "F0006",
+  "feature_slug": "compiled-kg-projection-and-integration",
+  "run_id": "2026-07-12-207a311b",
+  "status": "approved",
+  "recorded_on": "2026-07-12",
+  "contract_effective_date": "2026-07-11",
+  "feature_path_at_run_start": "planning-mds/features/F0006-compiled-kg-projection-and-integration",
+  "feature_path_at_closeout": "planning-mds/features/archive/F0006-compiled-kg-projection-and-integration",
+  "feature_state": "Archived",
+  "rerun_of": null,
+  "changed_paths": [
+    "planning-mds/features/F0006-compiled-kg-projection-and-integration",
+    "planning-mds/features/archive/F0006-compiled-kg-projection-and-integration",
+    "planning-mds/features/REGISTRY.md",
+    "planning-mds/features/ROADMAP.md",
+    "planning-mds/features/STORY-INDEX.md",
+    "planning-mds/BLUEPRINT.md",
+    "planning-mds/operations/evidence/runs/2026-07-12-207a311b",
+    "planning-mds/operations/evidence/features/F0006-compiled-kg-projection-and-integration/latest-run.json"
+  ],
+  "scm": {
+    "base_ref": "main",
+    "head_ref": "feat/coverage-report-alignment",
+    "diff_artifact": "artifacts/diffs/changed-files.txt"
+  },
+  "runtime_bearing": false,
+  "deployment_config_changed": false,
+  "frontend_in_scope": false,
+  "security_sensitive_scope": false,
+  "required_roles": [
+    "Quality Engineer",
+    "Code Reviewer",
+    "DevOps",
+    "Architect"
+  ],
+  "gate_results": {
+    "assembly_plan_validation": {"required": true, "result": "PASS", "artifact": "g0-assembly-plan-validation.md"},
+    "self_review": {"required": true, "result": "PASS", "artifact": "g2-self-review.md"},
+    "deployability": {"required": true, "result": "PASS", "artifact": "deployability-check.md"},
+    "signoff": {"required": true, "result": "PASS", "artifact": "signoff-ledger.md"},
+    "kg_reconciliation": {"required": true, "result": "PASS", "artifact": "kg-reconciliation.md"},
+    "pm_closeout": {"required": true, "result": "APPROVED", "artifact": "pm-closeout.md"},
+    "tracker_sync": {"required": true, "result": "PASS", "artifact": "lifecycle-gates.log"}
+  },
+  "files": {
+    "readme": "README.md",
+    "action_context": "action-context.md",
+    "artifact_trace": "artifact-trace.md",
+    "gate_decisions": "gate-decisions.md",
+    "commands_log": "commands.log",
+    "lifecycle_gates_log": "lifecycle-gates.log",
+    "assembly_plan_validation": "g0-assembly-plan-validation.md",
+    "self_review": "g2-self-review.md",
+    "test_plan": "test-plan.md",
+    "test_execution_report": "test-execution-report.md",
+    "coverage_report": "coverage-report.md",
+    "deployability_check": "deployability-check.md",
+    "code_review_report": "code-review-report.md",
+    "signoff_ledger": "signoff-ledger.md",
+    "feature_action_execution": "feature-action-execution.md",
+    "kg_reconciliation": "kg-reconciliation.md",
+    "pm_closeout": "pm-closeout.md"
+  },
+  "role_results": {
+    "Quality Engineer": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": ["test-plan.md", "test-execution-report.md", "coverage-report.md"],
+      "verdict_artifact": "test-execution-report.md"
+    },
+    "Code Reviewer": {
+      "required": true,
+      "result": "APPROVED",
+      "required_artifacts": ["code-review-report.md"],
+      "verdict_artifact": "code-review-report.md"
+    },
+    "DevOps": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": ["deployability-check.md"],
+      "verdict_artifact": "deployability-check.md"
+    },
+    "Architect": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": ["g0-assembly-plan-validation.md"],
+      "verdict_artifact": "g0-assembly-plan-validation.md"
+    }
+  },
+  "omissions": [],
+  "waivers": {},
+  "global_evidence_refs": {}
+}

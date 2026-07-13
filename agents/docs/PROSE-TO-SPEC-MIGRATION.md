@@ -1,7 +1,9 @@
-# Prose-to-Spec Migration: Making Scripts the Source of Truth
+# Spec-Driven Orchestration: Moving Procedure Out of Prompts
 
 **Status:** Proposal
-**Scope:** `agents/actions/**`, `agents/templates/prompts/evidence-contract/**`, `agents/*/SKILL.md`, shared and per-role scripts
+**Scope:** `agents/actions/**`, `agents/templates/prompts/evidence-contract/**`, evidence
+templates and consumer contract, `agents/*/SKILL.md`, lifecycle configuration, shared and
+per-role scripts
 **Author:** framework review, 2026-07-12
 
 ---
@@ -19,20 +21,24 @@ contract change to be re-authored in up to 24 files.
 
 This proposal inverts the direction:
 
-1. **One machine-readable spec per action** (`agents/actions/spec/<action>.yaml`) becomes
-   the single source of truth for gates, artifacts, commands, ordering, ownership, and
-   stop conditions.
+1. **One versioned machine-readable spec per action**
+   (`agents/actions/spec/<action>.yaml`) becomes the active source of truth for gates,
+   artifacts, typed operations, ordering, ownership, and stop conditions. Historical
+   policy snapshots remain available so archived evidence is always interpreted under the
+   contract that created it.
 2. **Prompts become build artifacts** rendered from the spec (both operator-friendly and
    automation-safe variants), with a CI drift gate.
 3. **Deterministic procedure moves into scripts** the agent invokes: session setup, gate
-   running, severity gating, closeout sequencing, product scaffolding.
+   running, severity gating, closeout sequencing, command logging, product scaffolding.
 4. **Prose shrinks to what genuinely needs judgment**: review criteria, severity
    classification, clarification questions, KG binding decisions, writing voice.
 
 The end state: action files and SKILL.md files roughly halve in size, the 24
-evidence-contract prompts become generated output of ~13 small YAML records + 1 template,
-and a contract change (e.g. a new gate artifact) is a one-file edit that propagates to
-prompts, runner, and validator automatically.
+evidence-contract prompts become generated output of ~13 small YAML records + templates,
+and a contract change (e.g. a new gate artifact) is declared once, produces an explicit
+behavioral diff, and propagates to prompts, runners, validators, and generated configuration.
+Independent conformance fixtures remain outside the generated path so "consistent but
+wrong" changes still fail.
 
 ---
 
@@ -91,8 +97,8 @@ regex.
   IDs, yet six SKILL.md files carry "Feature Evidence Contract" sections re-narrating its
   rules per role (`product-manager/SKILL.md:369-403`, `code-reviewer/SKILL.md:441-465`,
   `quality-engineer/SKILL.md:505-534`, plus security, architect, devops).
-- The ≥80% coverage threshold appears in ~15 prose locations; `validate-test-coverage.py`
-  (`--min 80`) and `agent-map.yaml:440-442` already own it.
+- The ≥80% coverage threshold appears in ~15 prose locations; `agent-map.yaml:440-442`,
+  `generate-coverage-report.sh`'s default, and explicit `--min 80` callers all encode it.
 - `## Retrieval Guard` is verbatim-identical in 9 SKILL.md files with two already-drifted
   variants in 2 more.
 - Four SKILL.md files exceed the 500-line ceiling enforced by `run-skill-regression.py`
@@ -104,22 +110,27 @@ regex.
 
 ## 3. Design Principles
 
-1. **Spec over prose.** Anything with a fixed answer (paths, commands, ordering, gate
-   arithmetic, artifact lists, ID formats, thresholds) lives in YAML or a script. Prose
-   never states a fact the spec owns; it points at it.
+1. **Versioned spec over prose.** Anything with a fixed answer (paths, commands, ordering,
+   gate arithmetic, artifact lists, ID formats, thresholds) lives in versioned YAML or a
+   script. Prose never states a fact the spec owns; it points at it. A new active policy
+   never changes the interpretation of an evidence package stamped with an older policy.
 2. **Prompts are build artifacts.** Rendered from spec + template; humans edit the spec,
    never the rendered file. CI fails on drift.
 3. **Scripts execute; agents decide.** The agent runs `run-gate.py G4` and reads its
    verdict; the agent does not recall which validator command belongs to G4.
-4. **Validators and generators consume the same data.** The stage matrix that
-   `validate-feature-evidence.py` enforces and the gate table the prompt shows must be
-   the same object.
+4. **Validators and generators consume the same data, with independent conformance tests.**
+   The stage matrix that `validate-feature-evidence.py` enforces and the gate table the
+   prompt shows must be the same versioned object. Historical golden fixtures and
+   non-generated invariants test that the object still expresses the intended policy.
 5. **Judgment stays in prose, and gets more room.** Review criteria, severity
    classification, clarification, KG binding decisions, and voice remain natural language
    — with more of the context window available to them.
 6. **Boundary discipline is unchanged.** Framework scripts stay generic
    (`validate-genericness.py` still gates); product-repo scripts (`scripts/kg/*`) are
    referenced by the spec but never vendored into it.
+7. **Commands are data, not shell source.** Executable operations are argument arrays with
+   explicit working directories, timeouts, expected outputs, and mutation declarations.
+   Runners never execute spec content through a shell.
 
 ---
 
@@ -127,7 +138,14 @@ regex.
 
 ```
 agents/actions/spec/
-  _contract.yaml            # shared constants (one copy, consumed everywhere)
+  schema/action-spec.schema.json
+  _contract.yaml            # active shared constants + current contract version
+  history/                  # immutable policy snapshots used by historical evidence
+    2026-05-19.yaml
+    2026-05-25.yaml
+    2026-06-01.yaml
+    2026-07-05.yaml
+    2026-07-11.yaml
   _common.yaml              # shared blocks: session setup, forbidden, conflict rules
   feature.yaml              # per-action spec (gates, artifacts, commands, ownership)
   build.yaml
@@ -139,8 +157,12 @@ agents/actions/spec/
         │       agents/templates/prompts/evidence-contract/*.md
         │       (committed, but CI regenerates and diffs — drift fails)
         │
+        ├──> agents/scripts/gate_runtime.py
+        │       shared typed-operation engine used by run-gate.py and
+        │       run-lifecycle-gates.py; never invokes a shell
+        │
         ├──> agents/scripts/run-gate.py <stage>
-        │       runtime driver: executes the gate's commands in order,
+        │       action runtime driver: executes the gate's operations in order,
         │       enforces sequencing constraints, appends to commands.log
         │       and lifecycle-gates.log, returns structured verdict
         │
@@ -153,8 +175,8 @@ agents/actions/spec/
         │       and by review-family actions
         │
         └──> validators (validate-feature-evidence.py, validate_templates.py)
-                import the stage matrix / required-artifact lists from the
-                same spec instead of private constants
+                load the policy version stamped into the evidence manifest;
+                independent golden fixtures guard contract meaning
 ```
 
 The action `.md` files remain — but as the judgment layer: flow narrative, role
@@ -173,6 +195,8 @@ action: feature
 action_doc: agents/actions/feature.md
 contract:
   name: Feature Evidence Contract
+  version: "2026-07-11"
+  effective_from: 2026-07-11
   scope: feature-completion          # feature-completion | base-run-only | read-only-audit | merge
 run_id:
   scheme: contract                   # contract = YYYY-MM-DD-{secrets.token_hex(4)}
@@ -193,8 +217,10 @@ auto_resolved:                        # emitted by init-run.py; templates for do
 retrieval:
   tier_defaults: {clean: [1, 2], drift-reconcile: [3, 4]}   # retuned by eval.py
 context_load:                         # beyond the shared 4-item preamble in _common.yaml
-  - "python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} ..."
-  - "{FEATURE_PATH}/**"
+  - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/lookup.py", "{FEATURE_ID}",
+                 --tier, "{start_tier}"], cwd: product, timeout_seconds: 120,
+          mutates: [], expected_artifacts: []}
+  - path: "{FEATURE_PATH}/**"
 ownership:
   product-manager: [pm-closeout.md, signoff-ledger.md, latest-run.json, "kg-source/features/*.yaml#path,status"]
   architect:       [feature-assembly-plan.md, g0-assembly-plan-validation.md, "kg-source/bindings/**", "kg-source/nodes/**"]
@@ -207,7 +233,14 @@ gates:
     artifacts: [g0-assembly-plan-validation.md]
     manifest_status_after: in-progress
     validate:
-      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G0"
+      - run:
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G0]
+          cwd: framework
+          timeout_seconds: 300
+          expected_artifacts: []
+          mutates: []
     judgment: |                       # rendered as prose; NOT executed
       Author or reconcile the assembly plan; validate scope split, dependencies,
       checkpoints, ownership; initialize the Required Signoff Roles matrix.
@@ -218,24 +251,37 @@ gates:
     role_switch: agents/architect/SKILL.md
     artifacts: [kg-reconciliation.md]
     validate:
-      - "python3 {PRODUCT_ROOT}/scripts/kg/compile.py"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
+      - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"], cwd: product,
+              timeout_seconds: 600, mutates: [generated-kg], expected_artifacts: []}
+      - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py",
+                     --regenerate-symbols, --check-symbols,
+                     --regenerate-decisions, --check-decisions], cwd: product,
+              timeout_seconds: 600, mutates: [generated-kg], expected_artifacts: []}
+      - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift],
+              cwd: product, timeout_seconds: 300, mutates: [], expected_artifacts: []}
     constraints:
       - {forbid: "--write-coverage-report", reason: "path-sensitive; deferred to G8 after archive move"}
   - id: G8
     title: PM closeout
     role: product-manager
     role_switch: agents/product-manager/SKILL.md
-    sequence:                         # strictly ordered; run-gate.py enforces
-      - trackers-and-archive-move    # judgment step, prompt prose describes it
-      - "python3 {PRODUCT_ROOT}/scripts/kg/compile.py"
-      - "python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}"
-      - write: latest-run.json        # only after prior step exits 0
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
-      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout"
-      - "python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}"
+    sequence:                         # strictly ordered; run-gate.py journals each step
+      - checkpoint:
+          id: trackers-and-archive-move
+          description: Reconcile trackers and move the completed feature to its archive path.
+          requires: [pm-closeout.md, signoff-ledger.md]
+          produces: [archived-feature-folder]
+      - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"], cwd: product,
+              timeout_seconds: 600, mutates: [generated-kg], expected_artifacts: []}
+      - run: {argv: [python3, agents/product-manager/scripts/patch-prior-manifest.py,
+                     --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                     --new-run-id, "{RUN_ID}"], cwd: framework, timeout_seconds: 300,
+              mutates: [prior-manifest], expected_artifacts: []}
+      - write: {artifact: latest-run.json, after: prior-manifest-patched}
+      - run: {argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py",
+                     --write-coverage-report], cwd: product, timeout_seconds: 600,
+              mutates: [coverage-report], expected_artifacts: [coverage-report]}
+      # remaining validation operations use the same typed shape
 severity_gate: standard               # -> gate_policy.py profile
 forbidden:                            # merged with _common.yaml shared list
   - "Authoring kg-source shards during PM closeout (G7 owns shaping; G8 verifies)"
@@ -249,10 +295,11 @@ notes:                                # irreducible action-specific prose blocks
 Shared files:
 
 ```yaml
-# agents/actions/spec/_contract.yaml — constants, single-sourced
-contract_effective_date: 2026-05-19
+# agents/actions/spec/_contract.yaml — active constants, single-sourced
+current_contract_version: "2026-07-11"
+historical_policies: agents/actions/spec/history
 run_id_format: "YYYY-MM-DD-[a-z0-9]{8}"
-run_id_suffix_cmd: 'python3 -c "import secrets; print(secrets.token_hex(4))"'
+run_id_generator: {provider: python-secrets, operation: token-hex, bytes: 4}
 run_id_forbidden: [uuid4]
 base_run_files: [README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log]
 artifacts_subdirs: [coverage, diffs, test-results, security, screenshots]
@@ -261,6 +308,16 @@ coverage_min_pct: 80
 banned_words: [should, might, probably, usually, easy, simple, fast, secure, ...]
 context_preamble: [agents/ROUTER.md, agents/agent-map.yaml, agents/docs/AGENT-USE.md]
 ```
+
+Each historical snapshot is a fully resolved policy bundle: shared constants plus the
+action matrices active from its `effective_from` date. It does not inherit mutable values
+from `_contract.yaml`. `init-run.py` stamps both `contract_version` and
+`contract_effective_date` into new manifests. Validators select the snapshot by
+`contract_version`; the date remains for eligibility and compatibility rules. Legacy
+manifests without `contract_version` resolve to the newest snapshot whose `effective_from`
+is not later than their recorded contract date, without rewriting the archived manifest.
+Published snapshots are immutable. Corrections create a new version, even when the desired
+human-facing contract name is unchanged.
 
 `_common.yaml` holds the shared FORBIDDEN entries (hint.py/blast.py preflight rules,
 lookup-not-authoritative, gate-skipping), shared stop conditions, the runtime
@@ -271,10 +328,18 @@ declares `contract.scope: feature-completion`.
 
 - JSON Schema for the spec files, validated by a new
   `agents/scripts/validate_action_specs.py` (added to lifecycle gates).
+- Semantic validation rejects string-form commands, unknown placeholders, shell control
+  operators, undeclared mutations, checkpoint IDs without pre/postconditions, duplicate
+  policy versions, and non-monotonic effective dates.
 - `severity_gate` values map to profiles in `gate_policy.py`
   (`standard`, `review-family`, `none`).
 - `judgment:` and `notes:` fields are free text by design — the escape hatch that keeps
   the schema from fighting reality.
+- `validate_action_specs.py --contract-diff <base>..<head>` emits a reviewable behavioral
+  diff: added/removed gates, artifacts, operations, thresholds, and stop conditions.
+- Historical golden fixtures and a small set of independent invariants are deliberately
+  not generated from the spec. They catch policy weakening that would otherwise make the
+  generator, runner, and validator agree on the same mistake.
 
 ---
 
@@ -294,16 +359,19 @@ Does everything the SESSION_SETUP prose currently asks the LLM to do:
 2. Mint `RUN_ID` in contract format (or the integrate scheme when the spec says so).
 3. Create `FEATURE_INDEX_ROOT`, `RUN_FOLDER`, and `artifacts/{...}` subdirs.
 4. Initialize `evidence-manifest.json` from the template with all skeleton keys,
-   `status: draft`, correct `contract_effective_date` (from `_contract.yaml`).
+   `status: draft`, and the active `contract_version` + `contract_effective_date` from
+   `_contract.yaml`.
 5. Create the base run files from templates; touch empty logs.
 6. Run the concurrent-run check (scan sibling manifests for same-feature
-   `draft`/`in-progress`); exit non-zero with a clear message on conflict.
+   `draft`/`in-progress`); acquire a per-feature creation lock before scanning and creating
+   the folder so two initializers cannot both pass the check.
 7. Capture `RUN_ID_PRIOR` from `latest-run.json` if present.
 8. **Emit all resolved variables as JSON to stdout** (and write
    `{RUN_FOLDER}/action-context.md` seed). The prompt shrinks to: "Run `init-run.py`;
    use its JSON output for every variable below."
 
 Idempotency: refuses to re-init an existing non-empty RUN_FOLDER unless `--resume`.
+Manifest initialization and pointer writes use temporary files plus atomic replacement.
 
 ### 6.2 `agents/scripts/run-gate.py` — the gate driver
 
@@ -312,25 +380,30 @@ python3 agents/scripts/run-gate.py --action feature --stage G4 \
     --product-root PATH --feature F0038 --run-id 2026-07-12-ab12cd34 [--dry-run]
 ```
 
-1. Loads `spec/<action>.yaml`, finds the stage.
-2. Runs the gate's `validate:`/`sequence:` commands **in order**; stops at first failure.
+1. Loads and validates `spec/<action>.yaml`, finds the stage, and resolves only
+   schema-declared placeholders.
+2. Delegates typed operations to `gate_runtime.py`, which calls `subprocess.run(argv, ...)`
+   without a shell, applies timeouts, and stops at first failure.
 3. Enforces `constraints:` (e.g. refuses to run a forbidden flag at that stage; warns if
    a G8-only command is attempted at G7).
-4. Appends every command to `commands.log` via `append-command-log.py` (closing the
-   22-of-24-files gap where the helper is never mentioned) and gate results to
-   `lifecycle-gates.log`.
+4. Appends every command **the driver executes** to `commands.log` via
+   `append-command-log.py` and gate results to `lifecycle-gates.log`. Arbitrary agent-run
+   commands remain subject to the general logging contract and use `exec-and-log.py`.
 5. Prints a structured verdict: `{stage, status: pass|fail, failed_step, log_refs}`.
 6. `--list` mode prints the full ordered exit-validation runbook for the action —
    replacing the prose tables.
 
-Judgment steps inside a `sequence:` (e.g. `trackers-and-archive-move`) are emitted as
-"MANUAL: <description>" checkpoints — the driver pauses there (`--until`/`--from` flags)
-so the agent performs the judgment work, then resumes the mechanical tail.
+Judgment steps inside a `sequence:` (e.g. `trackers-and-archive-move`) are durable manual
+checkpoints. The driver writes `{RUN_FOLDER}/gate-state.json` before pausing. Resume requires
+`run-gate.py --attest-checkpoint <id> --evidence <path>...`; the driver verifies declared
+outputs, records their hashes and the attestation, then permits the next operation. `--from`
+cannot skip an unattested checkpoint. State writes and log appends use a per-run lock so
+parallel role agents cannot corrupt the journal.
 
 ### 6.3 `agents/scripts/gate_policy.py` — the severity state machine (module + CLI)
 
 ```
-python3 -m gate_policy --profile standard \
+python3 agents/scripts/gate_policy.py --profile standard \
     --code-critical 0 --code-high 1 --security-critical 0 --security-high 0
 → {"status": "WARNING", "options": ["fix issues", "approve with justification", "reject"],
    "approve_enabled": true, "requires_justification": true}
@@ -369,6 +442,8 @@ python3 agents/scripts/render-prompts.py [--action feature] [--check]
   drift. Added to `lifecycle-stage.yaml` gates and CI.
 - Header injected into every rendered file:
   `<!-- GENERATED from agents/actions/spec/feature.yaml — do not edit; run render-prompts.py -->`
+- `--check` is a drift check, not a semantic proof. Independent prompt invariants remain in
+  `validate_templates.py`, and generator snapshot tests cover each scope/variant branch.
 
 ### 6.6 `agents/scripts/lint-vague-language.py` — the banned-words linter
 
@@ -376,18 +451,38 @@ Extracts the plan/plan-review/validate word lists into `_contract.yaml:banned_wo
 scans given story/architecture files, reports per-line hits with the ❌→✅ replacement
 suggestions. The three prose copies become "run the linter; fix hits or justify."
 
+### 6.7 `agents/scripts/exec-and-log.py` — arbitrary command telemetry
+
+```
+python3 agents/scripts/exec-and-log.py --log {RUN_FOLDER}/commands.log \
+    --product-root PATH --cwd product -- command arg1 arg2
+```
+
+- Runs an argv array without a shell and appends the normalized result through
+  `append-command-log.py`.
+- Provides the supported path for implementation, investigation, and manual-checkpoint
+  commands that are intentionally outside `run-gate.py`.
+- Supports explicit `--artifact` and `--redaction` metadata, signal forwarding, and
+  configurable timeouts.
+- The contract can now say precisely: all gate operations use `run-gate.py`; all other
+  shell commands use `exec-and-log.py`. The gate runner alone does not assert complete
+  command coverage.
+
 ---
 
 ## 7. Changes to Existing Scripts
 
 | Script | Change |
 |---|---|
-| `validate-feature-evidence.py` | Read the stage→required-artifact matrix from `spec/feature.yaml` (or a shared `stage-matrix.yaml` both import) instead of a private constant. Rule IDs unchanged. Behavior-identical refactor with the existing test suite as the harness. |
-| `validate_templates.py` | Replace the hand-maintained `ACTIONS_THAT_MUST_REFERENCE_PACKAGE`, `PROMPTS_FORBIDDEN_UUID4`, `GATE_TEMPLATE_REFS` lists with a call to `render-prompts.py --check` (drift check subsumes them) plus spec-schema validation. |
+| `validate-feature-evidence.py` | Load the stage→required-artifact matrix from the policy version stamped into each manifest. Start in dual-read shadow mode against the private constants and fail on disagreement; remove the constants only after parity. Preserve date-sensitive historical behavior and rule IDs. |
+| `validate_templates.py` | Add `render-prompts.py --check` and spec-schema validation, but retain independent semantic invariants (canonical evidence scope, forbidden run-ID schemes, required gate/artifact relationships). Generated equality does not subsume these checks. |
 | `audit-contract.py` | Keep the HARD ownership invariant (now checkable against `spec/*.yaml:ownership` too). The stale-phrase sweep shrinks as prose shrinks; long-term it audits only the hand-written judgment sections. |
-| `append-command-log.py` | Unchanged; becomes the single logging path because `run-gate.py` calls it. |
+| `append-command-log.py` | Unchanged; remains the single normalized append path used by `run-gate.py`, `run-lifecycle-gates.py`, and `exec-and-log.py`. Add concurrency tests around the caller-level per-run lock. |
 | `run-skill-regression.py` | Add a check that SKILL.md files do **not** contain literal threshold numbers / rule paraphrases that `_contract.yaml` owns (grep for `≥80%`, rule-ID prose blocks) — the inverse of today's checks. |
-| `run-lifecycle-gates.py` / `lifecycle-stage.yaml` | Add gates: `action_spec_schema`, `prompt_drift` (`render-prompts.py --check`). |
+| `run-lifecycle-gates.py` / `lifecycle-stage.yaml` | Extract subprocess execution into `gate_runtime.py`; preserve the existing lifecycle-stage interface. Add gates: `action_spec_schema`, `contract_conformance`, `prompt_drift` (`render-prompts.py --check`). |
+| `agent-map.yaml` | Replace the literal unit-coverage value with a symbolic `coverage_min_pct` reference and validate that the consumer resolves it from `_contract.yaml`. |
+| `generate-coverage-report.sh` / coverage callers | Resolve the default through a small `contract-value.py coverage_min_pct` CLI or receive `--min` explicitly from a typed action operation. Remove private default literals. |
+| `evidence-manifest-template.json` / `CONSUMER-CONTRACT.md` | Add `contract_version` as required for newly initialized runs; document date-based read compatibility for legacy manifests and the supported execution paths. |
 
 ---
 
@@ -446,18 +541,22 @@ Each phase is independently shippable and gated by the existing test suites
 (`agents/product-manager/scripts/tests/`, `agents/scripts/tests/`,
 `run-skill-regression.py`, `run-lifecycle-gates.py`).
 
-### Phase 1 — Foundations (low risk, ~2–3 days)
+### Phase 1 — Foundations (~4–5 days)
 
-1. Add `agents/actions/spec/_contract.yaml` + JSON schema + `validate_action_specs.py`.
+1. Add versioned `agents/actions/spec/_contract.yaml`, immutable historical policy
+   snapshots, JSON Schema, semantic validation, and `validate_action_specs.py`.
 2. Build `init-run.py` (reuse `_product_root.py`; unit tests with a fixture product
-   root; cover concurrent-run check and idempotency).
+   root; cover contract stamping, concurrent initialization, locking, atomic writes, and
+   idempotency).
 3. Build `gate_policy.py` with table-driven tests reproducing every IF/ELIF block from
    the seven action files (this is the regression proof that behavior is unchanged).
 4. Extract `RETRIEVAL-GUARD.md`; fix the two drifted copies; update
    `run-skill-regression.py`.
-5. **Acceptance:** all existing gates green; one feature-run smoke test using
-   `init-run.py` produces a skeleton that `validate-feature-evidence.py --stage G0`
-   accepts.
+5. Add historical evidence fixtures for each existing contract cutover and independent
+   invariants for required scope, artifacts, run-ID format, and monotonic policy dates.
+6. **Acceptance:** all existing gates green; every historical fixture retains its current
+   verdict; one feature-run smoke test using `init-run.py` produces a version-stamped
+   skeleton that `validate-feature-evidence.py --stage G0` accepts.
 
 ### Phase 2 — Prompt generation (~3–4 days)
 
@@ -466,37 +565,50 @@ Each phase is independently shippable and gated by the existing test suites
    iterate the template until the rendered output is semantically equivalent (this diff
    review is the main effort).
 2. Roll out the remaining 12 specs (each far smaller than feature).
-3. Wire `render-prompts.py --check` into `lifecycle-stage.yaml` and CI; add the
-   GENERATED header; simplify `validate_templates.py` prompt lists.
+3. Wire `render-prompts.py --check`, spec-schema validation, and contract conformance into
+   `lifecycle-stage.yaml` and CI; add the GENERATED header. Simplify only those
+   `validate_templates.py` checks actually subsumed by generation; retain independent
+   semantic invariants.
 4. **Acceptance:** `render-prompts.py --check` green in CI; `audit-contract.py` sweep
-   count does not increase; a manual read of feature/build/plan pairs signs off
-   semantic equivalence.
+   count does not increase; generator snapshots cover every action scope and variant; a
+   manual read of feature/build/plan pairs signs off semantic equivalence.
 
 ### Phase 3 — Gate driver + action thinning (~4–5 days)
 
-1. Build `run-gate.py` against `spec/feature.yaml`; dry-run mode first.
-2. Pilot on one real feature run in the product repo (pwb): agent uses
+1. Extract the typed, shell-free `gate_runtime.py` execution library from
+   `run-lifecycle-gates.py`; preserve existing lifecycle-runner behavior with regression
+   tests.
+2. Build `run-gate.py` against `spec/feature.yaml`; dry-run mode first. Build
+   `exec-and-log.py` for commands outside the gate runner.
+3. Pilot on one real feature run in the product repo (pwb): agent uses
    `init-run.py` + `run-gate.py` end-to-end; compare evidence package to a
    prose-driven run.
-3. Thin `feature.md` and `build.md` per §8.1; regenerate prompts (they now reference
+4. Thin `feature.md` and `build.md` per §8.1; regenerate prompts (they now reference
    the driver); update `audit-contract.py` sweep list.
-4. Extend to plan/review/test/validate/integrate; ship `scaffold-product.py` and
+5. Extend to plan/review/test/validate/integrate; ship `scaffold-product.py` and
    `lint-vague-language.py`; thin `init.md`/`plan.md`.
-5. **Acceptance:** a full governed feature run completes with every command routed
-   through `run-gate.py`, `commands.log` fully populated via `append-command-log.py`,
-   and `validate-feature-evidence.py --stage closeout` exit 0.
+6. **Acceptance:** a full governed feature run completes with all gate operations routed
+   through `run-gate.py`, all other shell commands routed through `exec-and-log.py`, every
+   manual checkpoint durably attested before resume, `commands.log` complete via
+   `append-command-log.py`, and `validate-feature-evidence.py --stage closeout` exit 0.
 
 ### Phase 4 — Validator convergence + SKILL cleanup (~3 days)
 
-1. Refactor `validate-feature-evidence.py` to import the stage matrix from spec
-   (behavior-identical; existing pytest suite is the harness).
+1. Put `validate-feature-evidence.py` in dual-read mode: load the versioned stage matrix
+   from spec and compare its decisions with the existing constants across current and
+   historical fixtures. Remove the constants only after parity is demonstrated.
 2. SKILL.md thinning per §8.3; add the inverse checks to `run-skill-regression.py`.
-3. Retire the now-redundant `STALE_PATTERNS` entries and `validate_templates.py`
-   hard-coded lists.
-4. **Acceptance:** all SKILLs < 500 lines; grep finds no literal `80%` thresholds or
-   validator-rule paraphrases in SKILL prose; full lifecycle gates green.
+3. Move remaining threshold consumers (`agent-map.yaml`, coverage report scripts, action
+   command defaults) to the shared `coverage_min_pct` value.
+4. Retire only the demonstrably redundant `STALE_PATTERNS` entries and
+   `validate_templates.py` generated-content lists; retain independent invariants.
+5. **Acceptance:** all SKILLs < 500 lines; grep finds no policy-owned literal `80%`
+   thresholds or validator-rule paraphrases in SKILL prose; all threshold consumers resolve
+   `coverage_min_pct`; historical contract fixtures and full lifecycle gates are green.
 
-Total: roughly 12–15 working days, parallelizable after Phase 1.
+Total: roughly 17–22 working days, parallelizable after Phase 1. Re-estimate after the
+feature spec, historical fixtures, and typed runtime complete; they establish the true
+complexity for the remaining actions.
 
 ---
 
@@ -505,12 +617,18 @@ Total: roughly 12–15 working days, parallelizable after Phase 1.
 | Risk | Mitigation |
 |---|---|
 | **Rendered prompts lose nuance** — a paraphrase in the hand-written file carried meaning the spec missed | Phase 2 requires a human semantic-equivalence review per action pair before switching; `notes:` free-text fields are the escape hatch, and anything that resists the schema stays prose |
+| **A spec change makes prompts, runner, and validator consistently wrong** | Keep historical golden fixtures and independent non-generated invariants; require a behavioral contract diff for policy changes. Drift checks prove reproducibility, not correctness |
+| **A new active spec retroactively changes archived evidence** | Stamp every run with a contract version; select immutable historical policy by version; test every effective-date cutover |
+| **Interpolated command content is parsed as shell source** | Commands are typed argv arrays, placeholders are schema-allowlisted, and `gate_runtime.py` never invokes a shell |
 | **Agents stop *understanding* the contract** because prompts say "run the script" without the why | Keep one-sentence rationales in the rendered output (spec `reason:` fields — e.g. why coverage regeneration is post-move). Understanding the *why* is judgment content; we keep it, we just stop restating the *what* |
-| **run-gate.py becomes a second place gate logic lives** (vs the validators) | The driver only *sequences* commands from spec; it asserts nothing the validators don't. Pass/fail always comes from the invoked validator's exit code |
+| **run-gate.py becomes a second place evidence policy lives** | Keep the boundary explicit: the runner owns procedural integrity (operation ordering, checkpoint state, timeouts, logging); validators own evidence acceptance. Both read the versioned policy, and conformance tests verify their interpretations agree |
+| **run-gate.py duplicates the existing lifecycle runner** | Extract a shared `gate_runtime.py`; keep lifecycle-stage and action-stage schemas distinct while sharing execution, timeout, logging, and error semantics |
+| **An agent resumes after skipping a manual checkpoint** | Persist per-run gate state; require output evidence and an explicit attestation; disallow `--from` across unattested checkpoints |
+| **Parallel agents race while creating a run or appending state** | Use per-feature initialization and per-run journal locks plus atomic state/pointer writes |
 | **Generated-file merge conflicts** on concurrent branches | Files are regenerable; conflict resolution = re-run `render-prompts.py`. Document in CONTRIBUTING.md |
-| **Product repos consuming CONSUMER-CONTRACT.md** see churn | The contract document and validator rule IDs are unchanged; only the framework's internal encoding moves. Note it in CHANGELOG.md and the consumer contract's effective-date mechanism |
+| **Product repos consuming CONSUMER-CONTRACT.md see churn** | Treat `contract_version` and the supported execution paths as an additive contract release; preserve rule IDs and date-based compatibility for legacy manifests; document the change in CHANGELOG.md and CONSUMER-CONTRACT.md |
 | **Spec schema too rigid for the next new action** | `judgment:`/`notes:` free text plus per-action `extra_sections:`; the schema validates structure, not content |
-| **LLM ignores the driver and hand-runs commands** | The rendered FORBIDDEN list includes "running gate validation commands directly instead of via run-gate.py"; `commands.log` review at signoff catches it; long-term, `validate-feature-evidence.py` can check that gate results in `lifecycle-gates.log` were driver-emitted |
+| **LLM ignores the supported execution paths and hand-runs commands** | Prompts distinguish gate operations (`run-gate.py`) from arbitrary commands (`exec-and-log.py`); closeout verifies driver-emitted gate records and complete JSONL telemetry |
 
 ---
 

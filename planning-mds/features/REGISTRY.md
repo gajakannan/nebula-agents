@@ -1,6 +1,6 @@
 # Feature Registry
 
-**Next Available Feature Number:** F0007
+**Next Available Feature Number:** F0008
 
 **Planning Views:**
 - Roadmap sequencing (`Now / Next / Later`): `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
@@ -12,7 +12,7 @@
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
 | F0001 | Tmux-Native Agent Cockpit | Planned | MVP | `F0001-tmux-native-agent-cockpit/` |
-| F0006 | Compiled Knowledge-Graph Projection and Governed Integration | Done | Platform Hardening | `F0006-compiled-kg-projection-and-integration/` |
+| F0007 | Spec-Driven Orchestration and Prompt Compilation | Planned | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
 
 ## Retired Features
 
@@ -34,6 +34,7 @@ Replaces the legacy `Abandoned Features` section. Retired features are registry 
 
 | Feature ID | Name | Archived Date | Evidence Reentry Date | Folder |
 |------------|------|---------------|-----------------------|--------|
+| F0006 | Compiled Knowledge-Graph Projection and Governed Integration | 2026-07-12 | 2026-07-12 | `archive/F0006-compiled-kg-projection-and-integration/` |
 
 ## Numbering Rules
 

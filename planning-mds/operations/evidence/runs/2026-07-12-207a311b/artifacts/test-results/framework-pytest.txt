@@ -1,0 +1,6 @@
+Recovery execution 2026-07-12
+198 passed in 8.36s
+Suites: agents/product-manager/scripts/tests, agents/scripts/tests
+audit-contract.py: PASS
+validate_agent_map.py: PASS
+validate_templates.py: PASS

@@ -2,7 +2,7 @@
 
 > **Living tracker for the B2 build.** Companion to
 > [`F0006-S0005-deterministic-kg-compiler.md`](./F0006-S0005-deterministic-kg-compiler.md).
-> Builds on S0004 ([`F0006-S0004-implementation-plan.md`](./F0006-S0004-implementation-plan.md), done).
+> Builds on S0004 ([`implementation-plan-S0004.md`](./implementation-plan-S0004.md), done).
 > Update §10 as work lands.
 
 | Field | Value |

@@ -1,0 +1,8 @@
+planning-mds/features/F0006-compiled-kg-projection-and-integration
+planning-mds/features/archive/F0006-compiled-kg-projection-and-integration
+planning-mds/features/REGISTRY.md
+planning-mds/features/ROADMAP.md
+planning-mds/features/STORY-INDEX.md
+planning-mds/BLUEPRINT.md
+planning-mds/operations/evidence/runs/2026-07-12-207a311b
+planning-mds/operations/evidence/features/F0006-compiled-kg-projection-and-integration/latest-run.json
