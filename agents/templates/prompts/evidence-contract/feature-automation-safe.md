@@ -185,7 +185,8 @@ G6 CANDIDATE EVIDENCE VALIDATION (no PM closeout artifacts yet)
 
 G7 ARCHITECT KG RECONCILIATION (Architect agent role switch is mandatory; runs after G6, before G8 closeout)
      - MUST read agents/architect/SKILL.md before executing (explicit role switch)
-     - Reconcile the SEMANTIC graph against the as-built source by AUTHORING SHARDS: add/update kg-source/bindings/** (directory-glob, not file-by-file; confirm existing-glob coverage) and kg-source/nodes/** for new capabilities/shared semantics (logical F####/ doc refs only); diff against the G0 "Knowledge-Graph Binding Plan" baseline; then run compile.py to regenerate the projection trio + trackers (never hand-edit knowledge-graph/*.yaml)
+     - Reconcile the SEMANTIC graph against the as-built source by AUTHORING SHARDS: add/update kg-source/bindings/** (directory-glob, not file-by-file; confirm existing-glob coverage) and kg-source/nodes/** for new capabilities/shared semantics (logical F####/ doc refs only); diff against the G0 "Knowledge-Graph Binding Plan" baseline
+     - `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` MUST regenerate the projection trio + trackers from the shards; never hand-edit knowledge-graph/*.yaml
      - Bind CODE paths only (stable across the G8 archive move); do NOT run `--write-coverage-report` here (path-sensitive; deferred to G8 after the move)
      - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions` exit 0 (refreshes symbol-index.yaml, unbound-but-referenced.yaml, and decisions-index.yaml; cannot be skipped)
      - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` exit 0
@@ -197,7 +198,7 @@ G8 PM CLOSEOUT (PM agent role switch is mandatory)
      - VERIFY (do not re-author) the G7 semantic graph: kg-reconciliation.md present + its symbol/drift checks green. A binding gap found here routes back to the Architect for a G7 delta pass, not a closeout edit
      - Write {RUN_FOLDER}/pm-closeout.md (Result: APPROVED|APPROVED WITH RECOMMENDATIONS|REJECTED)
      - Finalize {RUN_FOLDER}/evidence-manifest.json: status="approved", feature_state in {Done|Completed|Archived}, feature_path_at_closeout resolved, all gate_results present (incl. kg_reconciliation, pm_closeout, tracker_sync)
-     - Move the feature folder to features/archive/ and edit the feature shard kg-source/features/F####.yaml path:/status: (lifecycle-coupled, PM-owned), then run compile.py — it regenerates feature-mappings.yaml + trackers; archiving is one shard path: edit with no repoint anywhere
+     - Move the feature folder to features/archive/ and edit the feature shard kg-source/features/F####.yaml path:/status: (lifecycle-coupled, PM-owned), then run `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` — it regenerates feature-mappings.yaml + trackers; archiving is one shard path: edit with no repoint anywhere
      - AFTER the archive move, regenerate the path-sensitive coverage layer: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (running it before the move re-stales it), then `--check-drift` exit 0
      - Run `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}`; it is idempotent and patches all prior approved manifests for the same feature to `status="superseded"` (rule two_approved_runs_without_supersession_fails)
      - Write {FEATURE_INDEX_ROOT}/latest-run.json (schema per §12) pointing to {RUN_FOLDER} only after patch-prior-manifest.py exits 0

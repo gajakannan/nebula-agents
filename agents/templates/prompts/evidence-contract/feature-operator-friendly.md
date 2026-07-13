@@ -100,7 +100,7 @@ At `G7 ARCHITECT KG RECONCILIATION`, do all of this:
 - `Diff the as-built source against the G0 "Knowledge-Graph Binding Plan" baseline to find the binding delta`
 - `Author {PRODUCT_ROOT}/planning-mds/kg-source/bindings/** shards: directory-glob bindings for every new capability/shared-semantic source surface (e.g. experience/src/features/forms/**); confirm existing-glob coverage rather than duplicating file-by-file`
 - `Author {PRODUCT_ROOT}/planning-mds/kg-source/nodes/** shards for new shared semantics (logical F####/ doc refs only), or state "none introduced; reuses existing"`
-- `python3 {PRODUCT_ROOT}/scripts/kg/compile.py MUST regenerate the projection trio + tracker regions from the shards; never hand-edit knowledge-graph/*.yaml`
+- `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` MUST regenerate the projection trio + tracker regions from the shards; never hand-edit knowledge-graph/*.yaml
 - `Do NOT run --write-coverage-report here (path-sensitive; deferred to G8 after the archive move)`
 - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions MUST exit 0` (refreshes `symbol-index.yaml`, `unbound-but-referenced.yaml`, and `decisions-index.yaml`; symbols/decisions stay validate.py-driven; cannot be skipped)
 - `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift MUST exit 0`
@@ -115,7 +115,7 @@ At `G8 PM CLOSEOUT`, do all of this:
 - `Update {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md: Now/Next/Later/Completed placement`
 - `Update {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md: feature/story status labels and links`
 - `IF overall_status in {Done|Completed}: move {FEATURE_PATH} to {ARCHIVE_FEATURE_PATH}/ and fix impacted links`
-- `Edit the feature shard {PRODUCT_ROOT}/planning-mds/kg-source/features/F####.yaml (path:/status:, lifecycle-coupled, PM-owned), then run compile.py — it regenerates feature-mappings.yaml + the REGISTRY/ROADMAP tracker regions. Archiving is one shard path: edit, no repoint anywhere`
+- `Edit the feature shard {PRODUCT_ROOT}/planning-mds/kg-source/features/F####.yaml` (`path:`/`status:`, lifecycle-coupled, PM-owned), then run `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` — it regenerates feature-mappings.yaml + the REGISTRY/ROADMAP tracker regions. Archiving is one shard path: edit, no repoint anywhere
 - `Do NOT hand-edit the generated knowledge-graph/*.yaml or tracker tables — author kg-source/ shards; the Architect's G7 shard pass + compile.py produce them (closeout only verifies green)`
 - `Capture orphaned stories and deferred follow-ups in pm-closeout.md`
 - `AFTER the archive move: python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report (mandatory; path-sensitive — binds the relocated feature-doc paths; running it before the move re-stales it)`
