@@ -366,3 +366,36 @@ PASS — the complete G0-G5 package, execution timeline, unpublished in-progress
 ## Next Action
 
 Freeze and reconcile the approved implementation candidate, then activate Architect G7 for the as-built knowledge-graph governance decision.
+
+# Lifecycle Gate Run — G7 Architect KG Reconciliation
+
+## Command
+
+Architect as-built source/binding audit; product-path checks for `planning-mds/kg-source/`, `planning-mds/knowledge-graph/`, `scripts/kg/compile.py`, and `scripts/kg/validate.py`.
+
+## Stage
+
+G7 architect knowledge-graph reconciliation
+
+## Exit Code
+
+1 — blocking product governance/toolchain precondition is absent
+
+## Result
+
+BLOCKED — all six G0-predicted F0001 capabilities exist in the frozen implementation candidate, but this product has not adopted the mandatory compiled KG source/projection toolchain. `TRACKER-GOVERNANCE.md` records that non-adoption, and the F0001 assembly plan explicitly treats it as a High closeout blocker. Compile, symbol/decision regeneration, reproducibility, and drift commands cannot run because the product scripts and source schemas do not exist. No generated or authored graph evidence was fabricated.
+
+## Output References
+
+- `kg-reconciliation.md`
+- `planning-mds/features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md`
+- `planning-mds/features/TRACKER-GOVERNANCE.md`
+- `evidence-manifest.json`
+
+## Next Action
+
+Stop before G8. Obtain an explicit governance choice to adopt the compiled KG toolchain/shards in this product or implement an approved non-adopter exception mechanism.
+
+## Structural Evidence Check
+
+`validate-feature-evidence.py --stage G7` exited 0. This confirms the run package has the required G7 row/report structure; it does not execute the missing product KG compiler, symbol/decision regeneration, reproducibility, or drift checks. The substantive G7 result therefore remains `BLOCKED` and G8 remains closed.

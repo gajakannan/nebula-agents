@@ -37,4 +37,4 @@ The formal failure-triage request authorizes exact reads from cold archive run `
 
 ## Lifecycle Stage
 
-Current stage: `G6 passed; approved implementation candidate frozen at 99d2020c8ccaa23f370eef526c27867395981c7e; Architect G7 is next`.
+Current stage: `G6 passed; G7 blocked because the product has not adopted the mandatory KG source/compiler/validator contract; G8 is closed pending explicit governance resolution`.

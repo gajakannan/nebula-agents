@@ -66,6 +66,11 @@
       "required": true,
       "result": "PASS",
       "artifact": "signoff-ledger.md"
+    },
+    "kg_reconciliation": {
+      "required": true,
+      "result": "FAIL",
+      "artifact": "kg-reconciliation.md"
     }
   },
   "files": {
@@ -86,6 +91,7 @@
     "security_review": "security-review-report.md",
     "signoff_ledger": "signoff-ledger.md",
     "feature_action_execution": "feature-action-execution.md",
+    "kg_reconciliation": "kg-reconciliation.md",
     "code_review_cycle_1": "code-review-report-cycle-1.md",
     "security_review_cycle_1": "security-review-report-cycle-1.md",
     "code_review_cycle_2": "code-review-report-cycle-2.md",

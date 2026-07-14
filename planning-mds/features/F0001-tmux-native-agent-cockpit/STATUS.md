@@ -12,7 +12,7 @@
 | Ontology sync | Not applicable in this repository | `TRACKER-GOVERNANCE.md` records that `nebula-agents` has no populated self-hosted KG; raw planning/architecture artifacts remain authoritative |
 | Phase B user approval | Approved at `2026-07-13T21:39:29-04:00` | Explicit operator response: `approve` |
 | Feature assembly plan | G0 validated | `feature-assembly-plan.md`; evidence run `2026-07-13-1cfbc5a0/g0-assembly-plan-validation.md` |
-| Implementation | G4 approved; G5 signoff verification active | Original G2/G3 run `2026-07-13-1cfbc5a0`; linked remediation run `2026-07-14-b885d64c` |
+| Implementation | G6 passed; G7 governance blocked | Candidate commit `99d2020c8ccaa23f370eef526c27867395981c7e`; remediation run `2026-07-14-b885d64c` |
 
 ## Story Checklist
 
@@ -54,6 +54,7 @@
 - [x] README and getting-started docs updated
 - [x] G3 remediation R1-R10 validated and independently re-reviewed in run `2026-07-14-b885d64c`
 - [x] G4 approved explicitly by the operator on 2026-07-14
+- [ ] G7 compiled knowledge-graph reconciliation — blocked because this product has not adopted `kg-source` or `scripts/kg`; no graph evidence was fabricated
 
 ## Required Role Matrix
 
@@ -110,11 +111,11 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | Implementation completed | 2026-07-14 remediation complete; G3 passed with recommendations; G4 approved |
 | Closeout review date | Not reached |
 | Total stories | 6 |
-| Stories completed | 0 / 6 closed; 6 / 6 implemented and signed off; final closeout pending |
+| Stories completed | 0 / 6 closed; 6 / 6 implemented and signed off; G7 governance resolution and final closeout pending |
 | Test count (unit + integration) | 514 passed; focused real-tmux test passed in 0.48 seconds |
 | Defects found during review | Linked remediation cycles opened H-01 through H-06; final Code and Security reviews independently closed all six |
 | Defects fixed before closeout | H-01 through H-06 have implementation, exact boundary regressions, and independent closure evidence |
-| Residual risks | Non-blocking Code/Security recommendations in the final canonical G3 reports; disposition is required at G8 closeout |
+| Residual risks | Non-blocking Code/Security recommendations require G8 disposition. Separately, the assembly plan's High KG/bootstrap governance blocker prevents G8 until explicitly resolved. |
 
 ## Tracker Sync Checklist
 

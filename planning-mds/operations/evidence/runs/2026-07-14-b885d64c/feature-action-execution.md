@@ -2,7 +2,7 @@
 
 ## Gate
 
-Current gate reached: `G6` pre-closeout candidate validation.
+Current gate reached: `G7` architect reconciliation — blocked by the product KG/compiler bootstrap precondition; `G8` has not started.
 
 ## Execution Timeline
 
@@ -41,3 +41,8 @@ Current gate reached: `G6` pre-closeout candidate validation.
   - Validators: scoped G6 feature-evidence and tracker validators are the gate commands.
   - Outputs: this gate-by-gate execution record and candidate manifest file map.
   - Outcome: both G6 commands exited 0. The approved candidate was frozen at commit `99d2020c8ccaa23f370eef526c27867395981c7e`, and its 160-path `main...HEAD` diff exactly matches the canonical diff artifact. G7 must now apply the assembly plan's explicit knowledge-graph governance decision.
+- 2026-07-14T19:45:30-04:00 — G7 entered and blocked.
+  - Inputs: frozen as-built candidate, G0 binding plan, `TRACKER-GOVERNANCE.md`, the Architect role contract, and framework KG contract.
+  - Audit: confirmed absence of `planning-mds/kg-source/`, `planning-mds/knowledge-graph/`, `scripts/kg/compile.py`, and `scripts/kg/validate.py`; the structural feature-evidence schema check exited 0 but cannot substitute for the missing substantive KG commands.
+  - Output: `kg-reconciliation.md` maps all six as-built capabilities and records the truthful blocker.
+  - Outcome: stop before G8 pending explicit governance/bootstrap resolution.

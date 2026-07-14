@@ -67,6 +67,7 @@
 - `engine/tests/integration/test_commit_reconciliation.py` — added H-06 direct, launch, termination-failure, and already-stopped-provider-preservation regressions.
 - `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/code-review-report.md` — final cycle-5 Code Review `PASS WITH RECOMMENDATIONS`; SHA-256 `afba7a7a8bdd25de5c5120a13436f72bfa38fc7a10fbe7cfa2ed046703bfa91a`.
 - `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/security-review-report.md` — final cycle-5 Security Review `PASS WITH RECOMMENDATIONS`; SHA-256 `b86ee09526ca61a02de4b6d9b17348a7e106352237922c89e70c3413b39e5810`.
+- `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/kg-reconciliation.md` — mapped the six as-built capability surfaces and recorded the missing product KG source/compiler/validator contract as the assembly plan's blocking G7 governance condition; no graph artifact was fabricated.
 
 ## Generated Evidence
 

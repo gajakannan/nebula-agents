@@ -6,7 +6,7 @@ This is a separately authorized F0001 `feature` remediation run linked to blocke
 
 ## Status
 
-Current state: `in-progress — G6 passed; approved implementation candidate frozen at 99d2020c; Architect G7 next`.
+Current state: `in-progress — G6 passed; G7 blocked by the documented product KG/compiler bootstrap limitation; G8 closed`.
 
 ## Evidence Index
 
@@ -34,6 +34,7 @@ Current state: `in-progress — G6 passed; approved implementation candidate fro
 - `code-review-report.md` and `security-review-report.md` — final cycle-5 canonical `PASS WITH RECOMMENDATIONS` verdicts
 - `signoff-ledger.md` — current per-story passing evidence for every required role
 - `feature-action-execution.md` — gate-by-gate remediation and review timeline
+- `kg-reconciliation.md` — as-built binding map and truthful G7 bootstrap blocker
 
 ## Validation Summary
 
@@ -42,5 +43,6 @@ G0-G2 passed. Final G3 cycle 5 independently closed H-01 through H-06. Code and 
 ## Open Follow-ups
 
 - Approved implementation candidate frozen at `99d2020c8ccaa23f370eef526c27867395981c7e`; exact 160-path diff reconciled.
-- At G7, resolve the assembly plan's documented self-hosted KG/compiler bootstrap limitation; do not fabricate graph evidence.
+- G7 requires an explicit governance choice: adopt the compiled KG toolchain in this repo, or approve and implement a framework/product exception mechanism for non-adopter repositories.
+- Do not start G8 archive/publish closeout while G7 is blocked.
 - Disposition all non-blocking Code and Security recommendations in `pm-closeout.md`.
