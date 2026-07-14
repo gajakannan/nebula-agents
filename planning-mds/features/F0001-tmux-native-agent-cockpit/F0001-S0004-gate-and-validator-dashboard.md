@@ -44,10 +44,10 @@ The evidence-contract prompts include gated stages and user approval moments. Th
 | Gate Dashboard | Approve or hold gate | Decision, reviewer label, reason | Appends gate decision and updates gate state | Gate decision appears after reload and in evidence path | Local Operator; approval disabled when evidence or validation is blocked |
 
 Required checks for mutation stories:
-- [ ] Render-only behavior cannot satisfy the story.
-- [ ] Gate decision validates evidence state, validator state, reviewer label, and reason when holding.
-- [ ] A successful gate decision has audit/timeline evidence.
-- [ ] Tests prove blocked gates cannot be approved and approved gates survive reload.
+- [x] Render-only behavior cannot satisfy the story.
+- [x] Gate decision validates evidence state, validator state, reviewer label, and reason when holding.
+- [x] A successful gate decision has audit/timeline evidence.
+- [x] Tests prove blocked gates cannot be approved and approved gates survive reload.
 
 ## Data Requirements
 
@@ -124,14 +124,14 @@ Required checks for mutation stories:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced for approve and hold actions
-- [ ] Audit/timeline logged for validator runs, approvals, holds, blocked attempts, and cancellations
-- [ ] Tests cover missing evidence, failed validator, approve, hold, unauthorized approval, timeout, and reload
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced for approve and hold actions
+- [x] Audit/timeline logged for validator runs, approvals, holds, blocked attempts, and cancellations
+- [x] Tests cover missing evidence, failed validator, approve, hold, unauthorized approval, timeout, and reload
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

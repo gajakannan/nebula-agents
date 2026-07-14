@@ -116,14 +116,14 @@ N/A - read-only diagnostic story. The command may create an empty runtime direct
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced through local filesystem and shell access boundaries
-- [ ] Audit/timeline logged as N/A - diagnostic only, with runtime-dir initialization recorded when it occurs
-- [ ] Tests cover ready, missing tmux, missing provider, auth attention, unsupported provider, and denied runtime directory
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced through local filesystem and shell access boundaries
+- [x] Audit/timeline logged as N/A - diagnostic only, with runtime-dir initialization recorded when it occurs
+- [x] Tests cover ready, missing tmux, missing provider, auth attention, unsupported provider, and denied runtime directory
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

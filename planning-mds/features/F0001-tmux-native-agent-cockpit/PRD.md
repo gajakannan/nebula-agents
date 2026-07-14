@@ -152,6 +152,49 @@
 - Existing evidence-contract prompts under `agents/templates/prompts/evidence-contract`.
 - Story and tracker validators under `agents/product-manager/scripts`.
 
+## Architecture Traceability
+
+**Phase B design:** Approved at `2026-07-13T21:39:29-04:00`.
+
+| Story | Architecture coverage |
+|-------|-----------------------|
+| F0001-S0001 | Provider adapter contract, non-secret readiness probes, preflight JSON Schema, and `doctor` exit semantics |
+| F0001-S0002 | Tmux session lifecycle, validated launch descriptor, one-provider-per-run invariant, and attach reuse |
+| F0001-S0003 | Atomic run snapshot, append-only runtime events, artifact observations, polling watcher, and recovery rules |
+| F0001-S0004 | Gate state machine, validator allowlist, eligibility guard, local authorization actions, and immutable decisions |
+| F0001-S0005 | Opt-in pipe capture, redact-before-write filter, bounded preview, transcript state machine, and recovery contract |
+| F0001-S0006 | Versioned read-only CLI/JSON projections, stable exit codes, and mutation isolation for validator recording |
+
+### Phase B Resolution of Story Questions
+
+| Question | Resolution |
+|----------|------------|
+| Provider readiness probe depth | Default probes are executable discovery, version/help, and provider-supported non-secret login status. F0001 never starts a dry-run model request or performs login during preflight. |
+| Tmux session naming | `nebula-F####-<run-suffix>`; provider and full metadata stay in the registry so the tmux name remains short and shell-safe. |
+| Registry format | Atomic JSON snapshot for current state plus append-only JSONL for audit history. Markdown is a rendered view, not persistence. |
+| Gate reviewer label | Capture OS user ID and resolved username; an optional display label may supplement but never replace the OS identity. |
+| Transcript default | Disabled by default and enabled explicitly per run. Redaction happens before the first transcript write. |
+| JSON CLI output | Included in MVP through `--format json`; human tables and the TUI are projections of the same versioned records. |
+
+### Technical Boundaries
+
+- The cockpit is a single local Python executable with Presentation, Application, Domain, and Infrastructure Adapter modules.
+- The native provider TUI remains the source of truth inside tmux. Nebula observes state and invokes explicit operator actions; it does not parse the screen to infer approvals.
+- F0003 owns MCP status tools, artifact IDs, deterministic summaries, metrics, and learning proposals. F0002 owns managed provider orchestration.
+- There is no HTTP API or database in F0001. Public integration contracts are the CLI, JSON Schemas, runtime snapshot, append-only event stream, and evidence paths.
+
+### Architecture Documents
+
+- [`../../architecture/SOLUTION-PATTERNS.md`](../../architecture/SOLUTION-PATTERNS.md)
+- [`../../architecture/data-model.md`](../../architecture/data-model.md)
+- [`../../architecture/f0001-workflows.md`](../../architecture/f0001-workflows.md)
+- [`../../architecture/f0001-cli-contract.md`](../../architecture/f0001-cli-contract.md)
+- [`../../security/f0001-authorization-model.md`](../../security/f0001-authorization-model.md)
+- [`../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md`](../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md)
+- [`../../architecture/decisions/ADR-002-f0001-runtime-persistence.md`](../../architecture/decisions/ADR-002-f0001-runtime-persistence.md)
+- [`../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md`](../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md)
+- [`../../architecture/decisions/ADR-004-f0001-transcript-redaction.md`](../../architecture/decisions/ADR-004-f0001-transcript-redaction.md)
+
 ## Related Stories
 
 - [F0001-S0001](./F0001-S0001-provider-auth-and-environment-preflight.md) - Provider auth and environment preflight

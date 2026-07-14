@@ -45,10 +45,10 @@ N/A - read-only command story except validation result recording when explicitly
 | CLI `validate` | Run validator | Validator choice | Writes optional validation result audit entry, never a gate decision | Latest validation summary appears in status output | Reviewer and Local Operator; approval remains unavailable |
 
 Required checks for mutation stories:
-- [ ] Render-only behavior satisfies read-only commands; validation result recording is the only allowed mutation.
-- [ ] Validation command arguments are constrained to known validators.
-- [ ] Validation result recording has an audit/timeline entry.
-- [ ] Tests prove read-only commands do not create sessions or gate decisions.
+- [x] Render-only behavior satisfies read-only commands; validation result recording is the only allowed mutation.
+- [x] Validation command arguments are constrained to known validators.
+- [x] Validation result recording has an audit/timeline entry.
+- [x] Tests prove read-only commands do not create sessions or gate decisions.
 
 ## Data Requirements
 
@@ -126,14 +126,14 @@ Required checks for mutation stories:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced for attach guidance and validation allowlist
-- [ ] Audit/timeline logged for validation runs only; pure read-only commands are N/A
-- [ ] Tests cover status, sessions, evidence, doctor, validation failure, denied attach guidance, stale tmux session, and missing run
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced for attach guidance and validation allowlist
+- [x] Audit/timeline logged for validation runs only; pure read-only commands are N/A
+- [x] Tests cover status, sessions, evidence, doctor, validation failure, denied attach guidance, stale tmux session, and missing run
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

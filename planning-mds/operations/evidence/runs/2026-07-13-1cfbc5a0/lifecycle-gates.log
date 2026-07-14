@@ -1,0 +1,101 @@
+# Lifecycle Gates Log — F0001 run 2026-07-13-1cfbc5a0
+
+## Lifecycle Gate Run
+
+G0 artifact production completed and the scoped validator returned without errors or warnings.
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0001 --run-id 2026-07-13-1cfbc5a0 --stage G0`
+
+## Stage
+
+`G0`
+
+## Exit Code
+
+`0`
+
+## Result
+
+`PASS` — no errors or warnings. The validator reported `features_validated: 0` because F0001 is correctly active/nonterminal; its completion-eligibility filter does not deeply validate in-progress packages. The Architect therefore also ran the action's explicit G0 checklist plus architecture, story, tracker, template, schema, and diff checks.
+
+## Output References
+
+- `g0-assembly-plan-validation.md`
+- `planning-mds/features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md`
+- `artifacts/diffs/changed-files.txt`
+
+## Skipped Gates
+
+None. G2-G8 are future stages, not skipped.
+
+### G1 Runtime Preflight
+
+Command: Python/jsonschema/curses/fcntl import checks; workspace/prompt/schema checks; `tmux new-session`/`has-session`/`kill-session`; Codex/Claude help and version checks
+
+Stage: G1
+
+Exit Code: 0 after exact runtime restoration retry
+
+Result: PASS
+
+Output References: `g1-runtime-preflight.md`
+
+Skipped Gates: None
+
+### G2 Quality, Coverage, And Deployability
+
+Command: `/tmp/f0001-venv/bin/pytest -q engine/tests --cov=nebula_agents --cov-report=term-missing --cov-report=xml:planning-mds/operations/evidence/runs/2026-07-13-1cfbc5a0/artifacts/test-results/coverage.xml --cov-fail-under=85 --junitxml=planning-mds/operations/evidence/runs/2026-07-13-1cfbc5a0/artifacts/test-results/junit.xml`
+
+Stage: G2
+
+Exit Code: 0
+
+Result: PASS — 424 passed, zero failures/errors/skips/xfails, 90.03% line coverage, and the real tmux lifecycle passed in the approved host-runtime lane.
+
+Output References: `test-execution-report.md`, `coverage-report.md`, `deployability-check.md`, `artifacts/test-results/junit.xml`, `artifacts/test-results/coverage.xml`
+
+Skipped Gates: None
+
+### G2 Evidence Validation
+
+Command: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root . --feature F0001 --run-id 2026-07-13-1cfbc5a0 --stage G2 --json`
+
+Stage: G2
+
+Exit Code: 0
+
+Result: PASS with no errors or warnings; `features_validated: 0` remains the validator's active/nonterminal completion-eligibility behavior, supplemented by the explicit story, coverage, deployability, and lifecycle checks above.
+
+Output References: `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`, `deployability-check.md`, `evidence-manifest.json`
+
+Skipped Gates: None
+
+### G1 Evidence Validation
+
+Command: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0001 --run-id 2026-07-13-1cfbc5a0 --stage G1 --json`
+
+Stage: G1
+
+Exit Code: 0
+
+Result: PASS with no errors or warnings; `features_validated: 0` reflects the validator's active/nonterminal completion-eligibility filter.
+
+Output References: `g1-runtime-preflight.md`, `evidence-manifest.json`
+
+Skipped Gates: None
+
+### G3 Code And Security Review
+
+Command: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root . --feature F0001 --run-id 2026-07-13-1cfbc5a0 --stage G3 --json`
+
+Stage: G3
+
+Exit Code: 0
+
+Result: BLOCKED — the structural validator returned no errors or warnings but reported `features_validated: 0` because F0001 is active/nonterminal. Independent role evidence is authoritative for the live gate: Security Reviewer returned `PASS WITH RECOMMENDATIONS`; Code Reviewer returned `REQUEST CHANGES` with six Critical, one High, and one Medium blocking finding. G4 was not opened.
+
+Output References: `code-review-report.md`, `security-review-report.md`, `gate-decisions.md`, `evidence-manifest.json`
+
+Skipped Gates: G4-G8 were not opened because G3 is blocked; they are not waived.

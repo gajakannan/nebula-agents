@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0001-local-policy.schema.json",
+  "title": "F0001 Local Authorization Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_version", "default_effect", "bindings", "reviewer_grants", "updated_at"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "policy_version": {"type": "integer", "minimum": 1},
+    "default_effect": {"const": "deny"},
+    "bindings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/binding"}
+    },
+    "reviewer_grants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer_can_launch",
+        "reviewer_can_attach",
+        "reviewer_can_hold",
+        "reviewer_can_approve",
+        "reviewer_can_configure_transcript"
+      ],
+      "properties": {
+        "reviewer_can_launch": {"type": "boolean", "default": false},
+        "reviewer_can_attach": {"type": "boolean", "default": false},
+        "reviewer_can_hold": {"type": "boolean", "default": false},
+        "reviewer_can_approve": {"type": "boolean", "default": false},
+        "reviewer_can_configure_transcript": {"type": "boolean", "default": false}
+      }
+    },
+    "validator_allowlist": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "enum": ["stories", "trackers", "templates"]},
+      "default": ["stories", "trackers", "templates"]
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_type", "subject_id", "role"],
+      "properties": {
+        "subject_type": {"type": "string", "enum": ["uid", "gid"]},
+        "subject_id": {"type": "integer", "minimum": 0},
+        "role": {"type": "string", "enum": ["LocalOperator", "Reviewer"]}
+      }
+    }
+  }
+}

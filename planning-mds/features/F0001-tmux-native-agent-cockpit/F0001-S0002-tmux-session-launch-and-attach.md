@@ -43,10 +43,10 @@ The operator values the native provider terminal because it supports interactive
 | CLI `nebula-agents attach --run-id` | Attach to active run | No editable state | No new session; attaches to existing tmux session | Session registry `attached_at` audit entry is appended | Local Operator or Reviewer with shell access |
 
 Required checks for mutation stories:
-- [ ] Render-only behavior cannot satisfy the story.
-- [ ] The launch path validates provider, feature/story ID, prompt action, and tmux session uniqueness.
-- [ ] A successful launch has an audit event in the run registry.
-- [ ] Tests prove attach reuses the existing tmux session after process reload.
+- [x] Render-only behavior cannot satisfy the story.
+- [x] The launch path validates provider, feature/story ID, prompt action, and tmux session uniqueness.
+- [x] A successful launch has an audit event in the run registry.
+- [x] Tests prove attach reuses the existing tmux session after process reload.
 
 ## Data Requirements
 
@@ -123,14 +123,14 @@ Required checks for mutation stories:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced through local shell access and launch guards
-- [ ] Audit/timeline logged for launch, attach, failure, and exit events
-- [ ] Tests cover launch success, duplicate run, tmux collision, failed provider process, and attach reuse
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced through local shell access and launch guards
+- [x] Audit/timeline logged for launch, attach, failure, and exit events
+- [x] Tests cover launch success, duplicate run, tmux collision, failed provider process, and attach reuse
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

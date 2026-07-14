@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "feature_id": "F0001",
+  "feature_slug": "tmux-native-agent-cockpit",
+  "run_id": "2026-07-13-1cfbc5a0",
+  "status": "in-progress",
+  "recorded_on": "2026-07-13",
+  "contract_effective_date": "2026-07-13",
+  "feature_path_at_run_start": "planning-mds/features/F0001-tmux-native-agent-cockpit",
+  "feature_path_at_closeout": null,
+  "feature_state": "In Progress",
+  "rerun_of": null,
+  "changed_paths": [
+    ".gitignore",
+    "planning-mds",
+    "engine"
+  ],
+  "scm": {
+    "base_ref": "main",
+    "head_ref": "feat/F0001-tmux-native-agent-cockpit",
+    "diff_artifact": "artifacts/diffs/changed-files.txt"
+  },
+  "runtime_bearing": true,
+  "deployment_config_changed": false,
+  "frontend_in_scope": true,
+  "security_sensitive_scope": true,
+  "required_roles": [
+    "Quality Engineer",
+    "Code Reviewer",
+    "Security Reviewer",
+    "Architect"
+  ],
+  "gate_results": {
+    "assembly_plan_validation": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "g0-assembly-plan-validation.md"
+    },
+    "runtime_preflight": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "g1-runtime-preflight.md"
+    },
+    "self_review": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "g2-self-review.md"
+    },
+    "deployability": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "deployability-check.md"
+    }
+  },
+  "files": {
+    "readme": "README.md",
+    "action_context": "action-context.md",
+    "artifact_trace": "artifact-trace.md",
+    "gate_decisions": "gate-decisions.md",
+    "commands_log": "commands.log",
+    "lifecycle_gates_log": "lifecycle-gates.log",
+    "assembly_plan_validation": "g0-assembly-plan-validation.md",
+    "runtime_preflight": "g1-runtime-preflight.md",
+    "self_review": "g2-self-review.md",
+    "test_plan": "test-plan.md",
+    "test_execution_report": "test-execution-report.md",
+    "coverage_report": "coverage-report.md",
+    "deployability": "deployability-check.md",
+    "code_review": "code-review-report.md",
+    "security_review": "security-review-report.md"
+  },
+  "test_results": {
+    "result": "PASS",
+    "tests": 424,
+    "passed": 424,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "xfail": 0,
+    "coverage": {
+      "lines_covered": 3577,
+      "lines_valid": 3973,
+      "line_rate": 0.9003,
+      "minimum_rate": 0.85,
+      "result": "PASS"
+    },
+    "artifacts": {
+      "junit": {
+        "path": "artifacts/test-results/junit.xml",
+        "bytes": 62864,
+        "sha256": "632209797c2ff935a528b5e22c6c2f566621c918aad27ffc5bf03d1539fd379c"
+      },
+      "coverage": {
+        "path": "artifacts/test-results/coverage.xml",
+        "bytes": 149476,
+        "sha256": "482883b0e1b1808cc985d09c88cea31eafa181ff83a4e731c6d42d1ac5d32b73"
+      }
+    }
+  },
+  "role_results": {
+    "Architect": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": [
+        "g0-assembly-plan-validation.md"
+      ],
+      "verdict_artifact": "g0-assembly-plan-validation.md"
+    },
+    "Quality Engineer": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": [
+        "test-plan.md",
+        "test-execution-report.md",
+        "coverage-report.md"
+      ],
+      "verdict_artifact": "test-execution-report.md"
+    },
+    "Code Reviewer": {
+      "required": true,
+      "result": "REQUEST CHANGES",
+      "required_artifacts": [
+        "code-review-report.md"
+      ],
+      "verdict_artifact": "code-review-report.md"
+    },
+    "Security Reviewer": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "required_artifacts": [
+        "security-review-report.md"
+      ],
+      "verdict_artifact": "security-review-report.md"
+    }
+  },
+  "security_scans": {
+    "dependency": {
+      "ran": true,
+      "result": "clean",
+      "artifact": "artifacts/security/dependency-audit.json",
+      "waiver": null
+    },
+    "secrets": {
+      "ran": true,
+      "result": "clean",
+      "artifact": "artifacts/security/secrets-scan.json",
+      "waiver": null
+    },
+    "sast": {
+      "ran": true,
+      "result": "findings",
+      "artifact": "artifacts/security/bandit-sast.txt",
+      "waiver": null
+    },
+    "dast": {
+      "ran": false,
+      "result": "not_run",
+      "artifact": null,
+      "waiver": {
+        "reason": "The approved local CLI/TUI architecture exposes no network listener or HTTP target for dynamic application security testing.",
+        "owner": "Security Reviewer",
+        "approved_on": "2026-07-13"
+      }
+    }
+  },
+  "omissions": [],
+  "waivers": {},
+  "global_evidence_refs": {}
+}

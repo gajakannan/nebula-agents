@@ -1,0 +1,43 @@
+# Feature Action Execution — F0001-tmux-native-agent-cockpit run 2026-07-14-b885d64c
+
+## Gate
+
+Current gate reached: `G6` pre-closeout candidate validation.
+
+## Execution Timeline
+
+- 2026-07-14T15:43:28-04:00 — G0 entered and passed.
+  - Inputs: approved F0001 PRD, six stories, Phase B architecture, existing assembly plan, blocked run `2026-07-13-1cfbc5a0`, and the bounded R1-R10 remediation request.
+  - Validator: `validate-feature-evidence.py --stage G0` exited 0.
+  - Outputs: remediation addendum, `g0-assembly-plan-validation.md`, draft manifest, and base run evidence.
+  - Outcome: proceed to isolated runtime preflight.
+- 2026-07-14T15:47:00-04:00 — G1 entered and passed.
+  - Inputs: clean remediation virtual environment, installed CLI, provider executables, tmux, and isolated runtime/product roots.
+  - Validator: `validate-feature-evidence.py --stage G1` exited 0.
+  - Outputs: `g1-runtime-preflight.md` and unique create/probe/destroy tmux smoke evidence.
+  - Outcome: proceed to implementation and QE.
+- 2026-07-14T16:18:00-04:00 through 2026-07-14T19:24:00-04:00 — G2 implementation, remediation, and evidence refreshes passed.
+  - Inputs: R1-R10 plus review findings H01-H06.
+  - Validators: official pytest/Cobertura, real-tmux, dependency, secrets, Bandit, architecture, story, tracker, template, compile, diff, doctor, and evidence stages.
+  - Outputs: final 514-test JUnit, 90.67% line/81.32% branch coverage, four 100% mandatory risk-module branch gates, clean dependency/secrets results, 13 Low/0 Medium/0 High SAST findings, and updated G2 role reports.
+  - Outcome: all implementation blockers remediated; proceed to final independent review.
+- 2026-07-14T16:35:00-04:00 through 2026-07-14T19:31:00-04:00 — G3 review cycles 1-5 completed.
+  - Inputs: immutable cycle reports and exact H01-H06 fault reproductions.
+  - Validator: `validate-feature-evidence.py --stage G3` exited 0 after cycle 5.
+  - Outputs: final `code-review-report.md` and `security-review-report.md`, both `PASS WITH RECOMMENDATIONS`, with zero Critical or High findings.
+  - Outcome: stop for explicit operator approval.
+- 2026-07-14T19:37:54-04:00 — G4 approved.
+  - Input: explicit operator message `approve G4`.
+  - Validator: `validate-feature-evidence.py --stage G4` exited 0.
+  - Output: approval row in `gate-decisions.md`.
+  - Outcome: proceed to required-role signoff verification.
+- 2026-07-14T19:40:17-04:00 — G5 passed.
+  - Inputs: `STATUS.md` Required Role Matrix, final QE/Code/Security/Architect evidence, and six local story contracts.
+  - Validator: `validate-feature-evidence.py --stage G5` exited 0.
+  - Outputs: 24 current passing story-role rows and `signoff-ledger.md`.
+  - Outcome: proceed to pre-closeout candidate validation.
+- 2026-07-14T19:42:00-04:00 — G6 candidate assembled.
+  - Inputs: all passing G0-G5 artifacts and the still-`in-progress` manifest.
+  - Validators: scoped G6 feature-evidence and tracker validators are the gate commands.
+  - Outputs: this gate-by-gate execution record and candidate manifest file map.
+  - Outcome: proceed only if both G6 commands exit 0; G7 must then apply the assembly plan's explicit knowledge-graph governance decision.

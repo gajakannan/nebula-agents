@@ -1,6 +1,6 @@
 # Nebula Agents Planning Blueprint
 
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-13
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
 
 ## Feature Plan
 
-- [F0001 - Tmux-Native Agent Cockpit](features/F0001-tmux-native-agent-cockpit/README.md) - Planned / Now
+- [F0001 - Tmux-Native Agent Cockpit](features/F0001-tmux-native-agent-cockpit/README.md) - In Progress / Now
   - [F0001-S0001 - Provider auth and environment preflight](features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) - Not Started
   - [F0001-S0002 - Tmux session launch and attach](features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) - Not Started
   - [F0001-S0003 - Run registry and evidence watchers](features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) - Not Started
@@ -64,3 +64,77 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
 - Product planning updates must keep `features/REGISTRY.md`, `features/ROADMAP.md`, `features/STORY-INDEX.md`, and this blueprint synchronized.
 - Story files must use one story per file with IDs matching `F####-S####`.
 - F0001 is the mandatory first delivery path. F0002 must not remove tmux fallback until feature closeout evidence proves parity for interactive prompts, user approvals, terminal visibility, transcript recovery, and validator gates.
+
+## 4. F0001 Technical Architecture
+
+### 4.1 Service Boundaries
+
+F0001 is one local Python executable, not a daemon or hosted service. It uses four inward-facing layers:
+
+| Boundary | Responsibility | Must Not Own |
+|----------|----------------|--------------|
+| Presentation | CLI commands and the terminal cockpit; maps input and renders sanitized views | Provider processes, filesystem persistence, or lifecycle rules |
+| Application | Preflight, launch, attach, validation, gate-decision, transcript, recovery, and query use cases | Direct `tmux` calls or provider-specific command syntax |
+| Domain | Run, gate, validator, transcript, and authorization invariants | Terminal rendering, subprocesses, or files |
+| Infrastructure adapters | Tmux, Codex/Claude CLI, filesystem state, evidence polling, OS identity, clock, and process execution | Gate policy or run-state decisions |
+
+F0001 owns the minimum local registry, native-session lifecycle, gate visibility, and redacted recovery surface. F0003 owns MCP tools, stable artifact IDs, deterministic summaries, metrics, and learning proposals. F0002 owns managed provider adapters and remote/SDK orchestration. Direct native CLI use remains a fallback.
+
+### 4.2 Data Model
+
+The `RunRecord` aggregate is stored as an atomic JSON snapshot with a monotonically increasing `revision`. It contains run identity, provider/tmux identity, feature/story focus, workspace and evidence roots, current session/gate/transcript state, the latest validator result, artifact observations, `created_at`, and `updated_at`. Each state-changing operation also appends a `RuntimeEvent` to a per-run JSONL audit stream with `sequence`, `occurred_at`, actor, event type, and sanitized payload.
+
+`ProviderProbe`, `GateSnapshot`, `ValidatorResult`, `TranscriptState`, and `ArtifactObservation` are value records within the aggregate. `LocalPolicy` maps OS user/group attributes to local roles and action grants. F0001 has no database, soft delete, or cross-run transaction; writes use a per-run lock, revision check, same-directory temporary file, `fsync`, and atomic replace. JSON Schemas under `planning-mds/schemas/` are authoritative.
+
+### 4.3 Workflow Rules
+
+- Session transitions: `PreflightPending -> Launching -> Active -> Exited`; launch failures move to `Failed`; a missing tmux session moves `Active -> DetachedOrExited`; reconciliation may move `DetachedOrExited -> Active`. `Failed` and `Exited` are terminal for that run.
+- Gate transitions: `Unknown -> Pending` only after reconciliation; `Pending <-> Blocked` follows required evidence and validator state; `Pending|Blocked -> Held` is explicit; `Held -> Pending` is explicit; only an authorized user may move an eligible `Pending -> Approved`. A gate decision is append-only.
+- Transcript transitions: `Disabled -> Active -> Completed|Failed`; retry from `Failed -> Active` requires a new explicit action. Unredacted output is never written as fallback.
+- Repeating a successful request is idempotent where safe. Duplicate run IDs and tmux names are conflicts; attaching never launches a second provider; approving an already approved gate returns the existing decision.
+- Every mutation and every denied or blocked mutation appends a runtime event. Read-only queries do not create events; validator execution records its result because it changes review evidence.
+
+### 4.4 Authorization Model
+
+Authorization uses a default-deny subject/resource/action contract. Subject attributes are OS user ID, group IDs, configured role, and run ownership. Resource attributes are run ID, owner ID, session state, gate state, evidence readiness, and transcript state. Actions are `Probe`, `Launch`, `Attach`, `ReadState`, `RunValidator`, `DecideGate`, and `ConfigureTranscript`.
+
+`LocalOperator` may mutate runs it owns. `Reviewer` may read state and run allowlisted validators; attach guidance, gate hold, or gate approval requires an explicit policy grant. Provider login is owned by the provider CLI. F0001 never reads credential bodies or copies provider authentication state. This keeps Casbin-compatible ABAC semantics without requiring a policy server for the local MVP.
+
+### 4.5 API and CLI Contracts
+
+F0001 exposes no HTTP API, so OpenAPI is not applicable. Its public contract is the versioned CLI and JSON output described in `planning-mds/architecture/f0001-cli-contract.md`. CREATE operations are `launch`, validator-result recording, gate decisions, and transcript enablement. READ operations are `doctor`, `sessions`, `status`, and `evidence`; `attach` delegates to the existing tmux session without creating a provider process.
+
+All subprocess calls originate from validated argv records. Provider-specific flags live behind provider adapters. Errors use stable machine codes plus human remediation and stable exit-code classes. `--format json` output conforms to the shared schemas; terminal tables are projections of the same records.
+
+The public machine-readable record contracts are `RunRecord` for status/READ projections, `RuntimeEvent` for append-only mutation evidence, and `LocalPolicy` for authorization configuration. They are filesystem/CLI contracts rather than HTTP resources.
+
+### 4.6 Non-Functional Requirements
+
+- **Performance:** `doctor` completes within 3 seconds when probes return normally; launch feedback appears within 2 seconds of tmux return; cached registry status returns within 250 ms for 100 local runs; evidence and gate changes appear within 1 second at the default 500 ms polling interval.
+- **Security:** state files are owner-only (`0600`) and directories `0700`; subprocess input is argv-based except the isolated tmux helper seam; secrets are neither inspected nor persisted; transcript content is redacted before its first disk write; path containment uses resolved paths, not prefix strings.
+- **Availability:** there is no remote availability SLO. A TUI crash must not terminate the tmux/provider session, and state recovery must succeed from the last valid snapshot plus append-only events.
+- **Reliability:** snapshot writes are locked, revision-checked, and atomic; corrupt files are preserved for diagnosis; failed redaction disables transcript writes; unknown gate or session state fails closed.
+- **Scalability:** MVP supports 100 retained local run snapshots, 20 watched active runs, and one provider process per run. Larger stores, remote coordination, and distributed execution are deferred to F0003/F0002.
+- **Portability:** MVP supports POSIX environments with tmux and Python 3.11 or newer; Windows is supported through WSL when tmux and the provider CLI run inside the same distribution.
+- **UI quality:** the TUI must support keyboard-only operation, resize without state loss, text labels in addition to color, and a narrow layout at 80x24. There is no web theme surface.
+- **Caching:** the process may keep an in-memory read projection invalidated by registry/watcher events; it must re-probe tmux and re-check gate eligibility before mutations. No external cache is used.
+
+### 4.7 Architecture Artifacts
+
+- [Solution patterns](architecture/SOLUTION-PATTERNS.md)
+- [Data model](architecture/data-model.md)
+- [System context](architecture/c4-context.md) and [container view](architecture/c4-container.md)
+- [CLI contract](architecture/f0001-cli-contract.md)
+- [Workflow design](architecture/f0001-workflows.md)
+- [Authorization model](security/f0001-authorization-model.md)
+- [Architecture decisions](architecture/decisions/)
+
+### 4.8 Architecture Boundary Decision
+
+F0001 deliberately has no HTTP service, database, managed provider SDK, MCP surface, artifact index, metrics store, or learning loop. Those are not missing layers; they are explicit F0003/F0002 scope boundaries. The feature action creates the implementation-level `feature-assembly-plan.md` at G0 from this approved Phase B design.
+
+### 4.9 Phase B Approval
+
+The operator approved the F0001 architecture at `2026-07-13T21:39:29-04:00`. The four F0001 ADRs are Accepted, architecture validation is clean, and F0001 is ready to enter the `feature` action at G0.
+
+The feature action started on 2026-07-13 as run `2026-07-13-1cfbc5a0`. Its G0 implementation plan is [`features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md`](features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md); implementation remains bounded to one local Python package under `engine/`.

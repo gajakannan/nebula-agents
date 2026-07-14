@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0001-preflight-result.schema.json",
+  "title": "F0001 Preflight Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "probed_at",
+    "workspace_root",
+    "planning_docs_path",
+    "missing_paths",
+    "runtime_dir",
+    "tmux",
+    "providers",
+    "overall_status"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "probed_at": {"type": "string", "format": "date-time"},
+    "workspace_root": {"type": "string", "minLength": 1},
+    "planning_docs_path": {"type": ["string", "null"]},
+    "missing_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 16,
+      "items": {"type": "string", "minLength": 1, "maxLength": 256}
+    },
+    "runtime_dir": {"type": "string", "minLength": 1},
+    "prompt_contract_path": {"type": ["string", "null"]},
+    "overall_status": {
+      "type": "string",
+      "enum": ["ready", "blocked", "authentication_attention_needed", "denied"]
+    },
+    "tmux": {"$ref": "#/$defs/probe"},
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/providerProbe"}
+    },
+    "checks": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/check"}
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": ["ready", "missing", "authentication_attention_needed", "unsupported", "denied", "timeout", "error"]
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1},
+        "status": {"$ref": "#/$defs/status"},
+        "executable_path": {"type": ["string", "null"]},
+        "version": {"type": ["string", "null"], "maxLength": 256},
+        "remediation_category": {"type": ["string", "null"], "maxLength": 80}
+      }
+    },
+    "providerProbe": {
+      "allOf": [
+        {"$ref": "#/$defs/probe"},
+        {
+          "type": "object",
+          "properties": {
+            "key": {"enum": ["codex", "claude"]}
+          }
+        }
+      ]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status", "message"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "status": {"$ref": "#/$defs/status"},
+        "message": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    }
+  }
+}

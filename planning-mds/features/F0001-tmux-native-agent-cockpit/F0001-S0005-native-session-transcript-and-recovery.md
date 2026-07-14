@@ -31,6 +31,7 @@ Long-running agent work can be interrupted by terminal disconnects, machine slee
 
 **Alternative Flows / Edge Cases:**
 - If tmux session exists but transcript capture failed, attach remains available and transcript status is marked blocked with the failure reason.
+- If capture may still be active, pipe inactivity must be positively proved or durable status must remain `Active`; if neither safety result can be established, the owning tmux session is terminated and verified absent before the error returns.
 - If tmux session no longer exists, recovery shows last transcript path, last known gate, and last audit event.
 - Secret patterns detected in transcript output are redacted before evidence display.
 - Transcript file permission denied is reported and does not disable attach.
@@ -44,10 +45,10 @@ Long-running agent work can be interrupted by terminal disconnects, machine slee
 | Recovery Command | Attach or inspect transcript | No direct edit | Appends recovery audit entry | Run registry shows recovery attempt after reload | Local Operator and Reviewer |
 
 Required checks for mutation stories:
-- [ ] Render-only behavior cannot satisfy the story.
-- [ ] Transcript capture validates output path and redaction settings.
-- [ ] Transcript enablement and recovery attempts have audit/timeline entries.
-- [ ] Tests prove transcript and attach recovery still work after TUI restart.
+- [x] Render-only behavior cannot satisfy the story.
+- [x] Transcript capture validates output path and redaction settings.
+- [x] Transcript enablement and recovery attempts have audit/timeline entries.
+- [x] Tests prove transcript and attach recovery still work after TUI restart.
 
 ## Data Requirements
 
@@ -96,7 +97,7 @@ Required checks for mutation stories:
 
 ## Business Rules
 
-1. Preserve context: Recovery must favor reattaching to the native session when it still exists.
+1. Preserve context: Recovery must favor reattaching to the native session when it still exists, except when terminating it is the only verified way to prevent capture continuing behind an untruthful durable state.
 2. Redact before review: Transcript content shown outside the native terminal must pass redaction first.
 3. Recovery is auditable: Attach attempts and transcript recovery events are recorded.
 
@@ -123,14 +124,14 @@ Required checks for mutation stories:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced through local access and path validation
-- [ ] Audit/timeline logged for transcript enablement, failure, redaction, attach, and recovery actions
-- [ ] Tests cover active recovery, exited session, redaction, denied transcript path, oversized transcript, and restart
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced through local access and path validation
+- [x] Audit/timeline logged for transcript enablement, failure, redaction, attach, and recovery actions
+- [x] Tests cover active recovery, exited session, redaction, denied transcript path, oversized transcript, and restart
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

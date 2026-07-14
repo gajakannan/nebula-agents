@@ -11,7 +11,7 @@
 
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
-| F0001 | Tmux-Native Agent Cockpit | Planned | MVP | `F0001-tmux-native-agent-cockpit/` |
+| F0001 | Tmux-Native Agent Cockpit | In Progress | MVP | `F0001-tmux-native-agent-cockpit/` |
 | F0007 | Spec-Driven Orchestration and Prompt Compilation | Planned | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
 
 ## Retired Features

@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0001-run-record.schema.json",
+  "title": "F0001 Run Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "run_id",
+    "feature_id",
+    "story_id",
+    "provider_key",
+    "tmux_session",
+    "workspace_root",
+    "prompt_contract",
+    "prompt_action",
+    "status",
+    "owner",
+    "evidence_root",
+    "gate",
+    "latest_validator",
+    "artifacts",
+    "transcript",
+    "audit_log_path",
+    "last_event_sequence",
+    "created_at",
+    "updated_at",
+    "last_seen_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "revision": {"type": "integer", "minimum": 0},
+    "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
+    "feature_id": {"type": "string", "pattern": "^F\\d{4}$"},
+    "story_id": {
+      "oneOf": [
+        {"type": "string", "pattern": "^F\\d{4}-S\\d{4}$"},
+        {"type": "null"}
+      ]
+    },
+    "provider_key": {"type": "string", "enum": ["codex", "claude"]},
+    "tmux_session": {"type": "string", "pattern": "^nebula-F\\d{4}-[0-9a-f]{8}$", "maxLength": 80},
+    "workspace_root": {"type": "string", "minLength": 1},
+    "prompt_contract": {"type": "string", "minLength": 1},
+    "prompt_action": {"type": "string", "enum": ["plan", "feature", "build", "review", "validate"]},
+    "status": {
+      "type": "string",
+      "enum": ["PreflightPending", "Launching", "Active", "DetachedOrExited", "Failed", "Exited", "Unknown"]
+    },
+    "owner": {"$ref": "#/$defs/actor"},
+    "evidence_root": {"type": ["string", "null"]},
+    "gate": {"$ref": "#/$defs/gate"},
+    "latest_validator": {
+      "oneOf": [
+        {"$ref": "#/$defs/validator"},
+        {"type": "null"}
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "transcript": {"$ref": "#/$defs/transcript"},
+    "audit_log_path": {"type": "string", "minLength": 1},
+    "last_event_sequence": {"type": "integer", "minimum": 0},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "last_seen_at": {"type": ["string", "null"], "format": "date-time"}
+  },
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uid", "username", "role"],
+      "properties": {
+        "uid": {"type": "integer", "minimum": 0},
+        "username": {"type": "string", "minLength": 1, "maxLength": 256},
+        "role": {"type": "string", "enum": ["LocalOperator", "Reviewer", "System"]},
+        "display_label": {"type": ["string", "null"], "maxLength": 80}
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_id", "status", "evidence_ready", "required_evidence", "decision"],
+      "properties": {
+        "gate_id": {"type": ["string", "null"], "pattern": "^G\\d+$"},
+        "status": {"type": "string", "enum": ["Pending", "Blocked", "Approved", "Held", "Unknown"]},
+        "evidence_ready": {"type": "boolean"},
+        "required_evidence": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "decision": {
+          "oneOf": [
+            {"$ref": "#/$defs/decision"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reason", "actor", "decided_at", "record_revision"],
+      "properties": {
+        "decision": {"type": "string", "enum": ["Approve", "Hold"]},
+        "reason": {"type": ["string", "null"], "maxLength": 2000},
+        "actor": {"$ref": "#/$defs/actor"},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "record_revision": {"type": "integer", "minimum": 0}
+      }
+    },
+    "validator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validator_key",
+        "exit_code",
+        "duration_ms",
+        "summary",
+        "artifact_path",
+        "completed_at",
+        "command_template",
+        "gate_id",
+        "validated_revision",
+        "evidence_digest"
+      ],
+      "properties": {
+        "validator_key": {"type": "string", "enum": ["stories", "trackers", "templates"]},
+        "exit_code": {"type": "integer", "minimum": 0, "maximum": 255},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "summary": {"type": "string", "maxLength": 4000},
+        "artifact_path": {"type": ["string", "null"]},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "command_template": {"type": "string", "maxLength": 512},
+        "gate_id": {"type": ["string", "null"], "pattern": "^G\\d+$"},
+        "validated_revision": {"type": ["integer", "null"], "minimum": 0},
+        "evidence_digest": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relative_path", "status", "observed_at", "size_bytes"],
+      "properties": {
+        "relative_path": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["Pending", "Available", "Missing", "Moved", "Malformed", "Denied", "Stale"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "size_bytes": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "transcript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "redaction_status", "path", "preview", "redaction_findings", "failure_reason"],
+      "properties": {
+        "status": {"type": "string", "enum": ["Disabled", "Active", "Failed", "Completed"]},
+        "redaction_status": {"type": "string", "enum": ["NotRun", "Passed", "Redacted", "Failed"]},
+        "path": {"type": ["string", "null"]},
+        "preview": {"type": ["string", "null"], "maxLength": 16000},
+        "redaction_findings": {"type": "integer", "minimum": 0},
+        "failure_reason": {"type": ["string", "null"], "maxLength": 256}
+      }
+    }
+  }
+}

@@ -1,0 +1,368 @@
+# Lifecycle Gate Run
+
+F0001 remediation run `2026-07-14-b885d64c`.
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G0`
+
+## Stage
+
+G0
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — feature evidence structure passed. The validator reports `validated=0` because F0001 is active/nonterminal; stage-scoped structural validation still exited successfully.
+
+## Output References
+
+- `g0-assembly-plan-validation.md`
+- `evidence-manifest.json`
+
+## Skipped Gates
+
+G1-G8 have not opened.
+
+# Lifecycle Gate Run — G1
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G1`
+
+## Stage
+
+G1
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — the G1 runtime-preflight artifact and manifest mapping passed stage validation. The feature remains active/nonterminal, so the validator's completion-eligibility count is zero by design.
+
+## Output References
+
+- `g1-runtime-preflight.md`
+- `evidence-manifest.json`
+
+## Skipped Gates
+
+G2-G8 have not opened.
+
+# Lifecycle Gate Run — G2
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G2`
+
+## Stage
+
+G2
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — the self-review, test plan/execution, branch-enabled coverage, deployability evidence, QE role result, and canonical raw artifacts passed stage validation. The feature remains active/nonterminal, so the validator's completion-eligibility count is zero by design.
+
+## Output References
+
+- `g2-self-review.md`
+- `test-plan.md`
+- `test-execution-report.md`
+- `coverage-report.md`
+- `deployability-check.md`
+- `artifacts/test-results/junit.xml`
+- `artifacts/test-results/coverage.xml`
+- `artifacts/security/`
+
+## Skipped Gates
+
+G3-G8 have not opened.
+
+# Lifecycle Gate Run — G3 Cycle 1
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G3`
+
+## Stage
+
+G3 cycle 1
+
+## Exit Code
+
+0 (structural evidence validator)
+
+## Result
+
+REQUEST CHANGES — the canonical code/security reports and manifest mappings are structurally valid, but their substantive verdicts block G3. Code Review found three Critical blockers; Security Review independently found the same three as High. Structural exit 0 is not a passing role verdict.
+
+## Archived Verdicts
+
+- `code-review-report-cycle-1.md` — SHA-256 `58060c7d1d00ceee2acf787ed54f58c376d6b22b835c51cf4515bbc75f856dd5`
+- `security-review-report-cycle-1.md` — SHA-256 `9ed763cd55549ced503697ff9fa25e1a94f923b4bfd2a6c83daec3ff43b3c6f2`
+
+## Blocking Findings
+
+- G3-H01 / R2: ambiguous post-publication launch commit can leave false durable Active state after tmux compensation.
+- G3-H02 / R4: story validator descendant reads are pathname-based and follow a post-check symlink swap.
+- G3-H03 / R5: ambiguous post-publication transcript completion can durably publish Completed and restart capture.
+
+## Next Action
+
+Return to bounded implementation, refresh G2 evidence, then run a new independent G3 cycle. G4-G8 remain closed.
+
+# Lifecycle Gate Run — G2 Refresh After G3 Cycle 1
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G2`
+
+## Stage
+
+G2 refresh
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — H01/H02/H03 are implemented with their exact real-repository and real-subprocess boundary regressions. The refreshed 488-test JUnit, branch-enabled coverage, dependency/secrets/SAST artifacts, deployability report, self-review, and QE role result passed structural validation. Canonical G3 reports remain `REQUEST CHANGES` until fresh cycle-2 reviews complete.
+
+## Output References
+
+- `test-plan.md`
+- `test-execution-report.md`
+- `coverage-report.md`
+- `deployability-check.md`
+- `g2-self-review.md`
+- `artifacts/test-results/`
+- `artifacts/security/`
+
+## Next Action
+
+Fresh independent G3 cycle-2 Code Reviewer and Security Reviewer passes. G4-G8 remain closed.
+
+# Lifecycle Gate Run — Final G2 Refresh After H-04
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G2`
+
+## Stage
+
+Final G2 refresh
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — H04 is remediated through verified pipe inactivity or a conservative recovered-revision Active fact. The 14 exact compound cases, final 496-test JUnit, 90.24% line/81.16% branch coverage, risk-module branch gates, clean dependency/secrets scans, 13-Low/0-Medium/0-High SAST artifact, real-tmux lane, and production validators pass.
+
+## Next Action
+
+Independent Security H04 follow-up and Code impact confirmation. G4-G8 remain closed.
+
+# Lifecycle Gate Run — G3 Cycle 3
+
+## Stage
+
+G3 cycle 3
+
+## Result
+
+REQUEST CHANGES — independent Code and Security reviewers confirmed H04R and H05 as High blockers. A second pre-publication failure could prevent truthful Active compensation while capture remained live, and the production tmux adapter treated timeout/nonzero liveness results as inactive.
+
+## Archived Verdicts
+
+- `code-review-report-cycle-3.md` — SHA-256 `916bb455e41e5f65b2940e6f43cd8136c2b2b86f10d49df58b3db4c1e21898e2`
+- `security-review-report-cycle-3.md` — SHA-256 `a37d79bf96902dc989d1d50b287044604b14c142bf1342456720af64702355a6`
+
+## Next Action
+
+Return to bounded implementation for H04R/H05, refresh G2, and request fresh independent reviews. G4-G8 remain closed.
+
+# Lifecycle Gate Run — Final G2 Refresh After H04R/H05
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G2`
+
+## Stage
+
+Final G2 remediation refresh
+
+## Result
+
+PASS — H04R/H05 are remediated through strict pipe/session probe semantics and verified owning-session termination when truthful Active compensation cannot be established. The focused 145-case lane, official 510-test JUnit, 90.64% line/81.35% branch coverage, 100% mandatory risk branches, clean dependency/secrets scans, 13-Low/0-Medium/0-High SAST artifact, real-tmux lane, and production validators pass.
+
+## Next Action
+
+Fresh independent G3 Code and Security reviews. G4-G8 remain closed.
+
+# Lifecycle Gate Run — G3 Cycle 4
+
+## Stage
+
+G3 cycle 4
+
+## Result
+
+REQUEST CHANGES — both reviewers closed the requested H04R/H05 shapes but independently reproduced High H06. When the first authoritative recovery read failed after the original transcript commit error, direct and launch paths returned before capture disable, truthful Active compensation, or verified session termination. Durable transcript state remained `Disabled` while capture and the owning session remained live; launch also returned a raw persistence exception.
+
+## Archived Verdicts
+
+- `code-review-report-cycle-4.md` — SHA-256 `db48c21678d88ac0e0ad1442051f599fa5d0798a14210131e8199dba751695d6`
+- `security-review-report-cycle-4.md` — SHA-256 `a34d17233081e4526d3d9bed0421753e9c8c1c7716c488f00e168be961f06ff1`
+
+## Next Action
+
+Remediate H06 at the first-recovery boundary, refresh G2, and request final independent reviews. G4-G8 remain closed.
+
+# Lifecycle Gate Run — Final G2 Refresh After H06
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G2`
+
+## Stage
+
+Final G2 H06 refresh
+
+## Result
+
+PASS — direct and launch first-authoritative-recovery failures now terminate the owning session, verify absence, and surface stable STATE_IO. The already-stopped transcript-failure control preserves the provider session. The focused 149-case lane, official 514-test JUnit, 90.67% line/81.32% branch coverage, 100% mandatory risk branches, clean dependency/secrets scans, 13-Low/0-Medium/0-High SAST artifact, real-tmux lane, production validators, and structural G2 validation pass.
+
+## Next Action
+
+Final independent G3 Code and Security reviews. G4-G8 remain closed.
+
+# Lifecycle Gate Run — G3 Cycle 5 Final
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G3`
+
+## Stage
+
+G3 final review
+
+## Exit Code
+
+0
+
+## Result
+
+PASS WITH RECOMMENDATIONS — final independent Code and Security reviews closed H01-H06 and found zero Critical or High issues. Code retains one Medium pre-G7 commit/manifest reproducibility recommendation and one Low backend-linter recommendation. Security retains five Low hardening/operations recommendations. The official 514-test package, final hashes/scans, strict failure probes, real tmux, and structural G3 evidence validation pass.
+
+## Output References
+
+- `code-review-report.md` — SHA-256 `afba7a7a8bdd25de5c5120a13436f72bfa38fc7a10fbe7cfa2ed046703bfa91a`
+- `security-review-report.md` — SHA-256 `b86ee09526ca61a02de4b6d9b17348a7e106352237922c89e70c3413b39e5810`
+- `evidence-manifest.json`
+
+## Next Action
+
+Stop for the mandatory explicit G4 operator decision. Do not start G5-G8 without approval.
+
+# Lifecycle Gate Run — G4 Operator Approval
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G4`
+
+## Stage
+
+G4 approval
+
+## Exit Code
+
+0
+
+## Result
+
+APPROVED — the operator explicitly approved G4. Final Code and Security reviews contain zero Critical or High findings; remaining Medium/Low recommendations are non-blocking and retained for Product Manager disposition at G8. Scoped G4 evidence validation passed.
+
+## Output References
+
+- `gate-decisions.md`
+- `code-review-report.md`
+- `security-review-report.md`
+- `evidence-manifest.json`
+
+## Next Action
+
+Verify current passing story-level evidence for every required role at G5.
+
+# Lifecycle Gate Run — G5 Required Signoff
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G5`
+
+## Stage
+
+G5 signoff
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — all six stories have current dated passing signoffs for Quality Engineer, Code Reviewer, Security Reviewer, and Architect, backed by files within this canonical run package. DevOps remains non-required because no deployment configuration or hosted topology is in scope. The signoff ledger and manifest reconcile with `STATUS.md`.
+
+## Output References
+
+- `planning-mds/features/F0001-tmux-native-agent-cockpit/STATUS.md`
+- `signoff-ledger.md`
+- `evidence-manifest.json`
+
+## Next Action
+
+Assemble and validate the unpublished G6 candidate package before any graph or closeout mutation.
+
+# Lifecycle Gate Run — G6 Candidate Evidence And Trackers
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c --stage G6`
+
+`python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c`
+
+## Stage
+
+G6 candidate validation
+
+## Exit Code
+
+0 for both commands
+
+## Result
+
+PASS — the complete G0-G5 package, execution timeline, unpublished in-progress manifest, and current feature trackers reconcile. Scoped tracker validation reported zero errors and zero warnings; its internal G6 feature-evidence validation also passed.
+
+## Output References
+
+- `feature-action-execution.md`
+- `evidence-manifest.json`
+- `planning-mds/features/F0001-tmux-native-agent-cockpit/STATUS.md`
+- `planning-mds/features/REGISTRY.md`
+- `planning-mds/features/ROADMAP.md`
+- `planning-mds/features/STORY-INDEX.md`
+- `planning-mds/BLUEPRINT.md`
+
+## Next Action
+
+Freeze and reconcile the approved implementation candidate, then activate Architect G7 for the as-built knowledge-graph governance decision.

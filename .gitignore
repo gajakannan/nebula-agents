@@ -2,8 +2,14 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+build/
+dist/
 .venv/
 venv/
+.nebula-agents/
 .idea/
 .vscode/
 .DS_Store

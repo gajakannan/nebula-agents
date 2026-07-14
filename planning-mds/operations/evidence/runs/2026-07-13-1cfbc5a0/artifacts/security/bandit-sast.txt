@@ -1,0 +1,212 @@
+Run started:2026-07-14 03:53:07.808400+00:00
+
+Test results:
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/gates.py:172:12
+171	                )
+172	            except Exception:
+173	                pass
+174	            raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/queries.py:60:20
+59	                        recorder(run.run_id, subject, Action.READ_STATE, datetime.now().astimezone())
+60	                    except Exception:
+61	                        pass
+62	            if len(records) >= max(1, min(limit, 100)):
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/runs.py:85:12
+84	                recorder(run.run_id, actor, action, datetime.now().astimezone())
+85	            except Exception:
+86	                # An audit persistence failure must not turn a denial into access.
+87	                pass
+88	        raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/runs.py:315:12
+314	                )
+315	            except Exception:
+316	                pass
+317	            if descriptor_path.exists():
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/runs.py:362:16
+361	                    self._transcript_pipe.disable(run=launched)
+362	                except Exception:
+363	                    pass
+364	            raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/transcripts.py:55:12
+54	                )
+55	            except Exception:
+56	                pass
+57	            raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/transcripts.py:73:12
+72	                self._pipe.disable(run=run)
+73	            except Exception:
+74	                pass
+75	            raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/transcripts.py:100:12
+99	                self._pipe.disable(run=run)
+100	            except Exception:
+101	                pass
+102	            failed_at = self._clock.now()
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/application/transcripts.py:200:16
+199	                    self._pipe.configure(run=run, output_path=Path(run.transcript.path))
+200	                except Exception:
+201	                    pass
+202	            raise
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: engine/src/nebula_agents/infrastructure/process.py:6:0
+5	import signal
+6	import subprocess
+7	import time
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: engine/src/nebula_agents/infrastructure/process.py:68:18
+67	            stderr=subprocess.PIPE,
+68	            shell=False,
+69	            start_new_session=True,
+70	        )
+71	        selector = selectors.DefaultSelector()
+72	        streams = {
+73	            "stdout": _BoundedStream(capture_limit),
+74	            "stderr": _BoundedStream(capture_limit),
+75	        }
+76	        assert process.stdout is not None and process.stderr is not None
+77	        for name, pipe in (("stdout", process.stdout), ("stderr", process.stderr)):
+78	            os.set_blocking(pipe.fileno(), False)
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: engine/src/nebula_agents/infrastructure/process.py:76:8
+75	        }
+76	        assert process.stdout is not None and process.stderr is not None
+77	        for name, pipe in (("stdout", process.stdout), ("stderr", process.stderr)):
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: engine/src/nebula_agents/infrastructure/tmux.py:7:0
+6	import shutil
+7	import subprocess
+8	from pathlib import Path
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: engine/src/nebula_agents/infrastructure/tmux.py:73:15
+72	        environment = {name: os.environ[name] for name in SAFE_ENV_NAMES if name in os.environ}
+73	        return subprocess.call((binary, "attach-session", "-t", self._session(session_name)), env=environment, shell=False)
+74	
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/infrastructure/transcript.py:224:12
+223	                )
+224	            except Exception:
+225	                pass
+226	            raise
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: engine/src/nebula_agents/infrastructure/transcript.py:250:16
+249	                    )
+250	                except Exception:
+251	                    pass
+252	            raise
+
+--------------------------------------------------
+>> Issue: [B606:start_process_with_no_shell] Starting a process without a shell.
+   Severity: Low   Confidence: Medium
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b606_start_process_with_no_shell.html
+   Location: engine/src/nebula_agents/presentation/session_entry.py:132:4
+131	        raise SessionEntryError("Validated descriptor could not be retired.") from error
+132	    os.execvpe(executable, argv, environment)
+133	    raise AssertionError("os.execvpe returned unexpectedly")
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 5572
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 17
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 16
+Files skipped (0):

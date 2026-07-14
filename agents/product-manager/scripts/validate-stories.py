@@ -16,7 +16,9 @@ Usage:
 
 import sys
 import io
+import os
 import re
+import stat
 import argparse
 from pathlib import Path
 
@@ -39,15 +41,82 @@ STRICT_WARNING_PREFIXES = (
     "Story involves data mutation but has no audit/timeline requirements",
 )
 
+_MAX_STORY_BYTES = 1_048_576
+_MAX_DESCRIPTOR_ENTRIES = 4_096
+_MAX_DESCRIPTOR_DEPTH = 32
+
+
+def _metadata_fingerprint(details):
+    return (
+        details.st_dev,
+        details.st_ino,
+        details.st_mode,
+        details.st_uid,
+        details.st_size,
+        details.st_mtime_ns,
+        details.st_ctime_ns,
+        details.st_nlink,
+    )
+
+
+def _require_safe_metadata(details, *, directory: bool) -> None:
+    expected_kind = stat.S_ISDIR(details.st_mode) if directory else stat.S_ISREG(details.st_mode)
+    if not expected_kind:
+        raise ValueError("descriptor entry has an unsafe filesystem type")
+    if details.st_uid != os.getuid():
+        raise ValueError("descriptor entry is not owned by the current user")
+    if stat.S_IMODE(details.st_mode) & 0o022:
+        raise ValueError("descriptor entry is group- or world-writable")
+    if not directory and details.st_nlink < 1:
+        raise ValueError("descriptor story is no longer linked below the feature root")
+
+
+def _pread_exact(file_descriptor: int, size: int) -> bytes:
+    payload = bytearray()
+    while len(payload) < size:
+        chunk = os.pread(
+            file_descriptor,
+            min(64 * 1024, size - len(payload)),
+            len(payload),
+        )
+        if not chunk:
+            raise ValueError("descriptor story changed during validation")
+        payload.extend(chunk)
+    return bytes(payload)
+
+
+def _read_stable_story(file_descriptor: int) -> str:
+    before = os.fstat(file_descriptor)
+    _require_safe_metadata(before, directory=False)
+    if before.st_size > _MAX_STORY_BYTES:
+        raise ValueError("descriptor story exceeds the one MiB validation limit")
+
+    first = _pread_exact(file_descriptor, before.st_size)
+    middle = os.fstat(file_descriptor)
+    second = _pread_exact(file_descriptor, before.st_size)
+    after = os.fstat(file_descriptor)
+    if (
+        _metadata_fingerprint(before) != _metadata_fingerprint(middle)
+        or _metadata_fingerprint(middle) != _metadata_fingerprint(after)
+        or first != second
+    ):
+        raise ValueError("descriptor story changed during validation")
+    return first.decode("utf-8")
+
+
 class StoryValidator:
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, content: str | None = None):
         self.file_path = Path(file_path)
         self.content = ""
+        self._descriptor_content = content
         self.errors = []
         self.warnings = []
 
     def load_story(self) -> bool:
         """Load story file content."""
+        if self._descriptor_content is not None:
+            self.content = self._descriptor_content
+            return True
         try:
             self.content = self.file_path.read_text(encoding='utf-8')
             return True
@@ -311,6 +380,76 @@ def _is_story_file(path: Path) -> bool:
     return False
 
 
+def collect_descriptor_story_files(
+    root_file_descriptor: int,
+    display_root: Path,
+) -> Tuple[List[Tuple[Path, str]], List[str]]:
+    """Read cockpit story inputs from stable no-follow descriptors.
+
+    The inherited root descriptor is the authority. Descendants are opened
+    relative to their already-open parent and story bytes are consumed only
+    from retained regular-file descriptors.
+    """
+
+    sources: List[Tuple[Path, str]] = []
+    seen_directories = set()
+    entry_count = 0
+    open_flags = (
+        os.O_RDONLY
+        | getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+    )
+
+    def walk(directory_fd: int, relative_parts: Tuple[str, ...]) -> None:
+        nonlocal entry_count
+        if len(relative_parts) > _MAX_DESCRIPTOR_DEPTH:
+            raise ValueError("descriptor story tree exceeds the depth limit")
+        directory_details = os.fstat(directory_fd)
+        _require_safe_metadata(directory_details, directory=True)
+        identity = (directory_details.st_dev, directory_details.st_ino)
+        if identity in seen_directories:
+            raise ValueError("descriptor story tree contains a directory cycle")
+        seen_directories.add(identity)
+
+        for name in sorted(os.listdir(directory_fd)):
+            entry_count += 1
+            if entry_count > _MAX_DESCRIPTOR_ENTRIES:
+                raise ValueError("descriptor story tree exceeds the entry limit")
+            if not name or name in {".", ".."} or "/" in name or "\x00" in name:
+                raise ValueError("descriptor story tree contains an unsafe name")
+
+            child_fd = os.open(name, open_flags, dir_fd=directory_fd)
+            try:
+                details = os.fstat(child_fd)
+                child_parts = (*relative_parts, name)
+                if stat.S_ISDIR(details.st_mode):
+                    _require_safe_metadata(details, directory=True)
+                    walk(child_fd, child_parts)
+                elif stat.S_ISREG(details.st_mode):
+                    _require_safe_metadata(details, directory=False)
+                    relative_path = Path(*child_parts)
+                    if name.endswith(".md") and _is_story_file(relative_path):
+                        sources.append(
+                            (
+                                display_root / relative_path,
+                                _read_stable_story(child_fd),
+                            )
+                        )
+                else:
+                    raise ValueError("descriptor story tree contains an unsafe filesystem type")
+            finally:
+                os.close(child_fd)
+
+    try:
+        if isinstance(root_file_descriptor, bool) or root_file_descriptor < 3:
+            raise ValueError("descriptor story root is invalid")
+        walk(root_file_descriptor, ())
+        return sources, []
+    except (OSError, UnicodeDecodeError, ValueError) as error:
+        return [], [f"Descriptor-bound story validation failed: {error}"]
+
+
 def collect_story_files(paths: Iterable[str]) -> Tuple[List[Path], List[str]]:
     story_files: List[Path] = []
     errors: List[str] = []
@@ -353,6 +492,12 @@ def main():
     )
     add_product_root_arg(parser)
     parser.add_argument(
+        "--story-root-fd",
+        type=int,
+        default=None,
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
         "paths",
         nargs="*",
         help=(
@@ -365,7 +510,19 @@ def main():
     product_root = resolve_product_root(args.product_root)
     paths = args.paths if args.paths else [str(product_root / "planning-mds" / "features")]
 
-    story_files, path_errors = collect_story_files(paths)
+    descriptor_sources: dict[Path, str] = {}
+    if args.story_root_fd is None:
+        story_files, path_errors = collect_story_files(paths)
+    elif len(paths) != 1:
+        story_files = []
+        path_errors = ["Descriptor-bound validation requires exactly one feature path."]
+    else:
+        sources, path_errors = collect_descriptor_story_files(
+            args.story_root_fd,
+            Path(paths[0]),
+        )
+        story_files = [path for path, _content in sources]
+        descriptor_sources = dict(sources)
 
     if path_errors:
         for error in path_errors:
@@ -386,7 +543,10 @@ def main():
         print(f"Validating story: {file_path}")
         print("-" * 60)
 
-        validator = StoryValidator(str(file_path))
+        validator = StoryValidator(
+            str(file_path),
+            content=descriptor_sources.get(file_path),
+        )
         is_valid, errors, warnings = validator.validate(strict_warnings=args.strict_warnings)
 
         if errors:

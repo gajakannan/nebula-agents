@@ -43,10 +43,10 @@ The native terminal session is valuable, but it is not enough by itself. Nebula 
 | Session Detail | Inspect evidence state | No direct edit in this story | Watcher updates artifact status and audit timeline | Changed evidence files appear after reload or watcher restart | Local Operator and Reviewer |
 
 Required checks for mutation stories:
-- [ ] Render-only behavior cannot satisfy the story.
-- [ ] Registry writes validate schema and path boundaries.
-- [ ] A successful registry mutation has an audit event.
-- [ ] Tests prove registry state survives process reload and changed evidence is observed.
+- [x] Render-only behavior cannot satisfy the story.
+- [x] Registry writes validate schema and path boundaries.
+- [x] A successful registry mutation has an audit event.
+- [x] Tests prove registry state survives process reload and changed evidence is observed.
 
 ## Data Requirements
 
@@ -125,14 +125,14 @@ Required checks for mutation stories:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met
-- [ ] Edge cases handled
-- [ ] Permissions enforced through runtime path validation
-- [ ] Audit/timeline logged for registry creation, update, artifact change, parse error, and session disappearance
-- [ ] Tests cover schema validation, reload, watcher change, deleted file, denied file, and corrupt registry recovery
-- [ ] Documentation updated
-- [ ] Story filename matches `Story ID` prefix
-- [ ] Story index regenerated or updated
+- [x] Acceptance criteria met
+- [x] Edge cases handled
+- [x] Permissions enforced through runtime path validation
+- [x] Audit/timeline logged for registry creation, update, artifact change, parse error, and session disappearance
+- [x] Tests cover schema validation, reload, watcher change, deleted file, denied file, and corrupt registry recovery
+- [x] Documentation updated
+- [x] Story filename matches `Story ID` prefix
+- [x] Story index regenerated or updated
 
 ## Review Provenance
 

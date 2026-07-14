@@ -1,6 +1,6 @@
 # Feature Roadmap (Now / Next / Later)
 
-**Last Reviewed:** 2026-07-12
+**Last Reviewed:** 2026-07-13
 
 ## Purpose
 
@@ -17,7 +17,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
 | [F0007 - Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
-| [F0001 - Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/) | Planned | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
+| [F0001 - Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/) | In Progress | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. G0 assembly planning passed in run `2026-07-13-1cfbc5a0`. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
 
 ## Next
 
