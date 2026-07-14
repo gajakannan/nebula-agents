@@ -37,4 +37,4 @@ The formal failure-triage request authorizes exact reads from cold archive run `
 
 ## Lifecycle Stage
 
-Current stage: `G6 passed; approved implementation candidate freeze is in progress before Architect G7`.
+Current stage: `G6 passed; approved implementation candidate frozen at 99d2020c8ccaa23f370eef526c27867395981c7e; Architect G7 is next`.

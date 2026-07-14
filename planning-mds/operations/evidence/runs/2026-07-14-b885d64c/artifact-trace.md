@@ -82,6 +82,8 @@
 
 None. The previous F0001 run is a local, explicitly selected failure-triage input and is linked through `rerun_of` rather than reused as passing evidence.
 
+The approved G6 implementation candidate is frozen at commit `99d2020c8ccaa23f370eef526c27867395981c7e`. Its `main...HEAD` path set matches all 160 entries in `artifacts/diffs/changed-files.txt`, closing Code Review recommendation CR-GOV-01 before G7.
+
 ## Omissions And Waivers
 
 - G3 cycles 1-4 are archived and final cycle 5 passed with recommendations. G4-G8 remain pending.

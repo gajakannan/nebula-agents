@@ -40,4 +40,4 @@ Current gate reached: `G6` pre-closeout candidate validation.
   - Inputs: all passing G0-G5 artifacts and the still-`in-progress` manifest.
   - Validators: scoped G6 feature-evidence and tracker validators are the gate commands.
   - Outputs: this gate-by-gate execution record and candidate manifest file map.
-  - Outcome: proceed only if both G6 commands exit 0; G7 must then apply the assembly plan's explicit knowledge-graph governance decision.
+  - Outcome: both G6 commands exited 0. The approved candidate was frozen at commit `99d2020c8ccaa23f370eef526c27867395981c7e`, and its 160-path `main...HEAD` diff exactly matches the canonical diff artifact. G7 must now apply the assembly plan's explicit knowledge-graph governance decision.

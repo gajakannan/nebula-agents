@@ -6,7 +6,7 @@ This is a separately authorized F0001 `feature` remediation run linked to blocke
 
 ## Status
 
-Current state: `in-progress — G6 passed; approved implementation candidate is being frozen before G7`.
+Current state: `in-progress — G6 passed; approved implementation candidate frozen at 99d2020c; Architect G7 next`.
 
 ## Evidence Index
 
@@ -41,6 +41,6 @@ G0-G2 passed. Final G3 cycle 5 independently closed H-01 through H-06. Code and 
 
 ## Open Follow-ups
 
-- Reconcile the approved implementation candidate to an immutable commit before G7.
+- Approved implementation candidate frozen at `99d2020c8ccaa23f370eef526c27867395981c7e`; exact 160-path diff reconciled.
 - At G7, resolve the assembly plan's documented self-hosted KG/compiler bootstrap limitation; do not fabricate graph evidence.
 - Disposition all non-blocking Code and Security recommendations in `pm-closeout.md`.

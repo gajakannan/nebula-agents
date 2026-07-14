@@ -18,6 +18,7 @@
   "scm": {
     "base_ref": "main",
     "head_ref": "feat/F0001-tmux-native-agent-cockpit",
+    "candidate_commit": "99d2020c8ccaa23f370eef526c27867395981c7e",
     "diff_artifact": "artifacts/diffs/changed-files.txt"
   },
   "runtime_bearing": true,
