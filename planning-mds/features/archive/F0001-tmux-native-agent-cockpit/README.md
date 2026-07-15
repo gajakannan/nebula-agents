@@ -1,6 +1,7 @@
 # F0001 - Tmux-Native Agent Cockpit
 
-**Status:** In Progress - G3 remediation active in run `2026-07-14-b885d64c`
+**Status:** Archived - implementation and G8 closeout complete
+**Archived:** 2026-07-15
 **Priority:** Critical
 **Phase:** MVP
 
@@ -15,24 +16,24 @@ F0001 delivers the first usable terminal UI for Nebula Agents by launching nativ
 | [PRD.md](./PRD.md) | Full product requirements for the tmux-native cockpit |
 | [STATUS.md](./STATUS.md) | Delivery checklist and signoff tracking |
 | [GETTING-STARTED.md](./GETTING-STARTED.md) | Developer and agent setup guide |
-| [CLI contract](../../architecture/f0001-cli-contract.md) | Versioned command, JSON output, error, and exit-code contract |
-| [Workflow design](../../architecture/f0001-workflows.md) | Session, gate, and transcript state machines |
-| [Data model](../../architecture/data-model.md) | Runtime records, persistence, and ERD |
+| [CLI contract](../../../architecture/f0001-cli-contract.md) | Versioned command, JSON output, error, and exit-code contract |
+| [Workflow design](../../../architecture/f0001-workflows.md) | Session, gate, and transcript state machines |
+| [Data model](../../../architecture/data-model.md) | Runtime records, persistence, and ERD |
 
 ## Stories
 
 | ID | Title | Status |
 |----|-------|--------|
-| [F0001-S0001](./F0001-S0001-provider-auth-and-environment-preflight.md) | Provider auth and environment preflight | Implemented; G3 blocked |
-| [F0001-S0002](./F0001-S0002-tmux-session-launch-and-attach.md) | Tmux session launch and attach | Implemented; G3 blocked |
-| [F0001-S0003](./F0001-S0003-run-registry-and-evidence-watchers.md) | Run registry and evidence watchers | Implemented; G3 blocked |
-| [F0001-S0004](./F0001-S0004-gate-and-validator-dashboard.md) | Gate and validator dashboard | Implemented; G3 blocked |
-| [F0001-S0005](./F0001-S0005-native-session-transcript-and-recovery.md) | Native session transcript and recovery | Implemented; G3 blocked |
-| [F0001-S0006](./F0001-S0006-readonly-review-and-status-commands.md) | Read-only review and status commands | Implemented; G3 blocked |
+| [F0001-S0001](./F0001-S0001-provider-auth-and-environment-preflight.md) | Provider auth and environment preflight | Done |
+| [F0001-S0002](./F0001-S0002-tmux-session-launch-and-attach.md) | Tmux session launch and attach | Done |
+| [F0001-S0003](./F0001-S0003-run-registry-and-evidence-watchers.md) | Run registry and evidence watchers | Done |
+| [F0001-S0004](./F0001-S0004-gate-and-validator-dashboard.md) | Gate and validator dashboard | Done |
+| [F0001-S0005](./F0001-S0005-native-session-transcript-and-recovery.md) | Native session transcript and recovery | Done |
+| [F0001-S0006](./F0001-S0006-readonly-review-and-status-commands.md) | Read-only review and status commands | Done |
 
 **Total Stories:** 6
 **Implemented:** 6 / 6
-**Lifecycle Closed:** 0 / 6 (G3 remediation and G4-G8 pending)
+**Lifecycle Closed:** 6 / 6
 
 ## Operator Interaction Model
 
@@ -41,7 +42,7 @@ F0001 delivers the first usable terminal UI for Nebula Agents by launching nativ
 ## Architecture Review
 
 **Phase B status:** Complete and approved at `2026-07-13T21:39:29-04:00`
-**Execution Plan:** Created and validated by the `feature` action at G0 in `feature-assembly-plan.md`.
+**Execution Plan:** Created and validated by the `feature` action at G0, completed through G8, and retained in `feature-assembly-plan.md`.
 
 ### Key Findings
 

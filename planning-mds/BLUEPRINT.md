@@ -1,6 +1,6 @@
 # Nebula Agents Planning Blueprint
 
-**Last Updated:** 2026-07-13
+**Last Updated:** 2026-07-15
 
 ## Purpose
 
@@ -12,13 +12,13 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
 
 ## Feature Plan
 
-- [F0001 - Tmux-Native Agent Cockpit](features/F0001-tmux-native-agent-cockpit/README.md) - In Progress / Now
-  - [F0001-S0001 - Provider auth and environment preflight](features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) - Not Started
-  - [F0001-S0002 - Tmux session launch and attach](features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) - Not Started
-  - [F0001-S0003 - Run registry and evidence watchers](features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) - Not Started
-  - [F0001-S0004 - Gate and validator dashboard](features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md) - Not Started
-  - [F0001-S0005 - Native session transcript and recovery](features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md) - Not Started
-  - [F0001-S0006 - Read-only review and status commands](features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md) - Not Started
+- [F0001 - Tmux-Native Agent Cockpit](features/archive/F0001-tmux-native-agent-cockpit/README.md) - Archived / Completed (2026-07-15)
+  - [F0001-S0001 - Provider auth and environment preflight](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) - Done
+  - [F0001-S0002 - Tmux session launch and attach](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) - Done
+  - [F0001-S0003 - Run registry and evidence watchers](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) - Done
+  - [F0001-S0004 - Gate and validator dashboard](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md) - Done
+  - [F0001-S0005 - Native session transcript and recovery](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md) - Done
+  - [F0001-S0006 - Read-only review and status commands](features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md) - Done
 
 - [F0002 - Managed Agent Orchestration](features/F0002-managed-agent-orchestration/README.md) - Planned / Next
   - [F0002-S0001 - Provider adapter contract](features/F0002-managed-agent-orchestration/F0002-S0001-provider-adapter-contract.md) - Not Started
@@ -137,4 +137,4 @@ F0001 deliberately has no HTTP service, database, managed provider SDK, MCP surf
 
 The operator approved the F0001 architecture at `2026-07-13T21:39:29-04:00`. The four F0001 ADRs are Accepted, architecture validation is clean, and F0001 is ready to enter the `feature` action at G0.
 
-The feature action started on 2026-07-13 as run `2026-07-13-1cfbc5a0`. Its G0 implementation plan is [`features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md`](features/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md); implementation remains bounded to one local Python package under `engine/`.
+The feature action started on 2026-07-13 as run `2026-07-13-1cfbc5a0`, completed remediation and review in run `2026-07-14-b885d64c`, and archived on 2026-07-15. Its completed G0 implementation plan is retained at [`features/archive/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md`](features/archive/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md); implementation remains bounded to one local Python package under `engine/`.

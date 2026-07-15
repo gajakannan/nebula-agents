@@ -3,17 +3,18 @@
   "feature_id": "F0001",
   "feature_slug": "tmux-native-agent-cockpit",
   "run_id": "2026-07-14-b885d64c",
-  "status": "in-progress",
+  "status": "approved",
   "recorded_on": "2026-07-14",
   "contract_effective_date": "2026-07-14",
   "feature_path_at_run_start": "planning-mds/features/F0001-tmux-native-agent-cockpit",
-  "feature_path_at_closeout": null,
-  "feature_state": "In Progress",
-  "rerun_of": "2026-07-13-1cfbc5a0",
+  "feature_path_at_closeout": "planning-mds/features/archive/F0001-tmux-native-agent-cockpit",
+  "feature_state": "Archived",
+  "rerun_of": null,
   "changed_paths": [
     ".gitattributes",
     ".github",
     ".gitignore",
+    "agents",
     "planning-mds",
     "engine",
     "scripts"
@@ -21,17 +22,18 @@
   "scm": {
     "base_ref": "main",
     "head_ref": "feat/F0001-tmux-native-agent-cockpit",
-    "candidate_commit": "99d2020c8ccaa23f370eef526c27867395981c7e",
+    "candidate_commit": "39014b435dc67dce8fe4c90761a4a245db4b7360",
     "diff_artifact": "artifacts/diffs/changed-files.txt"
   },
   "runtime_bearing": true,
-  "deployment_config_changed": false,
+  "deployment_config_changed": true,
   "frontend_in_scope": true,
   "security_sensitive_scope": true,
   "required_roles": [
     "Quality Engineer",
     "Code Reviewer",
     "Security Reviewer",
+    "DevOps",
     "Architect"
   ],
   "gate_results": {
@@ -52,7 +54,7 @@
     },
     "deployability": {
       "required": true,
-      "result": "PASS",
+      "result": "PASS WITH RECOMMENDATIONS",
       "artifact": "deployability-check.md"
     },
     "code_review": {
@@ -69,6 +71,16 @@
       "required": true,
       "result": "PASS",
       "artifact": "signoff-ledger.md"
+    },
+    "pm_closeout": {
+      "required": true,
+      "result": "APPROVED",
+      "artifact": "pm-closeout.md"
+    },
+    "tracker_sync": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "lifecycle-gates.log"
     },
     "kg_reconciliation": {
       "required": true,
@@ -102,7 +114,8 @@
     "code_review_cycle_3": "code-review-report-cycle-3.md",
     "security_review_cycle_3": "security-review-report-cycle-3.md",
     "code_review_cycle_4": "code-review-report-cycle-4.md",
-    "security_review_cycle_4": "security-review-report-cycle-4.md"
+    "security_review_cycle_4": "security-review-report-cycle-4.md",
+    "pm_closeout": "pm-closeout.md"
   },
   "test_results": {
     "result": "PASS",
@@ -170,6 +183,15 @@
         "security-review-report.md"
       ],
       "verdict_artifact": "security-review-report.md"
+    },
+    "DevOps": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "required_artifacts": [
+        "g1-runtime-preflight.md",
+        "deployability-check.md"
+      ],
+      "verdict_artifact": "deployability-check.md"
     }
   },
   "security_scans": {

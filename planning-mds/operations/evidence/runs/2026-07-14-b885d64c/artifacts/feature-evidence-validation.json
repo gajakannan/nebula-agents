@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "validator": "validate-feature-evidence",
+  "stage": "closeout",
+  "product_root": "/home/gajap/uSandbox/repos/nebula/nebula-agents",
+  "effective_date": "2026-05-19",
+  "features_validated": 1,
+  "features_skipped_pre_contract_archived": 0,
+  "features_skipped_active_done_pre_contract": 0,
+  "features_skipped_retired_abandoned": 0,
+  "features_skipped_retired_superseded": 0,
+  "errors": [],
+  "warnings": [],
+  "info": []
+}

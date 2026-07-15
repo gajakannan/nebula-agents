@@ -439,3 +439,65 @@ validation, compile/check, symbol and decision regeneration/checks, reproducibil
 Activate Product Manager G8. Archive F0001 first, update the feature shard to the final lifecycle path
 and status, regenerate story/KG/coverage projections after the move, validate closeout evidence and
 trackers, disposition recommendations, and publish the approved run.
+
+# Lifecycle Gate Run — G8 Tracker Validation
+
+## Command
+
+`python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature F0001 --run-id 2026-07-14-b885d64c`
+
+## Stage
+
+G8 post-archive tracker reconciliation
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — REGISTRY records F0001 under Archived, ROADMAP records it under Completed, STORY-INDEX resolves all six archive paths, BLUEPRINT shows Archived/Done, and the scoped tracker validator reports zero errors and zero warnings. Its internal feature-evidence validation also passed after the five-role G2/G5 scope refresh.
+
+## Output References
+
+- `planning-mds/features/REGISTRY.md`
+- `planning-mds/features/ROADMAP.md`
+- `planning-mds/features/STORY-INDEX.md`
+- `planning-mds/BLUEPRINT.md`
+- `planning-mds/features/archive/F0001-tmux-native-agent-cockpit/STATUS.md`
+- `signoff-ledger.md`
+
+## Next Action
+
+Run the G8 and closeout feature-evidence validators, then record the final result without altering the already validated tracker state.
+
+# Lifecycle Gate Run — G8 Product Manager Closeout
+
+## Command
+
+`validate-feature-evidence.py --stage G8`, followed by `validate-feature-evidence.py --stage closeout --json-out artifacts/feature-evidence-validation.json`
+
+## Stage
+
+G8 final archive publication and closeout
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — F0001 is Archived with all six stories Done and five-role PASS provenance. The approved manifest, PM closeout, latest-run pointer, recommendation dispositions, archive links, compiled graph, coverage report, tracker state, evidence artifacts, commands log, and gate history satisfy the closeout contract. The machine-readable validator result contains zero errors and zero warnings.
+
+## Output References
+
+- `pm-closeout.md`
+- `evidence-manifest.json`
+- `artifacts/feature-evidence-validation.json`
+- `planning-mds/operations/evidence/features/F0001-tmux-native-agent-cockpit/latest-run.json`
+- `planning-mds/features/archive/F0001-tmux-native-agent-cockpit/STATUS.md`
+- `planning-mds/knowledge-graph/coverage-report.yaml`
+
+## Next Action
+
+Run final reproducibility/diff hygiene checks and commit the G8 closeout state.

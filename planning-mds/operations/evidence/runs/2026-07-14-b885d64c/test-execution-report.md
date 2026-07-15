@@ -3,7 +3,7 @@
 ## Acceptance Command
 
 ```text
-/tmp/f0001-remediation-venv/bin/pytest -q engine/tests --cov=nebula_agents --cov-branch --cov-config=engine/pyproject.toml --cov-report=term-missing --cov-report=xml:planning-mds/operations/evidence/runs/2026-07-14-b885d64c/artifacts/test-results/coverage.xml --cov-fail-under=85 --junitxml=planning-mds/operations/evidence/runs/2026-07-14-b885d64c/artifacts/test-results/junit.xml
+/tmp/f0001-remediation-venv/bin/pytest -q engine/tests --cov=nebula_agents --cov-branch --cov-config=engine/pyproject.toml --cov-report=term-missing --cov-report=xml:<COVERAGE_XML> --cov-fail-under=85 --junitxml=<JUNIT_XML>
 ```
 
 The exact final command ran in the approved host-runtime context because the filesystem sandbox cannot access the tmux server socket.
@@ -49,6 +49,10 @@ JUnit reports `tests=514`, `failures=0`, `errors=0`, and `skipped=0`. The final 
 - Dependency scan: clean after the pytest security reconciliation.
 - Secret scan: clean.
 - Bandit SAST: 13 Low, 0 Medium, 0 High findings over the final source and changed story validator; independent Security Reviewer disposition is required at the fresh G3 follow-up.
+
+## Feature-Level Frontend Notes
+
+F0001's frontend is the curses terminal UI under `engine/src/nebula_agents/presentation/tui.py`; there is no browser or web frontend. Fake-window unit and behavioral tests cover session list/detail rendering, gate and validator views, keyboard navigation, resize behavior, bounded/sanitized output, and TUI actions. Contract tests also verify the CLI/TUI projection boundary. These lanes are included in the 514 passing tests and the 90.67% coverage result.
 
 ## Raw Artifacts
 

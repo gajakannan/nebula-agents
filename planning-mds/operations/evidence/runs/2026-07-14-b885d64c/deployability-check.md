@@ -2,7 +2,7 @@
 
 ## Scope
 
-F0001 is a local Python package and tmux process, not a hosted deployment. This check covers clean package composition, the installed console entry, product-root and runtime discovery, host dependencies, validation execution, transcript/recovery behavior, and safe cleanup. No Docker, HTTP service, database migration, CI/CD promotion, or remote environment is in scope, and no deployment configuration changed.
+F0001 is a local Python package and tmux process, not a hosted deployment. This check covers clean package composition, the installed console entry, product-root and runtime discovery, host dependencies, validation execution, transcript/recovery behavior, safe cleanup, and the G7 knowledge-graph reproducibility workflow. No Docker, HTTP service, database migration, CD promotion, or remote environment is in scope. The new `.github/workflows/kg-reproducibility.yml` is a CI configuration change, so `deployment_config_changed=true` and DevOps is required for closeout.
 
 ## Checks
 
@@ -22,6 +22,10 @@ F0001 is a local Python package and tmux process, not a hosted deployment. This 
 | Recovery and compensation | PASS | exact pre/post-publication launch and transcript commit faults reconcile authoritative revision/event state before tmux/pipe compensation |
 | Descendant validator containment | PASS | pinned descriptor child reads reject pre-existing and post-check symlink swaps, unsafe modes, and FIFO inputs through a real subprocess |
 | Transcript stop truthfulness | PASS | terminal state requires positively verified inactive capture; unavailable probes and first recovery failure fail closed, while failed truthful-Active publication or unrecoverable ambiguity terminates and verifies absence of the owning session before stable STATE_IO |
+| CI workflow structure | PASS | YAML parses; job has explicit `contents: read`, a 10-minute timeout, no secrets, no artifact publication, and no deployment permissions |
+| CI command parity | PASS | workflow runs `python3 scripts/kg/validate.py --check-reproducible`; the exact command passed locally after the workflow change |
+| CI rollback | PASS | workflow is additive and stateless; rollback is deletion of `.github/workflows/kg-reproducibility.yml`, with no remote resources or data migration |
+| KG change impact | PASS | `main...HEAD` reports 7 affected capability nodes, 1,608 changed symbols, and 0 downstream blast symbols; the workflow itself is an unresolved non-runtime path |
 | Compile and diff hygiene | PASS | source/tests compile, `git diff --check`, architecture, schemas, stories, trackers, and templates pass |
 
 ## Security Evidence
@@ -37,11 +41,16 @@ F0001 is a local Python package and tmux process, not a hosted deployment. This 
 - At least one supported native provider CLI installed; login and credentials remain provider-owned.
 - A product root containing the governed feature, schema, validator, and prompt contracts.
 - Custom runtime roots must be owner-only and non-symlinked.
+- GitHub-hosted CI with Python 3.12 and permission to read repository contents; the job requires no repository secret and does not mutate the repository.
 
 ## Rollback
 
-Uninstall the Python package and remove only the operator-owned `.nebula-agents/runtime` directory after terminating recorded tmux sessions. The feature creates no database, remote resource, service, or migration requiring a separate rollback plane.
+Uninstall the Python package and remove only the operator-owned `.nebula-agents/runtime` directory after terminating recorded tmux sessions. Disable the KG CI gate by deleting `.github/workflows/kg-reproducibility.yml`; no environment variable, secret, database, remote resource, service, or migration requires rollback.
+
+## Recommendations
+
+- [low] Replace mutable GitHub Action major tags and the unpinned `pip install` inputs with reviewed immutable action SHAs and a hash-locked Python dependency set before this workflow becomes a protected release gate — owner: DevOps; follow-up: release-hardening backlog before the first distributable release
 
 ## Result
 
-PASS
+PASS WITH RECOMMENDATIONS

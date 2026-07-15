@@ -18,7 +18,6 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
 | [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
-| [F0001 — Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/README.md) | In Progress | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. G0 assembly planning passed in run `2026-07-13-1cfbc5a0`. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
 <!-- generated:end roadmap:now -->
 
 ## Next
@@ -52,6 +51,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Completed Date | Evidence |
 |---------|----------------|----------|
 | [F0006 — Compiled Knowledge-Graph Projection and Governed Integration](./archive/F0006-compiled-kg-projection-and-integration/README.md) | 2026-07-11 | All 9 stories Done; feature-review PASS; framework Phase-B PRs |
+| [F0001 — Tmux-Native Agent Cockpit](./archive/F0001-tmux-native-agent-cockpit/README.md) | 2026-07-15 | All 6 stories Done; 514 runtime tests and 186 compiled-KG toolchain tests pass; Code, Security, DevOps, QE, and Architect signoffs complete; G4 explicitly approved; G7 reconciliation and G8 archive closeout complete in run `2026-07-14-b885d64c`. |
 <!-- generated:end roadmap:completed -->
 
 ## Notes

@@ -9,9 +9,13 @@ on:
   push:
     branches-ignore: [main]
 
+permissions:
+  contents: read
+
 jobs:
   reproducibility:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -2,7 +2,7 @@
 
 ## Gate
 
-Current gate reached: `G7` architect reconciliation — PASS after explicit compiled-toolchain adoption; `G8` is authorized and has not started.
+Current gate reached: `G8` Product Manager closeout — archive and publication complete.
 
 ## Execution Timeline
 
@@ -52,3 +52,13 @@ Current gate reached: `G7` architect reconciliation — PASS after explicit comp
   - Validators: shard validation, compile/check, symbol and decision regeneration/checks, reproducibility, semantic drift, 186 toolchain tests, 514 runtime tests, scoped story validation, and tracker validation passed.
   - Output: updated `kg-reconciliation.md`, generated graph projections, and an adopted tracker-governance contract.
   - Outcome: the High bootstrap blocker is closed; activate Product Manager G8.
+- 2026-07-15T10:13:16-04:00 — G7-added DevOps scope reconciliation passed.
+  - Input: `.github/workflows/kg-reproducibility.yml` made `deployment_config_changed=true` mandatory.
+  - Review: the workflow is read-only, bounded, stateless, secret-free, locally reproducible, and deletion-only to roll back; 7 affected capability nodes and 0 downstream blast symbols were recorded.
+  - Outputs: hardened workflow permissions/timeout, updated `deployability-check.md`, DevOps role result, and 6 story-level DevOps PASS rows.
+  - Outcome: the forced false-to-true scope change was followed by a successful G2 evidence revalidation.
+- 2026-07-15T10:20:00-04:00 onward — G8 Product Manager closeout completed.
+  - Inputs: passing G0-G7 evidence, explicit G4 approval, five-role story signoffs, final role recommendations, and the authored F0001 shard.
+  - Actions: archived the feature folder, marked all stories Done, updated Blueprint and F0001 source paths/status, compiled tracker/KG projections, generated the story index and coverage report, accepted or closed every recommendation, finalized the approved manifest, and published `latest-run.json` after confirming there was no prior approved manifest to patch.
+  - Outputs: archived feature docs, `pm-closeout.md`, updated REGISTRY/ROADMAP/STORY-INDEX/BLUEPRINT, post-archive KG projections/coverage, and final closeout validation evidence.
+  - Outcome: F0001 is Archived and the run is approved.

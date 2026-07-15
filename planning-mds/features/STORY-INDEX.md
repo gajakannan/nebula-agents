@@ -10,12 +10,12 @@ Auto-generated index of all user stories across feature folders.
 
 | Story ID | Title | Priority | Phase | Persona |
 |----------|-------|----------|-------|---------|
-| [F0001-S0001](./F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) | Provider auth and environment preflight | Critical | MVP | product build operator |
-| [F0001-S0002](./F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) | Tmux session launch and attach | Critical | MVP | product build operator |
-| [F0001-S0003](./F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) | Run registry and evidence watchers | High | MVP | delivery lead |
-| [F0001-S0004](./F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md) | Gate and validator dashboard | High | MVP | product owner reviewing an agent run |
-| [F0001-S0005](./F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md) | Native session transcript and recovery | High | MVP | product build operator |
-| [F0001-S0006](./F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md) | Read-only review and status commands | Medium | MVP | reviewer |
+| [F0001-S0001](./archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md) | Provider auth and environment preflight | Critical | MVP | product build operator |
+| [F0001-S0002](./archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md) | Tmux session launch and attach | Critical | MVP | product build operator |
+| [F0001-S0003](./archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md) | Run registry and evidence watchers | High | MVP | delivery lead |
+| [F0001-S0004](./archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md) | Gate and validator dashboard | High | MVP | product owner reviewing an agent run |
+| [F0001-S0005](./archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md) | Native session transcript and recovery | High | MVP | product build operator |
+| [F0001-S0006](./archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md) | Read-only review and status commands | Medium | MVP | reviewer |
 
 ---
 

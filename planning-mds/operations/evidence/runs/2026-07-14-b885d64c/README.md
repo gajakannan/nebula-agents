@@ -6,7 +6,7 @@ This is a separately authorized F0001 `feature` remediation run linked to blocke
 
 ## Status
 
-Current state: `in-progress — G7 re-entry passed after explicit toolchain adoption; G8 authorized but not started`.
+Current state: `approved — G8 archive closeout completed on 2026-07-15`.
 
 ## Evidence Index
 
@@ -21,7 +21,7 @@ Current state: `in-progress — G7 re-entry passed after explicit toolchain adop
 - `test-plan.md` — R1-R10 acceptance strategy and pass criteria
 - `test-execution-report.md` — final 514-test execution and remediation mapping
 - `coverage-report.md` — official line/branch evidence and risk-module gates
-- `deployability-check.md` — clean-package, runtime, security, and rollback checks
+- `deployability-check.md` — clean-package, runtime, CI, security, and rollback checks; DevOps PASS WITH RECOMMENDATIONS
 - `g2-self-review.md` — implementation/QE closure matrix and G3 handoff
 - `code-review-report-cycle-1.md` — immutable first G3 Code Reviewer `REQUEST CHANGES` verdict
 - `security-review-report-cycle-1.md` — immutable first G3 Security Reviewer `REQUEST CHANGES` verdict
@@ -35,14 +35,13 @@ Current state: `in-progress — G7 re-entry passed after explicit toolchain adop
 - `signoff-ledger.md` — current per-story passing evidence for every required role
 - `feature-action-execution.md` — gate-by-gate remediation and review timeline
 - `kg-reconciliation.md` — adopted source/toolchain inventory, as-built binding map, and passing G7 checks
+- `pm-closeout.md` — final archive decision, story closure, recommendation acceptances, and tracker reconciliation
+- `artifacts/feature-evidence-validation.json` — machine-readable final closeout validation result
 
 ## Validation Summary
 
-G0-G2 passed. Final G3 cycle 5 independently closed H-01 through H-06. Code and Security both returned `PASS WITH RECOMMENDATIONS`, with zero Critical or High findings. The runtime package has 514 passing tests, 90.67% line coverage, all mandatory risk branches at 100%, clean dependency/secrets scans, 13 Low/0 Medium/0 High SAST findings, and passing real-tmux/descriptor lanes. G7 re-entry also passes with 186 adopted-toolchain tests, deterministic compile, symbol/decision checks, reproducibility, and semantic drift validation.
+G0-G8 passed. Final G3 cycle 5 independently closed H-01 through H-06. Code, Security, and the G7-added DevOps role returned `PASS WITH RECOMMENDATIONS`, with zero Critical or High findings. The runtime package has 514 passing tests, 90.67% line coverage, all mandatory risk branches at 100%, clean dependency/secrets scans, 13 Low/0 Medium/0 High SAST findings, and passing real-tmux/descriptor lanes. G7 passes with 186 adopted-toolchain tests, deterministic compile, symbol/decision checks, reproducibility, and semantic drift validation. Post-archive KG coverage reports zero uncovered feature directories, trackers and story links resolve to the archive, and the run is published through `latest-run.json`.
 
 ## Open Follow-ups
 
-- Approved implementation candidate frozen at `99d2020c8ccaa23f370eef526c27867395981c7e`; exact 160-path diff reconciled.
-- The operator selected compiled-KG adoption option 1; G7 is now PASS and its bootstrap blocker is closed.
-- G8 must perform archive-first path/status changes and post-move regeneration before publication.
-- Disposition all non-blocking Code and Security recommendations in `pm-closeout.md`.
+Six non-blocking hardening items are accepted and assigned in `pm-closeout.md`: backend linting, release dependency locks, optional cross-UID event chaining, adversarial redaction corpus growth, stricter multi-feature story provenance, and immutable CI action/dependency pins. CR-GOV-01 and the session-termination runbook recommendation are closed.

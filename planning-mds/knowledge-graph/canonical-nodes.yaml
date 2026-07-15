@@ -46,8 +46,8 @@ capabilities:
       - entity:runtime-event
       - workflow:gate-decision
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
   - id: capability:local-run-registry
     label: Local run registry
     notes: Persists typed run state and append-only runtime events in the product-local filesystem.
@@ -58,7 +58,7 @@ capabilities:
       - schema:f0001-runtime-event
     source_docs:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
   - id: capability:native-session-preflight
     label: Native session preflight
     notes: Validates feature resolution, provider capability, executable availability, authenticated local
@@ -70,7 +70,7 @@ capabilities:
       - schema:f0001-preflight-result
     source_docs:
       - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
   - id: capability:read-only-run-queries
     label: Read-only run queries
     notes: Exposes status, review, audit, and recovery information through CLI and terminal UI views without
@@ -79,7 +79,7 @@ capabilities:
       - capability:local-run-registry
       - entity:run-record
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
   - id: capability:redacted-transcript-recovery
     label: Redacted transcript recovery
     notes: Captures optional terminal transcripts through fail-closed redaction and uses safe transcript
@@ -90,7 +90,7 @@ capabilities:
       - workflow:transcript-capture
     source_docs:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
   - id: capability:tmux-session-lifecycle
     label: Tmux session lifecycle
     notes: Launches native provider CLIs in governed tmux sessions and supports attach, detach, recovery,
@@ -101,7 +101,7 @@ capabilities:
       - workflow:local-agent-session
     source_docs:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
 entities:
   - id: entity:run-record
     label: Run record
@@ -113,7 +113,7 @@ entities:
       - workflow:local-agent-session
     source_docs:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
   - id: entity:runtime-event
     label: Runtime event
     notes: Append-only audit event describing a run lifecycle transition, validator observation, gate
@@ -123,7 +123,7 @@ entities:
       - schema:f0001-runtime-event
     source_docs:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
 policy_rules:
   - id: policy_rule:gate-decide
     label: gate:decide
@@ -135,7 +135,7 @@ policy_rules:
       - workflow:gate-decision
     resource: gate
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
   - id: policy_rule:run-mutate
     label: run:mutate
     action: mutate
@@ -146,7 +146,7 @@ policy_rules:
       - capability:tmux-session-lifecycle
     resource: run
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
   - id: policy_rule:run-read
     label: run:read
     action: read
@@ -158,7 +158,7 @@ policy_rules:
       - entity:run-record
     resource: run
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
   - id: policy_rule:transcript-configure
     label: transcript:configure
     action: configure
@@ -169,7 +169,7 @@ policy_rules:
       - workflow:transcript-capture
     resource: transcript
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
 roles:
   - id: role:local-operator
     label: LocalOperator
@@ -178,7 +178,7 @@ roles:
     related_nodes:
       - entity:run-record
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
   - id: role:reviewer
     label: Reviewer
     notes: Read-only reviewer who may inspect run status, evidence, audit events, and redacted transcript
@@ -186,7 +186,7 @@ roles:
     related_nodes:
       - capability:read-only-run-queries
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
 schemas:
   - id: schema:f0001-launch-descriptor
     label: F0001 launch descriptor
@@ -224,7 +224,7 @@ workflows:
       - capability:evidence-and-gate-control
       - entity:run-record
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
     states:
       - id: state:gate-decision:pending
         label: Pending
@@ -249,7 +249,7 @@ workflows:
       - capability:tmux-session-lifecycle
       - entity:run-record
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
     states:
       - id: state:local-agent-session:preflight
         label: Preflight
@@ -275,7 +275,7 @@ workflows:
       - capability:redacted-transcript-recovery
       - entity:run-record
     source_docs:
-      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
     states:
       - id: state:transcript-capture:disabled
         label: Disabled

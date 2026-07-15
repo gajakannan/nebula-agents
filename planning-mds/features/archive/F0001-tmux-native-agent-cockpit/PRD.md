@@ -6,7 +6,7 @@
 **Feature Name:** Tmux-Native Agent Cockpit
 **Priority:** Critical
 **Phase:** MVP
-**Status:** Draft
+**Status:** Archived - accepted and delivered 2026-07-15
 
 ## Feature Statement
 
@@ -48,13 +48,13 @@
 
 ## Acceptance Criteria Overview
 
-- [ ] The cockpit can detect whether `tmux` and at least one supported provider CLI are available.
-- [ ] A user can launch a native Codex or Claude Code session inside a named tmux session.
-- [ ] Existing subscription-authenticated shells are reused by the launched provider CLI.
-- [ ] A user can detach and reattach while preserving the native provider UI and scrollback.
-- [ ] The cockpit records run metadata and exposes evidence paths for the active run.
-- [ ] Gate status and validation commands are visible before the next stage is approved.
-- [ ] Transcript capture is available with documented secret redaction behavior.
+- [x] The cockpit can detect whether `tmux` and at least one supported provider CLI are available.
+- [x] A user can launch a native Codex or Claude Code session inside a named tmux session.
+- [x] Existing subscription-authenticated shells are reused by the launched provider CLI.
+- [x] A user can detach and reattach while preserving the native provider UI and scrollback.
+- [x] The cockpit records run metadata and exposes evidence paths for the active run.
+- [x] Gate status and validation commands are visible before the next stage is approved.
+- [x] Transcript capture is available with documented secret redaction behavior.
 
 ## UX / Screens
 
@@ -185,15 +185,15 @@
 
 ### Architecture Documents
 
-- [`../../architecture/SOLUTION-PATTERNS.md`](../../architecture/SOLUTION-PATTERNS.md)
-- [`../../architecture/data-model.md`](../../architecture/data-model.md)
-- [`../../architecture/f0001-workflows.md`](../../architecture/f0001-workflows.md)
-- [`../../architecture/f0001-cli-contract.md`](../../architecture/f0001-cli-contract.md)
-- [`../../security/f0001-authorization-model.md`](../../security/f0001-authorization-model.md)
-- [`../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md`](../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md)
-- [`../../architecture/decisions/ADR-002-f0001-runtime-persistence.md`](../../architecture/decisions/ADR-002-f0001-runtime-persistence.md)
-- [`../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md`](../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md)
-- [`../../architecture/decisions/ADR-004-f0001-transcript-redaction.md`](../../architecture/decisions/ADR-004-f0001-transcript-redaction.md)
+- [`../../../architecture/SOLUTION-PATTERNS.md`](../../../architecture/SOLUTION-PATTERNS.md)
+- [`../../../architecture/data-model.md`](../../../architecture/data-model.md)
+- [`../../../architecture/f0001-workflows.md`](../../../architecture/f0001-workflows.md)
+- [`../../../architecture/f0001-cli-contract.md`](../../../architecture/f0001-cli-contract.md)
+- [`../../../security/f0001-authorization-model.md`](../../../security/f0001-authorization-model.md)
+- [`../../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md`](../../../architecture/decisions/ADR-001-f0001-local-tmux-runtime.md)
+- [`../../../architecture/decisions/ADR-002-f0001-runtime-persistence.md`](../../../architecture/decisions/ADR-002-f0001-runtime-persistence.md)
+- [`../../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md`](../../../architecture/decisions/ADR-003-f0001-provider-execution-boundary.md)
+- [`../../../architecture/decisions/ADR-004-f0001-transcript-redaction.md`](../../../architecture/decisions/ADR-004-f0001-transcript-redaction.md)
 
 ## Related Stories
 

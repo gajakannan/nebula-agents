@@ -2,9 +2,9 @@
 
 ## Scope Review
 
-The remediation remains inside the approved local Python/tmux cockpit. It changes `engine/`, F0001 planning/architecture/schema/operator documentation, and this linked evidence run. It does not introduce automatic TUI entry, automatic tmux attachment, managed providers, HTTP services, databases, hosted deployment, or cross-feature runtime behavior.
+The remediation remains inside the approved local Python/tmux cockpit. It changes `engine/`, F0001 planning/architecture/schema/operator documentation, this linked evidence run, and the G7 knowledge-graph source/compiler/CI governance surface. It does not introduce automatic TUI entry, automatic tmux attachment, managed providers, HTTP services, databases, hosted deployment, or cross-feature runtime behavior.
 
-Manifest scope remains accurate: runtime-bearing `true`, deployment-config-changed `false`, frontend-in-scope `true` for curses, and security-sensitive-scope `true` for authorization, local process execution, filesystem containment, evidence, recovery, and transcripts.
+Manifest scope is reconciled after G7: runtime-bearing `true`, deployment-config-changed `true` for `.github/workflows/kg-reproducibility.yml`, frontend-in-scope `true` for curses, and security-sensitive-scope `true` for authorization, local process execution, filesystem containment, evidence, recovery, and transcripts. The false-to-true deployment change adds DevOps to the required-role and story-signoff matrices; `deployability-check.md` contains the fresh CI review.
 
 ## R1-R10 Closure
 
@@ -24,7 +24,7 @@ Manifest scope remains accurate: runtime-bearing `true`, deployment-config-chang
 | H-05 | PASS | Pipe/session probe timeouts, nonstandard exits, and malformed output fail closed and cannot authorize a terminal transcript fact |
 | H-06 | PASS | First authoritative recovery failure in direct enable or launch triggers verified owning-session termination and stable STATE_IO; already-stopped failure paths preserve the provider |
 
-## Acceptance Review
+## Acceptance Criteria Review
 
 The final acceptance suite reports 514 passed with zero failures, errors, skips, or expected failures. Line coverage is 90.67% against the unwaived 85% gate. Authorization, transitions, redaction, and session entry each report 100% branch coverage. The focused real-tmux lifecycle passes in 0.48 seconds, and the production descriptor-bound runner passes all three allowlisted validators.
 
@@ -40,14 +40,14 @@ G3 cycle 4 closed H-04R/H-05 but found H-06 before the compensation branch: the 
 
 The initial pytest-8 clean environment was not accepted after its audit reproduced CVE-2025-71176. The plan, package contract, and test assertion were reconciled to `pytest>=9.0.3,<10`, the environment was rebuilt on pytest 9.1.1, and the final full suite and clean dependency scan were rerun.
 
-## Residual Risks
+## Implementation Risks
 
 - No real provider model turn or credential login was attempted; provider auth remains native-CLI behavior and credential files were not inspected.
 - No manual interactive curses usability session was recorded in G2; behavior and rendering contracts are covered by fake-window tests and the user already exercised the installed launch path.
 - `/proc/self/fd` is required by the fail-closed validator execution design and is documented as an operational requirement.
-- The repository lacks its self-hosted compiled KG contract; this is a future G7 governance limitation and no graph evidence is fabricated.
+- The compiled KG contract is now product-owned and passes G7 reconciliation. The adopted CI uses mutable major action tags and unpinned Python packages; DevOps records this as a non-blocking release-hardening recommendation.
 
-## Evidence
+## Validation Evidence
 
 - `test-plan.md`
 - `test-execution-report.md`
@@ -63,4 +63,4 @@ Artifact integrity: JUnit SHA-256 `df160ca44d33a73feef73e9dc62c44cfc50898bd1bab3
 
 ## Result
 
-PASS — H-01/H-02/H-03/H-04/H-04R/H-05/H-06 implementation and final QE evidence are complete. Final independent Code and Security reviews are still required before G3 can pass.
+PASS — H-01/H-02/H-03/H-04/H-04R/H-05/H-06 implementation and final QE evidence are complete; final Code, Security, and G7-added DevOps evidence pass with non-blocking recommendations for Product Manager disposition.

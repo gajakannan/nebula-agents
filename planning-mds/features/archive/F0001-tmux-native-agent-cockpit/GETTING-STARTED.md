@@ -64,8 +64,8 @@ No seed data is required. The first launch creates local run metadata for the se
 
 | Layer | Path | Purpose |
 |-------|------|---------|
-| Planning | `planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md` | Feature requirements |
-| Planning | `planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S*.md` | Implementation stories |
+| Planning | `planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md` | Archived feature requirements |
+| Planning | `planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S*.md` | Archived implementation stories |
 | Prompts | `agents/templates/prompts/evidence-contract/` | Operator-friendly and automation-safe prompt contracts |
 | Validation | `agents/product-manager/scripts/validate-stories.py` | Story completeness validation |
 | Validation | `agents/product-manager/scripts/validate-trackers.py` | Tracker consistency validation |
@@ -75,6 +75,18 @@ No seed data is required. The first launch creates local run metadata for the se
 ## Dev User Credentials
 
 Provider credentials are not managed by Nebula Agents. Use the local provider CLI login flow before launching the TUI. F0001 must not ask users to paste subscription credentials or API keys into Nebula-managed prompts.
+
+## Session-Termination Recovery
+
+An error operation ending in `-session-termination` is an operator alert: Nebula could not prove that its owning tmux session was absent, so it does not claim cleanup succeeded.
+
+1. Preserve the reported run ID, operation, error code, and tmux session name from `nebula-agents status --run-id <RUN_ID>`.
+2. Confirm the session name belongs to that run before taking any tmux action. Never target a similarly named or user-owned session by inference.
+3. Probe the exact recorded name with `tmux has-session -t <SESSION_NAME>`. Exit 0 means the provider session is still present; a nonzero exit means it is absent.
+4. If present, use `nebula-agents attach --run-id <RUN_ID>` to inspect or preserve the provider turn. If explicit cleanup is intended, terminate only that verified session with `tmux kill-session -t <SESSION_NAME>`.
+5. Re-run `nebula-agents status --run-id <RUN_ID>` and `nebula-agents recover --run-id <RUN_ID>`. Escalate with the saved error and audit-event context if the recorded state remains ambiguous or recovery again reports `STATE_IO`.
+
+Do not delete the runtime record to silence this condition; it is the audit trail used to reconcile the session safely.
 
 ## Notes
 

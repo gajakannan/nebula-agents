@@ -10,7 +10,7 @@
 - Product root: `/home/gajap/uSandbox/repos/nebula/nebula-agents`
 - Branch: `feat/F0001-tmux-native-agent-cockpit`
 - Started: `2026-07-14T15:43:28-04:00`
-- Current owner: Architect Agent
+- Current owner: Product Manager Agent (G8 closeout)
 
 ## Inputs
 
@@ -29,12 +29,12 @@
 
 ## Scope Boundaries
 
-In scope: the eight blocking review findings, `NEBULA_AGENTS_PRODUCT_ROOT` wiring, launch next-step guidance, corresponding tests/docs, new evidence, and fresh reviews.
+In scope: the eight blocking review findings, `NEBULA_AGENTS_PRODUCT_ROOT` wiring, launch next-step guidance, corresponding tests/docs, new evidence, fresh reviews, the explicitly selected G7 compiled-KG adoption, its CI reproducibility surface, DevOps scope reconciliation, and G8 archive closeout.
 
-Out of scope: automatic TUI entry, automatic tmux attachment, managed-provider orchestration, HTTP/remote operation, new provider SDKs, G4 approval, and any G5-G8 closeout action before that approval.
+Out of scope: automatic TUI entry, automatic tmux attachment, managed-provider orchestration, HTTP/remote operation, new provider SDKs, hosted deployment, Docker, database migration, and automatic provider or lifecycle approvals.
 
-The formal failure-triage request authorizes exact reads from cold archive run `2026-07-13-1cfbc5a0`. No unrelated evidence runs were read. The repository has no `.agentignore` and no self-hosted KG lookup/hint/compiler tools, so raw feature, architecture, source, and review artifacts remain authoritative.
+The formal failure-triage request authorizes exact reads from cold archive run `2026-07-13-1cfbc5a0`. No unrelated evidence runs were used as passing evidence. The repository has no `.agentignore`. After the operator selected option 1, the product adopted its own KG lookup/compiler/validator tools; raw feature, architecture, source, security, API/schema, and review artifacts remain authoritative on conflict.
 
 ## Lifecycle Stage
 
-Current stage: `G6 passed; G7 blocked because the product has not adopted the mandatory KG source/compiler/validator contract; G8 is closed pending explicit governance resolution`.
+Current stage: `G8 archive closeout complete; manifest approved; latest-run published; final validators recorded`.

@@ -2,7 +2,7 @@
 
 **Created:** 2026-07-13
 **Author:** Architect Agent
-**Status:** G0 Validated
+**Status:** Completed and archived after G8 closeout
 **Active Remediation Run:** `2026-07-14-b885d64c` (`rerun_of: 2026-07-13-1cfbc5a0`)
 **Run:** `2026-07-13-1cfbc5a0`
 

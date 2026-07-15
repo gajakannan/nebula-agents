@@ -27,7 +27,7 @@ Binding globs were narrowed to authored source and test paths so ignored C# `bin
 outputs cannot enter the symbol projection. Every declared binding pattern resolves to at least one
 repository path.
 
-## Canonical Nodes And Mappings
+## Canonical Nodes
 
 The authored source under `planning-mds/kg-source/**` contains:
 

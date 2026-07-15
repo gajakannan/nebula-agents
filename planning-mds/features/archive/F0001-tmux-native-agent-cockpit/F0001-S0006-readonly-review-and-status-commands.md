@@ -1,5 +1,7 @@
 # F0001-S0006 - Read-Only Review and Status Commands
 
+> Delivery status: Done; archived with F0001 on 2026-07-15.
+
 ## Story Header
 
 **Story ID:** F0001-S0006

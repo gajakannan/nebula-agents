@@ -67,11 +67,19 @@
 - `engine/tests/integration/test_commit_reconciliation.py` — added H-06 direct, launch, termination-failure, and already-stopped-provider-preservation regressions.
 - `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/code-review-report.md` — final cycle-5 Code Review `PASS WITH RECOMMENDATIONS`; SHA-256 `afba7a7a8bdd25de5c5120a13436f72bfa38fc7a10fbe7cfa2ed046703bfa91a`.
 - `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/security-review-report.md` — final cycle-5 Security Review `PASS WITH RECOMMENDATIONS`; SHA-256 `b86ee09526ca61a02de4b6d9b17348a7e106352237922c89e70c3413b39e5810`.
-- `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/kg-reconciliation.md` — mapped the six as-built capability surfaces and recorded the missing product KG source/compiler/validator contract as the assembly plan's blocking G7 governance condition; no graph artifact was fabricated.
+- `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/kg-reconciliation.md` — mapped the six as-built capability surfaces, recorded the truthful initial blocker, and then captured passing G7 re-entry after explicit toolchain adoption.
+- `.github/workflows/kg-reproducibility.yml` — added a read-only, 10-minute deterministic KG reproducibility gate; DevOps review and rollback are recorded in `deployability-check.md`.
+- `planning-mds/kg-source/**`, `planning-mds/schemas/kg-source/**`, and `scripts/kg/**` — adopted the compiled KG source, schema, compiler, validator, query, analysis, and test toolchain selected by the operator.
+- `planning-mds/knowledge-graph/**` — generated canonical nodes, feature mappings, code/symbol/decision indexes, ontology, and the post-archive coverage report.
+- `planning-mds/features/archive/F0001-tmux-native-agent-cockpit/**` — moved the complete feature folder at G8, marked all six stories Done, updated operator recovery guidance, and finalized STATUS/PRD/README.
+- `planning-mds/kg-source/features/F0001.yaml`, `planning-mds/features/REGISTRY.md`, `planning-mds/features/ROADMAP.md`, `planning-mds/features/STORY-INDEX.md`, and `planning-mds/BLUEPRINT.md` — synchronized the Archived/Completed state and all archive links.
+- `planning-mds/operations/evidence/runs/2026-07-14-b885d64c/pm-closeout.md` — recorded the approved archive decision and every recommendation acceptance/closure.
+- `planning-mds/operations/evidence/features/F0001-tmux-native-agent-cockpit/latest-run.json` — published this approved run after the prior-manifest patch step reported no prior approved F0001 manifest.
 
 ## Generated Evidence
 
-- `artifacts/diffs/changed-files.txt` — exact 160-path branch worktree inventory for the G6 implementation candidate; SHA-256 `a3652a451e98b3fa9b6615635f8c21066dd09d995accb35ef14f660a5fa98eff`. The final G3 reports retain their immutable 156-path reviewed-snapshot identity; the four later paths are gate/evidence closeout documents, not implementation changes.
+- `artifacts/diffs/changed-files.txt` — canonical final `main`-relative path inventory, refreshed after G8 archive and publication. The final G3 reports retain their immutable reviewed-snapshot identity; later paths are G7 governance and G8 closeout additions.
+- `artifacts/feature-evidence-validation.json` — machine-readable final closeout validator output.
 - `artifacts/test-results/junit.xml` — final canonical 514-test JUnit result; SHA-256 `df160ca44d33a73feef73e9dc62c44cfc50898bd1bab3ece6abe0cc4320679a6`.
 - `artifacts/test-results/coverage.xml` — final 90.67% line / 81.32% aggregate-branch Cobertura result; SHA-256 `aa55e2cdb15495bb1c573703922a20cf13e716fb141c3dd53f669bafe9bc906f`.
 - `artifacts/security/dependency-audit.json` — final clean resolved-environment audit.
@@ -83,15 +91,17 @@
 
 None. The previous F0001 run is a local, explicitly selected failure-triage input and is linked through `rerun_of` rather than reused as passing evidence.
 
-The approved G6 implementation candidate is frozen at commit `99d2020c8ccaa23f370eef526c27867395981c7e`. Its `main...HEAD` path set matches all 160 entries in `artifacts/diffs/changed-files.txt`, closing Code Review recommendation CR-GOV-01 before G7.
+The approved implementation candidate is frozen at commit `99d2020c8ccaa23f370eef526c27867395981c7e`; G7 adoption is frozen at `39014b435dc67dce8fe4c90761a4a245db4b7360`. The final main-relative diff inventory is refreshed and validated at G8, closing Code Review recommendation CR-GOV-01.
 
 ## Omissions And Waivers
 
-- G3 cycles 1-4 are archived and final cycle 5 passed with recommendations. G4-G8 remain pending.
-- No coverage or blocking-finding waiver is planned.
-- Architect recorded a DAST no-target waiver because the local CLI/TUI opens no listener; Security must independently confirm or reject it at G3.
-- KG lookup/hint/compiler scripts and `planning-mds/knowledge-graph`/`kg-source` are absent; no graph evidence is fabricated.
+- G3 cycles 1-4 remain immutable; final cycle 5 passed with recommendations and every recommendation is dispositioned in `pm-closeout.md`.
+- No coverage, validator-defect, or blocking-finding waiver is present.
+- Architect recorded a DAST no-target waiver because the local CLI/TUI opens no listener; Security independently confirmed it at G3. A future listener invalidates it.
+- The compiled KG source/toolchain is present, populated, reproducible, drift-checked, and covered by post-archive validation.
 
 ## Run Environment
 
 The absolute product-root path is recorded because F0001 path behavior is itself under remediation and the operator reproduced a cwd-dependent failure outside the repository.
+
+- Absolute cwd: /tmp — intentional outside-product-root doctor smoke using `NEBULA_AGENTS_PRODUCT_ROOT`; no evidence artifact was written outside the run package.

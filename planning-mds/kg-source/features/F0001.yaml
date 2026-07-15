@@ -1,13 +1,14 @@
 id: feature:F0001
 name: Tmux-Native Agent Cockpit
-path: planning-mds/features/F0001-tmux-native-agent-cockpit
-status: in-progress
-registry_section: Active
-phase: MVP
-roadmap_section: Now
+path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit
+status: archived-done
+registry_section: Archived
+roadmap_section: Completed
 roadmap_order: 2
-rationale: Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. G0 assembly planning passed in run `2026-07-13-1cfbc5a0`.
-validation_gate: Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI.
+archived_date: '2026-07-15'
+evidence_reentry_date: '2026-07-15'
+completed_date: '2026-07-15'
+completion_state: All 6 stories Done; 514 runtime tests and 186 compiled-KG toolchain tests pass; Code, Security, DevOps, QE, and Architect signoffs complete; G4 explicitly approved; G7 reconciliation and G8 archive closeout complete in run `2026-07-14-b885d64c`.
 affects:
   - capability:native-session-preflight
   - capability:tmux-session-lifecycle
@@ -41,7 +42,7 @@ restricted_to_role:
   - role:reviewer
 story_mappings:
   - id: story:F0001-S0001
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
     affects:
       - capability:native-session-preflight
       - entity:run-record
@@ -51,7 +52,7 @@ story_mappings:
       - schema:f0001-launch-descriptor
       - schema:f0001-preflight-result
   - id: story:F0001-S0002
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
     affects:
       - capability:tmux-session-lifecycle
       - workflow:local-agent-session
@@ -61,7 +62,7 @@ story_mappings:
     uses_schema:
       - schema:f0001-launch-descriptor
   - id: story:F0001-S0003
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
     affects:
       - capability:local-run-registry
       - capability:evidence-and-gate-control
@@ -73,7 +74,7 @@ story_mappings:
       - schema:f0001-run-record
       - schema:f0001-runtime-event
   - id: story:F0001-S0004
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
     affects:
       - capability:evidence-and-gate-control
       - workflow:gate-decision
@@ -83,7 +84,7 @@ story_mappings:
       - schema:f0001-run-record
       - schema:f0001-runtime-event
   - id: story:F0001-S0005
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
     affects:
       - capability:redacted-transcript-recovery
       - workflow:transcript-capture
@@ -93,7 +94,7 @@ story_mappings:
       - schema:f0001-run-record
       - schema:f0001-runtime-event
   - id: story:F0001-S0006
-    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+    path: planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
     affects:
       - capability:read-only-run-queries
       - entity:run-record

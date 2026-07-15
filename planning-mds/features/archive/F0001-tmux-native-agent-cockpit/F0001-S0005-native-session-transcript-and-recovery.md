@@ -1,5 +1,7 @@
 # F0001-S0005 - Native Session Transcript and Recovery
 
+> Delivery status: Done; archived with F0001 on 2026-07-15.
+
 ## Story Header
 
 **Story ID:** F0001-S0005

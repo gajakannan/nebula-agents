@@ -1,0 +1,592 @@
+version: 0
+summary:
+  canonical_nodes: 39
+  features_mapped: 2
+  stories_mapped: 15
+  features_excluded: 5
+  features_uncovered: 0
+  code_bindings: 7
+  symbol_count: 1608
+  bound_symbol_count: 1608
+  decision_count: 0
+  why_count: 0
+coverage:
+  mapped_feature_ids:
+  - feature:F0001
+  - feature:F0006
+  excluded_features:
+  - id: feature:F0002
+    path: planning-mds/features/F0002-managed-agent-orchestration
+    reason: Planned feature with no implementation to bind; canonical mappings are
+      deferred until its architecture and code are activated.
+  - id: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane
+    reason: Planned feature with no implementation to bind; canonical mappings are
+      deferred until its architecture and code are activated.
+  - id: feature:F0004
+    path: planning-mds/features/F0004-reflective-learning-loop
+    reason: Planned feature with no implementation to bind; canonical mappings are
+      deferred until its architecture and code are activated.
+  - id: feature:F0005
+    path: planning-mds/features/archive/F0005-move-invariant-kg-doc-references
+    reason: Superseded planning scope; its delivered behavior is represented by feature:F0006
+      and capability:compiled-kg-projection.
+  - id: feature:F0007
+    path: planning-mds/features/F0007-spec-driven-orchestration-and-prompt-compilation
+    reason: Framework-hardening feature is planned but not yet implemented in this
+      product repository.
+  uncovered_feature_paths: []
+  mapped_story_ids:
+  - story:F0001-S0001
+  - story:F0001-S0002
+  - story:F0001-S0003
+  - story:F0001-S0004
+  - story:F0001-S0005
+  - story:F0001-S0006
+  - story:F0006-S0001
+  - story:F0006-S0002
+  - story:F0006-S0003
+  - story:F0006-S0004
+  - story:F0006-S0005
+  - story:F0006-S0006
+  - story:F0006-S0007
+  - story:F0006-S0008
+  - story:F0006-S0009
+freshness:
+  canonical:
+    entity:run-record:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: b7c7bd47f37c992c
+    entity:runtime-event:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: b7c7bd47f37c992c
+    workflow:gate-decision:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 83ea549f28e1361f
+    workflow:local-agent-session:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: b1db816d338bfdf1
+    workflow:transcript-capture:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: dc76d69e1be870e5
+    capability:compiled-kg-projection:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
+      source_count: 3
+      last_modified: '2026-07-15'
+      source_hash: 4b72a3326240a6c3
+      hotspot_rank: 1
+      hotspot_score: 1.0
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:evidence-and-gate-control:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: 58616ae6ad36ebf2
+      hotspot_rank: 7
+      hotspot_score: 0.0
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:local-run-registry:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: b7c7bd47f37c992c
+      hotspot_rank: 3
+      hotspot_score: 0.03
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:native-session-preflight:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: 152c8cf7958f1661
+      hotspot_rank: 6
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:read-only-run-queries:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: ff24b5a6e5b00d61
+      hotspot_rank: 2
+      hotspot_score: 0.04
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:redacted-transcript-recovery:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: 8575e85ad8fb74e6
+      hotspot_rank: 4
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    capability:tmux-session-lifecycle:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      source_count: 2
+      last_modified: '2026-07-15'
+      source_hash: 7468b5a43ad41e36
+      hotspot_rank: 5
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
+    role:local-operator:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 9494886ae6d535b6
+    role:reviewer:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 9494886ae6d535b6
+    policy_rule:gate-decide:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 83ea549f28e1361f
+    policy_rule:run-mutate:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 9494886ae6d535b6
+    policy_rule:run-read:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 9494886ae6d535b6
+    policy_rule:transcript-configure:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: dc76d69e1be870e5
+    adr:001-f0001-local-tmux-runtime:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 4a5b9550fc3e8130
+    adr:002-f0001-runtime-persistence:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: b002af0b9f1aa5f4
+    adr:003-f0001-provider-execution-boundary:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 9566b810689373e2
+    adr:004-f0001-transcript-redaction:
+      source_paths:
+      - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 8a0fa00b1e398154
+    schema:f0001-launch-descriptor:
+      source_paths:
+      - planning-mds/schemas/f0001-launch-descriptor.schema.json
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: ebf32035ffadf3f8
+    schema:f0001-local-policy:
+      source_paths:
+      - planning-mds/schemas/f0001-local-policy.schema.json
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: a56102015e5b89eb
+    schema:f0001-preflight-result:
+      source_paths:
+      - planning-mds/schemas/f0001-preflight-result.schema.json
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: ab88898ee017d0af
+    schema:f0001-run-record:
+      source_paths:
+      - planning-mds/schemas/f0001-run-record.schema.json
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: fb51ef6786f2afa9
+    schema:f0001-runtime-event:
+      source_paths:
+      - planning-mds/schemas/f0001-runtime-event.schema.json
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: ae84277797473c3a
+  mappings:
+    feature:F0001:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/GETTING-STARTED.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/PRD.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/README.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/STATUS.md
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/feature-assembly-plan.md
+      source_count: 11
+      last_modified: '2026-07-15'
+      source_hash: f02129de4757aff6
+    feature:F0006:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/GETTING-STARTED.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/PRD.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/STATUS.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0004.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0005.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0006.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0007.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0008.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/implementation-plan-S0009.md
+      source_count: 19
+      last_modified: '2026-07-14'
+      source_hash: d8e872bb482aaa59
+    story:F0001-S0001:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 18bc03b1ed7d6b38
+    story:F0001-S0002:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: b1db816d338bfdf1
+    story:F0001-S0003:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: e222edc267ebc4ce
+    story:F0001-S0004:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: 83ea549f28e1361f
+    story:F0001-S0005:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: dc76d69e1be870e5
+    story:F0001-S0006:
+      source_paths:
+      - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+      source_count: 1
+      last_modified: '2026-07-15'
+      source_hash: ff24b5a6e5b00d61
+    story:F0006-S0001:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 871afb4d202c2301
+    story:F0006-S0002:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 8b5e77666aad2522
+    story:F0006-S0003:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 9694387886b36687
+    story:F0006-S0004:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: c8f4c149a927b535
+    story:F0006-S0005:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 4efb64dd5857a33f
+    story:F0006-S0006:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: fded3a010fb95a1c
+    story:F0006-S0007:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 1a9bce16d2cf967d
+    story:F0006-S0008:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: 878f22a74792b844
+    story:F0006-S0009:
+      source_paths:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md
+      source_count: 1
+      last_modified: '2026-07-14'
+      source_hash: d0bcd5cef88863a7
+  code_bindings:
+    capability:compiled-kg-projection:
+      source_paths:
+      - scripts/kg/blast.py
+      - scripts/kg/cochange.py
+      - scripts/kg/compile.py
+      - scripts/kg/coverage-gaps.py
+      - scripts/kg/dead-code.py
+      - scripts/kg/decisions.py
+      - scripts/kg/decompile.py
+      - scripts/kg/diff-impact.py
+      - scripts/kg/eval.py
+      - scripts/kg/hint.py
+      - scripts/kg/hotspots.py
+      - scripts/kg/kg_common.py
+      - scripts/kg/kg_usage.py
+      - scripts/kg/lookup.py
+      - scripts/kg/mcp_server.py
+      - scripts/kg/merge3.py
+      - scripts/kg/pagerank.py
+      - scripts/kg/reproducibility.py
+      - scripts/kg/risk.py
+      - scripts/kg/shard_validate.py
+      - scripts/kg/symbols.py
+      - scripts/kg/telemetry_rotate.py
+      - scripts/kg/tracker_gen.py
+      - scripts/kg/tracker_merge.py
+      - scripts/kg/validate.py
+      - scripts/kg/workstate.py
+      - scripts/kg/README.md
+      - scripts/kg/generated_paths.yaml
+      - scripts/kg/csharp-symbols/Program.cs
+      - scripts/kg/csharp-symbols/CSharpSymbols.csproj
+      - scripts/kg/ts-symbols/extract.js
+      - scripts/kg/ts-symbols/package.json
+      - scripts/kg/ts-symbols/pnpm-lock.yaml
+      - planning-mds/schemas/kg-source/binding.schema.json
+      - planning-mds/schemas/kg-source/exclusion.schema.json
+      - planning-mds/schemas/kg-source/feature.schema.json
+      - planning-mds/schemas/kg-source/node.schema.json
+      - planning-mds/kg-source/README.md
+      - planning-mds/kg-source/bindings/node_bindings.yaml
+      - planning-mds/kg-source/features/F0001.yaml
+      - planning-mds/kg-source/features/F0002.yaml
+      - planning-mds/kg-source/features/F0003.yaml
+      - planning-mds/kg-source/features/F0004.yaml
+      - planning-mds/kg-source/features/F0005.yaml
+      - planning-mds/kg-source/features/F0006.yaml
+      - planning-mds/kg-source/features/F0007.yaml
+      - planning-mds/kg-source/nodes/adrs/adrs.yaml
+      - planning-mds/kg-source/nodes/capabilities/compiled-kg-projection.yaml
+      - planning-mds/kg-source/nodes/capabilities/evidence-and-gate-control.yaml
+      - planning-mds/kg-source/nodes/capabilities/local-run-registry.yaml
+      - planning-mds/kg-source/nodes/capabilities/native-session-preflight.yaml
+      - planning-mds/kg-source/nodes/capabilities/read-only-run-queries.yaml
+      - planning-mds/kg-source/nodes/capabilities/redacted-transcript-recovery.yaml
+      - planning-mds/kg-source/nodes/capabilities/tmux-session-lifecycle.yaml
+      - planning-mds/kg-source/nodes/entities/run-record.yaml
+      - planning-mds/kg-source/nodes/entities/runtime-event.yaml
+      - planning-mds/kg-source/nodes/roles/roles.yaml
+      - planning-mds/kg-source/nodes/schemas/schemas.yaml
+      - planning-mds/kg-source/nodes/workflows/gate-decision.yaml
+      - planning-mds/kg-source/nodes/workflows/local-agent-session.yaml
+      - planning-mds/kg-source/nodes/workflows/transcript-capture.yaml
+      - planning-mds/kg-source/ontology/solution-ontology.yaml
+      - planning-mds/kg-source/policies/policy_rules.yaml
+      - planning-mds/kg-source/projections-meta.yaml
+      - scripts/kg/tests/test_compile.py
+      - scripts/kg/tests/test_decompile.py
+      - scripts/kg/tests/test_eval_source.py
+      - scripts/kg/tests/test_kg_usage.py
+      - scripts/kg/tests/test_lookup_tier.py
+      - scripts/kg/tests/test_mcp_server.py
+      - scripts/kg/tests/test_merge3.py
+      - scripts/kg/tests/test_reproducibility.py
+      - scripts/kg/tests/test_shard_validate.py
+      - scripts/kg/tests/test_symbols_sidecar.py
+      - scripts/kg/tests/test_tracker_gen.py
+      - scripts/kg/tests/test_tracker_merge.py
+      - scripts/kg/tests/test_workstate_digest.py
+      source_count: 77
+      last_modified: '2026-07-15'
+      source_hash: 1b2cffd3c0e8ee9d
+    capability:evidence-and-gate-control:
+      source_paths:
+      - engine/src/nebula_agents/application/gates.py
+      - engine/src/nebula_agents/infrastructure/watcher.py
+      - engine/tests/integration/test_story_validator_descriptor_boundary.py
+      - engine/tests/unit/test_application_services.py
+      - engine/tests/unit/test_watcher_validator.py
+      source_count: 5
+      last_modified: '2026-07-14'
+      source_hash: 266b1d531ac8c1bf
+    capability:local-run-registry:
+      source_paths:
+      - engine/src/nebula_agents/application/authorization.py
+      - engine/src/nebula_agents/domain/enums.py
+      - engine/src/nebula_agents/domain/errors.py
+      - engine/src/nebula_agents/domain/models.py
+      - engine/src/nebula_agents/domain/path_contracts.py
+      - engine/src/nebula_agents/domain/transitions.py
+      - engine/src/nebula_agents/infrastructure/filesystem_store.py
+      - engine/src/nebula_agents/infrastructure/identity.py
+      - engine/src/nebula_agents/infrastructure/policy_store.py
+      - engine/src/nebula_agents/infrastructure/schema_registry.py
+      - engine/tests/integration/test_filesystem_store.py
+      - engine/tests/unit/test_authorization.py
+      - engine/tests/unit/test_models.py
+      - engine/tests/unit/test_transitions.py
+      source_count: 14
+      last_modified: '2026-07-14'
+      source_hash: 67755fffba9f8a97
+    capability:native-session-preflight:
+      source_paths:
+      - engine/src/nebula_agents/application/preflight.py
+      - engine/src/nebula_agents/infrastructure/config.py
+      - engine/src/nebula_agents/infrastructure/process.py
+      - engine/src/nebula_agents/infrastructure/providers.py
+      - engine/tests/integration/test_process_and_providers.py
+      - engine/tests/unit/test_preflight.py
+      - engine/tests/unit/test_runtime_config_identity_policy.py
+      source_count: 7
+      last_modified: '2026-07-14'
+      source_hash: 0fdd2c07802465f3
+    capability:read-only-run-queries:
+      source_paths:
+      - engine/src/nebula_agents/application/queries.py
+      - engine/src/nebula_agents/presentation/cli.py
+      - engine/src/nebula_agents/presentation/formatters.py
+      - engine/src/nebula_agents/presentation/interop.py
+      - engine/src/nebula_agents/presentation/tui.py
+      - engine/tests/contract/__pycache__/test_cli.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_cli.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_cli.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_cli_edge_contracts.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_cli_edge_contracts.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_cli_edge_contracts.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_contract_files.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_formatters.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_formatters.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_formatters.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_json_schemas.cpython-314-pytest-8.4.2.pyc
+      - engine/tests/contract/__pycache__/test_json_schemas.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_json_schemas.cpython-314.pyc
+      - engine/tests/contract/test_cli.py
+      - engine/tests/contract/test_cli_edge_contracts.py
+      - engine/tests/contract/test_contract_files.py
+      - engine/tests/contract/test_formatter_interop_edges.py
+      - engine/tests/contract/test_formatters.py
+      - engine/tests/contract/test_json_schemas.py
+      - engine/tests/security/test_presentation_boundary_edges.py
+      - engine/tests/security/test_static_execution_boundary.py
+      - engine/tests/unit/test_tui_actions.py
+      - engine/tests/unit/test_tui_behavioral_coverage.py
+      source_count: 33
+      last_modified: '2026-07-14'
+      source_hash: 898bbde56a6e8fc1
+    capability:redacted-transcript-recovery:
+      source_paths:
+      - engine/src/nebula_agents/application/transcripts.py
+      - engine/src/nebula_agents/domain/redaction.py
+      - engine/src/nebula_agents/infrastructure/transcript.py
+      - engine/src/nebula_agents/infrastructure/transcript_filter_entry.py
+      - engine/src/nebula_agents/presentation/transcript_filter.py
+      - engine/tests/integration/test_transcript_adapter.py
+      - engine/tests/integration/test_transcript_filter.py
+      - engine/tests/security/test_redaction.py
+      - engine/tests/security/test_session_entry.py
+      source_count: 9
+      last_modified: '2026-07-14'
+      source_hash: 33cd41c3b1a58085
+    capability:tmux-session-lifecycle:
+      source_paths:
+      - engine/src/nebula_agents/application/ports.py
+      - engine/src/nebula_agents/application/runs.py
+      - engine/src/nebula_agents/bootstrap.py
+      - engine/src/nebula_agents/infrastructure/tmux.py
+      - engine/src/nebula_agents/presentation/session_entry.py
+      - engine/tests/integration/test_bootstrap.py
+      - engine/tests/integration/test_commit_reconciliation.py
+      - engine/tests/integration/test_real_tmux_lifecycle.py
+      - engine/tests/unit/test_tmux_adapter.py
+      source_count: 9
+      last_modified: '2026-07-14'
+      source_hash: 1ea1b6937ec77abb
+symbols:
+  symbol_count: 1608
+  bound_symbol_count: 1608
+  by_language:
+    python: 1608
+decisions:
+  decision_count: 0
+  why_count: 0
+  by_kind: {}
