@@ -1,0 +1,13 @@
+# Generated from scripts/kg/generated_paths.yaml (F0006-S0008). Do not hand-edit.
+# Regenerate: python3 scripts/kg/reproducibility.py --write-gitattributes
+# `merge=ours` needs a one-time local: git config merge.ours.driver true
+
+planning-mds/knowledge-graph/canonical-nodes.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/feature-mappings.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/code-index.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/solution-ontology.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/symbol-index.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/unbound-but-referenced.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/coverage-report.yaml linguist-generated=true merge=ours
+planning-mds/knowledge-graph/decisions-index.yaml linguist-generated=true merge=ours
+planning-mds/features/STORY-INDEX.md linguist-generated=true merge=ours

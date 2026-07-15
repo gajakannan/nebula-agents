@@ -1,0 +1,11 @@
+id: capability:native-session-preflight
+label: Native session preflight
+notes: Validates feature resolution, provider capability, executable availability, authenticated local CLI reuse, and launch policy before creating a run.
+related_nodes:
+  - capability:tmux-session-lifecycle
+  - entity:run-record
+  - schema:f0001-launch-descriptor
+  - schema:f0001-preflight-result
+source_docs:
+  - F0001/F0001-S0001-provider-auth-and-environment-preflight.md
+  - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md

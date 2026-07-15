@@ -1,0 +1,12 @@
+id: feature:F0003
+name: Local Agent Runtime Control Plane
+path: planning-mds/features/F0003-local-agent-runtime-control-plane
+status: planned
+registry_section: Planned
+phase: Platform Hardening
+roadmap_section: Next
+roadmap_order: 1
+rationale: Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default.
+validation_gate: F0001 session registry and transcript model are accepted or available as implementation dependencies.
+coverage_excluded:
+  reason: Planned feature with no implementation to bind; canonical mappings are deferred until its architecture and code are activated.

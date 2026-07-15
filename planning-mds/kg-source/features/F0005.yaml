@@ -1,0 +1,13 @@
+id: feature:F0005
+name: Move-Invariant Knowledge-Graph Feature-Doc References
+path: planning-mds/features/archive/F0005-move-invariant-kg-doc-references
+status: superseded
+registry_section: Retired
+roadmap_section: Abandoned
+roadmap_order: 1
+superseded_by: feature:F0006
+retired_date: '2026-07-04'
+reason: "Fully absorbed by F0006's compiled-projection design: logical doc refs become the compiler's reference format (F0006-S0005), migration lands via the decompiler (F0006-S0006), enforcement via reproducibility CI (F0006-S0008), contract reconciliation via F0006-S0009."
+rationale: Fully absorbed by F0006's compiled-projection design.
+coverage_excluded:
+  reason: Superseded planning scope; its delivered behavior is represented by feature:F0006 and capability:compiled-kg-projection.

@@ -1,0 +1,12 @@
+id: feature:F0002
+name: Managed Agent Orchestration
+path: planning-mds/features/F0002-managed-agent-orchestration
+status: planned
+registry_section: Planned
+phase: Future Platform
+roadmap_section: Next
+roadmap_order: 2
+rationale: Add provider adapters and richer orchestration once tmux behavior and runtime control-plane contracts are understood and testable.
+validation_gate: F0001 is implemented, F0003 runtime contracts are validated, and evidence shows native interactivity can be preserved or matched.
+coverage_excluded:
+  reason: Planned feature with no implementation to bind; canonical mappings are deferred until its architecture and code are activated.

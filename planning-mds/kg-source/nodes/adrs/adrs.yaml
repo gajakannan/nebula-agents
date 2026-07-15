@@ -1,0 +1,26 @@
+adrs:
+  - id: adr:001-f0001-local-tmux-runtime
+    label: F0001 local tmux runtime
+    path: planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
+    related_nodes:
+      - capability:tmux-session-lifecycle
+      - workflow:local-agent-session
+  - id: adr:002-f0001-runtime-persistence
+    label: F0001 runtime persistence
+    path: planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+    related_nodes:
+      - capability:local-run-registry
+      - entity:run-record
+      - entity:runtime-event
+  - id: adr:003-f0001-provider-execution-boundary
+    label: F0001 provider execution boundary
+    path: planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:tmux-session-lifecycle
+  - id: adr:004-f0001-transcript-redaction
+    label: F0001 transcript redaction
+    path: planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
+    related_nodes:
+      - capability:redacted-transcript-recovery
+      - workflow:transcript-capture

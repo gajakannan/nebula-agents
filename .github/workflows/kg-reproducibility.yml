@@ -1,0 +1,23 @@
+# Knowledge-graph reproducibility gate adopted with F0001's G7 remediation.
+#
+# Proves that compiled projections and fenced tracker regions equal their authored shards,
+# shard schemas remain valid, and generated-file git policy has not drifted.
+name: kg-reproducibility
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  reproducibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: pip install pyyaml jsonschema
+      - name: Reproducibility and git-policy check
+        run: python3 scripts/kg/validate.py --check-reproducible

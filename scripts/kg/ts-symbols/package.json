@@ -1,0 +1,13 @@
+{
+  "name": "kg-ts-symbols",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Knowledge-graph symbol-layer extractor for TS/TSX. Invoked as a subprocess by scripts/kg/symbols.py.",
+  "main": "extract.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ts-morph": "^28.0.0"
+  }
+}

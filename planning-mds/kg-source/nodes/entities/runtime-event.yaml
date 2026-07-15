@@ -1,0 +1,9 @@
+id: entity:runtime-event
+label: Runtime event
+notes: Append-only audit event describing a run lifecycle transition, validator observation, gate decision, or transcript change.
+related_nodes:
+  - entity:run-record
+  - schema:f0001-runtime-event
+source_docs:
+  - F0001/F0001-S0003-run-registry-and-evidence-watchers.md
+  - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md

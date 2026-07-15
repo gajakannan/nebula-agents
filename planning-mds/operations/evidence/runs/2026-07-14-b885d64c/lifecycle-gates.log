@@ -399,3 +399,43 @@ Stop before G8. Obtain an explicit governance choice to adopt the compiled KG to
 ## Structural Evidence Check
 
 `validate-feature-evidence.py --stage G7` exited 0. This confirms the run package has the required G7 row/report structure; it does not execute the missing product KG compiler, symbol/decision regeneration, reproducibility, or drift checks. The substantive G7 result therefore remains `BLOCKED` and G8 remains closed.
+
+# Lifecycle Gate Run — G7 Remediation Re-entry
+
+## Authorization
+
+The operator selected option 1: adopt the compiled knowledge-graph toolchain and initial F0001
+source/mapping/binding shards.
+
+## Stage
+
+G7 architect knowledge-graph reconciliation re-entry
+
+## Exit Code
+
+0
+
+## Result
+
+PASS — the product now owns populated `planning-mds/kg-source/**` shards, the compiler and validator
+toolchain, generated projections, tracker regions, git policy, and a CI reproducibility gate. Shard
+validation, compile/check, symbol and decision regeneration/checks, reproducibility, semantic drift,
+186 toolchain tests, 514 runtime tests, scoped story validation, and tracker validation passed.
+
+## Output References
+
+- `kg-reconciliation.md`
+- `planning-mds/kg-source/features/F0001.yaml`
+- `planning-mds/kg-source/bindings/node_bindings.yaml`
+- `planning-mds/knowledge-graph/canonical-nodes.yaml`
+- `planning-mds/knowledge-graph/feature-mappings.yaml`
+- `planning-mds/knowledge-graph/code-index.yaml`
+- `planning-mds/knowledge-graph/symbol-index.yaml`
+- `planning-mds/knowledge-graph/decisions-index.yaml`
+- `evidence-manifest.json`
+
+## Next Action
+
+Activate Product Manager G8. Archive F0001 first, update the feature shard to the final lifecycle path
+and status, regenerate story/KG/coverage projections after the move, validate closeout evidence and
+trackers, disposition recommendations, and publish the approved run.

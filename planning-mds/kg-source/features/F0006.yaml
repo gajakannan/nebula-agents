@@ -1,0 +1,41 @@
+id: feature:F0006
+name: Compiled Knowledge-Graph Projection and Governed Integration
+path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration
+status: archived-done
+registry_section: Archived
+roadmap_section: Completed
+roadmap_order: 1
+archived_date: '2026-07-12'
+evidence_reentry_date: '2026-07-12'
+completed_date: '2026-07-11'
+completion_state: All 9 stories Done; feature-review PASS; framework Phase-B PRs #42-#46 and product PR #59 landed on `main`; compiled-projection and reproducibility gates green; recovery G8 archive completed 2026-07-12.
+affects:
+  - capability:compiled-kg-projection
+story_mappings:
+  - id: story:F0006-S0001
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0002
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0003
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0004
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0005
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0007
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0008
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+    affects: [capability:compiled-kg-projection]
+  - id: story:F0006-S0009
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md
+    affects: [capability:compiled-kg-projection]

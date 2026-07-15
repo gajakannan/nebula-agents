@@ -14,29 +14,45 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 
 ## Now
 
+<!-- generated:begin roadmap:now -->
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
-| [F0007 - Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
-| [F0001 - Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/) | In Progress | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. G0 assembly planning passed in run `2026-07-13-1cfbc5a0`. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
+| [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
+| [F0001 — Tmux-Native Agent Cockpit](./F0001-tmux-native-agent-cockpit/README.md) | In Progress | Establish the first usable terminal cockpit without losing native agent interactivity or subscription auth. G0 assembly planning passed in run `2026-07-13-1cfbc5a0`. | Operator can launch, attach, monitor, validate, and recover a native Codex or Claude Code session from the TUI. |
+<!-- generated:end roadmap:now -->
 
 ## Next
 
+<!-- generated:begin roadmap:next -->
 | Feature | Status | Why Next | Entry Criteria |
 |---------|--------|----------|----------------|
-| [F0003 - Local Agent Runtime Control Plane](./F0003-local-agent-runtime-control-plane/) | Planned | Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. | F0001 session registry and transcript model are accepted or available as implementation dependencies. |
-| [F0002 - Managed Agent Orchestration](./F0002-managed-agent-orchestration/) | Planned | Add provider adapters and richer orchestration once tmux behavior and runtime control-plane contracts are understood and testable. | F0001 is implemented, F0003 runtime contracts are validated, and evidence shows native interactivity can be preserved or matched. |
+| [F0003 — Local Agent Runtime Control Plane](./F0003-local-agent-runtime-control-plane/README.md) | Planned | Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. | F0001 session registry and transcript model are accepted or available as implementation dependencies. |
+| [F0002 — Managed Agent Orchestration](./F0002-managed-agent-orchestration/README.md) | Planned | Add provider adapters and richer orchestration once tmux behavior and runtime control-plane contracts are understood and testable. | F0001 is implemented, F0003 runtime contracts are validated, and evidence shows native interactivity can be preserved or matched. |
+<!-- generated:end roadmap:next -->
 
 ## Later
 
+<!-- generated:begin roadmap:later -->
 | Feature | Status | Notes |
 |---------|--------|-------|
-| [F0004 - Reflective Learning Loop and Strategy Playbook](./F0004-reflective-learning-loop/) | Planned | Closes the context-engineering loop (learn -> Write -> Select). Needs run evidence/telemetry from F0003 evidence store before reflection has useful input. Ships behind a default-off flag, candidate-only at first. |
+| [F0004 — Reflective Learning Loop and Strategy Playbook](./F0004-reflective-learning-loop/README.md) | Planned | Closes the context-engineering loop (learn -> Write -> Select). Needs run evidence/telemetry from F0003 evidence store before reflection has useful input. Ships behind a default-off flag, candidate-only at first. |
+<!-- generated:end roadmap:later -->
+
+## Abandoned
+
+<!-- generated:begin roadmap:abandoned -->
+| Feature | Superseded By | Rationale |
+|---------|---------------|-----------|
+| [F0005 — Move-Invariant Knowledge-Graph Feature-Doc References](./archive/F0005-move-invariant-kg-doc-references/README.md) | F0006 | Fully absorbed by F0006's compiled-projection design. |
+<!-- generated:end roadmap:abandoned -->
 
 ## Completed
 
+<!-- generated:begin roadmap:completed -->
 | Feature | Completed Date | Evidence |
 |---------|----------------|----------|
-| [F0006 - Compiled KG Projection and Governed Integration](./archive/F0006-compiled-kg-projection-and-integration/) | 2026-07-11 | All 9 stories Done; feature-review PASS; framework Phase-B PRs #42-#46 and product PR #59 landed on `main`; compiled-projection and reproducibility gates green; recovery G8 archive completed 2026-07-12. |
+| [F0006 — Compiled Knowledge-Graph Projection and Governed Integration](./archive/F0006-compiled-kg-projection-and-integration/README.md) | 2026-07-11 | All 9 stories Done; feature-review PASS; framework Phase-B PRs |
+<!-- generated:end roadmap:completed -->
 
 ## Notes
 

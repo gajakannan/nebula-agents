@@ -1,0 +1,10 @@
+id: capability:tmux-session-lifecycle
+label: Tmux session lifecycle
+notes: Launches native provider CLIs in governed tmux sessions and supports attach, detach, recovery, and lifecycle reconciliation.
+related_nodes:
+  - capability:native-session-preflight
+  - capability:local-run-registry
+  - workflow:local-agent-session
+source_docs:
+  - F0001/F0001-S0002-tmux-session-launch-and-attach.md
+  - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md

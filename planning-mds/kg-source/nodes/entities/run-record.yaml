@@ -1,0 +1,10 @@
+id: entity:run-record
+label: Run record
+notes: Durable current-state record for one local provider run, including ownership, gate, transcript, evidence, and recovery metadata.
+related_nodes:
+  - entity:runtime-event
+  - workflow:local-agent-session
+  - schema:f0001-run-record
+source_docs:
+  - F0001/F0001-S0003-run-registry-and-evidence-watchers.md
+  - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md

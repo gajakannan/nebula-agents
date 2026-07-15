@@ -1,0 +1,13 @@
+policy_rules:
+  - id: policy_rule:account-contact-manage
+    label: account:contact:manage
+    resource: account
+    action: contact:manage
+    allowed_roles:
+      - role:admin
+      - role:distribution-user
+    related_nodes:
+      - entity:account
+      - capability:authorization-enforcement
+    source_docs:
+      - planning-mds/security/authorization-matrix.md

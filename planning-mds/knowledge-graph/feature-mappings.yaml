@@ -1,0 +1,183 @@
+version: 1
+status: generated
+coverage_note: Feature mappings cover implemented F0001 runtime behavior and the archived F0006 projection
+  toolchain. Planned and superseded scopes remain explicit coverage exclusions until implementation exists.
+coverage:
+  excluded_features:
+    - id: feature:F0002
+      path: planning-mds/features/F0002-managed-agent-orchestration
+      reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
+        architecture and code are activated.
+    - id: feature:F0003
+      path: planning-mds/features/F0003-local-agent-runtime-control-plane
+      reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
+        architecture and code are activated.
+    - id: feature:F0004
+      path: planning-mds/features/F0004-reflective-learning-loop
+      reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
+        architecture and code are activated.
+    - id: feature:F0005
+      path: planning-mds/features/archive/F0005-move-invariant-kg-doc-references
+      reason: Superseded planning scope; its delivered behavior is represented by feature:F0006 and capability:compiled-kg-projection.
+    - id: feature:F0007
+      path: planning-mds/features/F0007-spec-driven-orchestration-and-prompt-compilation
+      reason: Framework-hardening feature is planned but not yet implemented in this product repository.
+features:
+  - status: in-progress
+    id: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit
+    affects:
+      - capability:evidence-and-gate-control
+      - capability:local-run-registry
+      - capability:native-session-preflight
+      - capability:read-only-run-queries
+      - capability:redacted-transcript-recovery
+      - capability:tmux-session-lifecycle
+      - entity:run-record
+      - entity:runtime-event
+      - workflow:gate-decision
+      - workflow:local-agent-session
+      - workflow:transcript-capture
+    enforced_by_policy:
+      - policy_rule:gate-decide
+      - policy_rule:run-mutate
+      - policy_rule:run-read
+      - policy_rule:transcript-configure
+    governed_by:
+      - adr:001-f0001-local-tmux-runtime
+      - adr:002-f0001-runtime-persistence
+      - adr:003-f0001-provider-execution-boundary
+      - adr:004-f0001-transcript-redaction
+    restricted_to_role:
+      - role:local-operator
+      - role:reviewer
+    uses_schema:
+      - schema:f0001-launch-descriptor
+      - schema:f0001-local-policy
+      - schema:f0001-preflight-result
+      - schema:f0001-run-record
+      - schema:f0001-runtime-event
+  - status: archived-done
+    id: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration
+    affects:
+      - capability:compiled-kg-projection
+rules:
+  - Mappings must reference canonical IDs declared in canonical-nodes.yaml.
+  - Product Manager owns feature and story mapping freshness.
+  - Architect owns corrections to canonical shared semantics.
+  - If a target feature or story is not mapped here, prompts must fall back to the current file-centric
+    read pattern.
+stories:
+  - id: story:F0001-S0001
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+    affects:
+      - capability:native-session-preflight
+      - entity:run-record
+    governed_by:
+      - adr:003-f0001-provider-execution-boundary
+    uses_schema:
+      - schema:f0001-launch-descriptor
+      - schema:f0001-preflight-result
+  - id: story:F0001-S0002
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+    affects:
+      - capability:tmux-session-lifecycle
+      - workflow:local-agent-session
+    governed_by:
+      - adr:001-f0001-local-tmux-runtime
+      - adr:003-f0001-provider-execution-boundary
+    uses_schema:
+      - schema:f0001-launch-descriptor
+  - id: story:F0001-S0003
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+    affects:
+      - capability:evidence-and-gate-control
+      - capability:local-run-registry
+      - entity:run-record
+      - entity:runtime-event
+    governed_by:
+      - adr:002-f0001-runtime-persistence
+    uses_schema:
+      - schema:f0001-run-record
+      - schema:f0001-runtime-event
+  - id: story:F0001-S0004
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+    affects:
+      - capability:evidence-and-gate-control
+      - workflow:gate-decision
+    governed_by:
+      - adr:002-f0001-runtime-persistence
+    uses_schema:
+      - schema:f0001-run-record
+      - schema:f0001-runtime-event
+  - id: story:F0001-S0005
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+    affects:
+      - capability:redacted-transcript-recovery
+      - workflow:transcript-capture
+    governed_by:
+      - adr:004-f0001-transcript-redaction
+    uses_schema:
+      - schema:f0001-run-record
+      - schema:f0001-runtime-event
+  - id: story:F0001-S0006
+    feature: feature:F0001
+    path: planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+    affects:
+      - capability:read-only-run-queries
+      - entity:run-record
+    governed_by:
+      - adr:002-f0001-runtime-persistence
+    uses_schema:
+      - schema:f0001-run-record
+  - id: story:F0006-S0001
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0002
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0002-tracker-table-three-way-merge.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0003
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0003-integrator-role-and-integrate-action.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0004
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0004-kg-source-shard-schema-and-ownership.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0005
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0006
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0006-decompiler-first-migration.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0007
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0007-tracker-generation-from-shards.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0008
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+    affects:
+      - capability:compiled-kg-projection
+  - id: story:F0006-S0009
+    feature: feature:F0006
+    path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0009-framework-contract-reconciliation.md
+    affects:
+      - capability:compiled-kg-projection

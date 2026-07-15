@@ -1,0 +1,9 @@
+policy_rules:
+  - id: policy_rule:account-read
+    label: account:read
+    resource: account
+    action: read
+    allowed_roles:
+      - role:admin
+    related_nodes:
+      - entity:account

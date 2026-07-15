@@ -1,14 +1,12 @@
 # Tracker Governance
 
-**Last Updated:** 2026-07-11
+**Last Updated:** 2026-07-15
 
-> **Compiled-projection note (F0006-S0009).** In a product repo that has adopted the compiled-projection
-> model (reference: `nebula-insurance-crm`), the **REGISTRY.md and ROADMAP.md feature tables are
-> generated** from `kg-source/features/**` by `scripts/kg/tracker_gen.py` — the generator owns the
-> fenced `<!-- generated:begin … -->` regions; surrounding prose stays PM-authored. Never hand-edit a
-> generated table region; edit the feature shard and recompile. **This repo (`nebula-agents`) has not
-> yet adopted the shard model for its own planning graph** (it has no populated KG); its trackers below
-> remain hand-authored. Adopting it here is a tracked follow-up.
+> **Compiled-projection note (F0006-S0009).** This repository adopted the compiled-projection model
+> during F0001 G7 remediation completed on 2026-07-15. The **REGISTRY.md and ROADMAP.md feature tables are
+> generated** from `planning-mds/kg-source/features/**` by `scripts/kg/tracker_gen.py`. The generator
+> owns the fenced `<!-- generated:begin … -->` regions; surrounding prose stays PM-authored. Never
+> hand-edit a generated table region: edit the feature shard and run `python3 scripts/kg/compile.py`.
 
 ## Authoritative Trackers
 
@@ -52,6 +50,10 @@ All completed features require:
 Use explicit product-root arguments when running validators from this repo:
 
 ```bash
+python3 scripts/kg/shard_validate.py
+python3 scripts/kg/compile.py --check
+python3 scripts/kg/validate.py --check-reproducible
+python3 scripts/kg/validate.py --check-drift
 python agents/product-manager/scripts/validate-stories.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents planning-mds/features
 python agents/product-manager/scripts/validate-trackers.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --skip-feature-evidence
 ```

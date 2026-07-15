@@ -1,0 +1,18 @@
+canonical-nodes.yaml:
+  version: 1
+  status: generated
+  coverage_note: Canonical solution nodes are compiled from role-owned shards. Initial coverage includes the F0001 runtime and the adopted F0006 compiled-projection capability.
+code-index.yaml:
+  version: 1
+  status: generated
+  coverage_note: Stable solution node IDs are bound to the F0001 runtime and compiled-KG tooling so agents can route into implementation without broad repository scans. Bindings are retrieval hints; source files remain authoritative.
+feature-mappings.yaml:
+  version: 1
+  status: generated
+  coverage_note: Feature mappings cover implemented F0001 runtime behavior and the archived F0006 projection toolchain. Planned and superseded scopes remain explicit coverage exclusions until implementation exists.
+  rules:
+    - Mappings must reference canonical IDs declared in canonical-nodes.yaml.
+    - Product Manager owns feature and story mapping freshness.
+    - Architect owns corrections to canonical shared semantics.
+    - If a target feature or story is not mapped here, prompts must fall back to the current file-centric
+      read pattern.

@@ -1,0 +1,17 @@
+endpoints:
+  - id: endpoint:account-contact-create
+    label: POST /accounts/{accountId}/contacts
+    method: POST
+    route: /accounts/{accountId}/contacts
+    resource: account
+    related_nodes:
+      - entity:account
+      - policy_rule:account-contact-manage
+    source_docs:
+      - planning-mds/api/nebula-api.yaml
+  - id: endpoint:dashboard-kpis
+    label: GET /dashboard/kpis
+    method: GET
+    route: /dashboard/kpis
+    related_nodes:
+      - capability:dashboard-home

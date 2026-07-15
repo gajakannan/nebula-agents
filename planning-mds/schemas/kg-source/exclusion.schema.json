@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nebula.local/schemas/kg-source/exclusion.schema.json",
+  "title": "KG Source Exclusion Shard",
+  "description": "An excluded-feature record under kg-source/exclusions/**. Compiles into feature-mappings.yaml excluded_features. Co-signed by PM + Architect. `id` is the excluded feature; `reason` states why it is out of coverage.",
+  "type": "object",
+  "required": ["id", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^feature:F[0-9]{4}$" },
+    "reason": { "type": "string", "minLength": 1 },
+    "excluded_by": { "type": "array", "items": { "type": "string", "pattern": "^feature:F[0-9]{4}$" } },
+    "notes": { "type": "string" }
+  }
+}

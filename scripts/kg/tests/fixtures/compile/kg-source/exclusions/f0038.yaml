@@ -1,0 +1,4 @@
+id: feature:F0038
+reason: Example exclusion record.
+excluded_by:
+  - feature:F0099

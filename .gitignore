@@ -10,6 +10,7 @@ dist/
 .venv/
 venv/
 .nebula-agents/
+.kg-state/
 .idea/
 .vscode/
 .DS_Store

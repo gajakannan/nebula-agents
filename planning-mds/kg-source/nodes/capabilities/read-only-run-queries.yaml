@@ -1,0 +1,8 @@
+id: capability:read-only-run-queries
+label: Read-only run queries
+notes: Exposes status, review, audit, and recovery information through CLI and terminal UI views without mutating run state.
+related_nodes:
+  - capability:local-run-registry
+  - entity:run-record
+source_docs:
+  - F0001/F0001-S0006-readonly-review-and-status-commands.md

@@ -1,0 +1,22 @@
+id: workflow:local-agent-session
+label: Local agent session lifecycle
+related_nodes:
+  - capability:native-session-preflight
+  - capability:tmux-session-lifecycle
+  - entity:run-record
+source_docs:
+  - F0001/F0001-S0002-tmux-session-launch-and-attach.md
+states:
+  - id: state:local-agent-session:preflight
+    label: Preflight
+    transitions_to: [state:local-agent-session:active]
+  - id: state:local-agent-session:active
+    label: Active
+    transitions_to: [state:local-agent-session:recoverable, state:local-agent-session:completed]
+  - id: state:local-agent-session:recoverable
+    label: Recoverable
+    transitions_to: [state:local-agent-session:active, state:local-agent-session:failed]
+  - id: state:local-agent-session:completed
+    label: Completed
+  - id: state:local-agent-session:failed
+    label: Failed

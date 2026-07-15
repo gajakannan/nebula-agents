@@ -1,0 +1,19 @@
+id: workflow:gate-decision
+label: Gate decision lifecycle
+related_nodes:
+  - capability:evidence-and-gate-control
+  - entity:run-record
+source_docs:
+  - F0001/F0001-S0004-gate-and-validator-dashboard.md
+states:
+  - id: state:gate-decision:pending
+    label: Pending
+    transitions_to: [state:gate-decision:approved, state:gate-decision:changes-requested, state:gate-decision:blocked]
+  - id: state:gate-decision:approved
+    label: Approved
+  - id: state:gate-decision:changes-requested
+    label: Changes requested
+    transitions_to: [state:gate-decision:pending]
+  - id: state:gate-decision:blocked
+    label: Blocked
+    transitions_to: [state:gate-decision:pending]

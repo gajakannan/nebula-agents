@@ -1,0 +1,14 @@
+node_bindings:
+  - id: capability:authorization-enforcement
+    paths:
+      backend:
+        application:
+          - engine/src/Nebula.Application/Interfaces/IAuthorizationService.cs
+        infrastructure:
+          - engine/src/Nebula.Infrastructure/Authorization/CasbinAuthorizationService.cs
+        tests:
+          - engine/tests/Nebula.Tests/Unit/CasbinAuthorizationServiceTests.cs
+  - id: endpoint:dashboard-kpis
+    paths:
+      backend:
+        - engine/src/Nebula.Api/Endpoints/DashboardEndpoints.cs

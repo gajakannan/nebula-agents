@@ -1,0 +1,30 @@
+schemas:
+  - id: schema:f0001-launch-descriptor
+    label: F0001 launch descriptor
+    path: planning-mds/schemas/f0001-launch-descriptor.schema.json
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:tmux-session-lifecycle
+  - id: schema:f0001-local-policy
+    label: F0001 local policy
+    path: planning-mds/schemas/f0001-local-policy.schema.json
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:evidence-and-gate-control
+  - id: schema:f0001-preflight-result
+    label: F0001 preflight result
+    path: planning-mds/schemas/f0001-preflight-result.schema.json
+    related_nodes:
+      - capability:native-session-preflight
+  - id: schema:f0001-run-record
+    label: F0001 run record
+    path: planning-mds/schemas/f0001-run-record.schema.json
+    related_nodes:
+      - capability:local-run-registry
+      - entity:run-record
+  - id: schema:f0001-runtime-event
+    label: F0001 runtime event
+    path: planning-mds/schemas/f0001-runtime-event.schema.json
+    related_nodes:
+      - capability:local-run-registry
+      - entity:runtime-event

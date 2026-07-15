@@ -1,0 +1,11 @@
+id: capability:local-run-registry
+label: Local run registry
+notes: Persists typed run state and append-only runtime events in the product-local filesystem.
+related_nodes:
+  - entity:run-record
+  - entity:runtime-event
+  - schema:f0001-run-record
+  - schema:f0001-runtime-event
+source_docs:
+  - F0001/F0001-S0003-run-registry-and-evidence-watchers.md
+  - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md

@@ -1,0 +1,7 @@
+id: capability:compiled-kg-projection
+label: Compiled knowledge-graph projection
+notes: Compiles role-owned knowledge-graph shards into deterministic projections and fenced tracker tables, with drift and reproducibility enforcement.
+source_docs:
+  - F0006/README.md
+  - F0006/F0006-S0005-deterministic-kg-compiler.md
+  - F0006/F0006-S0008-reproducibility-ci-and-git-policy.md

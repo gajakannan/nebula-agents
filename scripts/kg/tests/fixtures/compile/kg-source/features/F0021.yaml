@@ -1,0 +1,10 @@
+id: feature:F0021
+name: Communication Hub
+path: planning-mds/features/archive/F0021-communication-hub
+status: archived-done
+phase: CRM Release MVP
+roadmap_section: Completed
+completion_state: Done and archived.
+archived_date: '2026-07-02'
+affects:
+  - entity:account

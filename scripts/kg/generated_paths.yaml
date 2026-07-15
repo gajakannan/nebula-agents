@@ -1,0 +1,46 @@
+# Authoritative manifest of every generated (compiled) path in this repo (F0006-S0008).
+# Single home read by three consumers: the reproducibility check, `.gitattributes` generation, and
+# the integrator. Content is PRD §2 "Generated projections". Never hand-edit a listed file — edit the
+# source (kg-source/** or the code/markers) and recompile.
+#
+# granularity:
+#   whole-file    — the entire file is generated; byte-compared by --check-reproducible; gets
+#                   `linguist-generated` + the `merge=ours` driver in .gitattributes.
+#   fenced-region — only the `<!-- generated:begin -->`…`<!-- generated:end -->` regions are generated;
+#                   checked inside the markers only; excluded from linguist-generated + the driver
+#                   (both are file-scoped and would hide/drop PM-authored prose).
+version: 1
+generated_paths:
+  - path: planning-mds/knowledge-graph/canonical-nodes.yaml
+    granularity: whole-file
+    by: compile.py
+  - path: planning-mds/knowledge-graph/feature-mappings.yaml
+    granularity: whole-file
+    by: compile.py
+  - path: planning-mds/knowledge-graph/code-index.yaml
+    granularity: whole-file
+    by: compile.py
+  - path: planning-mds/knowledge-graph/solution-ontology.yaml
+    granularity: whole-file
+    by: compile.py
+  - path: planning-mds/knowledge-graph/symbol-index.yaml
+    granularity: whole-file
+    by: symbols.py
+  - path: planning-mds/knowledge-graph/unbound-but-referenced.yaml
+    granularity: whole-file
+    by: symbols.py
+  - path: planning-mds/knowledge-graph/coverage-report.yaml
+    granularity: whole-file
+    by: validate.py --write-coverage-report
+  - path: planning-mds/knowledge-graph/decisions-index.yaml
+    granularity: whole-file
+    by: decisions.py
+  - path: planning-mds/features/STORY-INDEX.md
+    granularity: whole-file
+    by: generate-story-index.py
+  - path: planning-mds/features/REGISTRY.md
+    granularity: fenced-region
+    by: tracker_gen.py
+  - path: planning-mds/features/ROADMAP.md
+    granularity: fenced-region
+    by: tracker_gen.py

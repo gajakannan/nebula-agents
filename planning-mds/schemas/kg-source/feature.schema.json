@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nebula.local/schemas/kg-source/feature.schema.json",
+  "title": "KG Source Feature Shard",
+  "description": "A feature record under kg-source/features/**. Single home for the technical binding fields (projected verbatim into feature-mappings.features) AND every tracker fact (F0006-S0004 §4). Technical fields are open (additionalProperties) because feature-mappings records are heterogeneous (config_keys, notes as string-or-list, per-feature story-id lists, …); presentation + the structured `story_mappings` block are the named, validated fields.",
+  "type": "object",
+  "required": ["id", "name", "path", "status", "roadmap_section"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "pattern": "^feature:F[0-9]{4}$" },
+    "name": { "type": "string", "minLength": 1 },
+    "path": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["active", "in-progress", "planned", "planned-provisional", "superseded", "done",
+               "archived-done", "retired", "architecture-complete", "archived"]
+    },
+    "coverage_excluded": {
+      "type": "object",
+      "description": "Marks a feature that exists in the trackers but has no KG mapping yet; compiled into feature-mappings coverage.excluded_features (F0006-S0006 D-coverage-excluded) rather than features[].",
+      "required": ["reason"],
+      "additionalProperties": false,
+      "properties": { "reason": { "type": "string", "minLength": 1 } }
+    },
+    "phase": { "type": "string" },
+    "roadmap_section": { "type": "string", "enum": ["Now", "Next", "Later", "Abandoned", "Completed"] },
+    "rationale": { "type": "string" },
+    "completion_state": { "type": "string" },
+    "validation_gate": { "type": "string" },
+    "registry_section": { "type": "string", "enum": ["Active", "Retired", "Planned", "Archived"] },
+    "evidence_reentry_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "completed_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "affects": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "depends_on": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "governed_by": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "uses_api_contract": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "uses_schema": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "supersedes": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "enforced_by_policy": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "restricted_to_role": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "validated_by": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "workflow_states": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+    "superseded_by": { "type": "string", "pattern": "^feature:F[0-9]{4}$" },
+    "retired_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "reason": { "type": "string" },
+    "archived_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "story_mappings": {
+      "type": "array",
+      "description": "Detailed story mappings owned by this feature; compiled into feature-mappings.yaml top-level `stories` with `feature` set to this shard's id (F0006-S0005 D3). Named distinctly from any verbatim per-feature `stories` id-list that feature-mappings itself may carry.",
+      "items": {
+        "type": "object",
+        "required": ["id", "path"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "pattern": "^story:F[0-9]{4}-S[0-9]{4}$" },
+          "path": { "type": "string", "minLength": 1 },
+          "affects": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+          "depends_on": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+          "governed_by": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+          "uses_api_contract": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } },
+          "uses_schema": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "object", "required": ["id"], "properties": { "id": { "type": "string" } } }] } }
+        }
+      }
+    }
+  }
+}

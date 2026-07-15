@@ -1,0 +1,32 @@
+version: 0
+status: generated
+excluded_features:
+  - id: feature:F0038
+    reason: Example exclusion record.
+    excluded_by:
+      - feature:F0099
+features:
+  - status: archived-done
+    id: feature:F0021
+    path: planning-mds/features/archive/F0021-communication-hub
+    affects:
+      - entity:account
+  - status: in-progress
+    id: feature:F0099
+    path: planning-mds/features/F0099-example
+    affects:
+      - capability:dashboard-home
+      - entity:account
+    uses_schema:
+      - schema:account
+stories:
+  - id: story:F0099-S0001
+    feature: feature:F0099
+    path: planning-mds/features/F0099-example/F0099-S0001-example.md
+    affects:
+      - capability:dashboard-home
+  - id: story:F0099-S0002
+    feature: feature:F0099
+    path: planning-mds/features/F0099-example/F0099-S0002-example.md
+    affects:
+      - entity:account

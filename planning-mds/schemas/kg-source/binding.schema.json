@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nebula.local/schemas/kg-source/binding.schema.json",
+  "title": "KG Source Binding Shard",
+  "description": "A node→implementation-path binding under kg-source/bindings/**. Compiles into code-index.yaml node_bindings. `id` is an existing node ID; `paths` are physical code paths (stable roots), grouped by category — never logical feature-doc refs.",
+  "type": "object",
+  "required": ["id", "paths"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "paths": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "array", "items": { "type": "string" } },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

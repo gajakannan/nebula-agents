@@ -11,9 +11,12 @@
   "feature_state": "In Progress",
   "rerun_of": "2026-07-13-1cfbc5a0",
   "changed_paths": [
+    ".gitattributes",
+    ".github",
     ".gitignore",
     "planning-mds",
-    "engine"
+    "engine",
+    "scripts"
   ],
   "scm": {
     "base_ref": "main",
@@ -69,7 +72,7 @@
     },
     "kg_reconciliation": {
       "required": true,
-      "result": "FAIL",
+      "result": "PASS",
       "artifact": "kg-reconciliation.md"
     }
   },

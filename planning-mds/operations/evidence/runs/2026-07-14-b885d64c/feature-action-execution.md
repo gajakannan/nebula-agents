@@ -2,7 +2,7 @@
 
 ## Gate
 
-Current gate reached: `G7` architect reconciliation — blocked by the product KG/compiler bootstrap precondition; `G8` has not started.
+Current gate reached: `G7` architect reconciliation — PASS after explicit compiled-toolchain adoption; `G8` is authorized and has not started.
 
 ## Execution Timeline
 
@@ -46,3 +46,9 @@ Current gate reached: `G7` architect reconciliation — blocked by the product K
   - Audit: confirmed absence of `planning-mds/kg-source/`, `planning-mds/knowledge-graph/`, `scripts/kg/compile.py`, and `scripts/kg/validate.py`; the structural feature-evidence schema check exited 0 but cannot substitute for the missing substantive KG commands.
   - Output: `kg-reconciliation.md` maps all six as-built capabilities and records the truthful blocker.
   - Outcome: stop before G8 pending explicit governance/bootstrap resolution.
+- 2026-07-15T10:02:15-04:00 — G7 remediation re-entry passed.
+  - Input: explicit operator selection of adoption option 1.
+  - Implementation: adopted the governed F0006 compiler/validator/toolchain baseline, added product-owned F0001 canonical nodes and bindings, mapped F0001-F0007 tracker facts, generated the graph and tracker projections, and added the CI reproducibility gate.
+  - Validators: shard validation, compile/check, symbol and decision regeneration/checks, reproducibility, semantic drift, 186 toolchain tests, 514 runtime tests, scoped story validation, and tracker validation passed.
+  - Output: updated `kg-reconciliation.md`, generated graph projections, and an adopted tracker-governance contract.
+  - Outcome: the High bootstrap blocker is closed; activate Product Manager G8.

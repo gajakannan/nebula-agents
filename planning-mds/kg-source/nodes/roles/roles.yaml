@@ -1,0 +1,15 @@
+roles:
+  - id: role:local-operator
+    label: LocalOperator
+    notes: Authenticated local user who owns a run and may launch, attach, recover, configure transcripts, and decide gates for that run.
+    related_nodes:
+      - entity:run-record
+    source_docs:
+      - F0001/PRD.md
+  - id: role:reviewer
+    label: Reviewer
+    notes: Read-only reviewer who may inspect run status, evidence, audit events, and redacted transcript state without mutating the run.
+    related_nodes:
+      - capability:read-only-run-queries
+    source_docs:
+      - F0001/PRD.md

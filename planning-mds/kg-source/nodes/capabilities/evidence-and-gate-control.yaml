@@ -1,0 +1,10 @@
+id: capability:evidence-and-gate-control
+label: Evidence and gate control
+notes: Watches governed evidence, records validator results, and applies authorized gate decisions without bypassing lifecycle rules.
+related_nodes:
+  - capability:local-run-registry
+  - entity:runtime-event
+  - workflow:gate-decision
+source_docs:
+  - F0001/F0001-S0003-run-registry-and-evidence-watchers.md
+  - F0001/F0001-S0004-gate-and-validator-dashboard.md

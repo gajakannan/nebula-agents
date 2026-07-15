@@ -1,0 +1,7 @@
+adrs:
+  - id: adr:001
+    label: JSON Schema Validation
+    path: planning-mds/architecture/decisions/ADR-001-json-schema-validation.md
+  - id: adr:002
+    label: Dashboard Data Aggregation
+    path: planning-mds/architecture/decisions/ADR-002-dashboard-data-aggregation.md

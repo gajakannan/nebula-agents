@@ -1,0 +1,12 @@
+id: feature:F0007
+name: Spec-Driven Orchestration and Prompt Compilation
+path: planning-mds/features/F0007-spec-driven-orchestration-and-prompt-compilation
+status: planned
+registry_section: Active
+phase: Framework Hardening
+roadmap_section: Now
+roadmap_order: 1
+rationale: The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics.
+validation_gate: Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout.
+coverage_excluded:
+  reason: Framework-hardening feature is planned but not yet implemented in this product repository.

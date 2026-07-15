@@ -1,0 +1,6 @@
+id: entity:account
+label: Account
+source_docs:
+  - planning-mds/architecture/data-model.md
+related_nodes:
+  - workflow:account-lifecycle

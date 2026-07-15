@@ -1,0 +1,8 @@
+id: capability:dashboard-home
+label: Dashboard Home
+source_docs:
+  - F0099/README.md
+  - planning-mds/architecture/decisions/ADR-002-dashboard-data-aggregation.md
+related_nodes:
+  - entity:account
+  - endpoint:dashboard-kpis

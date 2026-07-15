@@ -1,0 +1,9 @@
+node_bindings:
+  - id: capability:dashboard-home
+    paths:
+      frontend:
+        - experience/src/pages/Dashboard.tsx
+  - id: endpoint:dashboard-kpis
+    paths:
+      backend:
+        - engine/src/Nebula.Api/Endpoints/DashboardEndpoints.cs

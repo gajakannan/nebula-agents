@@ -1,0 +1,6 @@
+version: 0
+status: seed
+purpose: Example ontology stub for shard-validator fixtures (whole-file curated source).
+node_types:
+  - entity
+  - capability

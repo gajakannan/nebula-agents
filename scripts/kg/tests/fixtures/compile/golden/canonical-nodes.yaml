@@ -1,0 +1,44 @@
+version: 0
+status: generated
+adrs:
+  - id: adr:002
+    label: Dashboard Data Aggregation
+    path: planning-mds/architecture/decisions/ADR-002-dashboard-data-aggregation.md
+capabilities:
+  - id: capability:dashboard-home
+    label: Dashboard Home
+    related_nodes:
+      - endpoint:dashboard-kpis
+      - entity:account
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-002-dashboard-data-aggregation.md
+      - planning-mds/features/F0099-example/README.md
+endpoints:
+  - id: endpoint:account-get
+    label: GET /accounts/{id}
+    method: GET
+    related_nodes:
+      - entity:account
+    route: /accounts/{id}
+  - id: endpoint:dashboard-kpis
+    label: GET /dashboard/kpis
+    method: GET
+    related_nodes:
+      - capability:dashboard-home
+    route: /dashboard/kpis
+entities:
+  - id: entity:account
+    label: Account
+    related_nodes:
+      - workflow:account-lifecycle
+    source_docs:
+      - planning-mds/architecture/data-model.md
+policy_rules:
+  - id: policy_rule:account-read
+    label: account:read
+    action: read
+    allowed_roles:
+      - role:admin
+    related_nodes:
+      - entity:account
+    resource: account

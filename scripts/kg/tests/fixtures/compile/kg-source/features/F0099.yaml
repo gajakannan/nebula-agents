@@ -1,0 +1,21 @@
+id: feature:F0099
+name: Example Feature
+path: planning-mds/features/F0099-example
+status: in-progress
+phase: Example Phase
+roadmap_section: Now
+rationale: Example why-now rationale.
+affects:
+  - capability:dashboard-home
+  - entity:account
+uses_schema:
+  - schema:account
+story_mappings:
+  - id: story:F0099-S0001
+    path: planning-mds/features/F0099-example/F0099-S0001-example.md
+    affects:
+      - capability:dashboard-home
+  - id: story:F0099-S0002
+    path: planning-mds/features/F0099-example/F0099-S0002-example.md
+    affects:
+      - entity:account

@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nebula.local/schemas/kg-source/node.schema.json",
+  "title": "KG Source Node Shard",
+  "description": "Structural envelope for a single node-shard record under kg-source/nodes/** or kg-source/policies/**. Per-kind required/allowed fields are enforced by scripts/kg/shard_validate.py (KIND_PROFILES); this schema enforces the shared shape and rejects unknown fields. Cross-concept references are IDs only; source_docs are logical or stable-root refs only.",
+  "type": "object",
+  "required": ["id"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "label": { "type": "string" },
+    "path": { "type": "string" },
+    "route": { "type": "string" },
+    "method": { "type": "string" },
+    "resource": { "type": "string" },
+    "action": { "type": "string" },
+    "key": { "type": "string" },
+    "event_type": { "type": "string" },
+    "notes": { "type": "string" },
+    "source_docs": { "type": "array", "items": { "type": "string" } },
+    "related_nodes": { "type": "array", "items": { "type": "string" } },
+    "related_entities": { "type": "array", "items": { "type": "string" } },
+    "allowed_roles": { "type": "array", "items": { "type": "string" } },
+    "states": { "type": "array" },
+    "rationale": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+policy_rules:
+  - id: policy_rule:run-mutate
+    label: run:mutate
+    resource: run
+    action: mutate
+    allowed_roles: [role:local-operator]
+    related_nodes:
+      - capability:tmux-session-lifecycle
+      - capability:local-run-registry
+    source_docs:
+      - F0001/PRD.md
+  - id: policy_rule:run-read
+    label: run:read
+    resource: run
+    action: read
+    allowed_roles: [role:local-operator, role:reviewer]
+    related_nodes:
+      - capability:read-only-run-queries
+      - entity:run-record
+    source_docs:
+      - F0001/PRD.md
+  - id: policy_rule:gate-decide
+    label: gate:decide
+    resource: gate
+    action: decide
+    allowed_roles: [role:local-operator]
+    related_nodes:
+      - capability:evidence-and-gate-control
+      - workflow:gate-decision
+    source_docs:
+      - F0001/F0001-S0004-gate-and-validator-dashboard.md
+  - id: policy_rule:transcript-configure
+    label: transcript:configure
+    resource: transcript
+    action: configure
+    allowed_roles: [role:local-operator]
+    related_nodes:
+      - capability:redacted-transcript-recovery
+      - workflow:transcript-capture
+    source_docs:
+      - F0001/F0001-S0005-native-session-transcript-and-recovery.md

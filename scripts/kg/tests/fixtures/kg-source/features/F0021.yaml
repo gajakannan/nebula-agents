@@ -1,0 +1,10 @@
+id: feature:F0021
+name: Communication Hub & Activity Capture
+path: planning-mds/features/archive/F0021-communication-hub-and-activity-capture
+status: archived-done
+phase: CRM Release MVP
+roadmap_section: Completed
+completion_state: Done and archived (2026-07-02, feature run 2026-07-01-9cee64f0) — 5 stories.
+archived_date: '2026-07-02'
+affects:
+  - entity:account

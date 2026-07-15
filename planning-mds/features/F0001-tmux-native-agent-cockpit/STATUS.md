@@ -1,7 +1,7 @@
 # F0001 - Tmux-Native Agent Cockpit - Status
 
 **Overall Status:** In Progress
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ## Planning Status
 
@@ -9,10 +9,10 @@
 |------|-------|----------|
 | Phase A requirements | Available | `PRD.md` and six validated story files |
 | Phase B architecture | Approved | `planning-mds/architecture/`, `planning-mds/security/f0001-authorization-model.md`, and `planning-mds/schemas/f0001-*.json` |
-| Ontology sync | Not applicable in this repository | `TRACKER-GOVERNANCE.md` records that `nebula-agents` has no populated self-hosted KG; raw planning/architecture artifacts remain authoritative |
+| Ontology sync | G7 passed | Compiled source/projections adopted; `planning-mds/kg-source/features/F0001.yaml`, 27 canonical nodes, 7 bindings, and passing reconciliation in run `2026-07-14-b885d64c` |
 | Phase B user approval | Approved at `2026-07-13T21:39:29-04:00` | Explicit operator response: `approve` |
 | Feature assembly plan | G0 validated | `feature-assembly-plan.md`; evidence run `2026-07-13-1cfbc5a0/g0-assembly-plan-validation.md` |
-| Implementation | G6 passed; G7 governance blocked | Candidate commit `99d2020c8ccaa23f370eef526c27867395981c7e`; remediation run `2026-07-14-b885d64c` |
+| Implementation | G7 passed; G8 authorized | Candidate commit `99d2020c8ccaa23f370eef526c27867395981c7e`; KG remediation and evidence in run `2026-07-14-b885d64c` |
 
 ## Story Checklist
 
@@ -47,14 +47,14 @@
 ## Cross-Cutting
 
 - [x] Story validator passes
-- [x] Tracker validator passes; the self-hosted KG bootstrap limitation remains documented for G7
+- [x] Tracker validator and compiled KG reconciliation pass
 - [x] No provider auth secrets are persisted
 - [x] Transcript redaction test coverage added
 - [x] Runtime validation evidence recorded
 - [x] README and getting-started docs updated
 - [x] G3 remediation R1-R10 validated and independently re-reviewed in run `2026-07-14-b885d64c`
 - [x] G4 approved explicitly by the operator on 2026-07-14
-- [ ] G7 compiled knowledge-graph reconciliation — blocked because this product has not adopted `kg-source` or `scripts/kg`; no graph evidence was fabricated
+- [x] G7 compiled knowledge-graph reconciliation — source/toolchain adoption, projections, symbols, reproducibility, drift, and tests pass
 
 ## Required Role Matrix
 
@@ -111,11 +111,11 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | Implementation completed | 2026-07-14 remediation complete; G3 passed with recommendations; G4 approved |
 | Closeout review date | Not reached |
 | Total stories | 6 |
-| Stories completed | 0 / 6 closed; 6 / 6 implemented and signed off; G7 governance resolution and final closeout pending |
+| Stories completed | 0 / 6 closed; 6 / 6 implemented and signed off; G8 final closeout pending |
 | Test count (unit + integration) | 514 passed; focused real-tmux test passed in 0.48 seconds |
 | Defects found during review | Linked remediation cycles opened H-01 through H-06; final Code and Security reviews independently closed all six |
 | Defects fixed before closeout | H-01 through H-06 have implementation, exact boundary regressions, and independent closure evidence |
-| Residual risks | Non-blocking Code/Security recommendations require G8 disposition. Separately, the assembly plan's High KG/bootstrap governance blocker prevents G8 until explicitly resolved. |
+| Residual risks | Non-blocking Code/Security recommendations require G8 disposition. The prior High KG/bootstrap blocker is closed. |
 
 ## Tracker Sync Checklist
 

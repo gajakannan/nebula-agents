@@ -1,0 +1,10 @@
+id: capability:redacted-transcript-recovery
+label: Redacted transcript recovery
+notes: Captures optional terminal transcripts through fail-closed redaction and uses safe transcript context for recovery.
+related_nodes:
+  - capability:tmux-session-lifecycle
+  - entity:runtime-event
+  - workflow:transcript-capture
+source_docs:
+  - F0001/F0001-S0005-native-session-transcript-and-recovery.md
+  - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md

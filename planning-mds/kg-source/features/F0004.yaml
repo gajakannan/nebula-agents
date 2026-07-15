@@ -1,0 +1,11 @@
+id: feature:F0004
+name: Reflective Learning Loop and Strategy Playbook
+path: planning-mds/features/F0004-reflective-learning-loop
+status: planned
+registry_section: Planned
+phase: Context Engineering
+roadmap_section: Later
+roadmap_order: 1
+rationale: Closes the context-engineering loop (learn -> Write -> Select). Needs run evidence/telemetry from F0003 evidence store before reflection has useful input. Ships behind a default-off flag, candidate-only at first.
+coverage_excluded:
+  reason: Planned feature with no implementation to bind; canonical mappings are deferred until its architecture and code are activated.

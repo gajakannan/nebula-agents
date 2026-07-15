@@ -1,0 +1,292 @@
+version: 1
+status: generated
+coverage_note: Canonical solution nodes are compiled from role-owned shards. Initial coverage includes
+  the F0001 runtime and the adopted F0006 compiled-projection capability.
+adrs:
+  - id: adr:001-f0001-local-tmux-runtime
+    label: F0001 local tmux runtime
+    path: planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
+    related_nodes:
+      - capability:tmux-session-lifecycle
+      - workflow:local-agent-session
+  - id: adr:002-f0001-runtime-persistence
+    label: F0001 runtime persistence
+    path: planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+    related_nodes:
+      - capability:local-run-registry
+      - entity:run-record
+      - entity:runtime-event
+  - id: adr:003-f0001-provider-execution-boundary
+    label: F0001 provider execution boundary
+    path: planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:tmux-session-lifecycle
+  - id: adr:004-f0001-transcript-redaction
+    label: F0001 transcript redaction
+    path: planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
+    related_nodes:
+      - capability:redacted-transcript-recovery
+      - workflow:transcript-capture
+capabilities:
+  - id: capability:compiled-kg-projection
+    label: Compiled knowledge-graph projection
+    notes: Compiles role-owned knowledge-graph shards into deterministic projections and fenced tracker
+      tables, with drift and reproducibility enforcement.
+    source_docs:
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
+      - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
+  - id: capability:evidence-and-gate-control
+    label: Evidence and gate control
+    notes: Watches governed evidence, records validator results, and applies authorized gate decisions
+      without bypassing lifecycle rules.
+    related_nodes:
+      - capability:local-run-registry
+      - entity:runtime-event
+      - workflow:gate-decision
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+  - id: capability:local-run-registry
+    label: Local run registry
+    notes: Persists typed run state and append-only runtime events in the product-local filesystem.
+    related_nodes:
+      - entity:run-record
+      - entity:runtime-event
+      - schema:f0001-run-record
+      - schema:f0001-runtime-event
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+  - id: capability:native-session-preflight
+    label: Native session preflight
+    notes: Validates feature resolution, provider capability, executable availability, authenticated local
+      CLI reuse, and launch policy before creating a run.
+    related_nodes:
+      - capability:tmux-session-lifecycle
+      - entity:run-record
+      - schema:f0001-launch-descriptor
+      - schema:f0001-preflight-result
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+  - id: capability:read-only-run-queries
+    label: Read-only run queries
+    notes: Exposes status, review, audit, and recovery information through CLI and terminal UI views without
+      mutating run state.
+    related_nodes:
+      - capability:local-run-registry
+      - entity:run-record
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+  - id: capability:redacted-transcript-recovery
+    label: Redacted transcript recovery
+    notes: Captures optional terminal transcripts through fail-closed redaction and uses safe transcript
+      context for recovery.
+    related_nodes:
+      - capability:tmux-session-lifecycle
+      - entity:runtime-event
+      - workflow:transcript-capture
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+  - id: capability:tmux-session-lifecycle
+    label: Tmux session lifecycle
+    notes: Launches native provider CLIs in governed tmux sessions and supports attach, detach, recovery,
+      and lifecycle reconciliation.
+    related_nodes:
+      - capability:local-run-registry
+      - capability:native-session-preflight
+      - workflow:local-agent-session
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+entities:
+  - id: entity:run-record
+    label: Run record
+    notes: Durable current-state record for one local provider run, including ownership, gate, transcript,
+      evidence, and recovery metadata.
+    related_nodes:
+      - entity:runtime-event
+      - schema:f0001-run-record
+      - workflow:local-agent-session
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+  - id: entity:runtime-event
+    label: Runtime event
+    notes: Append-only audit event describing a run lifecycle transition, validator observation, gate
+      decision, or transcript change.
+    related_nodes:
+      - entity:run-record
+      - schema:f0001-runtime-event
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
+policy_rules:
+  - id: policy_rule:gate-decide
+    label: gate:decide
+    action: decide
+    allowed_roles:
+      - role:local-operator
+    related_nodes:
+      - capability:evidence-and-gate-control
+      - workflow:gate-decision
+    resource: gate
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+  - id: policy_rule:run-mutate
+    label: run:mutate
+    action: mutate
+    allowed_roles:
+      - role:local-operator
+    related_nodes:
+      - capability:local-run-registry
+      - capability:tmux-session-lifecycle
+    resource: run
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+  - id: policy_rule:run-read
+    label: run:read
+    action: read
+    allowed_roles:
+      - role:local-operator
+      - role:reviewer
+    related_nodes:
+      - capability:read-only-run-queries
+      - entity:run-record
+    resource: run
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+  - id: policy_rule:transcript-configure
+    label: transcript:configure
+    action: configure
+    allowed_roles:
+      - role:local-operator
+    related_nodes:
+      - capability:redacted-transcript-recovery
+      - workflow:transcript-capture
+    resource: transcript
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+roles:
+  - id: role:local-operator
+    label: LocalOperator
+    notes: Authenticated local user who owns a run and may launch, attach, recover, configure transcripts,
+      and decide gates for that run.
+    related_nodes:
+      - entity:run-record
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+  - id: role:reviewer
+    label: Reviewer
+    notes: Read-only reviewer who may inspect run status, evidence, audit events, and redacted transcript
+      state without mutating the run.
+    related_nodes:
+      - capability:read-only-run-queries
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/PRD.md
+schemas:
+  - id: schema:f0001-launch-descriptor
+    label: F0001 launch descriptor
+    path: planning-mds/schemas/f0001-launch-descriptor.schema.json
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:tmux-session-lifecycle
+  - id: schema:f0001-local-policy
+    label: F0001 local policy
+    path: planning-mds/schemas/f0001-local-policy.schema.json
+    related_nodes:
+      - capability:evidence-and-gate-control
+      - capability:native-session-preflight
+  - id: schema:f0001-preflight-result
+    label: F0001 preflight result
+    path: planning-mds/schemas/f0001-preflight-result.schema.json
+    related_nodes:
+      - capability:native-session-preflight
+  - id: schema:f0001-run-record
+    label: F0001 run record
+    path: planning-mds/schemas/f0001-run-record.schema.json
+    related_nodes:
+      - capability:local-run-registry
+      - entity:run-record
+  - id: schema:f0001-runtime-event
+    label: F0001 runtime event
+    path: planning-mds/schemas/f0001-runtime-event.schema.json
+    related_nodes:
+      - capability:local-run-registry
+      - entity:runtime-event
+workflows:
+  - id: workflow:gate-decision
+    label: Gate decision lifecycle
+    related_nodes:
+      - capability:evidence-and-gate-control
+      - entity:run-record
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+    states:
+      - id: state:gate-decision:pending
+        label: Pending
+        transitions_to:
+          - state:gate-decision:approved
+          - state:gate-decision:changes-requested
+          - state:gate-decision:blocked
+      - id: state:gate-decision:approved
+        label: Approved
+      - id: state:gate-decision:changes-requested
+        label: Changes requested
+        transitions_to:
+          - state:gate-decision:pending
+      - id: state:gate-decision:blocked
+        label: Blocked
+        transitions_to:
+          - state:gate-decision:pending
+  - id: workflow:local-agent-session
+    label: Local agent session lifecycle
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:tmux-session-lifecycle
+      - entity:run-record
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
+    states:
+      - id: state:local-agent-session:preflight
+        label: Preflight
+        transitions_to:
+          - state:local-agent-session:active
+      - id: state:local-agent-session:active
+        label: Active
+        transitions_to:
+          - state:local-agent-session:recoverable
+          - state:local-agent-session:completed
+      - id: state:local-agent-session:recoverable
+        label: Recoverable
+        transitions_to:
+          - state:local-agent-session:active
+          - state:local-agent-session:failed
+      - id: state:local-agent-session:completed
+        label: Completed
+      - id: state:local-agent-session:failed
+        label: Failed
+  - id: workflow:transcript-capture
+    label: Transcript capture lifecycle
+    related_nodes:
+      - capability:redacted-transcript-recovery
+      - entity:run-record
+    source_docs:
+      - planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+    states:
+      - id: state:transcript-capture:disabled
+        label: Disabled
+        transitions_to:
+          - state:transcript-capture:enabled
+      - id: state:transcript-capture:enabled
+        label: Enabled
+        transitions_to:
+          - state:transcript-capture:disabled
+          - state:transcript-capture:failed-closed
+      - id: state:transcript-capture:failed-closed
+        label: Failed closed
+        transitions_to:
+          - state:transcript-capture:disabled

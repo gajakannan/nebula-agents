@@ -1,0 +1,4 @@
+adrs:
+  - id: adr:002
+    label: Dashboard Data Aggregation
+    path: planning-mds/architecture/decisions/ADR-002-dashboard-data-aggregation.md

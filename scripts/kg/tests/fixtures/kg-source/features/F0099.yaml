@@ -1,0 +1,13 @@
+id: feature:F0099
+name: Example Feature
+path: planning-mds/features/F0099-example
+status: in-progress
+phase: Example Phase
+roadmap_section: Now
+rationale: Foundational example slice; unblocks the downstream examples.
+affects:
+  - capability:dashboard-home
+depends_on:
+  - feature:F0004
+governed_by:
+  - adr:002

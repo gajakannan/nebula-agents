@@ -1,0 +1,17 @@
+id: workflow:transcript-capture
+label: Transcript capture lifecycle
+related_nodes:
+  - capability:redacted-transcript-recovery
+  - entity:run-record
+source_docs:
+  - F0001/F0001-S0005-native-session-transcript-and-recovery.md
+states:
+  - id: state:transcript-capture:disabled
+    label: Disabled
+    transitions_to: [state:transcript-capture:enabled]
+  - id: state:transcript-capture:enabled
+    label: Enabled
+    transitions_to: [state:transcript-capture:disabled, state:transcript-capture:failed-closed]
+  - id: state:transcript-capture:failed-closed
+    label: Failed closed
+    transitions_to: [state:transcript-capture:disabled]
