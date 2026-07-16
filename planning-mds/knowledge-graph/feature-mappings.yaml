@@ -22,6 +22,10 @@ coverage:
     - id: feature:F0007
       path: planning-mds/features/F0007-spec-driven-orchestration-and-prompt-compilation
       reason: Framework-hardening feature is planned but not yet implemented in this product repository.
+    - id: feature:F0008
+      path: planning-mds/features/F0008-agent-cockpit-landing-shell
+      reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
+        architecture and code are activated.
 features:
   - status: archived-done
     id: feature:F0001

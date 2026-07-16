@@ -35,6 +35,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | [F0004 — Reflective Learning Loop and Strategy Playbook](./F0004-reflective-learning-loop/README.md) | Planned | Closes the context-engineering loop (learn -> Write -> Select). Needs run evidence/telemetry from F0003 evidence store before reflection has useful input. Ships behind a default-off flag, candidate-only at first. |
+| [F0008 — Agent Cockpit Landing Shell](./F0008-agent-cockpit-landing-shell/README.md) | Planned | F0001 delivered a working curses cockpit but no front door — it boots straight into a session table, has no landing/navigation home, and delegates all free-form input to the native provider. F0008 adds a keyboard-first landing shell (select-driven home, `/` command palette, workspace health panel) over F0001's existing application services, gating not-yet-built surfaces gracefully, while preserving the tmux-native boundary. |
 <!-- generated:end roadmap:later -->
 
 ## Abandoned

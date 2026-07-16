@@ -1,0 +1,12 @@
+id: feature:F0008
+name: Agent Cockpit Landing Shell
+path: planning-mds/features/F0008-agent-cockpit-landing-shell
+status: planned
+registry_section: Planned
+phase: Operator Experience
+roadmap_section: Later
+roadmap_order: 2
+rationale: F0001 delivered a working curses cockpit but no front door — it boots straight into a session table, has no landing/navigation home, and delegates all free-form input to the native provider. F0008 adds a keyboard-first landing shell (select-driven home, `/` command palette, workspace health panel) over F0001's existing application services, gating not-yet-built surfaces gracefully, while preserving the tmux-native boundary.
+validation_gate: F0001 application services are reused unchanged; the shell adds no orchestration, provider SDK, or embedded chat; surfaces owned by F0003/F0006/F0007 degrade to explicit "not available" states rather than dead ends; the native provider remains the source of truth via attach.
+coverage_excluded:
+  reason: Planned feature with no implementation to bind; canonical mappings are deferred until its architecture and code are activated.

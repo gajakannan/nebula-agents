@@ -59,6 +59,9 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
   - [F0007-S0008 - Shared policy consumers and prose thinning](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0008-shared-policy-consumers-and-prose-thinning.md) - Not Started
   - [F0007-S0009 - Governed rollout and compatibility pilot](features/F0007-spec-driven-orchestration-and-prompt-compilation/F0007-S0009-governed-rollout-and-compatibility-pilot.md) - Not Started
 
+- [F0008 - Agent Cockpit Landing Shell](features/F0008-agent-cockpit-landing-shell/README.md) - Planned / Later
+  - _Stories not yet authored (core scaffold; Phase A PRD only). See [PRD](features/F0008-agent-cockpit-landing-shell/PRD.md) &rarr; Proposed Stories._
+
 ## Validation Policy
 
 - Product planning updates must keep `features/REGISTRY.md`, `features/ROADMAP.md`, `features/STORY-INDEX.md`, and this blueprint synchronized.

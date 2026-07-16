@@ -1,6 +1,6 @@
 # Feature Registry
 
-**Next Available Feature Number:** F0008
+**Next Available Feature Number:** F0009
 
 **Planning Views:**
 - Roadmap sequencing (`Now / Next / Later`): `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
@@ -33,6 +33,7 @@ Replaces the legacy `Abandoned Features` section. Retired features are registry 
 | F0002 | Managed Agent Orchestration | Planned | Future Platform | `F0002-managed-agent-orchestration/` |
 | F0003 | Local Agent Runtime Control Plane | Planned | Platform Hardening | `F0003-local-agent-runtime-control-plane/` |
 | F0004 | Reflective Learning Loop and Strategy Playbook | Planned | Context Engineering | `F0004-reflective-learning-loop/` |
+| F0008 | Agent Cockpit Landing Shell | Planned | Operator Experience | `F0008-agent-cockpit-landing-shell/` |
 <!-- generated:end registry:planned -->
 
 ## Archived Features
