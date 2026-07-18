@@ -12,7 +12,7 @@
 | F0007-S0003 | Run initialization and product scaffolding | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0004 | Typed command runtime and complete telemetry | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0006 | Generated evidence prompts and drift gate | C | [ ] Not Started |
+| F0007-S0006 | Generated evidence prompts and drift gate | C | [~] Machinery implemented (renderer + drift/semantic gate + CI wiring + `feature` pilot); remaining-action rollout & semantic-equivalence cutover of the 24 hand-written prompts are human-gated (PM + role owners) and deferred |
 | F0007-S0007 | Version-aware validator convergence | C | [ ] Not Started |
 | F0007-S0008 | Shared policy consumers and prose thinning | C | [ ] Not Started |
 | F0007-S0009 | Governed rollout and compatibility pilot | D | [ ] Not Started |

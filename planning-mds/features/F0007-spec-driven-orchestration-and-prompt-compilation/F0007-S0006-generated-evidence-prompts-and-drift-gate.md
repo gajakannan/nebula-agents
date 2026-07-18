@@ -76,19 +76,35 @@ notes; remaining actions follow after its semantic review.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Select Jinja2 or a stdlib renderer based on feature-pair prototype complexity and dependency cost.
+- [x] Select Jinja2 or a stdlib renderer based on feature-pair prototype complexity and dependency cost.
+  **Resolved:** stdlib (plain Python string assembly, two encodings). Zero new dependency, byte-stable,
+  and it never evaluates template data as code or shell content (satisfying the NFR directly). Two
+  render functions are clearer than one template with pervasive variant conditionals.
 
 **Assumptions:**
 - Two renderer templates are clearer than one template with pervasive variant conditionals.
 
 ## Definition of Done
 
-- [ ] Feature prompt pair generated and manually accepted for semantic equivalence.
-- [ ] Remaining declared variants generated with snapshot coverage.
-- [ ] Drift check and independent semantic checks wired to CI.
-- [ ] Direct-edit and missing-branch negative tests pass.
-- [ ] Generated-file resolution workflow documented for contributors.
-- [ ] Semantic review decision appears in audit evidence.
+- [~] Feature prompt pair generated and manually accepted for semantic equivalence.
+  Generated + committed under `agents/templates/prompts/evidence-contract/generated/`
+  (`feature-operator-friendly.md`, `feature-automation-safe.md`). **Human semantic-equivalence
+  acceptance vs. the legacy hand-written pair, and cutover, remain deferred** (PM + affected role
+  owners per Role-Based Visibility) — not self-certifiable.
+- [ ] Remaining declared variants generated with snapshot coverage. Deferred: only the `feature`
+  spec exists today; remaining action specs are authored incrementally, then generated (rollout).
+- [x] Drift check and independent semantic checks wired to CI. (`render-prompts.py --check`;
+  `prompt_drift` gate in `lifecycle-stage.yaml`; semantic checks: missing package ref, forbidden
+  run-id scheme, unresolved placeholder, unknown scope, undeclared variant file)
+- [x] Direct-edit and missing-branch negative tests pass. (`test_render_prompts.py` — drift on a
+  hand edit, unknown scope, unresolved placeholder, forbidden run-id scheme, missing package ref)
+- [x] Generated-file resolution workflow documented for contributors.
+  (`agents/templates/prompts/evidence-contract/generated/README.md`)
+- [ ] Semantic review decision appears in audit evidence. Deferred with the human-gated cutover above.
+
+**Increment note:** S0006 delivers the generation + drift/semantic machinery and the `feature`
+pilot pair. The destructive cutover of the 24 hand-written prompts and the multi-action rollout are
+human-gated (semantic-equivalence sign-off) and intentionally out of this automated increment.
 
 ## Review Provenance
 

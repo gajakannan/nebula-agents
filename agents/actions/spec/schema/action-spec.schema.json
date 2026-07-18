@@ -45,6 +45,12 @@
     },
     "gates": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/gate"}},
     "severity_gate": {"enum": ["standard", "review-family", "none"]},
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"enum": ["operator-friendly", "automation-safe"]},
+      "description": "Prompt variants render-prompts.py generates for this action (default: both)."
+    },
     "forbidden": {"type": "array", "items": {"type": "string"}},
     "stop_conditions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
     "conflict_resolution": {"type": "array"},

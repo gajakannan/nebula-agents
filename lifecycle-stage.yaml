@@ -16,30 +16,40 @@ stages:
       - boundary_genericness
       - skill_regression
       - agent_map_schema
+      - prompt_drift
   planning:
     description: Framework-side planning of new actions, roles, or templates.
     required_gates:
       - boundary_genericness
       - skill_regression
       - agent_map_schema
+      - prompt_drift
   implementation:
     description: Framework-side implementation of new actions, roles, or templates.
     required_gates:
       - boundary_genericness
       - skill_regression
       - agent_map_schema
+      - prompt_drift
   release-readiness:
     description: Framework release hardening before publishing a new tagged version.
     required_gates:
       - boundary_genericness
       - skill_regression
       - agent_map_schema
+      - prompt_drift
 gates:
   boundary_genericness:
     description: Prevent solution-specific leakage into generic framework agents. Embedded denylist is authoritative; --glossary override is optional.
     command:
       - python3
       - agents/scripts/validate-genericness.py
+  prompt_drift:
+    description: Committed generated evidence-contract prompts must match what render-prompts.py produces from the action policy (F0007-S0006). Fails on drift or a hand edit to a generated file.
+    command:
+      - python3
+      - agents/scripts/render-prompts.py
+      - --check
   skill_regression:
     description: Validate skill metadata, structure quality, and routing regressions.
     command:

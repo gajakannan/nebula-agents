@@ -210,6 +210,8 @@ gates:
 
 severity_gate: standard
 
+variants: [operator-friendly, automation-safe]
+
 forbidden:
   - "Authoring kg-source shards during PM closeout (G7 owns shaping; G8 verifies)."
   - "Running gate validation commands directly instead of through the gate driver."
