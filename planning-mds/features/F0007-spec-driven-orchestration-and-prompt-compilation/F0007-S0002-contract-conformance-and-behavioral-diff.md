@@ -78,19 +78,27 @@ changes before any consumer switches sources.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Decide whether the behavioral diff is Markdown, JSON, or both; CI requires a machine-readable form.
+- [x] Decide whether the behavioral diff is Markdown, JSON, or both; CI requires a machine-readable form.
+  **Resolved:** both — `validate_action_specs.py --contract-diff` emits JSON by default (the
+  machine-readable CI form); `--format md` renders a human-review table.
 
 **Assumptions:**
 - Existing validator tests can seed most historical fixtures without copying entire product repositories.
 
 ## Definition of Done
 
-- [ ] Fixture index covers every existing effective-date cutover.
-- [ ] Independent invariants fail on seeded weakening examples.
-- [ ] Behavioral diff distinguishes semantic changes from YAML reorder.
-- [ ] Compatibility classification and authorization rules documented.
-- [ ] CI-ready machine-readable output implemented.
-- [ ] Audit report contains no secret-bearing fixture content.
+- [x] Fixture index covers every existing effective-date cutover. (`conformance-baseline.yaml`,
+  5 cutovers 2026-05-19..2026-07-11 with expected verdict, requirements, artifacts, model hash)
+- [x] Independent invariants fail on seeded weakening examples. (`contract-conformance.py`;
+  `test_contract_conformance.py` — removing G7 artifact fails while the spec stays schema-valid)
+- [x] Behavioral diff distinguishes semantic changes from YAML reorder.
+  (`validate_action_specs.py --contract-diff`; `test_contract_diff.py` reorder → identical)
+- [x] Compatibility classification and authorization rules documented. (diff `compatibility_class`
+  + `behavioral_change_without_version_bump` / history-immutability rules; baseline audit-log
+  authorization in `conformance-baseline.yaml`)
+- [x] CI-ready machine-readable output implemented. (`--contract-diff` JSON default; `--json` conformance)
+- [x] Audit report contains no secret-bearing fixture content. (findings expose rule/path/message only;
+  test asserts the shape; conformance is read-only)
 
 ## Review Provenance
 

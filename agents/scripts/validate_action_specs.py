@@ -22,9 +22,13 @@ data-only. Output is deterministic for identical inputs.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -486,6 +490,275 @@ def resolve_manifest(policy: Policy, *, version: str | None = None,
 
 
 # --------------------------------------------------------------------------- #
+# Behavioral contract diff (S0002)
+# --------------------------------------------------------------------------- #
+# The diff compares the *behavioral* meaning of two policy states, not their
+# bytes: mappings are key-sorted and order-insensitive lists (artifacts,
+# mutates, requirements) are sorted, so a pure YAML reorder yields an empty diff.
+# Ordered lists (gates, operations, argv) keep their order because order is
+# behavior. Compatibility is derived from the change, never trusted from a label,
+# so a breaking change cannot be mislabeled non-breaking; the policy rule
+# "every behavioral change to active policy bumps the version" (and history is
+# immutable/append-only) is what rejects an under-versioned change.
+
+REQUIREMENT_KEYS = frozenset({
+    "security_scans_required", "kg_reconciliation_required",
+    "kg_generated_regen_required", "compile_projection_contract",
+    "required_security_scan_classes",
+})
+EMPTY_MODEL: dict[str, Any] = {"active_version": None, "shared": {}, "actions": {}, "history": {}}
+
+
+def _op_fingerprint(op: Any) -> dict[str, Any]:
+    if not isinstance(op, dict) or len(op) != 1:
+        return {"kind": "invalid", "raw": repr(op)}
+    kind, body = next(iter(op.items()))
+    body = body if isinstance(body, dict) else {}
+    if kind == "run":
+        return {"kind": "run", "argv": list(body.get("argv", []) or []), "cwd": body.get("cwd"),
+                "timeout_seconds": body.get("timeout_seconds"),
+                "expected_artifacts": sorted(body.get("expected_artifacts", []) or []),
+                "mutates": sorted(body.get("mutates", []) or [])}
+    if kind == "checkpoint":
+        return {"kind": "checkpoint", "id": body.get("id"),
+                "requires": sorted(body.get("requires", []) or []),
+                "produces": sorted(body.get("produces", []) or [])}
+    if kind == "write":
+        return {"kind": "write", "artifact": body.get("artifact"), "after": body.get("after"),
+                "mutates": sorted(body.get("mutates", []) or [])}
+    return {"kind": kind}
+
+
+def _shared_model(shared: dict[str, Any] | None) -> dict[str, Any]:
+    shared = shared or {}
+    reqs = dict(shared.get("requirements", {}) or {})
+    if isinstance(reqs.get("required_security_scan_classes"), list):
+        reqs["required_security_scan_classes"] = sorted(reqs["required_security_scan_classes"])
+    return {
+        "coverage_min_pct": shared.get("coverage_min_pct"),
+        "run_id_format": shared.get("run_id_format"),
+        "run_id_forbidden": sorted(shared.get("run_id_forbidden", []) or []),
+        "base_run_files": sorted(shared.get("base_run_files", []) or []),
+        "commands_log_fields": list((shared.get("commands_log_schema") or {}).get("fields", []) or []),
+        "requirements": reqs,
+    }
+
+
+def _action_model(spec: dict[str, Any]) -> dict[str, Any]:
+    # Gates are keyed by id so per-gate/artifact/operation changes diff granularly;
+    # gate_order is an ordered list so a reorder (which is behavior) still surfaces.
+    contract = spec.get("contract", {}) if isinstance(spec.get("contract"), dict) else {}
+    gate_order = []
+    gates: dict[str, Any] = {}
+    for g in spec.get("gates", []) or []:
+        if not isinstance(g, dict):
+            continue
+        gid = str(g.get("id"))
+        gate_order.append(gid)
+        gates[gid] = {
+            "role": g.get("role"),
+            "artifacts": sorted(g.get("artifacts", []) or []),
+            "constraints": sorted(json.dumps(c, sort_keys=True) for c in g.get("constraints", []) or []),
+            "operations": [_op_fingerprint(o) for o in g.get("operations", []) or []],
+        }
+    return {
+        "scope": contract.get("scope"),
+        "severity_gate": spec.get("severity_gate"),
+        "stop_conditions": sorted(spec.get("stop_conditions", []) or []),
+        "forbidden": sorted(spec.get("forbidden", []) or []),
+        "gate_order": gate_order,
+        "gates": gates,
+    }
+
+
+def bundle_model(bundle: Bundle) -> dict[str, Any]:
+    data = bundle.data
+    shared = data.get("shared", {}) if isinstance(data.get("shared"), dict) else {}
+    actions = {}
+    for name, matrix in sorted((data.get("actions", {}) or {}).items()):
+        if not isinstance(matrix, dict):
+            continue
+        gates = [{"id": g.get("id"), "role": g.get("role"),
+                  "required_artifacts": sorted(g.get("required_artifacts", []) or [])}
+                 for g in matrix.get("gates", []) or [] if isinstance(g, dict)]
+        actions[name] = {"scope": matrix.get("scope"), "gates": gates}
+    return {"version": bundle.version, "effective_from": bundle.effective_from.isoformat(),
+            "shared": _shared_model(shared), "actions": actions}
+
+
+def _hash_model(model: Any) -> str:
+    return hashlib.sha256(json.dumps(model, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def build_behavioral_model(policy: Policy) -> dict[str, Any]:
+    contract = policy.contract or {}
+    return {
+        "active_version": contract.get("active_version"),
+        "shared": _shared_model(contract.get("shared", {})),
+        "actions": {name: _action_model(spec) for name, spec in sorted(policy.actions.items())},
+        "history": {b.version: _hash_model(bundle_model(b))
+                    for b in sorted(policy.bundles, key=_bundle_sort_key)},
+    }
+
+
+def _deep_diff(bval: Any, hval: Any, path: list[str], out: list[dict[str, Any]]) -> None:
+    if isinstance(bval, dict) and isinstance(hval, dict):
+        for key in sorted(set(bval) | set(hval), key=str):
+            if key not in bval:
+                out.append({"path": path + [str(key)], "kind": "added", "base": None, "head": hval[key]})
+            elif key not in hval:
+                out.append({"path": path + [str(key)], "kind": "removed", "base": bval[key], "head": None})
+            else:
+                _deep_diff(bval[key], hval[key], path + [str(key)], out)
+    elif bval != hval:
+        out.append({"path": path, "kind": "changed", "base": bval, "head": hval})
+
+
+def _classify(entry: dict[str, Any]) -> str:
+    path, kind = entry["path"], entry["kind"]
+    top = path[0] if path else ""
+    leaf = path[-1] if path else ""
+    if top == "history":
+        return {"added": "additive", "removed": "breaking", "changed": "breaking"}[kind]
+    if top == "active_version":
+        return "informational"
+    # active policy (shared / actions)
+    if kind == "removed":
+        return "breaking"
+    requirement_touch = leaf in REQUIREMENT_KEYS or "requirements" in path
+    artifact_touch = any(p in {"artifacts", "required_artifacts", "expected_artifacts", "operations"} for p in path)
+    threshold_touch = leaf == "coverage_min_pct"
+    if kind == "added":
+        if requirement_touch or artifact_touch or leaf == "gates" or "gates" in path:
+            return "breaking"
+        return "additive"
+    # changed
+    if requirement_touch or artifact_touch or threshold_touch or "gates" in path:
+        return "breaking"
+    return "breaking"  # any other active-policy change is still compat-impacting
+
+
+def diff_models(base: dict[str, Any], head: dict[str, Any],
+                base_ref: str = "base", head_ref: str = "head") -> dict[str, Any]:
+    raw: list[dict[str, Any]] = []
+    _deep_diff(base, head, [], raw)
+
+    changes = []
+    for entry in raw:
+        changes.append({
+            "path": "/".join(entry["path"]),
+            "kind": entry["kind"],
+            "compatibility": _classify(entry),
+            "base": entry["base"],
+            "head": entry["head"],
+        })
+    changes.sort(key=lambda c: (c["path"], c["kind"]))
+
+    active_changed = any(c["path"].split("/")[0] in {"shared", "actions"} for c in changes)
+    version_bumped = base.get("active_version") != head.get("active_version")
+    history_mutated = [c for c in changes
+                       if c["path"].startswith("history/") and c["kind"] in {"changed", "removed"}]
+
+    violations = []
+    if active_changed and not version_bumped:
+        violations.append({
+            "rule": "behavioral_change_without_version_bump",
+            "detail": "active policy changed but active_version was not bumped; every "
+                      "compatibility-impacting change must publish a new policy version",
+        })
+    for c in history_mutated:
+        rule = "historical_bundle_mutated" if c["kind"] == "changed" else "historical_bundle_removed"
+        violations.append({"rule": rule, "detail": f"published bundle {c['path']} was {c['kind']}; "
+                                                    "history is immutable and append-only"})
+
+    if violations or any(c["compatibility"] == "breaking" for c in changes):
+        compat = "breaking"
+    elif changes:
+        compat = "additive"
+    else:
+        compat = "identical"
+
+    return {
+        "ok": not violations,
+        "base_ref": base_ref,
+        "head_ref": head_ref,
+        "compatibility_class": compat,
+        "requires_version_bump": active_changed,
+        "version_bumped": version_bumped,
+        "added": [c for c in changes if c["kind"] == "added"],
+        "removed": [c for c in changes if c["kind"] == "removed"],
+        "changed": [c for c in changes if c["kind"] == "changed"],
+        "violations": violations,
+    }
+
+
+def _git(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True)
+
+
+def _materialize_spec_at_ref(ref: str, repo: Path,
+                             spec_relpath: str = "agents/actions/spec") -> Path | None:
+    """Check out the policy files as they existed at ``ref`` into a temp dir.
+    Returns None when the spec path did not exist at that ref (e.g. before S0001)."""
+    listed = _git(["ls-tree", "-r", "--name-only", ref, "--", spec_relpath], repo)
+    if listed.returncode != 0 or not listed.stdout.strip():
+        return None
+    tmp = Path(tempfile.mkdtemp(prefix="f0007-diff-"))
+    for rel in listed.stdout.splitlines():
+        rel = rel.strip()
+        if not rel:
+            continue
+        show = _git(["show", f"{ref}:{rel}"], repo)
+        if show.returncode != 0:
+            continue
+        dst = tmp / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(show.stdout, encoding="utf-8")
+    return tmp / spec_relpath
+
+
+def _model_at_ref(ref: str, repo: Path) -> dict[str, Any]:
+    spec_dir = _materialize_spec_at_ref(ref, repo)
+    if spec_dir is None:
+        return dict(EMPTY_MODEL)
+    try:
+        model = build_behavioral_model(load_policy(spec_dir, Result()))
+    finally:
+        shutil.rmtree(spec_dir.parents[2], ignore_errors=True)
+    return model
+
+
+def contract_diff(base_ref: str, head_ref: str, repo: Path = FRAMEWORK_ROOT) -> dict[str, Any]:
+    return diff_models(_model_at_ref(base_ref, repo), _model_at_ref(head_ref, repo),
+                       base_ref, head_ref)
+
+
+def diff_spec_dirs(base_dir: Path, head_dir: Path) -> dict[str, Any]:
+    """Diff two on-disk spec directories (used by tests without git plumbing)."""
+    base = build_behavioral_model(load_policy(base_dir, Result())) if base_dir else dict(EMPTY_MODEL)
+    head = build_behavioral_model(load_policy(head_dir, Result())) if head_dir else dict(EMPTY_MODEL)
+    return diff_models(base, head, str(base_dir), str(head_dir))
+
+
+def render_diff_md(diff: dict[str, Any]) -> str:
+    lines = [f"# Behavioral contract diff: `{diff['base_ref']}` -> `{diff['head_ref']}`", ""]
+    lines.append(f"- Compatibility: **{diff['compatibility_class']}**")
+    lines.append(f"- Requires version bump: **{diff['requires_version_bump']}** "
+                 f"(version bumped: {diff['version_bumped']})")
+    lines.append(f"- Result: **{'OK' if diff['ok'] else 'REJECTED'}**")
+    for label in ("added", "removed", "changed"):
+        rows = diff[label]
+        if not rows:
+            continue
+        lines += ["", f"## {label.capitalize()} ({len(rows)})", "", "| path | compatibility |", "|------|---------------|"]
+        lines += [f"| `{r['path']}` | {r['compatibility']} |" for r in rows]
+    if diff["violations"]:
+        lines += ["", "## Violations", ""]
+        lines += [f"- **{v['rule']}** — {v['detail']}" for v in diff["violations"]]
+    return "\n".join(lines)
+
+
+# --------------------------------------------------------------------------- #
 # Reporting
 # --------------------------------------------------------------------------- #
 def build_report(result: Result, policy: Policy) -> dict[str, Any]:
@@ -569,7 +842,21 @@ def main(argv: list[str] | None = None) -> int:
                         help="Resolve a manifest's policy version instead of validating.")
     parser.add_argument("--version", help="Explicit contract_version to resolve.")
     parser.add_argument("--effective-date", help="Legacy manifest effective date (YYYY-MM-DD).")
+    parser.add_argument("--contract-diff", metavar="BASE..HEAD",
+                        help="Behavioral policy diff between two git refs (e.g. origin/main..HEAD).")
+    parser.add_argument("--format", choices=["json", "md"], default="json",
+                        help="Output format for --contract-diff (default: json).")
     args = parser.parse_args(argv)
+
+    if args.contract_diff:
+        if ".." not in args.contract_diff:
+            sys.stderr.write("--contract-diff expects BASE..HEAD\n")
+            return 2
+        base_ref, head_ref = args.contract_diff.split("..", 1)
+        diff = contract_diff(base_ref or "HEAD", head_ref or "HEAD")
+        print(render_diff_md(diff) if args.format == "md"
+              else json.dumps(diff, indent=2, sort_keys=True))
+        return 0 if diff["ok"] else 1
 
     if args.resolve_manifest:
         result = Result()

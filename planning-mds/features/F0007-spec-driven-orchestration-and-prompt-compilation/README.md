@@ -45,7 +45,7 @@ independent historical fixtures + semantic invariants
 | ID | Title | Status |
 |----|-------|--------|
 | [F0007-S0001](./F0007-S0001-versioned-action-policy-and-schema.md) | Versioned action policy and schema | Implemented (pending signoff) |
-| [F0007-S0002](./F0007-S0002-contract-conformance-and-behavioral-diff.md) | Contract conformance and behavioral diff | Not Started |
+| [F0007-S0002](./F0007-S0002-contract-conformance-and-behavioral-diff.md) | Contract conformance and behavioral diff | Implemented (pending signoff) |
 | [F0007-S0003](./F0007-S0003-run-initialization-and-product-scaffolding.md) | Run initialization and product scaffolding | Not Started |
 | [F0007-S0004](./F0007-S0004-typed-command-runtime-and-telemetry.md) | Typed command runtime and complete telemetry | Not Started |
 | [F0007-S0005](./F0007-S0005-gate-driver-checkpoints-and-severity-policy.md) | Gate driver, durable checkpoints, and severity policy | Not Started |
@@ -55,7 +55,7 @@ independent historical fixtures + semantic invariants
 | [F0007-S0009](./F0007-S0009-governed-rollout-and-compatibility-pilot.md) | Governed rollout and compatibility pilot | Not Started |
 
 **Total Stories:** 9
-**Completed:** 0 / 9 (S0001 implemented, pending signoff)
+**Completed:** 0 / 9 (Phase A — S0001, S0002 — implemented, pending signoff)
 
 ## Phasing
 

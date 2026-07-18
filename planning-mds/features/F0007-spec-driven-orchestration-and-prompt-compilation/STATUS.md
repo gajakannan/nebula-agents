@@ -8,7 +8,7 @@
 | Story | Title | Phase | Status |
 |-------|-------|-------|--------|
 | F0007-S0001 | Versioned action policy and schema | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0002 | Contract conformance and behavioral diff | A | [ ] Not Started |
+| F0007-S0002 | Contract conformance and behavioral diff | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0003 | Run initialization and product scaffolding | B | [ ] Not Started |
 | F0007-S0004 | Typed command runtime and complete telemetry | B | [ ] Not Started |
 | F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [ ] Not Started |
@@ -21,7 +21,7 @@
 
 | Gate | Required Evidence | Status |
 |------|-------------------|--------|
-| A - Policy foundation | Schema report, behavioral diff fixture, historical baseline matrix | Not Started |
+| A - Policy foundation | Schema report, behavioral diff fixture, historical baseline matrix | Implemented (pending signoff) |
 | B - Runtime | Concurrency tests, shell-free subprocess tests, checkpoint failure/resume tests, telemetry samples | Not Started |
 | C - Compilation | Prompt snapshots, semantic-equivalence review, dual-read parity report, literal-owner audit | Not Started |
 | D - Rollout | Pilot run evidence, closeout validator result, migration/rollback report | Not Started |
