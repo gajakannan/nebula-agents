@@ -98,6 +98,36 @@ Identity, menu, health panel, and footer are the four bands. Aspirational status
 (knowledge-graph symbol counts, agent-load, cache) render only when a backing source exists;
 otherwise they are omitted rather than shown with placeholder numbers.
 
+## Visual Identity & Design Reference
+
+An interactive, TUI-faithful mockup of the landing screen and command palette is committed at
+[`design/landing-shell-mockup.html`](./design/landing-shell-mockup.html) (self-contained; open in a
+browser). It renders the shell the way a character-cell terminal (`curses` / Textual) actually paints
+it — no gradients, glow, drop-shadow, or sub-cell effects — and is the visual contract for Phase B.
+
+Decisions the mockup fixes:
+
+- **Rendering model — character cells only.** Box-drawing chrome (`┌─┐│├┤└┘`), one monospace face, a
+  flat palette. Everything aligns to a fixed column grid (the mockup uses a 68-column interior).
+- **Wordmark — Braille dot-matrix.** "NEBULA" is a 5×7 dot font rendered into Braille cells
+  (2×4 sub-dots per cell, U+2800–28FF), so it reads as individual dots and prints in any Unicode
+  terminal. It degrades to plain `NEBULA` on narrow or low-color terminals.
+- **Starfield — character constellation.** The `.:*#*:.` nebula core (violet/cyan) nested in a field
+  of `.`/`*` stars, a few tinted gold / blue-white / rose for stellar variety; the wordmark runs a
+  soft violet→cyan→green nebula gradient across its columns. All plain colored cells.
+- **Motion — stepped, honest, optional.** No alpha fade exists in a terminal, so a few glyph cells
+  "flare" and a few stars twinkle by stepping through small **truecolor** ramps on one timer (as
+  Textual would). Color/flare granularity is one cell = one glyph. Motion is truecolor-gated and
+  goes fully static under `prefers-reduced-motion` and on 16/256-color terminals.
+- **Status panel — grounded fields only.** Workspace, branch, run counts (active / recoverable), and
+  preflight readiness. Fields needing an absent backend (KG symbols, agents loaded, cache) are omitted,
+  never shown with placeholder numbers.
+- **Gating — degrade with a live "why".** "Explore knowledge graph" and "Choose agent role" render an
+  explicit `(not available in this workspace)` state and, when selected, surface the reason
+  (which backend they await: F0006/F0003, F0007) rather than erroring.
+- **Command palette.** A `/` palette does fuzzy navigation over the versioned command set (mirrors the
+  F0001 verbs today; sources from F0007's versioned command policy once available).
+
 ## Data Requirements
 
 **Reused (read-only) projections from F0001:**
@@ -157,10 +187,20 @@ for a future Phase A story pass:
 
 ## Open Questions
 
-- Terminal-UI framework: adopt Textual, or continue with stdlib `curses`? (Phase B / Architecture decision.)
-- Does F0008 replace the F0001 `tui` command, or ship as a new default `home` entrypoint with `tui` retained?
-- Command-palette surface: mirror the CLI verbs exactly, or a curated subset?
+- Terminal-UI framework: adopt Textual, or continue with stdlib `curses`?
+  → **Leaning Textual.** The design mockup (`design/landing-shell-mockup.html`) validates the
+  box-drawing chrome, full-row selection highlight, and command palette against a Textual-shaped model;
+  stdlib `curses` would make the same layout expensive to build and maintain. Final ratification is a
+  Phase B / Architecture decision.
 - Identity treatment (dot-matrix wordmark, particle field): in-product, docs-only, or both?
+  → **Resolved: in-product, TUI-faithful.** Braille dot-matrix wordmark + character starfield, with a
+  plain-`NEBULA` fallback for narrow/low-color terminals. Kept tasteful; it must never obstruct navigation.
+- Command-palette surface: mirror the CLI verbs exactly, or a curated subset?
+  → **Mirror the versioned command set.** The mockup mirrors the F0001 verbs today and should source
+  from F0007's versioned command policy once that lands, rather than hand-maintaining a list.
+- Does F0008 replace the F0001 `tui` command, or ship as a new default `home` entrypoint with `tui`
+  retained? *(Still open — the mockup assumes an opt-in surface with `tui` retained until parity; final
+  entrypoint naming is a Phase B decision.)*
 
 ## Rollout & Enablement
 

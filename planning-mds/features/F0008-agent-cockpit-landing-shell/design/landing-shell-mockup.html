@@ -1,0 +1,500 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Nebula Cockpit — TUI-Faithful Landing</title>
+<style>
+  :root{
+    color-scheme: dark;
+    --void:  #070a0e;
+    --crt:   #0a0d11;
+    --frame: #333b45;
+    --ink:   #c7cdd5;
+    --dim:   #79828d;
+    --gt:    #626c78;   /* gated / unavailable — dim but legible */
+    --ac:    #4fd88a;   /* phosphor green: selection, prompt     */
+    --wn:    #dca24a;   /* amber: the gated explainer            */
+    --ok:    #4fd88a;
+    --brand: #9aa4b0;   /* banner steel (pulse-off resting)      */
+    --sel:   #10261b;   /* selected-row bar                      */
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code",
+            "Menlo", "Consolas", monospace;
+  }
+
+  html,body{ background: var(--void); }
+  .page{
+    min-height: 100vh;
+    background: var(--void);
+    color: var(--ink);
+    font-family: var(--mono);
+    padding: clamp(16px, 4vw, 48px) clamp(12px, 3vw, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(18px, 3vw, 30px);
+  }
+
+  /* ---- intro / editorial framing ---------------------------------- */
+  .intro{ width: min(640px, 100%); }
+  .eyebrow{
+    font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--ac); margin: 0 0 10px;
+  }
+  .intro h1{
+    font-size: clamp(17px, 3.4vw, 22px); font-weight: 600; line-height: 1.35;
+    color: var(--ink); margin: 0 0 10px; text-wrap: balance;
+  }
+  .intro p{
+    font-size: 13px; line-height: 1.6; color: var(--dim); margin: 0;
+    max-width: 62ch;
+  }
+  .intro code{ color: var(--ac); }
+
+  .diff{
+    width: min(640px, 100%);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: #171b21; border: 1px solid #171b21; border-radius: 6px;
+    overflow: hidden;
+  }
+  .diff div{ background: var(--crt); padding: 12px 14px; }
+  .diff h2{
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .diff .was h2{ color: var(--dim); }
+  .diff .now h2{ color: var(--ac); }
+  .diff ul{ margin: 0; padding-left: 16px; }
+  .diff li{ font-size: 12px; line-height: 1.65; color: var(--dim); }
+  .diff .now li{ color: var(--ink); }
+
+  /* ---- terminal ---------------------------------------------------- */
+  .frame{ width: min(640px, 100%); display: flex; flex-direction: column; gap: 8px; }
+  .caphead{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .cap{ font-size: 11.5px; color: var(--dim); letter-spacing: 0.02em; padding-left: 2px; }
+  .cap b{ color: var(--ink); font-weight: 600; }
+
+  .toggle{
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11.5px; color: var(--dim); cursor: pointer; user-select: none;
+  }
+  .toggle input{ accent-color: var(--ac); margin: 0; }
+
+  .crt{
+    background: var(--crt);
+    border: 1px solid #171b21;
+    border-radius: 4px;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  .crt.live:focus-visible{ box-shadow: inset 0 0 0 1px var(--ac); outline: none; }
+
+  .screen{
+    width: max-content;
+    min-width: 100%;
+    font-size: clamp(10.5px, 2.5vw, 13.5px);
+    white-space: pre;
+    padding: 6px 10px;
+  }
+  .ln{ line-height: 1.32; display: block; }
+  .ln.mast{ line-height: 1.05; }             /* starfield band: braille rows touch */
+  .ln.sel{ background: var(--sel); }
+
+  .fr{ color: var(--frame); }
+  .ttl{ color: var(--dim); }
+  .ink{ color: var(--ink); }
+  .dim{ color: var(--dim); }
+  .gt{  color: var(--gt); }
+  .ac{  color: var(--ac); }
+  .wn{  color: var(--wn); }
+  .ok{  color: var(--ok); }
+  .brand{ color: #9aa4b0; }                   /* resting wordmark; only .wp* cells flare */
+  /* starfield: static stars + nebula core, both plain character cells */
+  .sfaint{ color:#464c55; }
+  .sdim{   color:#6a727c; }
+  .sblue{  color:#86b4d8; }                   /* blue-white star   */
+  .sgold{  color:#cdb072; }                   /* gold / warm star  */
+  .srose{  color:#c98f96; }                   /* rose / red giant  */
+  .nvio{   color:#8574c4; }                   /* nebula core, violet  */
+  .ncyn{   color:#5fb8c9; }                   /* nebula core, cyan    */
+  .ncore{  color:#b9a8ee; }                   /* nebula bright center  */
+  /* twinklers: JS steps --tw0/1/2 through a brightness ramp on the shared timer */
+  .tw0{ color: var(--tw0, #7a828c); }
+  .tw1{ color: var(--tw1, #7a828c); }
+  .tw2{ color: var(--tw2, #7a828c); }
+  /* wordmark: soft violet→cyan→green nebula gradient across the columns */
+  .wc0{ color:#8f86c8; } .wc1{ color:#7f9bc4; } .wc2{ color:#6aacba; }
+  .wc3{ color:#62bfa0; } .wc4{ color:#78c99a; }
+  /* wordmark flare: only a few glyph cells pulse; the rest keep their gradient hue */
+  .wp0{ color: var(--wp0, #78c99a); }
+  .wp1{ color: var(--wp1, #78c99a); }
+  .wp2{ color: var(--wp2, #78c99a); }
+  .cur{ color: var(--ac); animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink{ 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  .foot{
+    width: min(640px, 100%);
+    font-size: 11px; color: var(--gt); line-height: 1.6; text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cur{ animation: none; }
+  }
+  @media (max-width: 560px){
+    .diff{ grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="page">
+
+  <div class="intro">
+    <p class="eyebrow">F0008 · cockpit landing shell</p>
+    <h1>The starfield's back — as characters, the way a terminal draws it.</h1>
+    <p>The nebula and its <b style="color:var(--ink)">starfield</b> return, restored to what they
+    always were under the web glow: plain cells (<code>. · * : #</code>) with a violet/cyan core and
+    a scatter of <b style="color:var(--ink)">gold, blue, and rose stars</b>, and the
+    <b style="color:var(--ink)">Braille</b> wordmark (2×4 sub-dots per cell) floating inside it under a
+    soft <b style="color:var(--ink)">violet→cyan→green nebula gradient</b>.
+    The <b style="color:var(--ink)">ambient pulse</b> is honest — no alpha fade exists in a
+    terminal, so a <b style="color:var(--ink)">few glyph cells flare</b> (not the whole word) and the
+    stars twinkle, each stepping through a small truecolor ramp on one timer (what <code>Textual</code>
+    would do). A cell is the finest unit a terminal can colour — one glyph, one colour — so flaring
+    a handful of characters is as granular as it gets. Toggle it off, and it goes static under reduced-motion.
+    <span style="color:var(--ac)">↑/↓</span> or <span style="color:var(--ac)">j/k</span> to move,
+    <span style="color:var(--ac)">/</span> for the palette, <span style="color:var(--ac)">esc</span> to close.</p>
+  </div>
+
+  <div class="diff">
+    <div class="was">
+      <h2>Web identity mockup</h2>
+      <ul>
+        <li>Round CSS dots, border-radius, box-shadow glow</li>
+        <li>Sub-cell pixel sizing + smooth alpha twinkle</li>
+        <li>Cache 87% · Graph 412 symbols · 11 agents</li>
+        <li>All five actions look equally live</li>
+      </ul>
+    </div>
+    <div class="now">
+      <h2>TUI-faithful</h2>
+      <ul>
+        <li>Coloured starfield + violet/cyan nebula core</li>
+        <li>Nebula-gradient wordmark · a few glyphs flare</li>
+        <li>Grounded 4 lines only — unbuilt fields dropped</li>
+        <li>Two surfaces gated with a live "why"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="caphead">
+      <p class="cap"><b>Landing / Home</b> — interactive · select a gated item to see it explain itself</p>
+      <label class="toggle"><input type="checkbox" id="pulse" checked> ambient pulse</label>
+    </div>
+    <div class="crt live" id="crt-home" tabindex="0" aria-label="Nebula cockpit landing screen, interactive">
+      <div class="screen" id="screen-home"></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <p class="cap"><b>Command palette</b> — <span style="color:var(--ac)">/</span> from the home screen · fuzzy match over the versioned command set</p>
+    <div class="crt" aria-label="Nebula cockpit command palette (static snapshot)">
+      <div class="screen" id="screen-palette"></div>
+    </div>
+  </div>
+
+  <p class="foot">TUI-faithful mockup · character starfield + Braille wordmark · every glyph is a cell · palette filtered on “val” · no fabricated status</p>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- 5x7 dot font -> Braille (one font pixel = one Braille sub-dot) --- */
+  var FONT = {
+    N:["10001","11001","10101","10011","10001","10001","10001"],
+    E:["11111","10000","10000","11110","10000","10000","11111"],
+    B:["11110","10001","10001","11110","10001","10001","11110"],
+    U:["10001","10001","10001","10001","10001","10001","01110"],
+    L:["10000","10000","10000","10000","10000","10000","11111"],
+    A:["01110","10001","10001","11111","10001","10001","10001"]
+  };
+  /* Braille dot bit by (localCol, localRow): cols 0-1, rows 0-3 */
+  var BIT = [[0x01,0x02,0x04,0x40],[0x08,0x10,0x20,0x80]];
+
+  function brailleWord(word){
+    var px=[], r, c;
+    for(r=0;r<7;r++){                       /* each letter: 5 glyph cols + 1 gap col */
+      var line="";
+      for(c=0;c<word.length;c++){ line += FONT[word.charAt(c)][r] + "0"; }
+      px.push(line);
+    }
+    px.push(new Array(px[0].length+1).join("0"));   /* row 7 padding */
+    var cols = px[0].length, cellCols = Math.ceil(cols/2), rows=[];
+    for(var cr=0;cr<2;cr++){
+      var s="";
+      for(var cc=0;cc<cellCols;cc++){
+        var code=0x2800;
+        for(var lc=0;lc<2;lc++) for(var lr=0;lr<4;lr++){
+          var gx=cc*2+lc, gy=cr*4+lr;
+          if(gy<px.length && gx<cols && px[gy].charAt(gx)==="1") code += BIT[lc][lr];
+        }
+        s += String.fromCharCode(code);
+      }
+      rows.push(s);
+    }
+    return rows;                             /* 2 lines of Braille */
+  }
+  var BANNER = brailleWord("NEBULA");
+
+  /* ---- masthead: the original web mockup's tight nebula cluster, TUI-faithful ---
+     the .:*#*:. core nested inside its own little constellation, wordmark floating right */
+  var STARS = [                              /* [row, col, glyph, class] */
+    /* left nebula cluster (original arrangement); a few carry stellar colour */
+    [0,7,".","sdim"],[0,11,"*","tw0"],[0,16,".","sgold"],[0,21,".","sfaint"],
+    [1,4,".","sfaint"],[1,9,".","sblue"],[1,13,".","sdim"],[1,18,"*","tw1"],[1,22,".","sfaint"],
+    [2,7,"*","tw2"],[2,20,".","sdim"],
+    [3,4,".","sfaint"],[3,17,"*","tw0"],
+    [4,7,".","sdim"],[4,17,".","srose"],[4,22,".","sfaint"],
+    [5,5,"*","tw1"],[5,9,".","sdim"],[5,14,".","sblue"],[5,19,"*","tw2"],
+    [6,7,".","sfaint"],[6,12,"*","tw0"],[6,17,".","sgold"],
+    /* a few stars on the wordmark side, for depth — kept clear of the glyphs */
+    [0,57,".","srose"],[3,62,"·","sdim"],[5,54,".","sblue"]
+  ];
+
+  function drawMasthead(){
+    var H=7, grid=[], r, c;
+    for(r=0;r<H;r++){ grid.push([]); for(c=0;c<W;c++){ grid[r].push({ch:" ",cls:""}); } }
+    function put(r,c,ch,cls){ if(r>=0&&r<H&&c>=0&&c<W){ grid[r][c]={ch:ch,cls:cls}; } }
+
+    var i;
+    for(i=0;i<STARS.length;i++){ var s=STARS[i]; put(s[0],s[1],s[2],s[3]); }
+
+    /* nebula core (left) — colour by glyph */
+    function core(r,c,str){ for(var k=0;k<str.length;k++){ var ch=str.charAt(k); if(ch===" ")continue;
+      var cls = ch==="#"?"ncore" : ch==="*"?"ncyn" : "nvio"; put(r,c+k,ch,cls); } }
+    core(2,11,".:::.");
+    core(3,8,".:*#*:.");
+    core(4,11,":::");
+
+    /* Braille wordmark, floating right of the core.
+       Only a few lit glyph cells "flare" (pulse); the rest rest at .brand.
+       A cell is the finest a terminal can independently colour — one glyph, one colour. */
+    var wmc=30, lit=[], litF=[], pm={};
+    for(i=0;i<BANNER.length;i++){ for(c=0;c<BANNER[i].length;c++){
+      if(BANNER[i].charCodeAt(c)!==0x2800){ var cell=[2+i, wmc+c]; lit.push(cell); if(c>=11){ litF.push(cell); } }
+    } }
+    var pick = litF.length>=5 ? litF : lit;      /* bias flares to the green/teal end so they blend */
+    var FLARE=5;                                 /* handful of cells, spread + deterministic */
+    for(i=0;i<FLARE;i++){ var g=pick[Math.floor((i+0.5)*pick.length/FLARE)]; pm[g[0]+","+g[1]]="wp"+(i%3); }
+    function wc(col){ return col<4?"wc0":col<7?"wc1":col<11?"wc2":col<14?"wc3":"wc4"; }
+    for(i=0;i<BANNER.length;i++){ for(c=0;c<BANNER[i].length;c++){
+      put(2+i, wmc+c, BANNER[i].charAt(c), pm[(2+i)+","+(wmc+c)] || wc(c));   /* flare, else gradient */
+    } }
+
+    /* render each grid row into a bordered line, coalescing same-class runs */
+    return grid.map(function(cells){
+      var html="", run="", runCls=null, j, cell;
+      function flush(){ if(run!==""){ html += runCls ? '<span class="'+runCls+'">'+esc(run)+'</span>' : esc(run); run=""; } }
+      for(j=0;j<cells.length;j++){ cell=cells[j]; if(cell.cls!==runCls){ flush(); runCls=cell.cls; } run+=cell.ch; }
+      flush();
+      return { html: span("│","fr")+html+span("│","fr"), cls:"mast" };
+    });
+  }
+
+  var MENU = [
+    { label:"Resume current mission",  on:true,  hint:"▸ resumes the most recent recoverable run (1 of 3)" },
+    { label:"Start a new mission",     on:true,  hint:"▸ launches the F0001 tmux session flow" },
+    { label:"Explore knowledge graph", on:false, why:"needs the F0006 compiled-graph backend — not wired in this workspace" },
+    { label:"Choose agent role",       on:false, why:"needs the F0007 agent-role runtime — not built yet" },
+    { label:"Review repository health",on:true,  hint:"▸ runs the doctor preflight check" }
+  ];
+
+  var CMDS = [
+    { name:"attach",   desc:"attach to the running tmux session" },
+    { name:"status",   desc:"show run and gate status" },
+    { name:"validate", desc:"run validators for the selected run" },
+    { name:"evidence", desc:"open evidence and transcript" },
+    { name:"doctor",   desc:"workspace preflight / health check" },
+    { name:"resume",   desc:"resume the last recoverable run" },
+    { name:"help",     desc:"keybindings and command reference" },
+    { name:"quit",     desc:"exit the cockpit" }
+  ];
+
+  var W = 68, FW = 70;
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function span(t,c){ return '<span class="'+(c||'ink')+'">'+esc(t)+'</span>'; }
+  function rep(ch,n){ return n>0 ? new Array(n+1).join(ch) : ""; }
+
+  function topBar(title){
+    var tail = FW - (3 + title.length + 1 + 1);
+    return { html: span("┌─ ","fr")+span(title,"ttl")+span(" "+rep("─",tail)+"┐","fr") };
+  }
+  function rule(){   return { html: span("├"+rep("─",W)+"┤","fr") }; }
+  function bottom(){ return { html: span("└"+rep("─",W)+"┘","fr") }; }
+
+  function row(segs, opts){
+    opts = opts || {};
+    var fixed=0, fills=0, i, s;
+    for(i=0;i<segs.length;i++){ s=segs[i]; if(s.fill){fills++;} else {fixed+=s.t.length;} }
+    var pad=Math.max(0,W-fixed), each=fills?Math.floor(pad/fills):0, seen=0, used=0, html="";
+    for(i=0;i<segs.length;i++){
+      s=segs[i];
+      if(s.fill){ seen++; var n=(seen===fills)?(pad-each*(fills-1)):each; html+=rep(" ",n); used+=n; }
+      else { html+=span(s.t,s.c); used+=s.t.length; }
+    }
+    if(used<W){ html+=rep(" ",W-used); }
+    return { html: span("│","fr")+html+span("│","fr"), sel:!!opts.sel, gated:!!opts.gated, idx:opts.idx, cmd:opts.cmd, cls:opts.cls };
+  }
+  function seg(t,c){ return {t:t,c:c}; }
+  function fill(){ return {fill:true}; }
+  function blank(){ return row([]); }
+
+  function drawHome(st){
+    var L=[], i;
+    L.push(topBar("nebula-agents · cockpit"));
+    var mast=drawMasthead();
+    for(i=0;i<mast.length;i++){ L.push(mast[i]); }
+    L.push(row([seg(rep(" ",26)+"roles · evidence · delivery","dim")]));
+    L.push(blank());
+    L.push(rule());
+    for(i=0;i<MENU.length;i++){
+      var m=MENU[i], on=(i===st.sel), caret=on?"> ":"  ";
+      if(m.on){
+        L.push(row([seg(caret,on?"ac":"ink"), seg(m.label,on?"ac":"ink")], {sel:on, idx:i}));
+      } else {
+        L.push(row([seg(caret,on?"wn":"gt"), seg(m.label,"gt"), fill(), seg("(not available in this workspace)","gt")], {sel:on, gated:true, idx:i}));
+      }
+    }
+    L.push(rule());
+    L.push(row([seg("  Workspace  ","dim"), seg("nebula-insurance-crm","ink")]));
+    L.push(row([seg("  Branch     ","dim"), seg("feat/kg-projection","ink")]));
+    L.push(row([seg("  Runs       ","dim"), seg("3 active","ink"), seg(" · ","dim"), seg("1 recoverable","ink")]));
+    L.push(row([seg("  Preflight  ","dim"), seg("ok","ok")]));
+    L.push(rule());
+    L.push(row([seg("  ",""), seg("↑/↓","ac"), seg(" navigate","dim"), seg("   ",""),
+                seg("enter","ac"), seg(" select","dim"), seg("   ",""),
+                seg("/","ac"), seg(" command","dim"), seg("   ",""),
+                seg("?","ac"), seg(" help","dim"), seg("   ",""),
+                seg("q","ac"), seg(" quit","dim")]));
+    var cur=MENU[st.sel];
+    if(!cur.on){ L.push(row([seg("  ! ","wn"), seg(cur.why,"wn")])); }
+    else { L.push(row([seg("  "+cur.hint,"dim")])); }
+    L.push(bottom());
+    return L;
+  }
+
+  function drawPalette(st){
+    var L=[], i;
+    L.push(topBar("nebula-agents · cockpit — command palette"));
+    L.push(blank());
+    L.push(row([seg("  ",""), seg("/ ","ac"), seg(st.q,"ink"), {t:"█",c:"cur"}]));
+    L.push(rule());
+    var f=CMDS.filter(function(c){ return (c.name+" "+c.desc).toLowerCase().indexOf(st.q.toLowerCase())>=0; });
+    var ROWS=8;
+    if(f.length===0){
+      L.push(row([seg('  (no commands match “'+st.q+'”)',"dim")]));
+      for(i=1;i<ROWS;i++){ L.push(blank()); }
+    } else {
+      if(st.psel>=f.length){ st.psel=f.length-1; }
+      for(i=0;i<ROWS;i++){
+        if(i<f.length){
+          var c=f[i], on=(i===st.psel), caret=on?"> ":"  ";
+          L.push(row([seg(caret,on?"ac":"dim"), seg(pad(c.name,10),on?"ac":"ink"), seg(c.desc,"dim")], {sel:on, cmd:i}));
+        } else { L.push(blank()); }
+      }
+    }
+    L.push(rule());
+    L.push(row([seg("  ",""), seg("enter","ac"), seg(" run","dim"), seg("   ",""),
+                seg("↑/↓","ac"), seg(" select","dim"), seg("   ",""),
+                seg("esc","ac"), seg(" close","dim")]));
+    L.push(bottom());
+    return L;
+  }
+  function pad(s,n){ s=String(s); return s.length>=n?s:s+rep(" ",n-s.length); }
+
+  function render(el, lines){
+    var out="", i, L, attrs, cls;
+    for(i=0;i<lines.length;i++){
+      L=lines[i]; attrs=""; cls="ln";
+      if(L.cls){ cls+=" "+L.cls; }
+      if(L.sel){ cls+=" sel"; }
+      if(L.gated){ cls+=" gt"; }
+      if(L.idx!=null){ attrs+=' data-idx="'+L.idx+'"'; }
+      if(L.cmd!=null){ attrs+=' data-cmd="'+L.cmd+'"'; }
+      out+='<div class="'+cls+'"'+attrs+'>'+L.html+'</div>';
+    }
+    el.innerHTML=out;
+  }
+
+  function pulseRow(el){
+    if(reduce) return;
+    var sel=el.querySelector('.ln.sel');
+    if(sel && sel.animate){
+      sel.animate([{background:"rgba(79,216,138,0.30)"},{background:"rgba(16,38,27,1)"}],
+                  {duration:240, easing:"ease-out"});
+    }
+  }
+
+  /* ---- interactive home terminal ----------------------------------- */
+  var home=document.getElementById('screen-home');
+  var st={ mode:"home", sel:0, q:"", psel:0 };
+  function paint(){ render(home, st.mode==="home"?drawHome(st):drawPalette(st)); }
+  function filtered(){ return CMDS.filter(function(c){ return (c.name+" "+c.desc).toLowerCase().indexOf(st.q.toLowerCase())>=0; }); }
+
+  document.addEventListener('keydown', function(e){
+    var k=e.key;
+    if(st.mode==="home"){
+      if(k==="ArrowDown"||k==="j"){ st.sel=(st.sel+1)%MENU.length; paint(); e.preventDefault(); }
+      else if(k==="ArrowUp"||k==="k"){ st.sel=(st.sel-1+MENU.length)%MENU.length; paint(); e.preventDefault(); }
+      else if(k==="/"){ st.mode="palette"; st.q=""; st.psel=0; paint(); e.preventDefault(); }
+      else if(k==="Enter"){ paint(); pulseRow(home); e.preventDefault(); }
+    } else {
+      if(k==="Escape"){ st.mode="home"; paint(); e.preventDefault(); }
+      else if(k==="ArrowDown"){ var f=filtered(); if(f.length){ st.psel=(st.psel+1)%f.length; } paint(); e.preventDefault(); }
+      else if(k==="ArrowUp"){ var g=filtered(); if(g.length){ st.psel=(st.psel-1+g.length)%g.length; } paint(); e.preventDefault(); }
+      else if(k==="Backspace"){ st.q=st.q.slice(0,-1); st.psel=0; paint(); e.preventDefault(); }
+      else if(k==="Enter"){ paint(); pulseRow(home); e.preventDefault(); }
+      else if(k.length===1 && /[\w /.\-]/.test(k)){ st.q+=k; st.psel=0; paint(); e.preventDefault(); }
+    }
+  });
+  home.addEventListener('mousemove', function(e){
+    var el=e.target.closest ? e.target.closest('[data-idx],[data-cmd]') : null;
+    if(!el) return;
+    if(st.mode==="home" && el.hasAttribute('data-idx')){ var i=+el.getAttribute('data-idx'); if(i!==st.sel){ st.sel=i; paint(); } }
+    else if(st.mode==="palette" && el.hasAttribute('data-cmd')){ var j=+el.getAttribute('data-cmd'); if(j!==st.psel){ st.psel=j; paint(); } }
+  });
+  home.addEventListener('click', function(){ pulseRow(home); });
+  paint();
+
+  /* ---- ambient pulse: one stepped truecolor timer for a few flare cells + stars --- */
+  var FLARE=["#2f5f47","#3f9a6e","#65e79c","#3f9a6e"];   /* flare glyphs: dim → bright → dim */
+  var STAR =["#3f454e","#7a828c","#c2c7cf","#7a828c"];   /* star brightness ramp             */
+  function at(ramp,i){ return ramp[((i % ramp.length)+ramp.length) % ramp.length]; }
+  var timer=null, step=0;
+  var pulseBox=document.getElementById('pulse');
+  function tick(){
+    home.style.setProperty('--wp0', at(FLARE,step));     /* phase-offset so they don't sync */
+    home.style.setProperty('--wp1', at(FLARE,step+2));
+    home.style.setProperty('--wp2', at(FLARE,step+1));
+    home.style.setProperty('--tw0', at(STAR,step));
+    home.style.setProperty('--tw1', at(STAR,step+2));
+    home.style.setProperty('--tw2', at(STAR,step+1));
+    step++;
+  }
+  function applyAmbient(){
+    if(timer){ clearInterval(timer); timer=null; }
+    var on=pulseBox.checked;
+    if(on && !reduce){ step=0; tick(); timer=setInterval(tick, 520); }
+    else {
+      /* off → flares blend into the resting wordmark; on+reduced → flares held lit, no motion */
+      var wp = on ? "#65e79c" : "#78c99a", tw = on ? "#98a0aa" : "#6a727c";
+      home.style.setProperty('--wp0',wp); home.style.setProperty('--wp1',wp); home.style.setProperty('--wp2',wp);
+      home.style.setProperty('--tw0',tw); home.style.setProperty('--tw1',tw); home.style.setProperty('--tw2',tw);
+    }
+  }
+  pulseBox.addEventListener('change', applyAmbient);
+  applyAmbient();
+
+  /* ---- static palette snapshot ------------------------------------- */
+  render(document.getElementById('screen-palette'), drawPalette({ mode:"palette", q:"val", psel:0 }));
+})();
+</script>

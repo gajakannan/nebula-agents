@@ -1,15 +1,16 @@
 # F0008 - Agent Cockpit Landing Shell - Status
 
 **Overall Status:** Planned
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-17
 
 ## Planning Status
 
 | Item | State | Evidence |
 |------|-------|----------|
 | Phase A requirements | Draft available | `PRD.md` (core scaffold) |
+| Phase A design mockup | Available | `design/landing-shell-mockup.html` (TUI-faithful landing + command palette; visual contract) |
 | Story decomposition | Not started | Candidate stories listed in `PRD.md` → *Proposed Stories* |
-| Phase B architecture | Not started | Terminal-UI framework selection (Textual vs. curses) is an open question |
+| Phase B architecture | Not started | Framework leaning **Textual** (mockup validates the approach); ratification pending |
 | Registration | Registered | `features/REGISTRY.md` (Planned), `features/ROADMAP.md` (Later), `BLUEPRINT.md` |
 
 ## Scope Note
@@ -27,6 +28,7 @@ not yet in progress and carries no implementation or signoff provenance.
 
 ## Next Steps
 
-1. Decide the terminal-UI framework (Phase B / Architecture): adopt Textual or continue with `curses`.
+1. Ratify the terminal-UI framework at Phase B / Architecture — Textual is the leading candidate, and
+   the design mockup (`design/landing-shell-mockup.html`) demonstrates the approach.
 2. Confirm whether F0008 replaces the F0001 `tui` command or ships as a new default `home` entrypoint.
-3. Author the Phase A story set once scope is confirmed.
+3. Author the Phase A story set once scope is confirmed (candidates in `PRD.md` → *Proposed Stories*).

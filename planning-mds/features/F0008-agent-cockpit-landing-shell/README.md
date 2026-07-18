@@ -19,6 +19,7 @@ still runs in the native provider via `attach`; the shell adds no embedded chat,
 | Document | Purpose |
 |----------|---------|
 | [PRD.md](./PRD.md) | Phase A product requirements for the landing shell |
+| [design/landing-shell-mockup.html](./design/landing-shell-mockup.html) | Interactive, TUI-faithful mockup of the landing screen and command palette (visual contract for Phase B) |
 | [STATUS.md](./STATUS.md) | Delivery state and planning checklist |
 
 ## Stories
