@@ -1,0 +1,17 @@
+# Minimal active contract for run-gate.py driver tests (not schema-validated here;
+# the driver only needs active_version + the action spec).
+active_version: "2025-02-01"
+history_dir: history
+shared:
+  contract_effective_date: "2025-02-01"
+  run_id_format: "YYYY-MM-DD-[a-z0-9]{8}"
+  base_run_files: [commands.log, lifecycle-gates.log]
+  commands_log_schema:
+    fields: [schema_version, timestamp, command, exit_code]
+  coverage_min_pct: 80
+  context_preamble: [agents/ROUTER.md]
+  requirements:
+    security_scans_required: false
+    kg_reconciliation_required: false
+    kg_generated_regen_required: false
+    compile_projection_contract: false

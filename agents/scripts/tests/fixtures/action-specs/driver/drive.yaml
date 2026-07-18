@@ -1,0 +1,79 @@
+# Driver test fixture: executable operations (python3 -c) plus a manual
+# checkpoint, exercising ordered run, stop-on-failure, constraints, checkpoint
+# pause/attest/resume, crash recovery, and idempotent replay.
+action: drive
+action_doc: agents/actions/drive.md
+contract:
+  name: Driver Test Contract
+  scope: feature-completion
+  version: "2025-02-01"
+run_id:
+  scheme: contract
+  var: RUN_ID
+inputs:
+  required:
+    - {name: FEATURE_ID, format: "F####"}
+ownership:
+  product-manager: [pm-closeout.md]
+gates:
+  - id: G0
+    title: Passing write op
+    role: architect
+    operations:
+      - run:
+          id: r0
+          argv: [python3, -c, "import sys,pathlib; pathlib.Path(sys.argv[1]).write_text('g0')", "{RUN_FOLDER}/g0.txt"]
+          cwd: product
+          expected_artifacts: [g0.txt]
+
+  - id: G1
+    title: Failing op (stop on failure)
+    role: architect
+    operations:
+      - run:
+          id: r1
+          argv: [python3, -c, "import sys; sys.exit(1)"]
+          cwd: product
+
+  - id: G2
+    title: Run, manual checkpoint, run
+    role: product-manager
+    operations:
+      - run:
+          id: r2a
+          argv: [python3, -c, "import sys,pathlib; p=pathlib.Path(sys.argv[1]); p.write_text((p.read_text() if p.exists() else '')+'x')", "{RUN_FOLDER}/counter.txt"]
+          cwd: product
+      - checkpoint:
+          id: cp-review
+          description: Manual review before the tail runs.
+          requires: [note.md]
+          produces: [reviewed]
+      - run:
+          id: r2b
+          argv: [python3, -c, "import sys,pathlib; pathlib.Path(sys.argv[1]).write_text('after')", "{RUN_FOLDER}/g2-after.txt"]
+          cwd: product
+          expected_artifacts: [g2-after.txt]
+
+  - id: G3
+    title: Forbidden flag constraint
+    role: architect
+    operations:
+      - run:
+          id: r3
+          argv: [python3, -c, "pass", "--danger"]
+          cwd: product
+    constraints:
+      - forbid: "--danger"
+        reason: "test-only forbidden flag"
+
+  - id: G4
+    title: Idempotent replay
+    role: architect
+    operations:
+      - run:
+          id: r4
+          argv: [python3, -c, "pass"]
+          cwd: product
+
+stop_conditions:
+  - "Stop if an operation fails."

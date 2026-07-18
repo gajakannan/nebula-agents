@@ -76,18 +76,29 @@ findings; it does not classify findings itself.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Define the authorization representation for delegated checkpoint actors in local-only runs.
+- [x] Define the authorization representation for delegated checkpoint actors in local-only runs.
+  **Resolved:** an attestation records `actor` + `role` (free-form, operator-supplied) alongside the
+  hashed evidence and timestamp; local-only runs trust the operator identity and the per-run lock
+  rather than cryptographic signing (per the story assumption). The role names the authorized
+  checkpoint owner; delegation is expressed by recording the delegate as `actor` with the owning
+  `role`. Content signing is deferred (not required initially).
 
 **Assumptions:**
 - File hashes plus durable paths are sufficient checkpoint evidence; content signing is not required initially.
 
 ## Definition of Done
 
-- [ ] Driver dry-run/list/run/resume interfaces implemented.
-- [ ] Checkpoint skip, tamper, concurrent resume, crash recovery, and replay tests pass.
-- [ ] All existing severity branches reproduced by table-driven tests.
-- [ ] Journal and logs provide complete audit/timeline records.
-- [ ] Driver/validator responsibility boundary documented.
+- [x] Driver dry-run/list/run/resume interfaces implemented. (`run-gate.py` — `--list`, `--dry-run`,
+  run a stage, `--from`, `--attest-checkpoint`, `--force`)
+- [x] Checkpoint skip, tamper, concurrent resume, crash recovery, and replay tests pass.
+  (`test_run_gate.py` — `--from` past an unattested checkpoint rejected; tampered/missing evidence
+  rejected; per-run lock → concurrent conflict; resume does not re-run completed ops; `--force` replay)
+- [x] All existing severity branches reproduced by table-driven tests. (`gate_policy.py`;
+  `test_gate_policy.py` — standard + review-family (plan/feature) + none, negatives/booleans rejected)
+- [x] Journal and logs provide complete audit/timeline records. (atomic `gate-state.json` journal with
+  hashed attestations; `lifecycle-gates.log` blocks; `commands.log` via the shared runtime)
+- [x] Driver/validator responsibility boundary documented. (module docstring + this story: the driver
+  owns procedure integrity; pass/fail is each validator's own exit code)
 
 ## Review Provenance
 
