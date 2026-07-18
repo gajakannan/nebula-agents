@@ -75,18 +75,28 @@ supported shell-free subprocess path for later action gates.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Define whether lifecycle runs without a run folder emit only console output or an optional framework-local log.
+- [x] Define whether lifecycle runs without a run folder emit only console output or an optional framework-local log.
+  **Resolved:** console-only when no run folder / `--log` is supplied (preserves `run-lifecycle-gates.py`
+  behavior — no `commands.log` regression). `run_operation` appends telemetry only when a log path is
+  given; `exec-and-log.py` and the S0005 gate driver supply it during an active run.
 
 **Assumptions:**
 - Existing JSONL schema remains version 1 unless signal/timeout fields require an additive schema revision.
 
 ## Definition of Done
 
-- [ ] Shared runtime and arbitrary-command wrapper implemented.
-- [ ] Lifecycle runner regression suite passes unchanged behavior expectations.
-- [ ] Injection, argv preservation, timeout, signal, path, artifact, and redaction tests pass.
-- [ ] Audit telemetry proves every executed test command's normalized result.
-- [ ] No spec content reaches a shell interpreter.
+- [x] Shared runtime and arbitrary-command wrapper implemented. (`gate_runtime.py`;
+  `exec-and-log.py`)
+- [x] Lifecycle runner regression suite passes unchanged behavior expectations.
+  (`run-lifecycle-gates.py` reuses `execute_argv(capture=False)`; `--list` regression test)
+- [x] Injection, argv preservation, timeout, signal, path, artifact, and redaction tests pass.
+  (`test_gate_runtime.py` + `test_exec_and_log.py` — metacharacters stay one literal arg;
+  timeout → process-group kill, no orphan; missing-exec / unknown-cwd / undeclared-mutation /
+  artifact-escape named errors)
+- [x] Audit telemetry proves every executed test command's normalized result.
+  (JSONL via `append-command-log.py`, the single normalization path)
+- [x] No spec content reaches a shell interpreter. (argv passed directly to `subprocess`;
+  no reachable `shell=True`)
 
 ## Review Provenance
 

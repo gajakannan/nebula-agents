@@ -9,12 +9,14 @@ Usage:
 """
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gate_runtime import execute_argv  # noqa: E402  (shared shell-free execution)
 
 
 DEFAULT_CONFIG_PATH = Path("lifecycle-stage.yaml")
@@ -99,12 +101,13 @@ def run_gate(repo_root: Path, gate_name: str, gate_config: Dict) -> int:
         print(f"  {description}")
     print(f"  command: {' '.join(command)}")
 
-    completed = subprocess.run(command, cwd=repo_root, check=False)
-    if completed.returncode == 0:
+    # Shared shell-free runtime; capture=False preserves console streaming.
+    result = execute_argv(command, cwd=repo_root, capture=False)
+    if result.exit_code == 0:
         print(f"[PASS] {gate_name}\n")
     else:
-        print(f"[FAIL] {gate_name} (exit code {completed.returncode})\n")
-    return completed.returncode
+        print(f"[FAIL] {gate_name} (exit code {result.exit_code})\n")
+    return result.exit_code
 
 
 def main() -> int:
