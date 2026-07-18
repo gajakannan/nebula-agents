@@ -17,6 +17,8 @@ stages:
       - skill_regression
       - agent_map_schema
       - prompt_drift
+      - action_spec_schema
+      - contract_conformance
   planning:
     description: Framework-side planning of new actions, roles, or templates.
     required_gates:
@@ -24,6 +26,8 @@ stages:
       - skill_regression
       - agent_map_schema
       - prompt_drift
+      - action_spec_schema
+      - contract_conformance
   implementation:
     description: Framework-side implementation of new actions, roles, or templates.
     required_gates:
@@ -31,6 +35,8 @@ stages:
       - skill_regression
       - agent_map_schema
       - prompt_drift
+      - action_spec_schema
+      - contract_conformance
   release-readiness:
     description: Framework release hardening before publishing a new tagged version.
     required_gates:
@@ -38,6 +44,8 @@ stages:
       - skill_regression
       - agent_map_schema
       - prompt_drift
+      - action_spec_schema
+      - contract_conformance
 gates:
   boundary_genericness:
     description: Prevent solution-specific leakage into generic framework agents. Embedded denylist is authoritative; --glossary override is optional.
@@ -50,6 +58,16 @@ gates:
       - python3
       - agents/scripts/render-prompts.py
       - --check
+  action_spec_schema:
+    description: Validate the versioned action policy — JSON Schema, semantic invariants, and manifest-version resolution (F0007-S0001).
+    command:
+      - python3
+      - agents/scripts/validate_action_specs.py
+  contract_conformance:
+    description: Independent conformance invariants plus the historical baseline matrix for the action policy (F0007-S0002). Catches a weakened contract even when generated output matches.
+    command:
+      - python3
+      - agents/scripts/contract-conformance.py
   skill_regression:
     description: Validate skill metadata, structure quality, and routing regressions.
     command:

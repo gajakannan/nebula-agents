@@ -77,19 +77,35 @@ rollback rehearsal. Existing in-flight runs remain on the contract and procedure
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Select the pilot feature and product root after confirming no active run will overlap migration.
+- [x] Select the pilot feature and product root after confirming no active run will overlap migration.
+  **Resolved (rehearsal):** the S0009 rehearsal uses a scaffolded fixture product root (the `driver`
+  spec) so it overlaps no live run. Selecting the LIVE pilot feature + real product root is left to the
+  maintainer at promotion time, after confirming no active run for that feature (the per-feature lock
+  and concurrent-run check enforce this at `init-run.py`).
 
 **Assumptions:**
 - One representative feature-completion pilot plus the historical fixture suite is sufficient for initial framework adoption.
 
 ## Definition of Done
 
-- [ ] Lifecycle and CI gates enforced with documented remediation.
-- [ ] Consumer contract, contributor guide, action docs, and changelog updated.
-- [ ] Pilot reaches closeout with complete audit/timeline evidence.
-- [ ] Independent feature review passes with all required roles represented.
-- [ ] Rollback rehearsal succeeds without historical mutation.
-- [ ] Rollout decision and residual risks recorded in parent status.
+- [x] Lifecycle and CI gates enforced with documented remediation. (`lifecycle-stage.yaml` gates
+  `action_spec_schema`, `contract_conformance`, `prompt_drift`; remediation in `rollout-report.md`)
+- [x] Consumer contract, contributor guide, action docs, and changelog updated. (`CONSUMER-CONTRACT.md`
+  version resolution; `CHANGELOG.md` F0007 entry; `rollout-report.md`. Action-doc *thinning* is the
+  S0008 human-gated item, tracked there.)
+- [~] Pilot reaches closeout with complete audit/timeline evidence. **Rehearsal** reaches closeout with
+  complete telemetry (`test_pilot_end_to_end.py` — commands.log/lifecycle-gates.log/gate-state journal +
+  hashed attestation). The **live** product-feature pilot closeout is human-gated and deferred.
+- [ ] Independent feature review passes with all required roles represented. **Deferred:** requires real
+  Architect/QE/Code-Reviewer/DevOps/Security reviewers — not self-certifiable.
+- [x] Rollback rehearsal succeeds without historical mutation. (`test_rollback_preserves_immutable_history`
+  + documented procedure in `rollout-report.md`)
+- [x] Rollout decision and residual risks recorded in parent status. (`rollout-report.md` §4–§5; STATUS
+  overall = rollout HOLD)
+
+**Increment note:** S0009 adopts the CI/lifecycle gates, rehearses the governed run and rollback
+end-to-end against a fixture product root, and records the rollout HOLD decision. The live governed
+product pilot and the independent all-role feature review remain human-gated.
 
 ## Review Provenance
 

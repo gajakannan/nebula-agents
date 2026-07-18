@@ -1,6 +1,6 @@
 # F0007 - Spec-Driven Orchestration and Prompt Compilation - Status
 
-**Overall Status:** In Progress (Phase A)
+**Overall Status:** Implemented (S0001–S0009); rollout **HOLD** pending required role signoffs and a live governed product pilot
 **Last Updated:** 2026-07-18
 
 ## Story Checklist
@@ -15,7 +15,7 @@
 | F0007-S0006 | Generated evidence prompts and drift gate | C | [~] Machinery implemented (renderer + drift/semantic gate + CI wiring + `feature` pilot); remaining-action rollout & semantic-equivalence cutover of the 24 hand-written prompts are human-gated (PM + role owners) and deferred |
 | F0007-S0007 | Version-aware validator convergence | C | [x] Implemented (version-aware selection + dual-read parity proven zero-disagreement across all cutovers; private constants kept — their removal is deferred to S0008 per the parity-approval gate) |
 | F0007-S0008 | Shared policy consumers and prose thinning | C | [~] Consumer tooling implemented (contract-value resolver + inverse-literal/drift audit, vague-language linter, coverage-script migration); prose thinning (40% reduction, retrieval-guard extraction, disposition inventory) and private-constant removal are role-owner-gated and deferred (removal also follows the S0009 pilot per PRD rollout) |
-| F0007-S0009 | Governed rollout and compatibility pilot | D | [ ] Not Started |
+| F0007-S0009 | Governed rollout and compatibility pilot | D | [~] CI/lifecycle gates adopted + end-to-end pilot rehearsal + rollback rehearsal + rollout report; LIVE product pilot and independent all-role review are human-gated and deferred |
 
 ## Phase Gates
 
@@ -24,7 +24,7 @@
 | A - Policy foundation | Schema report, behavioral diff fixture, historical baseline matrix | Implemented (pending signoff) |
 | B - Runtime | Concurrency tests, shell-free subprocess tests, checkpoint failure/resume tests, telemetry samples | Implemented (pending signoff) |
 | C - Compilation | Prompt snapshots, semantic-equivalence review, dual-read parity report, literal-owner audit | Not Started |
-| D - Rollout | Pilot run evidence, closeout validator result, migration/rollback report | Not Started |
+| D - Rollout | Pilot run evidence, closeout validator result, migration/rollback report | Implemented (rehearsal + rollback report; `rollout-report.md`); live pilot deferred |
 
 ## Required Signoff Roles
 
