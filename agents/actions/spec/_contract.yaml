@@ -1,0 +1,54 @@
+# Active contract — the single source of truth for shared orchestration policy.
+#
+# This file is EDITABLE through review. Every published historical version is a
+# fully-resolved, immutable bundle under history/. `active_version` MUST equal
+# the newest history bundle; when policy changes, publish a new immutable bundle
+# and bump active_version to match (validate_action_specs.py enforces this).
+#
+# Structural contract: schema/contract.schema.json
+active_version: 2026-07-11
+history_dir: history
+description: >-
+  Spec-driven orchestration policy. Shared constants consumed by prompt
+  generation, gate execution, configuration consumers, and version-aware
+  validators. Fixed procedure lives here as data, not paraphrased prose.
+
+shared:
+  contract_effective_date: 2026-07-11
+  run_id_format: "YYYY-MM-DD-[a-z0-9]{8}"
+  run_id_suffix:
+    argv: [python3, -c, "import secrets; print(secrets.token_hex(4))"]
+  run_id_forbidden: [uuid4]
+  base_run_files:
+    - README.md
+    - action-context.md
+    - artifact-trace.md
+    - gate-decisions.md
+    - commands.log
+    - lifecycle-gates.log
+  artifacts_subdirs: [coverage, diffs, test-results, security, screenshots]
+  commands_log_schema:
+    fields: [schema_version, timestamp, cwd, command, exit_code, artifacts, redactions]
+  coverage_min_pct: 80
+  banned_words:
+    - should
+    - might
+    - probably
+    - usually
+    - easy
+    - simple
+    - fast
+    - secure
+    - robust
+    - seamless
+    - just
+  context_preamble:
+    - agents/ROUTER.md
+    - agents/agent-map.yaml
+    - agents/docs/AGENT-USE.md
+  requirements:
+    security_scans_required: true
+    required_security_scan_classes: [dependency, secrets, sast, dast]
+    kg_reconciliation_required: true
+    kg_generated_regen_required: true
+    compile_projection_contract: true

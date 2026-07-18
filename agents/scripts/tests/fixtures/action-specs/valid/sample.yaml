@@ -1,0 +1,45 @@
+# Minimal valid active action spec fixture exercising run, checkpoint, and write
+# operations plus placeholder/path/mutation-class surfaces.
+action: sample
+action_doc: agents/actions/sample.md
+contract:
+  name: Sample Contract
+  scope: feature-completion
+  version: "2025-02-01"
+run_id:
+  scheme: contract
+  var: RUN_ID
+inputs:
+  required:
+    - {name: FEATURE_ID, format: "F####"}
+ownership:
+  product-manager: [pm-closeout.md]
+gates:
+  - id: G0
+    title: Sample validate gate
+    role: architect
+    artifacts: [g0.md]
+    operations:
+      - run:
+          id: validate-g0
+          argv: [python3, agents/scripts/foo.py, --product-root, "{PRODUCT_ROOT}",
+                 --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
+          cwd: framework
+          timeout_seconds: 120
+          expected_artifacts: [g0.md]
+          mutates: [evidence-manifest]
+  - id: G1
+    title: Sample closeout gate
+    role: product-manager
+    operations:
+      - checkpoint:
+          id: archive-move
+          description: Move the feature folder to its archived path.
+          requires: [pm-closeout.md]
+          produces: [archived-feature-folder]
+      - write:
+          artifact: latest-run.json
+          after: archive-move
+          mutates: [latest-run.json]
+stop_conditions:
+  - "Stop if a historical fixture changes verdict without an approved version."

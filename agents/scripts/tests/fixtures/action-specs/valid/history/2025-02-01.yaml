@@ -1,0 +1,22 @@
+version: "2025-02-01"
+effective_from: "2025-02-01"
+description: Fixture bundle adding security scans and KG reconciliation.
+shared:
+  contract_effective_date: "2025-02-01"
+  run_id_format: "YYYY-MM-DD-[a-z0-9]{8}"
+  base_run_files: [README.md, commands.log]
+  commands_log_schema:
+    fields: [schema_version, timestamp, command, exit_code]
+  coverage_min_pct: 80
+  context_preamble: [agents/ROUTER.md]
+  requirements:
+    security_scans_required: true
+    kg_reconciliation_required: true
+    kg_generated_regen_required: false
+    compile_projection_contract: false
+actions:
+  sample:
+    scope: feature-completion
+    gates:
+      - {id: G0, role: architect, required_artifacts: [g0.md]}
+      - {id: G1, role: product-manager, required_artifacts: [pm-closeout.md]}

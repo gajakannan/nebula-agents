@@ -82,7 +82,9 @@ the policy loader.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Choose full multi-action bundles or per-action snapshots plus an immutable index.
+- [x] Choose full multi-action bundles or per-action snapshots plus an immutable index.
+  **Resolved:** full multi-action bundle per version (`history/<version>.yaml`), per ADR
+  F0007-001 — simpler resolution/monotonicity, fully-resolved and immutable, no cross-bundle index.
 
 **Assumptions:**
 - Date-form version identifiers remain adequate until a same-day compatibility break is needed; the
@@ -90,13 +92,16 @@ the policy loader.
 
 ## Definition of Done
 
-- [ ] Active and historical layout documented and implemented.
-- [ ] JSON Schema and semantic validator implemented.
-- [ ] Legacy-date and explicit-version selection tested.
-- [ ] Invalid operation, placeholder, version, and path cases tested.
-- [ ] No current prompt or validator source removed.
-- [ ] Validation report records an auditable version decision.
-- [ ] Story index and parent status remain synchronized.
+- [x] Active and historical layout documented and implemented. (`agents/actions/spec/` +
+  `spec/README.md`; `_contract.yaml`, `feature.yaml`, `history/2026-05-19..2026-07-11.yaml`)
+- [x] JSON Schema and semantic validator implemented. (`spec/schema/*.schema.json`;
+  `agents/scripts/validate_action_specs.py`)
+- [x] Legacy-date and explicit-version selection tested. (`--resolve-manifest`; resolver tests)
+- [x] Invalid operation, placeholder, version, and path cases tested.
+  (`tests/test_validate_action_specs.py`, 26 cases)
+- [x] No current prompt or validator source removed. (purely additive)
+- [x] Validation report records an auditable version decision. (report `audit` block; resolver record)
+- [x] Story index and parent status remain synchronized.
 
 ## Review Provenance
 

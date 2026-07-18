@@ -2,3 +2,5 @@
 # Keep this file minimal and aligned with actual imports.
 pyyaml==6.0.2
 pytest==9.0.3
+# Structural validation of versioned action policy (validate_action_specs.py, F0007).
+jsonschema==4.19.2

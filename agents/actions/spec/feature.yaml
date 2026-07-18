@@ -1,0 +1,225 @@
+# Active action specification: feature (single governed vertical slice).
+#
+# Structural contract: schema/action-spec.schema.json. contract.version MUST
+# equal _contract.yaml:active_version. Executable policy is typed data (argv
+# arrays), never shell text. Free-text `judgment`/`notes` are rendered into
+# prompts but never executed.
+#
+# S0001 scope: this spec exercises the full validator surface (typed operations,
+# ordered closeout sequence, checkpoint pre/postconditions, gate constraints,
+# placeholder/path containment). Byte-faithful transcription of every gate's
+# validator command set is authored under S0006 (prompt generation).
+action: feature
+action_doc: agents/actions/feature.md
+contract:
+  name: Feature Evidence Contract
+  scope: feature-completion
+  version: 2026-07-11
+
+run_id:
+  scheme: contract
+  var: RUN_ID
+
+inputs:
+  required:
+    - {name: FEATURE_ID, format: "F####"}
+  optional:
+    - {name: MODE, enum: [clean, drift-reconcile], default: clean}
+    - {name: SLICE_ORDER_SOURCE, enum: [assembly-plan, override], default: assembly-plan}
+    - {name: SLICE_ORDER, required_when: "SLICE_ORDER_SOURCE=override"}
+    - {name: PRODUCT_ROOT, default: sister-repo}
+
+auto_resolved:
+  FEATURE_SLUG: "kebab slug resolved from REGISTRY.md"
+  FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  FEATURE_INDEX_ROOT: "{PRODUCT_ROOT}/planning-mds/operations/evidence/{FEATURE_ID}-{FEATURE_SLUG}"
+  RUN_FOLDER: "{FEATURE_INDEX_ROOT}/{RUN_ID}"
+
+retrieval:
+  tier_defaults: {clean: [1, 2], drift-reconcile: [3, 4]}
+
+context_load:
+  - "python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier}"
+  - "{FEATURE_PATH}"
+
+ownership:
+  product-manager: [pm-closeout.md, signoff-ledger.md, latest-run.json]
+  architect: [feature-assembly-plan.md, g0-assembly-plan-validation.md, kg-reconciliation.md]
+  quality-engineer: [test-plan.md, test-execution-report.md, coverage-report.md]
+  code-reviewer: [code-review-report.md]
+  security: [security-review-report.md]
+
+gates:
+  - id: G0
+    title: Architect assembly plan authoring and validation
+    role: architect
+    artifacts: [g0-assembly-plan-validation.md]
+    manifest_status_after: in-progress
+    operations:
+      - run:
+          id: validate-g0
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G0]
+          cwd: framework
+          timeout_seconds: 300
+          expected_artifacts: [g0-assembly-plan-validation.md]
+          mutates: []
+    judgment: |
+      Author or reconcile the assembly plan; validate scope split, dependencies,
+      checkpoints, and ownership; initialize the Required Signoff Roles matrix.
+
+  - id: G1
+    title: DevOps runtime preflight
+    role: devops
+    artifacts: [g1-runtime-preflight.md]
+    operations:
+      - run:
+          id: validate-g1
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G1]
+          cwd: framework
+          timeout_seconds: 300
+    judgment: |
+      Verify the runtime boots and required services are reachable when the
+      slice is runtime-bearing; otherwise record the waiver rationale.
+
+  - id: G2
+    title: Implementation self-review and deployability
+    role: backend-developer
+    artifacts: [g2-self-review.md, g2-deployability-check.md]
+    operations:
+      - run:
+          id: validate-g2
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G2]
+          cwd: framework
+          timeout_seconds: 300
+    judgment: |
+      Set scope booleans (frontend_in_scope, security_sensitive_scope,
+      runtime_bearing, deployment_config_changed) from changed_paths; review the
+      slice against acceptance criteria before handoff.
+
+  - id: G3
+    title: Quality engineering test execution
+    role: quality-engineer
+    artifacts: [test-plan.md, test-execution-report.md]
+    operations:
+      - run:
+          id: validate-g3
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G3]
+          cwd: framework
+          timeout_seconds: 600
+
+  - id: G4
+    title: Coverage floor
+    role: quality-engineer
+    artifacts: [coverage-report.md]
+    operations:
+      - run:
+          id: validate-g4
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G4]
+          cwd: framework
+          timeout_seconds: 300
+    judgment: |
+      Coverage floor is `coverage_min_pct` (owned by _contract.yaml). Do not
+      restate the numeric threshold in prose.
+
+  - id: G5
+    title: Code review signoff
+    role: code-reviewer
+    artifacts: [code-review-report.md, signoff-ledger.md]
+    operations:
+      - run:
+          id: validate-g5
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G5]
+          cwd: framework
+          timeout_seconds: 300
+
+  - id: G6
+    title: Security review
+    role: security
+    artifacts: [security-review-report.md]
+    operations:
+      - run:
+          id: validate-g6
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --run-id, "{RUN_ID}", --stage, G6]
+          cwd: framework
+          timeout_seconds: 300
+
+  - id: G7
+    title: Architect knowledge-graph reconciliation
+    role: architect
+    role_switch: agents/architect/SKILL.md
+    artifacts: [kg-reconciliation.md]
+    operations:
+      - run:
+          id: kg-compile
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"]
+          cwd: product
+          timeout_seconds: 300
+          mutates: [kg-source, kg-projection]
+      - run:
+          id: kg-check-drift
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          cwd: product
+          timeout_seconds: 300
+    constraints:
+      - forbid: "--write-coverage-report"
+        reason: "path-sensitive; deferred to G8 after the archive move relocates evidence paths"
+
+  - id: G8
+    title: Product manager closeout
+    role: product-manager
+    role_switch: agents/product-manager/SKILL.md
+    artifacts: [pm-closeout.md]
+    operations:
+      - checkpoint:
+          id: archive-move
+          description: "Update trackers and move the feature folder to its archived path."
+          requires: [pm-closeout.md, signoff-ledger.md]
+          produces: [archived-feature-folder]
+      - run:
+          id: patch-prior-manifest
+          argv: [python3, agents/product-manager/scripts/patch-prior-manifest.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}",
+                 --new-run-id, "{RUN_ID}"]
+          cwd: framework
+          timeout_seconds: 120
+          mutates: [prior-manifest]
+      - write:
+          artifact: latest-run.json
+          after: patch-prior-manifest
+          mutates: [latest-run.json]
+      - run:
+          id: validate-closeout
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --stage, closeout]
+          cwd: framework
+          timeout_seconds: 300
+
+severity_gate: standard
+
+forbidden:
+  - "Authoring kg-source shards during PM closeout (G7 owns shaping; G8 verifies)."
+  - "Running gate validation commands directly instead of through the gate driver."
+
+stop_conditions:
+  - "A historical evidence fixture changes verdict without an approved new contract version."
+  - "An executable string or shell invocation becomes reachable from spec content."
+
+notes:
+  g2_scope_booleans: |
+    Set frontend_in_scope=true when any changed_paths[] entry matches
+    experience/**; security_sensitive_scope=true for auth, secrets, or crypto
+    changes; runtime_bearing=true when a service boot path changes.

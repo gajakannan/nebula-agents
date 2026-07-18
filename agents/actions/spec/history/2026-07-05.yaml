@@ -1,0 +1,47 @@
+# IMMUTABLE, fully-resolved historical policy bundle. DO NOT EDIT after
+# publication. Interprets evidence whose contract_effective_date falls in
+# [2026-07-05, 2026-07-11). Requires proof that generated KG layers were rebuilt
+# (not merely checked from a committed snapshot) — KG_GENERATED_REGEN_EFFECTIVE_DATE.
+version: 2026-07-05
+effective_from: 2026-07-05
+description: Requires fresh generated-KG regeneration at G7.
+shared:
+  contract_effective_date: 2026-07-05
+  run_id_format: "YYYY-MM-DD-[a-z0-9]{8}"
+  run_id_suffix:
+    argv: [python3, -c, "import secrets; print(secrets.token_hex(4))"]
+  run_id_forbidden: [uuid4]
+  base_run_files:
+    - README.md
+    - action-context.md
+    - artifact-trace.md
+    - gate-decisions.md
+    - commands.log
+    - lifecycle-gates.log
+  artifacts_subdirs: [coverage, diffs, test-results, security, screenshots]
+  commands_log_schema:
+    fields: [schema_version, timestamp, cwd, command, exit_code, artifacts, redactions]
+  coverage_min_pct: 80
+  context_preamble:
+    - agents/ROUTER.md
+    - agents/agent-map.yaml
+    - agents/docs/AGENT-USE.md
+  requirements:
+    security_scans_required: true
+    required_security_scan_classes: [dependency, secrets, sast, dast]
+    kg_reconciliation_required: true
+    kg_generated_regen_required: true
+    compile_projection_contract: false
+actions:
+  feature:
+    scope: feature-completion
+    gates:
+      - {id: G0, role: architect, required_artifacts: [g0-assembly-plan-validation.md]}
+      - {id: G1, role: devops, required_artifacts: []}
+      - {id: G2, role: backend-developer, required_artifacts: [g2-self-review.md, g2-deployability-check.md]}
+      - {id: G3, role: quality-engineer, required_artifacts: [test-execution-report.md]}
+      - {id: G4, role: quality-engineer, required_artifacts: [coverage-report.md]}
+      - {id: G5, role: code-reviewer, required_artifacts: [signoff-ledger.md]}
+      - {id: G6, role: security, required_artifacts: [security-review-report.md]}
+      - {id: G7, role: architect, required_artifacts: [kg-reconciliation.md]}
+      - {id: G8, role: product-manager, required_artifacts: [pm-closeout.md]}
