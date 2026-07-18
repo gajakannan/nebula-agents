@@ -77,19 +77,37 @@ skills. It preserves judgment criteria, examples, rationale, classification, and
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Decide whether `agent-map.yaml` uses a symbolic field or a generated resolved value plus drift check.
+- [x] Decide whether `agent-map.yaml` uses a symbolic field or a generated resolved value plus drift check.
+  **Resolved:** resolved numeric value + drift/inverse audit (`contract-value.py --audit`). The
+  `unit_coverage_pct` field is not consumed by code, so a symbolic string adds parsing risk for no
+  benefit; the audit binds it to `coverage_min_pct` and fails closed on any drift.
 
 **Assumptions:**
 - Rule IDs and shared document links provide enough local context after paraphrased validator sections are removed.
 
 ## Definition of Done
 
-- [ ] Shared policy consumer path implemented and private defaults removed.
-- [ ] Retrieval guard extracted and all role links validated.
-- [ ] Vague-language linter implemented with exception support.
-- [ ] Action/skill disposition inventory completed and approved by role owners.
-- [ ] Context reduction target measured without judgment loss.
-- [ ] Inverse literal and skill regression gates pass.
+- [x] Shared policy consumer path implemented and private defaults removed.
+  (`contract-value.py` resolves shared values, rejecting unknown keys with no fallback;
+  `validate-test-coverage.py --min-from-contract` consumes it; `agent-map.yaml:unit_coverage_pct`
+  is bound to `coverage_min_pct` by the drift audit; prompts already resolve it symbolically.)
+- [ ] Retrieval guard extracted and all role links validated. **Deferred (role-owner-gated):**
+  extracting `## Retrieval Guard` to a shared doc and repointing SKILL links is prose surgery each
+  role owner must approve.
+- [x] Vague-language linter implemented with exception support. (`lint-vague-language.py` —
+  banned words from `_contract`, per-line findings + suggestions, `vague-ok` exception marker, never
+  rewrites.)
+- [ ] Action/skill disposition inventory completed and approved by role owners. **Deferred:**
+  requires role-owner sign-off on move/retain/generate/delete per file (not self-certifiable).
+- [ ] Context reduction target measured without judgment loss. **Deferred:** the 40% fixed-procedure
+  reduction is the human-gated prose-thinning above; it also depends on the S0006 prompt cutover.
+- [x] Inverse literal and skill regression gates pass. (`contract-value.py --audit` clean;
+  `run-skill-regression.py` unaffected — no SKILL files were changed.)
+
+**Increment note:** S0008 delivers the consumer-consolidation *tooling* (resolver, inverse-literal/
+drift audit, vague-language linter) and one concrete consumer migration. The broad prose thinning
+(disposition inventory, retrieval-guard extraction, 40% reduction) and the removal of the validator's
+private date matrices (S0007) are role-owner-gated and, per the PRD rollout, follow the S0009 pilot.
 
 ## Review Provenance
 

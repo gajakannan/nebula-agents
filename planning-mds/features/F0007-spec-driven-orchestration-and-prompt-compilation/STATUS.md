@@ -14,7 +14,7 @@
 | F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0006 | Generated evidence prompts and drift gate | C | [~] Machinery implemented (renderer + drift/semantic gate + CI wiring + `feature` pilot); remaining-action rollout & semantic-equivalence cutover of the 24 hand-written prompts are human-gated (PM + role owners) and deferred |
 | F0007-S0007 | Version-aware validator convergence | C | [x] Implemented (version-aware selection + dual-read parity proven zero-disagreement across all cutovers; private constants kept — their removal is deferred to S0008 per the parity-approval gate) |
-| F0007-S0008 | Shared policy consumers and prose thinning | C | [ ] Not Started |
+| F0007-S0008 | Shared policy consumers and prose thinning | C | [~] Consumer tooling implemented (contract-value resolver + inverse-literal/drift audit, vague-language linter, coverage-script migration); prose thinning (40% reduction, retrieval-guard extraction, disposition inventory) and private-constant removal are role-owner-gated and deferred (removal also follows the S0009 pilot per PRD rollout) |
 | F0007-S0009 | Governed rollout and compatibility pilot | D | [ ] Not Started |
 
 ## Phase Gates

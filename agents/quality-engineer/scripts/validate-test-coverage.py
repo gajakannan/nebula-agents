@@ -22,6 +22,16 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
 
+
+def resolve_contract_value(key: str):
+    """Resolve a shared policy value via contract-value.py (single source of truth)."""
+    import importlib.util
+    cv_path = Path(__file__).resolve().parents[2] / "scripts" / "contract-value.py"
+    spec = importlib.util.spec_from_file_location("contract_value", cv_path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.resolve(key)
+
 LCOV_CANDIDATES = [
     "coverage/lcov.info",
     "coverage/lcov-report/lcov.info",
@@ -72,8 +82,19 @@ def main() -> int:
     add_product_root_arg(parser)
     parser.add_argument("coverage_file", nargs="?", help="Path to coverage file")
     parser.add_argument("--min", type=float, default=0.0, help="Minimum coverage percentage")
+    parser.add_argument("--min-from-contract", action="store_true",
+                        help="Resolve the minimum from the shared contract (coverage_min_pct) "
+                             "instead of hardcoding it. Fails closed if it cannot be resolved.")
     parser.add_argument("--auto", action="store_true", help="Auto-detect coverage file under {PRODUCT_ROOT}")
     args = parser.parse_args()
+
+    if args.min_from_contract:
+        # F0007-S0008: consume the shared policy value rather than a private literal.
+        try:
+            args.min = float(resolve_contract_value("coverage_min_pct"))
+        except Exception as exc:
+            print(f"❌ Could not resolve coverage_min_pct from the shared contract: {exc}")
+            return 2
 
     if args.auto:
         search_root = resolve_product_root(args.product_root)

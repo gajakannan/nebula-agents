@@ -51,11 +51,11 @@ independent historical fixtures + semantic invariants
 | [F0007-S0005](./F0007-S0005-gate-driver-checkpoints-and-severity-policy.md) | Gate driver, durable checkpoints, and severity policy | Implemented (pending signoff) |
 | [F0007-S0006](./F0007-S0006-generated-evidence-prompts-and-drift-gate.md) | Generated evidence prompts and drift gate | Machinery implemented; prompt cutover human-gated (deferred) |
 | [F0007-S0007](./F0007-S0007-version-aware-validator-convergence.md) | Version-aware validator convergence | Implemented (dual-read parity proven; constant removal deferred to S0008) |
-| [F0007-S0008](./F0007-S0008-shared-policy-consumers-and-prose-thinning.md) | Shared policy consumers and prose thinning | Not Started |
+| [F0007-S0008](./F0007-S0008-shared-policy-consumers-and-prose-thinning.md) | Shared policy consumers and prose thinning | Consumer tooling implemented; prose thinning + constant removal role-owner-gated (deferred) |
 | [F0007-S0009](./F0007-S0009-governed-rollout-and-compatibility-pilot.md) | Governed rollout and compatibility pilot | Not Started |
 
 **Total Stories:** 9
-**Completed:** 0 / 9 (S0001–S0005 implemented; S0006 generator/drift machinery + `feature` pilot (cutover human-gated); S0007 version-aware dual-read parity proven (constant removal deferred to S0008); pending signoff; Phases A & B complete, Phase C in progress)
+**Completed:** 0 / 9 (S0001–S0005 implemented; S0006 generator/drift + `feature` pilot; S0007 dual-read parity proven; S0008 consumer tooling (resolver/audit/linter) — prose thinning + constant removal role-owner-gated; pending signoff; Phases A & B complete, Phase C machinery complete, Phase D next)
 
 ## Phasing
 
