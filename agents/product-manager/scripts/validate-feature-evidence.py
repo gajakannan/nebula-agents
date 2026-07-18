@@ -67,6 +67,52 @@ TERMINAL_FEATURE_STATES = {"done", "completed", "archived"}
 RETIRED_FEATURE_STATES = {"abandoned", "superseded"}
 PRODUCT_ROOT_ARTIFACT_PREFIXES = ("planning-mds", "engine", "experience", "neuron", "bruno", "scripts")
 
+# --- F0007-S0007: version-aware manifest selection -------------------------------
+# These checks fire ONLY when a manifest carries the new `contract_version` field,
+# so legacy manifests (which resolve by contract_effective_date) are unaffected and
+# existing rule IDs/behavior are unchanged. The date constants above remain
+# authoritative; convergence to policy-derived matrices happens only after dual-read
+# parity is proven — see agents/product-manager/scripts/contract_compat.py.
+CONTRACT_VERSION_RE = re.compile(r"^\d{4}-\d{2}-\d{2}(-r\d+)?$")
+
+
+def _contract_version_date(cv: str) -> date | None:
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", cv)
+    if not match:
+        return None
+    return date(int(match.group(1)), int(match.group(2)), int(match.group(3)))
+
+
+def _published_policy_versions() -> set[str] | None:
+    """Published action-policy versions, or None when the policy tooling is unavailable."""
+    scripts_dir = FRAMEWORK_ROOT / "agents" / "scripts"
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    try:
+        import validate_action_specs as _vas
+    except (ImportError, SystemExit):
+        return None
+    return _vas.load_policy(_vas.DEFAULT_SPEC_DIR, _vas.Result()).version_set()
+
+
+def validate_contract_version_field(cv: object, effective_date_str: str, result: "Result", common: dict) -> None:
+    """Version-aware selection rules. Fail closed on a version/date contradiction."""
+    if not isinstance(cv, str) or not CONTRACT_VERSION_RE.fullmatch(cv):
+        result.add_error("manifest_malformed_contract_version_fails",
+                         "Manifest contract_version is malformed", **common)
+        return
+    cv_date = _contract_version_date(cv)
+    eff = parse_iso_date(effective_date_str)
+    if eff is not None and cv_date is not None and cv_date != eff:
+        result.add_error("manifest_version_date_conflict_fails",
+                         "Manifest contract_version date disagrees with contract_effective_date",
+                         **common)
+    versions = _published_policy_versions()
+    if versions is not None and cv not in versions:
+        result.add_error("manifest_unknown_contract_version_fails",
+                         f"Manifest contract_version {cv!r} is not a published policy version",
+                         **common)
+
 # §10 artifact dependency on the manifest scope booleans.
 RUNTIME_PREFLIGHT_FILE = "g1-runtime-preflight.md"
 SECURITY_REVIEW_FILE = "security-review-report.md"
@@ -3619,6 +3665,13 @@ def validate_manifest(
         result.add_error("manifest_bad_recorded_on_fails", "Manifest recorded_on is not a parseable ISO date", **common)
     if parse_iso_date(str(loaded.get("contract_effective_date", ""))) is None:
         result.add_error("manifest_bad_effective_date_fails", "Manifest contract_effective_date is not a parseable ISO date", **common)
+
+    # F0007-S0007: version-aware selection (only when the new field is present).
+    if loaded.get("contract_version") is not None:
+        validate_contract_version_field(
+            loaded.get("contract_version"),
+            str(loaded.get("contract_effective_date", "")),
+            result, common)
 
     # Start path shape
     start_path = str(loaded.get("feature_path_at_run_start", ""))

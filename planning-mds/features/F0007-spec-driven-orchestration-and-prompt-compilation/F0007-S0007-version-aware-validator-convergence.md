@@ -75,19 +75,31 @@ until the complete current/historical matrix reports zero disagreement.
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Decide how many releases dual-read remains available as a diagnostic after private constants are removed.
+- [x] Decide how many releases dual-read remains available as a diagnostic after private constants are removed.
+  **Resolved:** keep the dual-read diagnostic (`contract_compat.py`) for at least the next **two**
+  published contract versions after removal, then re-evaluate. It is read-only and cheap, and it gives
+  a fallback comparison during the first releases where policy-derived matrices are authoritative.
 
 **Assumptions:**
 - Existing validator fixtures can be extended to cover all policy cutovers without external product state.
 
 ## Definition of Done
 
-- [ ] Manifest template and consumer contract document version behavior.
-- [ ] Version selection and contradiction rules implemented.
-- [ ] Dual-read matrix is green across stages and historical cutovers.
-- [ ] Disagreement negative tests block constant removal.
-- [ ] Private matrices removed only after recorded parity approval.
-- [ ] Historical evidence is never modified by validation.
+- [x] Manifest template and consumer contract document version behavior.
+  (`evidence-manifest-template.json` adds `contract_version`; `CONSUMER-CONTRACT.md` documents
+  explicit-version + legacy-date resolution and the fail-closed rules)
+- [x] Version selection and contradiction rules implemented. (`validate-feature-evidence.py`
+  `validate_contract_version_field`: malformed / version-date-conflict / unknown-version, new-field
+  guarded so legacy manifests are unaffected; `contract_compat.py` explicit/legacy selection)
+- [x] Dual-read matrix is green across stages and historical cutovers.
+  (`contract_compat.py --matrix` — zero disagreement across all 5 cutovers × {explicit, legacy-date})
+- [x] Disagreement negative tests block constant removal. (`test_contract_compat.py` — a weakened
+  bundle produces a machine-readable disagreement)
+- [~] Private matrices removed only after recorded parity approval. **Intentionally deferred:** S0007
+  keeps the private date constants active and proves parity; the actual removal happens in S0008 after
+  a recorded zero-disagreement decision (this DoD item is the guard — it is honored by not removing yet).
+- [x] Historical evidence is never modified by validation. (dual-read is read-only; the validator
+  change is additive; no evidence or policy is mutated)
 
 ## Review Provenance
 

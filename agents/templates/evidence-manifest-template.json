@@ -6,6 +6,7 @@
   "run_id": "YYYY-MM-DD-XXXXXXXX",
   "status": "draft",
   "recorded_on": "YYYY-MM-DD",
+  "contract_version": "2026-05-25",
   "contract_effective_date": "2026-05-25",
   "feature_path_at_run_start": "planning-mds/features/F####-{slug}",
   "feature_path_at_closeout": null,
