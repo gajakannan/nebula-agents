@@ -9,7 +9,7 @@
 |-------|-------|-------|--------|
 | F0007-S0001 | Versioned action policy and schema | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0002 | Contract conformance and behavioral diff | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0003 | Run initialization and product scaffolding | B | [ ] Not Started |
+| F0007-S0003 | Run initialization and product scaffolding | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
 | F0007-S0004 | Typed command runtime and complete telemetry | B | [ ] Not Started |
 | F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [ ] Not Started |
 | F0007-S0006 | Generated evidence prompts and drift gate | C | [ ] Not Started |

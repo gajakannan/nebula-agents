@@ -75,18 +75,27 @@ using missing-only writes. User interviews and blueprint tailoring remain judgme
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Select the portable lock-file/advisory-lock implementation and stale-lock recovery contract.
+- [x] Select the portable lock-file/advisory-lock implementation and stale-lock recovery contract.
+  **Resolved:** atomic `os.open(O_CREAT|O_EXCL)` lock file (identity = feature id + resolved product
+  root), held only around the scan-and-create critical section and released in `finally`; fails
+  closed on `OSError` (never proceeds unlocked). The durable "one active run per feature" guard is
+  the manifest scan, not the lock, so stale locks are rare; a stale lock is cleared with
+  `--force-unlock`. Portable across POSIX/Windows without `fcntl`.
 
 **Assumptions:**
 - `_product_root.py` remains the canonical root resolver.
 
 ## Definition of Done
 
-- [ ] Run initialization and scaffold check/write modes implemented.
-- [ ] Contract stamping and legacy rerun linkage tested.
-- [ ] Concurrent creator, resume, malformed input, path escape, and rollback tests pass.
-- [ ] Audit output lists all created and preserved artifacts.
-- [ ] `init.md` mechanical inventory is represented in the scaffold spec.
+- [x] Run initialization and scaffold check/write modes implemented. (`init-run.py`;
+  `scaffold-product.py` with `--check`)
+- [x] Contract stamping and legacy rerun linkage tested. (manifest `contract_version` +
+  `contract_effective_date` from active policy; `rerun_of`; `test_init_run.py`)
+- [x] Concurrent creator, resume, malformed input, path escape, and rollback tests pass.
+  (`test_init_run.py` — 2 concurrent initializers → one success + one conflict; `--resume`
+  idempotency; F#### / slug traversal rejection; rollback leaves no partial skeleton)
+- [x] Audit output lists all created and preserved artifacts. (JSON report `created`/`preserved`)
+- [x] `init.md` mechanical inventory is represented in the scaffold spec. (`agents/scripts/scaffold-map.yaml`)
 
 ## Review Provenance
 

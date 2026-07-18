@@ -1,0 +1,41 @@
+# Product scaffold map — the mechanical inventory of agents/actions/init.md.
+#
+# scaffold-product.py creates `directories` (mkdir -p, idempotent) and copies each
+# `files` template to its destination IFF the destination is missing. Existing
+# product-owned files are never overwritten. Destinations are relative to
+# {PRODUCT_ROOT}; templates are relative to the framework's agents/templates/.
+#
+# The user-interview / judgment portion of init.md (BLUEPRINT sections 0-2,
+# glossary, REGISTRY/ROADMAP content) intentionally stays out of this map.
+schema_version: 1
+
+directories:
+  - planning-mds
+  - planning-mds/domain
+  - planning-mds/features
+  - planning-mds/features/archive
+  - planning-mds/examples/personas
+  - planning-mds/examples/features
+  - planning-mds/examples/stories
+  - planning-mds/architecture
+  - planning-mds/architecture/decisions
+  - planning-mds/security
+  - planning-mds/operations/evidence
+  - .github/workflows
+
+files:
+  - template: lifecycle-stage-template.yaml
+    destination: lifecycle-stage.yaml
+    required: true
+  - template: contributing-template.md
+    destination: CONTRIBUTING.md
+    required: true
+  - template: ci-gates-template.yml
+    destination: .github/workflows/ci-gates.yml
+    required: true
+  - template: tracker-governance-template.md
+    destination: planning-mds/features/TRACKER-GOVERNANCE.md
+    required: true
+  - template: solution-patterns-template.md
+    destination: planning-mds/architecture/SOLUTION-PATTERNS.md
+    required: true
