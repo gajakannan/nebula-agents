@@ -71,9 +71,10 @@ PHASE=A,existing -> update existing planning artifacts; STATUS.md story provenan
 append-only. PHASE=B,new -> REJECT (run architecture only after requirements exist).
 PHASE=B,existing -> update feature-assembly-plan.md + ontology bindings.
 PHASE=A+B -> Phase A then Phase B.
-NOTE[session_setup]: Resolve {PRODUCT_ROOT} and echo the absolute path on the first turn. Generate {PLAN_RUN_ID} once at
-session start (contract format; no uuid4). Create the base run folder
-{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}/ and the base run files
-(README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log).
-Plan does NOT create a feature evidence package — the feature index root is created later by the
-feature action for the same FEATURE_ID.
+NOTE[session_setup]: Resolve {PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
+`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {PRODUCT_ROOT}`.
+It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
+creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
+variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run
+is base-run-only for plan: it does NOT create a feature evidence package (the feature index root is
+created later by the feature action for the same FEATURE_ID).

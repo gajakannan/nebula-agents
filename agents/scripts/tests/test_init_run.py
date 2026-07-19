@@ -75,6 +75,19 @@ def test_second_active_run_conflicts(tmp_path):
     assert exc.value.code == 3
 
 
+def test_plan_base_run_does_not_block_feature_init(tmp_path):
+    # A base-run (plan) draft for the same feature must NOT count as an active feature run,
+    # so a subsequent feature init succeeds (frickle b).
+    plan = do_init(tmp_path, action="plan", run_id="2026-07-18-0000aaaa")
+    assert plan["ok"]
+    plan_manifest = json.loads((Path(plan["run_folder"]) / "evidence-manifest.json").read_text())
+    assert plan_manifest["run_scope"] == "base-run-only"
+    feat = do_init(tmp_path, action="feature")  # same feature id, feature-completion scope
+    assert feat["ok"]
+    feat_manifest = json.loads((Path(feat["run_folder"]) / "evidence-manifest.json").read_text())
+    assert feat_manifest["run_scope"] == "feature-completion"
+
+
 def test_resume_same_run_is_idempotent(tmp_path):
     first = do_init(tmp_path, run_id="2026-07-18-aaaaaaaa")
     assert first["ok"]

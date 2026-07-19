@@ -135,9 +135,13 @@ def release_lock(lock_path: Path) -> None:
 # --------------------------------------------------------------------------- #
 # Active-run scan
 # --------------------------------------------------------------------------- #
-def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str) -> list[str]:
+def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str,
+                     scope: str = "feature-completion") -> list[str]:
     """Runs live under a shared evidence/runs/ tree; a run belongs to this feature when its
-    manifest feature_id matches. Returns this feature's active (draft/in-progress) runs."""
+    manifest feature_id matches. The exclusivity rule is per scope: a feature-completion init
+    conflicts only with active feature-completion runs, so a base-run (plan) for the same
+    feature does not block it (and vice versa). Legacy manifests without run_scope default to
+    feature-completion. Returns this feature's active (draft/in-progress) runs of *scope*."""
     active = []
     if not runs_root.is_dir():
         return active
@@ -151,7 +155,9 @@ def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str) -> l
             data = json.loads(manifest.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if data.get("feature_id") == feature_id and data.get("status") in ACTIVE_STATUSES:
+        if (data.get("feature_id") == feature_id
+                and data.get("status") in ACTIVE_STATUSES
+                and data.get("run_scope", "feature-completion") == scope):
             active.append(child.name)
     return active
 
@@ -160,7 +166,8 @@ def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str) -> l
 # Skeleton creation
 # --------------------------------------------------------------------------- #
 def _write_manifest(run_folder: Path, *, feature_id: str, slug: str, run_id: str,
-                    contract_version: str, effective_date: str, rerun_of: str | None) -> None:
+                    contract_version: str, effective_date: str, rerun_of: str | None,
+                    scope: str | None = None) -> None:
     manifest = _strip_comments(json.loads(MANIFEST_TEMPLATE.read_text(encoding="utf-8")))
     feature_path = f"planning-mds/features/{feature_id}-{slug}"
     manifest.update({
@@ -171,6 +178,9 @@ def _write_manifest(run_folder: Path, *, feature_id: str, slug: str, run_id: str
         "recorded_on": date.today().isoformat(),
         "contract_version": contract_version,
         "contract_effective_date": effective_date,
+        # run_scope lets the concurrent-run scan distinguish a feature-completion run from a
+        # base-run (e.g. plan), so a plan run never blocks a feature run for the same feature.
+        "run_scope": scope or "feature-completion",
         "feature_path_at_run_start": feature_path,
         "feature_path_at_closeout": None,
         "rerun_of": rerun_of,
@@ -281,9 +291,11 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     acquire_lock(lock_path, force=force_unlock)
     created_run_folder = not run_folder.exists()
     try:
-        conflicts = scan_active_runs(runs_root, feature_id, exclude_run_id=run_id)
+        conflicts = scan_active_runs(runs_root, feature_id, exclude_run_id=run_id,
+                                     scope=action_scope or "feature-completion")
         if conflicts:
-            raise InitError(3, f"active run(s) already exist for {feature_id}: {conflicts}")
+            raise InitError(3, f"active {action_scope or 'feature-completion'} run(s) already "
+                               f"exist for {feature_id}: {conflicts}")
 
         if run_folder.exists() and any(run_folder.iterdir()) and not resume:
             raise InitError(4, f"run folder {run_folder.name} already exists (use --resume)")
@@ -305,7 +317,7 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
         else:
             _write_manifest(run_folder, feature_id=feature_id, slug=slug, run_id=run_id,
                             contract_version=contract_version, effective_date=effective_date,
-                            rerun_of=rerun_of)
+                            rerun_of=rerun_of, scope=action_scope)
             created.append("evidence-manifest.json")
     except Exception:
         if created_run_folder and run_folder.exists():
