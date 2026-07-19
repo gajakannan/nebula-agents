@@ -160,7 +160,7 @@ def _verify_attested(stage_state: dict[str, Any], checkpoint_id: str, run_folder
 # --------------------------------------------------------------------------- #
 def build_variables(*, product_root: Path, feature_id: str, slug: str, run_id: str,
                     run_folder: Path, stage: str) -> dict[str, str]:
-    index_root = product_root / "planning-mds" / "operations" / "evidence" / f"{feature_id}-{slug}"
+    index_root = product_root / "planning-mds" / "operations" / "evidence" / "features" / f"{feature_id}-{slug}"
     return {
         "PRODUCT_ROOT": str(product_root),
         "FEATURE_ID": feature_id,
@@ -402,7 +402,7 @@ def _resolve_run_folder(args, product_root: Path) -> Path:
     if args.run_folder:
         return Path(args.run_folder).resolve()
     return (product_root / "planning-mds" / "operations" / "evidence"
-            / f"{args.feature}-{args.feature_slug}" / args.run_id).resolve()
+            / "runs" / args.run_id).resolve()
 
 
 def main(argv: list[str] | None = None) -> int:

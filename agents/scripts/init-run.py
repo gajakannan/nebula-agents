@@ -135,21 +135,23 @@ def release_lock(lock_path: Path) -> None:
 # --------------------------------------------------------------------------- #
 # Active-run scan
 # --------------------------------------------------------------------------- #
-def scan_active_runs(index_root: Path, exclude_run_id: str) -> list[str]:
+def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str) -> list[str]:
+    """Runs live under a shared evidence/runs/ tree; a run belongs to this feature when its
+    manifest feature_id matches. Returns this feature's active (draft/in-progress) runs."""
     active = []
-    if not index_root.is_dir():
+    if not runs_root.is_dir():
         return active
-    for child in sorted(index_root.iterdir()):
+    for child in sorted(runs_root.iterdir()):
         if not child.is_dir() or child.name == exclude_run_id:
             continue
         manifest = child / "evidence-manifest.json"
         if not manifest.is_file():
             continue
         try:
-            status = json.loads(manifest.read_text(encoding="utf-8")).get("status")
+            data = json.loads(manifest.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if status in ACTIVE_STATUSES:
+        if data.get("feature_id") == feature_id and data.get("status") in ACTIVE_STATUSES:
             active.append(child.name)
     return active
 
@@ -246,14 +248,18 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     artifacts_subdirs = list(shared.get("artifacts_subdirs", []))
 
     slug = resolve_feature_slug(product_root, feature_id, feature_slug)
-    index_root = _contained(product_root, product_root / "planning-mds" / "operations"
-                            / "evidence" / f"{feature_id}-{slug}")
+    # Real evidence layout: the run folder lives in the shared runs/ tree; the per-feature index
+    # (features/{FID}-{slug}) holds latest-run.json and the per-feature init lock.
+    evidence_root = product_root / "planning-mds" / "operations" / "evidence"
+    runs_root = _contained(product_root, evidence_root / "runs")
+    index_root = _contained(product_root, evidence_root / "features" / f"{feature_id}-{slug}")
 
     run_id = run_id or mint_run_id()
     if not RUN_ID_RE.match(run_id):
         raise InitError(5, f"malformed run id {run_id!r}")
-    run_folder = _contained(product_root, index_root / run_id)
+    run_folder = _contained(product_root, runs_root / run_id)
 
+    runs_root.mkdir(parents=True, exist_ok=True)
     index_root.mkdir(parents=True, exist_ok=True)
     prior = index_root / "latest-run.json"
     run_id_prior = None
@@ -267,7 +273,7 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     acquire_lock(lock_path, force=force_unlock)
     created_run_folder = not run_folder.exists()
     try:
-        conflicts = scan_active_runs(index_root, exclude_run_id=run_id)
+        conflicts = scan_active_runs(runs_root, feature_id, exclude_run_id=run_id)
         if conflicts:
             raise InitError(3, f"active run(s) already exist for {feature_id}: {conflicts}")
 

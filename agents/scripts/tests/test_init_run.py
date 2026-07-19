@@ -106,8 +106,8 @@ def test_rollback_leaves_no_partial_skeleton(tmp_path, monkeypatch):
     monkeypatch.setattr(ir, "_write_manifest", boom)
     with pytest.raises(RuntimeError):
         do_init(tmp_path)
-    index = tmp_path / "planning-mds" / "operations" / "evidence" / f"F0007-{SLUG}"
-    run_dirs = [p for p in index.iterdir() if p.is_dir()] if index.is_dir() else []
+    runs = tmp_path / "planning-mds" / "operations" / "evidence" / "runs"
+    run_dirs = [p for p in runs.iterdir() if p.is_dir()] if runs.is_dir() else []
     assert run_dirs == [], "partial run folder must be rolled back"
 
 
