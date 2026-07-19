@@ -246,6 +246,10 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     effective_date = str(shared.get("contract_effective_date", contract_version))
     base_run_files = list(shared.get("base_run_files", []))
     artifacts_subdirs = list(shared.get("artifacts_subdirs", []))
+    action_spec = policy.actions.get(action, {})
+    action_contract = action_spec.get("contract", {}) if isinstance(action_spec, dict) else {}
+    action_scope = action_contract.get("scope") if isinstance(action_contract, dict) else None
+    base_run_only = action_scope == "base-run-only"
 
     slug = resolve_feature_slug(product_root, feature_id, feature_slug)
     # Real evidence layout: the run folder lives in the shared runs/ tree; the per-feature index
@@ -260,16 +264,20 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     run_folder = _contained(product_root, runs_root / run_id)
 
     runs_root.mkdir(parents=True, exist_ok=True)
-    index_root.mkdir(parents=True, exist_ok=True)
     prior = index_root / "latest-run.json"
     run_id_prior = None
-    if prior.is_file():
+    if not base_run_only:
+        index_root.mkdir(parents=True, exist_ok=True)
+    if not base_run_only and prior.is_file():
         try:
             run_id_prior = json.loads(prior.read_text(encoding="utf-8")).get("run_id")
         except (OSError, json.JSONDecodeError):
             run_id_prior = None
 
-    lock_path = index_root / ".init.lock"
+    # Base-run-only actions must not create a feature evidence package. Keep their
+    # transient per-feature lock in the shared runs tree instead of index_root.
+    lock_path = ((runs_root / f".{feature_id}.init.lock") if base_run_only
+                 else (index_root / ".init.lock"))
     acquire_lock(lock_path, force=force_unlock)
     created_run_folder = not run_folder.exists()
     try:

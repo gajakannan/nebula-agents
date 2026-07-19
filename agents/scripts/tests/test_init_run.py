@@ -55,6 +55,13 @@ def test_happy_path_creates_stamped_skeleton(tmp_path):
     assert "evidence-manifest.json" in report["created"]
 
 
+def test_plan_base_run_does_not_create_feature_index(tmp_path):
+    report = do_init(tmp_path, action="plan")
+    assert Path(report["run_folder"]).is_dir()
+    assert not Path(report["feature_index_root"]).exists()
+    assert not (Path(report["run_folder"]).parent / ".F0007.init.lock").exists()
+
+
 def test_rerun_linkage_recorded(tmp_path):
     report = do_init(tmp_path, rerun_of="2026-01-01-abcdef12")
     manifest = json.loads((Path(report["run_folder"]) / "evidence-manifest.json").read_text())
