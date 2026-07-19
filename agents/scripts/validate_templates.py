@@ -359,21 +359,11 @@ ACTIONS_THAT_MUST_REFERENCE_PACKAGE = [
 # text grep is retired for them. Any non-generated prompt can be re-added here.
 PROMPTS_FORBIDDEN_UUID4: list[str] = []
 
-# §24 (e): per-gate template references inside feature/build actions.
-GATE_TEMPLATE_REFS: dict[str, list[str]] = {
-    "agents/actions/feature.md": [
-        "g0-assembly-plan-validation.md",
-        "g1-runtime-preflight.md",
-        "g2-self-review.md",
-        "test-plan.md",
-        "test-execution-report.md",
-        "coverage-report.md",
-        "deployability-check.md",
-        "code-review-report.md",
-        "signoff-ledger.md",
-        "pm-closeout.md",
-    ],
-}
+# §24 (e): per-gate template references inside action docs.
+# F0007: feature.md is thinned — its gate->artifact mapping now lives in
+# agents/actions/spec/feature.yaml (verified by action_spec_schema) and renders into
+# the generated prompt (verified by prompt_drift), so it is no longer asserted here.
+GATE_TEMPLATE_REFS: dict[str, list[str]] = {}
 
 
 def validate_evidence_template_alignment() -> list[str]:

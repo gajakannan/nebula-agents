@@ -26,106 +26,34 @@ Ready for Build
 
 ---
 
-## Retrieval Contract
+## Contract (generated — the spec is the source of truth)
 
-Retuned by `python3 {PRODUCT_ROOT}/scripts/kg/eval.py`; do not hand-edit without running eval.
+The fixed procedure for this action — gates, artifacts, ordering, typed commands,
+ownership, forbidden actions, stop conditions, and conflict resolution — is declared
+once in [`agents/actions/spec/plan.yaml`](spec/plan.yaml) and compiled into the
+operator/automation prompt pair at
+`agents/templates/prompts/evidence-contract/plan-operator-friendly.md` and
+`plan-automation-safe.md`. Regenerate with `python3 agents/scripts/render-prompts.py`;
+the `prompt_drift` lifecycle gate fails if the committed prompts drift from the spec.
+**Edit the spec, not this doc or the generated prompts.**
 
-```yaml
-tier_defaults:
-  plan:
-    greenfield:      { start_tier: file-centric, max_auto_tier: 2 }
-    refinement:      { start_tier: 2,            max_auto_tier: 3 }
-    drift-reconcile: { start_tier: 3,            max_auto_tier: 4 }
-```
+Plan runs BEFORE any feature evidence package exists: it produces planning artifacts
+inside `{FEATURE_PATH}` plus a base-run evidence package (do NOT call
+`validate-feature-evidence.py` at plan). Run gates through
+`python3 agents/scripts/run-gate.py --action plan --stage <G1..G5> ...` (`--list` prints
+the runbook). The exit-validation sequence and the tracker-only closeout contract
+(`validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`) are the
+G5 operations in the spec.
 
-- `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` is a first-pass scope resolver and retrieval aid, not an authoritative source of truth.
-- Raw artifacts win on conflict: feature folder, ADRs, API contracts, schemas, and policy artifacts outrank KG output.
-- Navigate instead of eager-loading: open linked raw artifacts on demand when the current gate needs detail or drift repair.
+### Gate flow
 
-## Context Files
+G1 Clarification → G2 Tracker sync (Phase A) → G3 Phase A approval
+→ G4 Ontology sync (Phase B) → G5 Phase B approval + exit validation.
 
-Load in this order when the work is feature-scoped:
-
-1. `agents/ROUTER.md`
-2. `agents/agent-map.yaml`
-3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/plan.md`
-5. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-6. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-7. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
-
-## On-Demand Paths
-
-- `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`
-- `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`
-- `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml` beyond what `lookup.py` already returned
-- `agents/<role>/references/**` only after a matching `agents/ROUTER.md` row
-
-## Deliverables Contract
-
-- PM artifacts: `PRD.md`, stories, personas, trackers, feature folder scaffolding, and feature mapping stubs
-- Architect artifacts: data model, workflow design, API contracts, ADRs, authorization deltas, and completed KG bindings
-- KG artifacts: `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`, plus `canonical-nodes.yaml` or `solution-ontology.yaml` only when shared semantics or ontology vocabulary changed
-- Tracker artifacts: `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`, `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`, `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, and generated story index as needed
-- `feature-assembly-plan.md` is not a plan deliverable; it belongs to `agents/actions/feature.md` Step 0
-
-## Ownership Contract
-
-- `product-manager` owns `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`, stories, PRD, personas, and planning trackers
-- `architect` owns `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`, `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`, ADRs, API contracts, schemas, and authorization artifacts
-- Other roles flag drift but do not silently redefine canonical shared semantics
-
-## Forbidden
-
-- Hand-enumerating schemas, ADRs, or contract files when `lookup.py` output is already available
-- Loading `agents/<role>/references/**` without a `agents/ROUTER.md` row match
-- Treating lookup/KG mappings as authoritative over raw artifacts
-- Non-architect roles editing `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` or `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-- Proceeding past any gate without an explicit approval token
-- Widening scope outside the current feature or declared plan target
-- Climbing past `max_auto_tier` without recording `workstate.py escalate`
-
-## Gate Contract
-
-- `G1 CLARIFICATION` — Step 1.5 Requirements Clarification
-- `G2 TRACKER SYNC (A)` — Step 1.75 Mandatory tracker synchronization before Phase A approval
-- `G3 PHASE A APPROVAL` — Step 2 Phase A Review
-- `G4 ONTOLOGY SYNC (B)` — Step 3.5 Mandatory ontology synchronization before Phase B approval
-- `G5 PHASE B APPROVAL` — Step 4 Phase B Review
-
-## Stop Conditions
-
-- `validate.py` exits non-zero and cannot be repaired within the declared scope
-- A required approval gate lacks an explicit approval token
-- Scope drifts outside the declared feature or planning target
-- A non-architect attempts to edit architect-owned canonical semantics
-- `INSUFFICIENT_CONTEXT`: `lookup.py` returns empty scope for a declared in-scope node, or only ambiguous / low-confidence (`inferred`, `confidence < 0.5`) matches on a node about to be edited, or the workflow needs to climb past `max_auto_tier`; halt the current gate, invoke `workstate.py escalate <reason> --nodes ... --opened-raw ...`, open the raw artifacts, and do not proceed with weak matches
-
-## Exit Validation
-
-Run in this order:
-
-1. `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}`
-2. `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
-3. `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`
-4. `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
-5. `python3 {PRODUCT_ROOT}/scripts/kg/validate.py`
-6. `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
-7. `python3 agents/scripts/validate_templates.py`
-
-Plan closeout is tracker/base-run validation only. Do not run
-`validate-feature-evidence.py` for the current plan run, and do not run
-repo-wide feature-evidence validation as a plan closeout gate. Identify direct
-or impacted feature dependencies from planning artifacts and KG mappings, then
-record existing dependency evidence references or "audit pending" notes in the
-plan run evidence. Automated dependency discovery/validator support is a later
-contract step.
-
----
+Ownership in brief (full map in the spec's `ownership:`): the **product-manager** owns
+Phase A (PRD, personas, stories, STATUS skeleton); the **architect** owns Phase B
+(assembly plan, ADRs, contracts/schemas, and the canonical/ontology bindings).
+Per-step judgment follows below.
 
 ## Execution Steps
 

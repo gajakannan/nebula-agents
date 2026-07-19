@@ -81,9 +81,11 @@ def run_validator(plan_action: Path, feature_action: Path, templates_dir: Path) 
 
 def test_plan_closeout_examples_use_tracker_only_validation_contract() -> None:
     sources = read_sources(PLAN_CONTRACT_SOURCES)
+    # F0007: plan.md is thinned (procedure lives in the spec + generated prompt), so the
+    # tracker-only closeout contract is asserted across the plan sources combined, not per file.
+    combined = "\n".join(sources.values())
 
-    for path, content in sources.items():
-        assert PLAN_TRACKER_COMMAND in content, path.relative_to(REPO_ROOT)
+    assert PLAN_TRACKER_COMMAND in combined
     assert_no_unscoped_product_root_tracker_commands(sources)
 
 
