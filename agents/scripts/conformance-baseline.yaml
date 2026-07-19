@@ -1,13 +1,9 @@
 # Golden conformance baseline — independently-authored expected outcomes for the
-# published policy versions. This file is NOT generated from the action specs; it
-# is the separate line of defense that catches a weakening edit even when the
-# edited spec is internally consistent and its generated output matches.
-#
-# `model_hash` is a semantic fingerprint (sha256 of the normalized bundle model),
-# so comment/whitespace/key-order changes do not move it — only a behavioral
-# change does. Updating any expected outcome requires the SAME authorization as
-# publishing a new policy version: edit the value AND add an `audit_log` entry
-# naming the new version, reviewer, rationale, and affected fixtures.
+# published policy versions. NOT generated from the action specs; it is the separate
+# line of defense that catches a weakening edit even when the edited spec is internally
+# consistent. model_hash is a semantic fingerprint of the normalized bundle model.
+# Updating any expected outcome requires the same authorization as publishing a new
+# policy version: edit the value AND add an audit_log entry.
 #
 # Enforced by: agents/scripts/contract-conformance.py
 schema_version: 1
@@ -15,16 +11,13 @@ schema_version: 1
 audit_log:
   - date: 2026-07-18
     version: all
-    reviewer: architect (F0007-S0002)
+    reviewer: architect (F0007-S0002; refreshed during the S0006/S0008 faithful feature cutover)
     rationale: >-
-      Seed the golden baseline from the S0001 published bundles. Requirement
-      flags and required-artifact anchors mirror the *_EFFECTIVE_DATE cutovers
-      in agents/product-manager/scripts/validate-feature-evidence.py.
+      Baseline mirrors the published bundles after the feature gate matrix was corrected to
+      the real Feature Evidence Contract (G3 code+security review, G6 candidate validation,
+      G7 architect KG reconciliation). Requirement flags mirror the *_EFFECTIVE_DATE cutovers.
     affected_fixtures: [2026-05-19, 2026-05-25, 2026-06-01, 2026-07-05, 2026-07-11]
 
-# Expected verdict for each cutover is `pass`: the bundle must resolve to exactly
-# these requirement flags and required artifacts. feature_required_artifacts lists
-# the semantically load-bearing gate anchors; model_hash covers the rest.
 fixtures:
   - id: cutover-2026-05-19
     version: "2026-05-19"
@@ -37,10 +30,10 @@ fixtures:
       compile_projection_contract: false
     feature_required_artifacts:
       G0: [g0-assembly-plan-validation.md]
-      G6: []
+      G3: [code-review-report.md]
       G7: []
       G8: [pm-closeout.md]
-    model_hash: "8001159dc4fe4fe521b33217d8f048e61c95b0780f0477055419e40ddf5cdc6d"
+    model_hash: "832d76ee28fbaeba9871662e7b3ca460f1d85505533547d0102afcece78a5d00"
 
   - id: cutover-2026-05-25
     version: "2026-05-25"
@@ -48,16 +41,16 @@ fixtures:
     expected_verdict: pass
     requirements:
       security_scans_required: true
-      required_security_scan_classes: [dependency, dast, sast, secrets]
+      required_security_scan_classes: [dast, dependency, sast, secrets]
       kg_reconciliation_required: false
       kg_generated_regen_required: false
       compile_projection_contract: false
     feature_required_artifacts:
       G0: [g0-assembly-plan-validation.md]
-      G6: [security-review-report.md]
+      G3: [code-review-report.md, security-review-report.md]
       G7: []
       G8: [pm-closeout.md]
-    model_hash: "a535e3b4048af1d3f905e71b80fffb008a186d34bfc390b94daa0b19f50618a8"
+    model_hash: "bf520e119909314bb15a69e235485b2f96636cfff087929db6e43a007ec32ece"
 
   - id: cutover-2026-06-01
     version: "2026-06-01"
@@ -65,16 +58,16 @@ fixtures:
     expected_verdict: pass
     requirements:
       security_scans_required: true
-      required_security_scan_classes: [dependency, dast, sast, secrets]
+      required_security_scan_classes: [dast, dependency, sast, secrets]
       kg_reconciliation_required: true
       kg_generated_regen_required: false
       compile_projection_contract: false
     feature_required_artifacts:
       G0: [g0-assembly-plan-validation.md]
-      G6: [security-review-report.md]
+      G3: [code-review-report.md, security-review-report.md]
       G7: [kg-reconciliation.md]
       G8: [pm-closeout.md]
-    model_hash: "ad772c88d24de048f391c31edb62435fb333f3763b77aee5b6a59f1a7872a52a"
+    model_hash: "e9efdd3e381ebcdd954cfbbd32fcc2a55798e161056993b310ca323fe64a5842"
 
   - id: cutover-2026-07-05
     version: "2026-07-05"
@@ -82,16 +75,16 @@ fixtures:
     expected_verdict: pass
     requirements:
       security_scans_required: true
-      required_security_scan_classes: [dependency, dast, sast, secrets]
+      required_security_scan_classes: [dast, dependency, sast, secrets]
       kg_reconciliation_required: true
       kg_generated_regen_required: true
       compile_projection_contract: false
     feature_required_artifacts:
       G0: [g0-assembly-plan-validation.md]
-      G6: [security-review-report.md]
+      G3: [code-review-report.md, security-review-report.md]
       G7: [kg-reconciliation.md]
       G8: [pm-closeout.md]
-    model_hash: "7a2db1c04bafe5476f30a651db32cfbf295f013670c4d9bb9f51a4d815d53983"
+    model_hash: "66cbad32d8a8eb9c316b1910316125c8c17ba06b8c1a8c24071219e592b1e5fa"
 
   - id: cutover-2026-07-11
     version: "2026-07-11"
@@ -99,13 +92,13 @@ fixtures:
     expected_verdict: pass
     requirements:
       security_scans_required: true
-      required_security_scan_classes: [dependency, dast, sast, secrets]
+      required_security_scan_classes: [dast, dependency, sast, secrets]
       kg_reconciliation_required: true
       kg_generated_regen_required: true
       compile_projection_contract: true
     feature_required_artifacts:
       G0: [g0-assembly-plan-validation.md]
-      G6: [security-review-report.md]
+      G3: [code-review-report.md, security-review-report.md]
       G7: [kg-reconciliation.md]
       G8: [pm-closeout.md]
-    model_hash: "2fb4926f9b24272b03b388b142821b2a038a1251b16ba18d475b2c82b1773cbb"
+    model_hash: "bd9a81993a9abe245c298a0dbbdb232327f8c67fa8d3e73195c3ad749f3c188c"

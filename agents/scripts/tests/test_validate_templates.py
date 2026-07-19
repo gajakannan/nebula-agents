@@ -116,10 +116,12 @@ def test_exit_validation_drift_is_reported(tmp_path: Path) -> None:
         "feature-operator-friendly.md",
     ):
         content = (PROMPT_SOURCE_DIR / name).read_text(encoding="utf-8")
-        if name == "feature-automation-safe.md":
+        # F0007: the feature prompt is generated (drift covered by render-prompts.py --check), so
+        # the exit-validation cross-check now applies to actions not yet cut over — exercise it on plan.
+        if name == "plan-automation-safe.md":
             content = content.replace(
-                "python3 agents/product-manager/scripts/validate-trackers.py",
-                "python3 agents/product-manager/scripts/validate-trackerz.py",
+                "python3 agents/product-manager/scripts/generate-story-index.py",
+                "python3 agents/product-manager/scripts/generate-story-indez.py",
             )
         (templates_dir / name).write_text(content, encoding="utf-8")
 
@@ -127,7 +129,7 @@ def test_exit_validation_drift_is_reported(tmp_path: Path) -> None:
 
     assert result.returncode != 0
     assert "missing exit-validation commands" in result.stdout
-    assert "validate-trackers.py" in result.stdout
+    assert "generate-story-index.py" in result.stdout
 
 
 def test_plan_closeout_examples_use_tracker_only_validation_contract() -> None:

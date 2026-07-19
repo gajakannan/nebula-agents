@@ -38,10 +38,10 @@ actions:
     gates:
       - {id: G0, role: architect, required_artifacts: [g0-assembly-plan-validation.md]}
       - {id: G1, role: devops, required_artifacts: []}
-      - {id: G2, role: backend-developer, required_artifacts: [g2-self-review.md, g2-deployability-check.md]}
-      - {id: G3, role: quality-engineer, required_artifacts: [test-execution-report.md]}
-      - {id: G4, role: quality-engineer, required_artifacts: [coverage-report.md]}
-      - {id: G5, role: code-reviewer, required_artifacts: [signoff-ledger.md]}
-      - {id: G6, role: security, required_artifacts: [security-review-report.md]}
+      - {id: G2, role: quality-engineer, required_artifacts: [g2-self-review.md, test-plan.md, test-execution-report.md, coverage-report.md, g2-deployability-check.md]}
+      - {id: G3, role: code-reviewer, required_artifacts: [code-review-report.md, security-review-report.md]}
+      - {id: G4, role: product-manager, required_artifacts: []}
+      - {id: G5, role: product-manager, required_artifacts: [signoff-ledger.md]}
+      - {id: G6, role: quality-engineer, required_artifacts: [feature-action-execution.md]}
       - {id: G7, role: architect, required_artifacts: [kg-reconciliation.md]}
       - {id: G8, role: product-manager, required_artifacts: [pm-closeout.md]}

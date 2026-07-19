@@ -27,7 +27,7 @@ from typing import Any
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 FRAMEWORK_ROOT = SCRIPT_DIR.parents[1]
-GENERATED_DIR = FRAMEWORK_ROOT / "agents" / "templates" / "prompts" / "evidence-contract" / "generated"
+GENERATED_DIR = FRAMEWORK_ROOT / "agents" / "templates" / "prompts" / "evidence-contract"
 RENDERER_VERSION = 1
 KNOWN_SCOPES = frozenset({"feature-completion", "base-run-only", "read-only-audit", "merge"})
 PACKAGE_ROOT_REF = "planning-mds/operations/evidence"
@@ -89,6 +89,21 @@ def _common_facts(spec: dict[str, Any], shared: dict[str, Any]) -> dict[str, Any
     }
 
 
+def _auto_resolved(spec: dict[str, Any]) -> list[tuple[str, str]]:
+    auto = spec.get("auto_resolved", {})
+    return sorted((str(k), str(v)) for k, v in auto.items()) if isinstance(auto, dict) else []
+
+
+def _tiers(spec: dict[str, Any]) -> list[tuple[str, Any]]:
+    tiers = (spec.get("retrieval", {}) or {}).get("tier_defaults", {})
+    return sorted(tiers.items()) if isinstance(tiers, dict) else []
+
+
+def _ownership(spec: dict[str, Any]) -> list[tuple[str, list[str]]]:
+    own = spec.get("ownership", {})
+    return sorted((str(k), list(v)) for k, v in own.items()) if isinstance(own, dict) else []
+
+
 def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version: str) -> str:
     action = spec["action"]
     contract = spec.get("contract", {})
@@ -107,6 +122,11 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
         for item in optional:
             default = f" — default `{item['default']}`" if item.get("default") else ""
             out.append(f"- `{item['name']}`{default}")
+    auto = _auto_resolved(spec)
+    if auto:
+        out.append("")
+        out.append("Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):")
+        out.extend(f"- `{name}` — {value}" for name, value in auto)
     out.append("")
     out.append(f"Generate `{spec['run_id']['var']}` once at session start in the contract format "
                f"`{facts['run_id_format']}` using `{facts['run_id_method']}`. "
@@ -116,9 +136,14 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
                f"`evidence-manifest.json` (status `draft`) with the active contract version stamped, "
                f"create the base run files ({facts['base_run_files']}) and artifact subdirs "
                f"({facts['artifacts_subdirs']}). Run `agents/scripts/init-run.py` to perform this.")
+    tiers = _tiers(spec)
+    if tiers:
+        out.append("")
+        out.append("Retrieval tier defaults: " + "; ".join(f"{mode}: {vals}" for mode, vals in tiers))
     out.append("")
     out.append("Load context in this order, then navigate rather than eager-load:")
-    for i, path in enumerate(facts["context_preamble"], 1):
+    ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
+    for i, path in enumerate(ctx, 1):
         out.append(f"{i}. `{path}`")
     out.append("")
     out.append("Gates (run each stage through `agents/scripts/run-gate.py`, in order):")
@@ -134,6 +159,11 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
     out.append(f"Severity gate profile: `{spec.get('severity_gate', 'none')}` "
                f"(compute allowed outcomes with `agents/scripts/gate_policy.py`; "
                f"coverage floor is {facts['coverage_min_pct']}%).")
+    ownership = _ownership(spec)
+    if ownership:
+        out.append("")
+        out.append("Ownership (strict):")
+        out.extend(f"- **{role}** owns: {', '.join(items)}" for role, items in ownership)
     if spec.get("forbidden"):
         out.append("")
         out.append("Forbidden:")
@@ -141,6 +171,10 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
     out.append("")
     out.append("Stop conditions:")
     out.extend(f"- {s}" for s in spec.get("stop_conditions", []))
+    if spec.get("conflict_resolution"):
+        out.append("")
+        out.append("Conflict resolution:")
+        out.extend(f"- {c}" for c in spec["conflict_resolution"])
     for name, text in sorted((spec.get("notes", {}) or {}).items()):
         out.append("")
         out.append(f"Note ({name}): {text.strip()}")
@@ -160,13 +194,21 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
     out.append("OPTIONAL_INPUTS:")
     for item in spec.get("inputs", {}).get("optional", []):
         out.append(f"- {item['name']}" + (f" =default:{item['default']}" if item.get("default") else ""))
+    auto = _auto_resolved(spec)
+    if auto:
+        out.append("AUTO_RESOLVED:")
+        out.extend(f"- {name} = {value}" for name, value in auto)
     out.append("")
     out.append(f"RUN_ID: var={spec['run_id']['var']} format={facts['run_id_format']} "
                f"method={facts['run_id_method']} forbidden={','.join(facts['run_id_forbidden']) or 'none'}")
     out.append(f"SESSION_SETUP: init-run.py -> {PACKAGE_ROOT_REF}/... "
                f"manifest=draft base_files=[{facts['base_run_files']}] "
                f"artifacts=[{facts['artifacts_subdirs']}]")
-    out.append(f"CONTEXT_PREAMBLE: {' -> '.join(facts['context_preamble'])}")
+    tiers = _tiers(spec)
+    if tiers:
+        out.append("RETRIEVAL_TIERS: " + "; ".join(f"{mode}={vals}" for mode, vals in tiers))
+    ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
+    out.append(f"CONTEXT: {' -> '.join(ctx)}")
     out.append("")
     out.append("GATES:")
     for gate in spec.get("gates", []):
@@ -178,10 +220,17 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
     out.append("")
     out.append(f"SEVERITY_GATE: profile={spec.get('severity_gate', 'none')} "
                f"tool=gate_policy.py coverage_min_pct={facts['coverage_min_pct']}")
+    ownership = _ownership(spec)
+    if ownership:
+        out.append("OWNERSHIP:")
+        out.extend(f"- {role}: {', '.join(items)}" for role, items in ownership)
     out.append("FORBIDDEN:")
     out.extend(f"- {f}" for f in spec.get("forbidden", []))
     out.append("STOP_CONDITIONS:")
     out.extend(f"- {s}" for s in spec.get("stop_conditions", []))
+    if spec.get("conflict_resolution"):
+        out.append("CONFLICT_RESOLUTION:")
+        out.extend(f"- {c}" for c in spec["conflict_resolution"])
     for name, text in sorted((spec.get("notes", {}) or {}).items()):
         out.append(f"NOTE[{name}]: {text.strip()}")
     return "\n".join(out).rstrip() + "\n"
@@ -284,11 +333,15 @@ def check(spec_dir: Path, action: str | None = None) -> dict[str, Any]:
                     fromfile=f"committed/{path.name}", tofile=f"regenerated/{path.name}"))
                 drifts.append({"file": _rel(path), "diff": diff[:2000]})
     # Undeclared extra files under generated/ for these actions (e.g. operator-only leaking a variant).
+    # An undeclared variant file for an action that declares a subset (e.g. an operator-only
+    # action leaking an automation-safe file). Only the exact variant filenames are considered,
+    # so a different action whose name shares a prefix (feature vs feature-review) is not matched.
     extra = []
     for name in actions:
-        for existing in GENERATED_DIR.glob(f"{name}-*.md"):
-            if existing not in expected_files:
-                extra.append(_rel(existing))
+        for variant in ALL_VARIANTS:
+            candidate = _target(name, variant)
+            if candidate.exists() and candidate not in expected_files:
+                extra.append(_rel(candidate))
     ok = not (drifts or missing or extra)
     return {"ok": ok, "policy_version": version, "drift": drifts,
             "missing": sorted(missing), "undeclared_extra": sorted(extra)}

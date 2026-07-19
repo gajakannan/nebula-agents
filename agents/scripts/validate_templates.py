@@ -268,19 +268,18 @@ def main() -> int:
                 templates_dir = candidate_dir
                 break
 
+    # F0007: the feature prompt pair is GENERATED from agents/actions/spec/feature.yaml and
+    # validated by the prompt_drift gate (render-prompts.py --check) + action_spec_schema, so its
+    # legacy feature.md<->prompt cross-check is retired here. Actions not yet cut over to generation
+    # (e.g. plan) keep this cross-check until their spec + generated prompt land.
     templates = {
         "plan": [
             parse_template(templates_dir / "plan-automation-safe.md"),
             parse_template(templates_dir / "plan-operator-friendly.md"),
         ],
-        "feature": [
-            parse_template(templates_dir / "feature-automation-safe.md"),
-            parse_template(templates_dir / "feature-operator-friendly.md"),
-        ],
     }
     action_contracts = {
         "plan": parse_action_contract(args.plan_action),
-        "feature": parse_action_contract(args.feature_action),
     }
     ontology_owners = ontology_expectations(args.ontology)
 
@@ -351,18 +350,20 @@ CANONICAL_HEADINGS: dict[str, list[str]] = {
     "implementation-validation-report-template.md": ["Run Identity", "Validator Invocations", "Findings By Rule ID", "Recommendations", "Result"],
 }
 
-# §24 (c): action files and prompts that must reference the canonical evidence package.
+# §24 (c): action files that must reference the canonical evidence package.
+# F0007: GENERATED evidence-contract prompts are covered by the prompt_drift gate
+# (render-prompts.py --check) plus the generator's own missing_package_reference /
+# forbidden_run_id_scheme semantic checks, so they are no longer asserted here.
 ACTIONS_THAT_MUST_REFERENCE_PACKAGE = [
     ("agents/actions/feature.md", "planning-mds/operations/evidence/"),
     ("agents/actions/build.md", "planning-mds/operations/evidence/"),
-    ("agents/templates/prompts/evidence-contract/feature-automation-safe.md", "planning-mds/operations/evidence/"),
 ]
 
 # §24 (d): prompt templates that must not generate `uuid4`-based run IDs.
-PROMPTS_FORBIDDEN_UUID4 = [
-    "agents/templates/prompts/evidence-contract/feature-automation-safe.md",
-    "agents/templates/prompts/evidence-contract/feature-operator-friendly.md",
-]
+# F0007: the feature prompts are generated; the generator's forbidden_run_id_scheme
+# check (over the run-id method in the policy) enforces this at the source, so the
+# text grep is retired for them. Any non-generated prompt can be re-added here.
+PROMPTS_FORBIDDEN_UUID4: list[str] = []
 
 # §24 (e): per-gate template references inside feature/build actions.
 GATE_TEMPLATE_REFS: dict[str, list[str]] = {

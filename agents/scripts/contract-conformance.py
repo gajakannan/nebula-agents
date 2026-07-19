@@ -51,9 +51,10 @@ FEATURE_UNCONDITIONAL_ARTIFACTS = {
     "G8": "pm-closeout.md",
 }
 # (requirement flag -> (gate, artifact)) — required only when the flag resolves true.
+# G3 is the code+security review gate; G7 is the architect KG reconciliation (real contract).
 FEATURE_CONDITIONAL_ARTIFACTS = {
     "kg_reconciliation_required": ("G7", "kg-reconciliation.md"),
-    "security_scans_required": ("G6", "security-review-report.md"),
+    "security_scans_required": ("G3", "security-review-report.md"),
 }
 
 

@@ -119,11 +119,16 @@ def test_generate_check_drift_and_extra(tmp_path, monkeypatch):
     drifted = rp.check(REAL_SPEC_DIR, "feature")
     assert not drifted["ok"] and drifted["drift"]
 
-    # undeclared extra generated file for the action
+    # a missing variant file is caught
     rp.generate(REAL_SPEC_DIR, "feature")  # restore
-    (tmp_path / "feature-legacy.md").write_text("x", encoding="utf-8")
-    extra = rp.check(REAL_SPEC_DIR, "feature")
-    assert not extra["ok"] and extra["undeclared_extra"]
+    (tmp_path / "feature-automation-safe.md").unlink()
+    missing = rp.check(REAL_SPEC_DIR, "feature")
+    assert not missing["ok"] and missing["missing"]
+
+    # a prefix-sharing file for a DIFFERENT action is not mistaken for an extra variant
+    rp.generate(REAL_SPEC_DIR, "feature")
+    (tmp_path / "feature-review-operator-friendly.md").write_text("x", encoding="utf-8")
+    assert rp.check(REAL_SPEC_DIR, "feature")["ok"]
 
 
 def test_committed_feature_pair_matches_policy():
