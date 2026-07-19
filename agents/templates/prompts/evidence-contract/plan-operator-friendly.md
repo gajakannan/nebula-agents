@@ -1,86 +1,112 @@
-This prompt encodes the plan action under the base run evidence profile in the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Plan runs BEFORE the feature evidence package exists — it produces planning artifacts in `{FEATURE_PATH}` and a base run evidence package, but no feature evidence package. The feature evidence package itself is created later by `agents/actions/feature.md` for the same `FEATURE_ID`.
+<!-- GENERATED from agents/actions/spec/plan.yaml + _contract.yaml — do not edit; run: python3 agents/scripts/render-prompts.py --action plan -->
+<!-- policy_version: 2026-07-11 | renderer_version: 1 -->
 
-REQUIRED INPUTS (you must set):
-- `FEATURE_ID={F####}`
-- `PHASE={A | B | A+B}` — Phase A is PM requirements; Phase B is Architect architecture; A+B runs both sequentially
-- `FEATURE_MODE={new | existing}` — `new` when the ID is reserved in `REGISTRY.md` but `{FEATURE_PATH}` does not exist; `existing` when the folder already contains at least `PRD.md` and a `STATUS.md` skeleton
 
-OPTIONAL INPUTS (defaults apply when omitted):
-- `PRODUCT_ROOT=` — default: sister-repo per `agents/docs/AGENT-USE.md` → Session Setup; override only for non-standard layouts
+This prompt encodes the **Plan (Phase A + B)** (scope `base-run-only`, policy `2026-07-11`).
 
-AUTO-RESOLVED (do not set; SESSION_SETUP and the orchestrator compute these):
-- `FEATURE_SLUG` — kebab-case slug for `{FEATURE_ID}` from `REGISTRY.md`
-- `FEATURE_PATH` — `{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}`
-- `FEATURE_INDEX_ROOT` — `{PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}`
-- `PLAN_RUN_ID` — `YYYY-MM-DD-{secrets.token_hex(4)}` generated once at session start
-- `PLAN_RUN_FOLDER` — `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}` (NOT under a feature index root — this is the non-feature base run path per §8)
+Required inputs:
+- `FEATURE_ID` (format `F####`)
+- `PHASE`
+- `FEATURE_MODE`
 
-Echo the resolved absolute `{PRODUCT_ROOT}` path on your first turn before any shell command; every command below assumes that resolution.
+Optional inputs (defaults apply when omitted):
+- `PRODUCT_ROOT` — default `sister-repo`
 
-Generate `{PLAN_RUN_ID}` once at session start using the contract format `YYYY-MM-DD-[a-z0-9]{8}` — date is the local date, suffix from `python3 -c "import secrets; print(secrets.token_hex(4))"`. Do not use `uuid4`. Do not regenerate after session start.
+Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
+- `FEATURE_INDEX_ROOT` — {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
+- `FEATURE_PATH` — {PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}
+- `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md
+- `PLAN_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}
 
-Create `PLAN_RUN_FOLDER` at `{PLAN_RUN_FOLDER}/` (note: NOT under a feature index root — this is the non-feature base run path per §8). Initialize base run files from templates: `README.md`, `action-context.md`, `artifact-trace.md`, `gate-decisions.md`, an empty `commands.log` (JSONL), and an empty `lifecycle-gates.log`.
+Generate `PLAN_RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Run `agents/actions/plan.md` for `FEATURE_ID` with `PHASE`. Phase A is PM requirements; Phase B is Architect architecture; A+B runs both sequentially. Determine `FEATURE_MODE` upfront: `new` when `FEATURE_ID` is reserved in `REGISTRY.md` Planned (Reserved IDs) but `{FEATURE_PATH}` does not exist; `existing` when `{FEATURE_PATH}` already contains at least `PRD.md` and a `STATUS.md` skeleton.
+Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
-Compatibility:
-- `PHASE=A` + `FEATURE_MODE=new` → plan creates `{FEATURE_PATH}` and scaffolds PRD, personas, stories, and the STATUS skeleton
-- `PHASE=A` + `FEATURE_MODE=existing` → plan updates existing planning artifacts; `STATUS.md` story provenance rows are append-only and must not be mutated
-- `PHASE=B` + `FEATURE_MODE=new` → REJECT: cannot run architecture before requirements exist; run `PHASE=A` or `PHASE=A+B` instead
-- `PHASE=B` + `FEATURE_MODE=existing` → plan updates the architecture artifacts (ADRs, API/schema contracts, data model, BLUEPRINT §4) and ontology bindings
-- `PHASE=A+B` + `FEATURE_MODE=new` → plan creates `{FEATURE_PATH}`, then runs Phase A and Phase B sequentially
-- `PHASE=A+B` + `FEATURE_MODE=existing` → plan updates planning artifacts then architecture
-
-Start only when `PLAN_RUN_FOLDER` is initialized and `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` already exits 0.
-
-Load context in this order:
+Load context in this order, then navigate rather than eager-load:
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/actions/plan.md`
-5. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (confirm `FEATURE_ID` is reserved or new)
+5. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
 6. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
 7. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
 8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
 9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
 10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
-12. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml`
-13. `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` when the feature folder exists
 
-Open these on demand only when lookup links them, the current gate needs them, or drift repair requires them: `{PRODUCT_ROOT}/planning-mds/api/<openapi-spec>.yaml`, `{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md`, `{PRODUCT_ROOT}/planning-mds/security/policies/policy.csv`, and `agents/<role>/references/**` only with a `ROUTER.md` row match.
+Gates (run each stage through `agents/scripts/run-gate.py`, in order):
+- **G1 — Clarification** (role: product-manager; artifacts: none)
+    - judgment: Step 1.5 Requirements Clarification: the PM resolves open requirement questions before approval.
+- **G2 — Tracker sync (Phase A)** (role: product-manager; artifacts: none)
+    - judgment: Step 1.75 mandatory tracker synchronization (REGISTRY.md / ROADMAP.md / BLUEPRINT.md /
+STORY-INDEX.md) before Phase A approval.
+- **G3 — Phase A approval** (role: product-manager; artifacts: gate-decisions.md)
+    - MANUAL checkpoint `approve-phase-a`: User reviews requirements; PM records the explicit approval token in gate-decisions.md. (requires: gate-decisions.md; produces: phase-a-approved)
+    - judgment: Step 2 Phase A review. No gate may be passed without an explicit approval token recorded in
+gate-decisions.md.
+- **G4 — Ontology sync (Phase B)** (role: architect; artifacts: none)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - judgment: Step 3.5: feature-mappings.yaml + canonical-nodes.yaml + solution-ontology.yaml aligned with the
+assembly plan; kg validate --check-drift must exit 0. Only the Architect edits canonical-nodes.yaml
+or solution-ontology.yaml.
+- **G5 — Phase B approval and exit validation** (role: architect; artifacts: gate-decisions.md)
+    - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 120s)
+    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. (requires: gate-decisions.md; produces: phase-b-approved)
+    - judgment: Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
+Do NOT call validate-feature-evidence.py at plan — there is no feature evidence package yet.
+Do NOT run validate-trackers.py --all-feature-evidence as plan closeout; repo-wide feature-evidence validation is an explicit health/audit action.
 
-Don't generate `{PLAN_RUN_ID}` with `uuid4` or any non-contract format. Don't write or consume `current-run.json`. Don't produce role reports (`g0-*`, `test-*`, `code-review-*`, etc.) — those belong to the feature action's evidence package at `agents/actions/feature.md`, not the plan action. Don't create a feature evidence package at `{FEATURE_INDEX_ROOT}/` during plan; that root is created later by `feature.md`. Don't skip the approval or ontology-sync gates. Don't edit `canonical-nodes.yaml` or `solution-ontology.yaml` outside the Architect phase. Don't treat lookup/KG mappings as authoritative over raw artifacts. Don't climb past max_auto_tier without recording a workstate.py escalate event.
+Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 
-Append every shell command to `{PLAN_RUN_FOLDER}/commands.log` with `python3 agents/scripts/append-command-log.py`, passing `--log`, `--product-root`, `--framework-root`, `--cwd`, `--command`, `--exit-code`, and repeatable `--artifact` values as needed. Artifact paths must be durable product-repo paths, usually under the run's `artifacts/` folder; scratch paths such as `/tmp/...` are not durable evidence artifacts.
+Ownership (strict):
+- **architect** owns: feature-assembly-plan.md, ADRs, API contract updates, schema updates, canonical-nodes.yaml, solution-ontology.yaml, feature-mappings.yaml
+- **product-manager** owns: PRD.md, persona files, acceptance-criteria-checklist.md, story breakdown, STATUS.md skeleton
 
-Keep ownership strict — product-manager owns Phase A: `PRD.md`, persona files, acceptance criteria, story breakdown, and the initial `STATUS.md` skeleton (Required Role Matrix and empty Story Provenance table). architect owns Phase B: ADRs, API/schema updates, data model, BLUEPRINT §4, `canonical-nodes.yaml` updates, `solution-ontology.yaml` updates, and `feature-mappings.yaml` additions. The per-feature `feature-assembly-plan.md` is NOT a plan-action deliverable — it belongs to `agents/actions/feature.md` Step 0. implementation agents do not run during the plan action, and other roles flag drift but do not silently redefine canonical shared semantics.
+Forbidden:
+- Generate PLAN_RUN_ID with uuid4 or any non-contract format.
+- Write or consume current-run.json for any reason.
+- Produce role reports (g0-*, test-*, code-review-*, etc.) — those belong to the feature action.
+- Create a feature evidence package at FEATURE_INDEX_ROOT during plan.
+- Skip the APPROVAL or ONTOLOGY SYNC gates.
+- Edit canonical-nodes.yaml or solution-ontology.yaml outside the Architect phase.
+- Treat lookup/KG mappings as authoritative over raw artifacts.
+- Climb past max_auto_tier without recording a workstate.py escalate event.
 
-Follow these gates exactly:
-- `G1 CLARIFICATION` — Step 1.5 Requirements Clarification (PM resolves open requirement questions before approval)
-- `G2 TRACKER SYNC (A)` — Step 1.75 Mandatory tracker synchronization (REGISTRY.md / ROADMAP.md / BLUEPRINT.md / STORY-INDEX.md) before Phase A approval
-- `G3 PHASE A APPROVAL` — Step 2 user reviews requirements; PM records decision in `gate-decisions.md`
-- `G4 ONTOLOGY SYNC (B)` — Step 3.5 `feature-mappings.yaml`, `canonical-nodes.yaml`, and `solution-ontology.yaml` aligned with the Phase B architecture; `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` exit 0
-- `G5 PHASE B APPROVAL` — Step 4 user reviews architecture; architect records decision in `gate-decisions.md`
+Stop conditions:
+- PRD approval refused by user.
+- Architecture approval refused by user.
+- Ontology sync gate fails and cannot be reconciled.
+- kg validate.py --check-drift fails after one repair cycle.
+- A canonical node edit is attempted outside the Architect role.
 
-Evidence outputs land in two places. In `{PLAN_RUN_FOLDER}`: the six base run files (`README.md`, `action-context.md`, `artifact-trace.md`, `gate-decisions.md`, `commands.log`, `lifecycle-gates.log`) plus an `Evidence Index` in `README.md` that points to the planning artifacts. In `{FEATURE_PATH}`: `PRD.md`, persona files, acceptance-criteria checklist, story files, `STATUS.md` skeleton (Phase A); ADRs, `README.md` (feature ERD + C4), `GETTING-STARTED.md` (Phase B). The per-feature `feature-assembly-plan.md` is produced later by `agents/actions/feature.md` Step 0, not the plan action.
+Conflict resolution:
+- PRD vs architecture conflict -> resolve in Phase B before architecture approval; do not silently change the PRD.
+- existing assembly plan vs new architecture -> log reconciliation in gate-decisions.md; never silently overwrite.
+- ontology binding conflict -> halt; resolve in canonical-nodes.yaml first.
 
-Plan-time dependency evidence audit: identify direct or impacted feature dependencies from the PRD, architecture notes, `feature-mappings.yaml`, and KG lookup output. Record existing approved dependency evidence references or "audit pending" notes in `{PLAN_RUN_FOLDER}/artifact-trace.md` or `gate-decisions.md`. Automated dependency discovery/validator implementation is a later step; do not substitute repo-wide feature-evidence validation for this plan gate.
+Note (dependency_audit): Identify direct/impacted feature dependencies from the PRD, architecture notes, feature-mappings.yaml,
+and KG lookup output; record approved dependency evidence references or "audit pending" notes in
+artifact-trace.md or gate-decisions.md. Do not substitute repo-wide feature-evidence validation.
 
-Stop immediately if PRD approval is refused, if architecture approval is refused, if the ontology sync gate fails and cannot be reconciled, if `kg/validate.py --check-drift` fails after one repair cycle, or if a canonical node edit is attempted outside Architect role.
+Note (feature_path_outputs): In {FEATURE_PATH}: PRD.md, persona files, acceptance-criteria-checklist.md, story files, STATUS.md
+skeleton (Phase A); feature-assembly-plan.md, ADRs, README.md, GETTING-STARTED.md (Phase B).
+feature-assembly-plan.md is NOT a plan deliverable in the run folder — it is authored here but
+belongs to the feature action's G0 for the same FEATURE_ID.
 
-Close the run by executing these in order, each exit 0:
-- `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}`
-- `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
-- `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py`
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
-- `python3 agents/scripts/validate_templates.py`
+Note (phase_mode_matrix): PHASE=A,new -> create {FEATURE_PATH} and scaffold PRD/personas/stories/STATUS skeleton.
+PHASE=A,existing -> update existing planning artifacts; STATUS.md story provenance rows are
+append-only. PHASE=B,new -> REJECT (run architecture only after requirements exist).
+PHASE=B,existing -> update feature-assembly-plan.md + ontology bindings.
+PHASE=A+B -> Phase A then Phase B.
 
-Do NOT call `validate-feature-evidence.py` at plan — there is no feature evidence package yet. Do NOT run `validate-trackers.py --all-feature-evidence` as plan closeout. The first stage validation call (`--stage G0`) happens during the feature action.
-
-Resolve conflicts like this:
-- PRD vs architecture conflict → resolve in Phase B before architecture approval; do not silently change PRD
-- existing assembly plan vs new architecture → log reconciliation in `gate-decisions.md`; never silently overwrite
-- ontology binding conflict → halt; resolve in `canonical-nodes.yaml` first
+Note (session_setup): Resolve {PRODUCT_ROOT} and echo the absolute path on the first turn. Generate {PLAN_RUN_ID} once at
+session start (contract format; no uuid4). Create the base run folder
+{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}/ and the base run files
+(README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log).
+Plan does NOT create a feature evidence package — the feature index root is created later by the
+feature action for the same FEATURE_ID.

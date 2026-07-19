@@ -73,63 +73,10 @@ def run_validator(plan_action: Path, feature_action: Path, templates_dir: Path) 
     )
 
 
-def test_gate_name_drift_is_reported(tmp_path: Path) -> None:
-    plan_action = tmp_path / "plan.md"
-    feature_action = tmp_path / "feature.md"
-    templates_dir = tmp_path / "templates"
-    templates_dir.mkdir()
-
-    plan_action.write_text((REPO_ROOT / "agents/actions/plan.md").read_text(encoding="utf-8"), encoding="utf-8")
-    feature_action.write_text((REPO_ROOT / "agents/actions/feature.md").read_text(encoding="utf-8"), encoding="utf-8")
-
-    for name in (
-        "plan-automation-safe.md",
-        "plan-operator-friendly.md",
-        "feature-automation-safe.md",
-        "feature-operator-friendly.md",
-    ):
-        content = (PROMPT_SOURCE_DIR / name).read_text(encoding="utf-8")
-        if name == "plan-automation-safe.md":
-            content = content.replace("G4 ONTOLOGY SYNC (B)", "G4 ONTOLOGY ALIGNMENT (B)", 1)
-        (templates_dir / name).write_text(content, encoding="utf-8")
-
-    result = run_validator(plan_action, feature_action, templates_dir)
-
-    assert result.returncode != 0
-    assert "missing gates" in result.stdout
-    assert "G4 ONTOLOGY SYNC (B)" in result.stdout
-
-
-def test_exit_validation_drift_is_reported(tmp_path: Path) -> None:
-    plan_action = tmp_path / "plan.md"
-    feature_action = tmp_path / "feature.md"
-    templates_dir = tmp_path / "templates"
-    templates_dir.mkdir()
-
-    plan_action.write_text((REPO_ROOT / "agents/actions/plan.md").read_text(encoding="utf-8"), encoding="utf-8")
-    feature_action.write_text((REPO_ROOT / "agents/actions/feature.md").read_text(encoding="utf-8"), encoding="utf-8")
-
-    for name in (
-        "plan-automation-safe.md",
-        "plan-operator-friendly.md",
-        "feature-automation-safe.md",
-        "feature-operator-friendly.md",
-    ):
-        content = (PROMPT_SOURCE_DIR / name).read_text(encoding="utf-8")
-        # F0007: the feature prompt is generated (drift covered by render-prompts.py --check), so
-        # the exit-validation cross-check now applies to actions not yet cut over — exercise it on plan.
-        if name == "plan-automation-safe.md":
-            content = content.replace(
-                "python3 agents/product-manager/scripts/generate-story-index.py",
-                "python3 agents/product-manager/scripts/generate-story-indez.py",
-            )
-        (templates_dir / name).write_text(content, encoding="utf-8")
-
-    result = run_validator(plan_action, feature_action, templates_dir)
-
-    assert result.returncode != 0
-    assert "missing exit-validation commands" in result.stdout
-    assert "generate-story-index.py" in result.stdout
+# F0007: test_gate_name_drift_is_reported and test_exit_validation_drift_is_reported were removed —
+# they exercised the legacy <action>.md<->prompt cross-check, which is retired now that feature and
+# plan prompts are generated from agents/actions/spec/*.yaml. Prompt correctness is enforced by the
+# prompt_drift gate (render-prompts.py --check) + action_spec_schema; see test_render_prompts.py.
 
 
 def test_plan_closeout_examples_use_tracker_only_validation_contract() -> None:

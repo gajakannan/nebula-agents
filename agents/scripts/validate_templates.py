@@ -268,19 +268,13 @@ def main() -> int:
                 templates_dir = candidate_dir
                 break
 
-    # F0007: the feature prompt pair is GENERATED from agents/actions/spec/feature.yaml and
-    # validated by the prompt_drift gate (render-prompts.py --check) + action_spec_schema, so its
-    # legacy feature.md<->prompt cross-check is retired here. Actions not yet cut over to generation
-    # (e.g. plan) keep this cross-check until their spec + generated prompt land.
-    templates = {
-        "plan": [
-            parse_template(templates_dir / "plan-automation-safe.md"),
-            parse_template(templates_dir / "plan-operator-friendly.md"),
-        ],
-    }
-    action_contracts = {
-        "plan": parse_action_contract(args.plan_action),
-    }
+    # F0007: the feature and plan prompt pairs are GENERATED from agents/actions/spec/*.yaml and
+    # validated by the prompt_drift gate (render-prompts.py --check) + action_spec_schema, so the
+    # legacy <action>.md<->prompt cross-check is fully retired (design §7 — the drift check subsumes
+    # it). The dead cross-check helpers remain callable for any action re-added here before it is
+    # cut over to generation. The report-template checks below (headings, canonical paths) stay.
+    templates: dict[str, list[dict[str, Any]]] = {}
+    action_contracts: dict[str, dict[str, Any]] = {}
     ontology_owners = ontology_expectations(args.ontology)
 
     errors: list[str] = []
