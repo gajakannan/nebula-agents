@@ -1,0 +1,185 @@
+# Active action specification: feature-review (read-only "is this feature truly done?" audit).
+#
+# FAITHFUL encoding of the feature-review action under the Feature Evidence Contract (see
+# agents/actions/feature-review.md and CONSUMER-CONTRACT.md). feature-review is a READ-ONLY
+# post-completion audit: it writes a base run package with feature-review-report.md and reads,
+# but never writes, the canonical feature evidence package — so its scope is read-only-audit.
+# render-prompts.py compiles both prompt variants from this file; run prompt_drift after edits.
+action: feature-review
+action_doc: agents/actions/feature-review.md
+contract:
+  name: Feature Evidence Contract
+  scope: read-only-audit
+  version: "2026-07-11"
+
+run_id:
+  scheme: contract
+  var: FEATURE_REVIEW_RUN_ID
+
+inputs:
+  optional:
+    - {name: PR_URL, format: "GitHub PR URL — usual target; derives FEATURE_ID/DIFF_RANGE/MODE"}
+    - {name: FEATURE_ID, format: "F####", required_when: "PR_URL unset"}
+    - {name: MODE, enum: [closeout-audit, candidate-audit], required_when: "PR_URL unset"}
+    - {name: DIFF_RANGE, format: "base..head | working-tree | ...", required_when: "PR_URL unset"}
+    - {name: FEATURE_RUN_ID, format: "YYYY-MM-DD-[a-z0-9]{8}", required_when: "MODE=candidate-audit or an older-run review"}
+    - {name: RUN_DEVOPS, enum: [auto, "yes", "no"], default: auto}
+    - {name: PRODUCT_ROOT, default: sister-repo}
+
+auto_resolved:
+  FEATURE_SLUG: "kebab-case slug for {FEATURE_ID} from REGISTRY.md"
+  FEATURE_PATH: "current or archived feature path for {FEATURE_ID}"
+  FEATURE_INDEX_ROOT: "{PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  FEATURE_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_RUN_ID} (closeout: FEATURE_RUN_ID defaults to latest-run.json run_id)"
+  FEATURE_REVIEW_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_REVIEW_RUN_ID}"
+
+context_load:
+  - "agents/ROUTER.md"
+  - "agents/agent-map.yaml"
+  - "agents/docs/AGENT-USE.md"
+  - "agents/actions/feature-review.md"
+  - "agents/actions/feature.md"
+  - "{FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/**"
+  - "{FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports"
+  - "role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes"
+
+ownership:
+  product-manager: ["Requirements Satisfaction", "Signoff and Closeout", "Tracker Sync findings"]
+  architect: ["Architecture and KG Alignment findings"]
+  quality-engineer: ["Test Evidence and Coverage findings"]
+  code-reviewer: ["Code Quality and merge-readiness findings"]
+  security: ["Security findings"]
+  devops: ["Deployability findings when RUN_DEVOPS resolves to yes"]
+
+gates:
+  - id: FR0
+    title: Feature run and diff lock
+    role: product-manager
+    artifacts: [action-context.md]
+    judgment: |
+      Record FEATURE_ID, MODE, FEATURE_RUN_ID, FEATURE_PATH, FEATURE_RUN_FOLDER, DIFF_RANGE, the resolved
+      changed-file set, and the RUN_DEVOPS decision in action-context.md. Resolve the changed-file set from
+      DIFF_RANGE, scm.diff_artifact, the manifest changed_paths[], or an explicit operator list.
+
+  - id: FR1
+    title: Parallel completion review
+    role: product-manager
+    artifacts: [feature-review-report.md]
+    judgment: |
+      Six role lanes in parallel (each owns its report section): PM — stories, AC disposition, signoffs,
+      closeout, trackers, archive state, mitigation acceptance; Architect — assembly-plan alignment, API/schema,
+      data/workflow, authorization, ADR, KG, code-index, drift; QE — AC-to-test mapping, runtime evidence,
+      coverage, skipped layers, failure/retry history; Code Reviewer — changed code scope, vertical-slice
+      completeness, review findings, hidden TODO/debug/dead paths, merge readiness; Security — server-side
+      authorization, inputs, external calls, audit/timeline, secrets/config, security-sensitive scope; DevOps —
+      runtime/deployment/env/CI/deployability when RUN_DEVOPS=yes. Reviewers do NOT repair during review.
+
+  - id: FR2
+    title: Validator pass
+    role: product-manager
+    operations:
+      - run:
+          id: fr2-validate-closeout
+          argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
+                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --stage, closeout]
+          cwd: framework
+          timeout_seconds: 300
+      - run:
+          id: fr2-validate-trackers
+          argv: [python3, agents/product-manager/scripts/validate-trackers.py]
+          cwd: framework
+          timeout_seconds: 300
+      - run:
+          id: fr2-kg-check-symbols
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-symbols]
+          cwd: product
+          timeout_seconds: 300
+      - run:
+          id: fr2-kg-check-drift
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          cwd: product
+          timeout_seconds: 300
+      - run:
+          id: fr2-validate-templates
+          argv: [python3, agents/scripts/validate_templates.py]
+          cwd: framework
+          timeout_seconds: 300
+    judgment: |
+      The op above is the CLOSEOUT-AUDIT validator; for candidate-audit swap the first op for
+      `validate-feature-evidence.py --feature {FEATURE_ID} --run-id {FEATURE_RUN_ID} --stage G6`. When story
+      files changed, also run `generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` as a CURRENCY
+      CHECK — a non-zero diff is a finding, not a repair (this read-only audit never commits the regeneration).
+      Record exit code, summary, and artifact path for each command in lifecycle-gates.log.
+
+  - id: FR3
+    title: Self-review gate
+    role: product-manager
+    judgment: |
+      Each reviewer verifies that its findings cite exact evidence (raw files/paths, not report summaries) and
+      that any skipped item is explicitly justified.
+
+  - id: FR4
+    title: Done gate
+    role: product-manager
+    judgment: |
+      Compute the completion verdict with gate_policy.py (profile review-family): evidence validation FAIL or
+      critical > 0 -> NOT DONE; validation PASS, critical = 0, high > 0 -> CONDITIONALLY DONE (each high needs
+      owner + mitigation + target date); validation PASS, critical = 0, high = 0 -> TRULY DONE. Never declare
+      TRULY DONE while required evidence validation fails.
+
+severity_gate: review-family
+
+variants: [operator-friendly, automation-safe]
+
+forbidden:
+  - "Generate FEATURE_REVIEW_RUN_ID with uuid4."
+  - "Edit implementation code, tests, feature docs, closeout files, trackers, KG artifacts, or feature evidence packages."
+  - "Write into {FEATURE_RUN_FOLDER}."
+  - "Bulk-load {FEATURE_RUN_FOLDER}/**, raw logs, screenshots, or artifacts/** without a manifest citation, validator failure, or explicit operator request."
+  - "Treat prior feature-action approval as proof the feature is done."
+  - "Approve from report summaries without checking raw evidence paths."
+  - "Substitute global evidence lanes for feature-scoped role evidence."
+  - "Ignore uncommitted or unreviewed changed files."
+  - "Declare TRULY DONE while required evidence validation fails."
+  - "Widen scope beyond FEATURE_ID except to record cross-feature impact."
+
+stop_conditions:
+  - "FEATURE_ID, FEATURE_PATH, FEATURE_RUN_ID, or FEATURE_RUN_FOLDER cannot be resolved."
+  - "The feature evidence package is missing outside explicit candidate-audit mode."
+  - "The changed-file set cannot be identified."
+  - "Required evidence validation fails in a way that prevents completion review."
+  - "Reviewers cannot cite concrete evidence for FR4."
+
+conflict_resolution:
+  - "raw artifact vs evidence summary -> raw artifact wins; record an evidence-drift finding."
+  - "latest-run.json points to a different run than FEATURE_RUN_ID in closeout-audit -> NOT DONE unless older-run review is explicit."
+  - "role report passes but raw evidence contradicts it -> raw evidence wins."
+  - "required evidence missing for a completed-terminal feature -> NOT DONE."
+  - "a high finding accepted without owner, mitigation, and target date -> CONDITIONALLY DONE at best."
+
+notes:
+  target: |
+    PR_URL is the usual target: `gh pr checkout <PR#>`, then
+    `gh pr view <PR_URL> --json title,headRefName,baseRefName,state` -> FEATURE_ID from the F#### token in the
+    title/branch, DIFF_RANGE=origin/<baseRefName>..<headRefName>, MODE=candidate-audit if the PR is OPEN else
+    closeout-audit. Explicit inputs always override values derived from PR_URL.
+  modes: |
+    closeout-audit audits the approved feature run (FEATURE_RUN_ID defaults to the latest-run.json run_id;
+    validate --stage closeout). candidate-audit audits an in-progress run (FEATURE_RUN_ID set, FEATURE_RUN_FOLDER
+    exists; validate --run-id {FEATURE_RUN_ID} --stage G6). Precondition: feature.md reached G6 or G8 for FEATURE_ID.
+  session_setup: |
+    Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Generate FEATURE_REVIEW_RUN_ID once in contract
+    format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Resolve FEATURE_SLUG/PATH/
+    INDEX_ROOT/RUN_ID/RUN_FOLDER, then create FEATURE_REVIEW_RUN_FOLDER and its artifacts/ and initialize the six
+    §8 base run files.
+  report_sections: |
+    feature-review-report.md required sections: Decision; Findings By Severity; Completion Checks; Validation
+    Evidence; Artifact Trace. README.md summarizes the done state and open follow-ups; gate-decisions.md records
+    FR0 through FR4.
+  read_only: |
+    feature-review READS but never writes the canonical feature evidence package. Repair ownership stays with the
+    original lifecycle owners (feature.md / review.md / test.md / targeted rework); reviewers never repair during
+    review — a NOT DONE / CONDITIONALLY DONE verdict routes the fix back to the owner.
+  telemetry: |
+    Append every shell command to {FEATURE_REVIEW_RUN_FOLDER}/commands.log per the §13 JSONL schema
+    (schema_version, timestamp with timezone, cwd, command, exit_code, artifacts[], redactions[]).
