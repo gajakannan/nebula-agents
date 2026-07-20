@@ -108,6 +108,15 @@ FEATURE_INDEX_ROOT, RUN_FOLDER, and RUN_FOLDER/artifacts/{coverage,diffs,test-re
 screenshots}. Initialize evidence-manifest.json (status draft, contract version stamped, all
 required keys, skeleton gate_results/role_results/files). Create the base run files and touch empty
 commands.log and lifecycle-gates.log. Capture a prior latest-run.json run_id as RUN_ID_PRIOR.
+NOTE[story_progress]: Maintain the `## Story x Role Progress` matrix in {FEATURE_PATH}/STATUS.md live as the run
+progresses (advisory, not validator-enforced). Cells: not-started / in-progress / done / not-in-scope;
+review columns (Code Review, Security) resolve to PASS/FAIL. At G2 flip each story's Backend/Frontend/AI
+cell in-progress->done as its slice is built, and QA/DevOps when that story's tests/deployability pass.
+At G3 resolve the Code Review and Security cells per story. Roll up the Overall column (Done only when
+every required cell is Done/PASS) and keep it consistent with the Story Checklist. Cells marked
+not-in-scope follow the manifest scope booleans (AI = slice AI/LLM scope; DevOps = deployment_config_
+changed/runtime_bearing; Security = security_sensitive_scope). At G8 the PM verifies the matrix is
+complete and consistent before finalizing story status.
 NOTE[telemetry]: Append every shell command to RUN_FOLDER/commands.log via append-command-log.py (--log,
 --product-root, --framework-root, --cwd, --command, --exit-code, repeatable --artifact). Artifact
 paths must be durable product-repo paths under artifacts/; scratch paths (/tmp/...) are not

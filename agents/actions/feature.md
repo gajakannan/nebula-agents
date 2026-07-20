@@ -67,6 +67,12 @@ shared semantics, and G7 KG reconciliation; **implementation** agents (backend, 
 AI, QE, DevOps) own their runtime layer and role reports, and route shared-semantics
 changes back to the architect. Per-step judgment follows below.
 
+**Progress visibility:** keep the `## Story × Role Progress` matrix in the feature's
+`STATUS.md` current as each slice/role advances — implementation cells flip at G2, the
+Code Review / Security cells resolve at G3, and the Overall column rolls up (spec
+`notes.story_progress`). It is advisory (not validator-enforced) and gives per-story ×
+per-role visibility during the run instead of a single status that flips only at closeout.
+
 ## Runtime Execution Boundary
 
 - The builder runtime orchestrates feature flow and gates; keep it stack-agnostic.

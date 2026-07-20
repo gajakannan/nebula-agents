@@ -54,10 +54,13 @@ after G0 passes.
 notes.scope_booleans). Any false->true flip forces the corresponding required role and artifact.
 coverage-report.md must exist even when waived. Booleans that change after G2 force re-running G2.
 Coverage floor is `coverage_min_pct` (owned by _contract.yaml); do not restate the number.
+Keep the STATUS.md Story x Role Progress matrix current (see notes.story_progress): flip each
+story's Backend/Frontend/AI cell as its slice is built and QA/DevOps when its tests/deployability pass.
 - **G3 — Code and security review (parallel)** (role: code-reviewer; artifacts: code-review-report.md, security-review-report.md)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G3` (cwd: framework, timeout: 300s)
     - judgment: Code Reviewer and Security Reviewer run in parallel. security-review-report.md is required when
-security_sensitive_scope=true or Security is required in STATUS.md.
+security_sensitive_scope=true or Security is required in STATUS.md. Record each story's Code Review
+and Security cell (PASS/FAIL) in the STATUS.md Story x Role Progress matrix.
 - **G4 — Approval** (role: product-manager; artifacts: gate-decisions.md)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G4` (cwd: framework, timeout: 300s)
     - judgment: Approval requires critical=0; any high requires an explicit mitigation token recorded in
@@ -156,6 +159,16 @@ FEATURE_INDEX_ROOT, RUN_FOLDER, and RUN_FOLDER/artifacts/{coverage,diffs,test-re
 screenshots}. Initialize evidence-manifest.json (status draft, contract version stamped, all
 required keys, skeleton gate_results/role_results/files). Create the base run files and touch empty
 commands.log and lifecycle-gates.log. Capture a prior latest-run.json run_id as RUN_ID_PRIOR.
+
+Note (story_progress): Maintain the `## Story x Role Progress` matrix in {FEATURE_PATH}/STATUS.md live as the run
+progresses (advisory, not validator-enforced). Cells: not-started / in-progress / done / not-in-scope;
+review columns (Code Review, Security) resolve to PASS/FAIL. At G2 flip each story's Backend/Frontend/AI
+cell in-progress->done as its slice is built, and QA/DevOps when that story's tests/deployability pass.
+At G3 resolve the Code Review and Security cells per story. Roll up the Overall column (Done only when
+every required cell is Done/PASS) and keep it consistent with the Story Checklist. Cells marked
+not-in-scope follow the manifest scope booleans (AI = slice AI/LLM scope; DevOps = deployment_config_
+changed/runtime_bearing; Security = security_sensitive_scope). At G8 the PM verifies the matrix is
+complete and consistent before finalizing story status.
 
 Note (telemetry): Append every shell command to RUN_FOLDER/commands.log via append-command-log.py (--log,
 --product-root, --framework-root, --cwd, --command, --exit-code, repeatable --artifact). Artifact

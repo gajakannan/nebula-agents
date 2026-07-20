@@ -26,6 +26,26 @@ Completion has two distinct checkpoints:
 | F{NNNN}-S0001 | [Story title] | [ ] Not Started / [ ] In Progress / [x] Done |
 | F{NNNN}-S0002 | [Story title] | [ ] Not Started / [ ] In Progress / [x] Done |
 
+## Story × Role Progress
+
+Per-story status across the roles that touch a story, updated live as the feature run
+progresses (advisory — not yet validator-enforced). Cell states: `⬜` not started ·
+`🔄` in progress · `✅` done · `—` not in scope. Review columns (Code Review, Security)
+resolve to `PASS` / `FAIL` at signoff. The **Overall** column is the story's rolled-up
+state and must match its row in the Story Checklist above.
+
+| Story | Backend | Frontend | AI | QA | Code Review | Security | DevOps | Overall |
+|-------|---------|----------|----|----|-------------|----------|--------|---------|
+| F{NNNN}-S0001 | ⬜ | ⬜ | — | ⬜ | ⬜ | ⬜ | — | ⬜ Not Started |
+| F{NNNN}-S0002 | ⬜ | ⬜ | — | ⬜ | ⬜ | ⬜ | — | ⬜ Not Started |
+
+Update points: G2 implementation flips Backend/Frontend/AI to `🔄`→`✅` per slice, and
+QA/DevOps when that story's tests/deployability pass; G3 resolves Code Review / Security
+per story; the Overall column rolls up (Done only when every required cell is Done/PASS).
+Columns marked `—` follow the manifest scope booleans (AI when the slice has AI/LLM scope,
+DevOps when `deployment_config_changed`/`runtime_bearing`, Security when
+`security_sensitive_scope`).
+
 ## Backend Progress
 
 - [ ] Entities and EF configurations
