@@ -1,90 +1,63 @@
-ACTION: agents/actions/init.md
-CONTRACT: Feature Evidence Contract in CONSUMER-CONTRACT.md (effective 2026-05-19)
-CONTRACT SCOPE: Init bootstraps a new product. It runs BEFORE any feature exists, so there is no feature evidence package to produce. Init still produces a base run evidence package per §8 so the bootstrap itself is auditable.
+<!-- GENERATED from agents/actions/spec/init.yaml + _contract.yaml — do not edit; run: python3 agents/scripts/render-prompts.py --action init -->
+<!-- policy_version: 2026-07-11 | renderer_version: 1 -->
 
-REQUIRED INPUTS (operator must set before SESSION_SETUP):
-  PROJECT_NAME:         {string}
-  DOMAIN_DESCRIPTION:   {1-2 sentence summary}
-  TARGET_USERS:         [{role}, {role}, ...]
-  CORE_ENTITIES:        [{entity}, {entity}, ...]
 
-OPTIONAL INPUTS (defaults apply when omitted):
-  PRODUCT_ROOT:         absolute product repo root             # default: NEBULA_PRODUCT_ROOT env var, or sister-repo `../<product-repo>` per agents/docs/AGENT-USE.md
+CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
-AUTO-RESOLVED (do not set; SESSION_SETUP and the orchestrator compute these):
-  INIT_RUN_ID           = YYYY-MM-DD-{secrets.token_hex(4)} generated at SESSION_SETUP
-  INIT_RUN_FOLDER       = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}
+REQUIRED_INPUTS:
+- PROJECT_NAME [string]
+- DOMAIN_DESCRIPTION [1-2 sentence summary]
+- TARGET_USERS [[role, role, ...]]
+- CORE_ENTITIES [[entity, entity, ...]]
+OPTIONAL_INPUTS:
+- PRODUCT_ROOT =default:NEBULA_PRODUCT_ROOT env var, or sister-repo ../<product-repo>
+AUTO_RESOLVED:
+- INIT_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}
 
-SESSION_SETUP:
-- Resolve {PRODUCT_ROOT} per agents/docs/AGENT-USE.md → Session Setup (operator input, NEBULA_PRODUCT_ROOT env var, or default `../<product-repo>`)
-- Echo resolved absolute {PRODUCT_ROOT}
-- Confirm {PRODUCT_ROOT} is empty or a new repository willing to accept scaffolded files
-- Generate {INIT_RUN_ID} once at session start using contract format YYYY-MM-DD-[a-z0-9]{8} (suffix from `secrets.token_hex(4)`). DO NOT use uuid4.
-- Create base run folder per §8 (created after {PRODUCT_ROOT} scaffolding lands operations/evidence/):
-    INIT_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}/
-    mkdir -p {INIT_RUN_FOLDER}
-- Initialize base run files: README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log (empty JSONL), lifecycle-gates.log (empty)
-
-PRECONDITIONS:
-- nebula-agents is checked out and is the current session working directory
-- {PRODUCT_ROOT} resolved and either empty or accepting scaffold
-- Operator has basic project context (domain, goals, target users, initial entities)
-
-CONTEXT LOADING ORDER:
-1. agents/ROUTER.md
-2. agents/agent-map.yaml
-3. agents/docs/AGENT-USE.md
-4. agents/actions/init.md
-5. agents/product-manager/SKILL.md (initialization mode)
-6. agents/templates/** (templates for scaffolded files)
-
-FORBIDDEN:
-- Generating {INIT_RUN_ID} with uuid4
-- Scaffolding into a non-empty {PRODUCT_ROOT} without explicit operator confirmation
-- Skipping the evidence directory bootstrap; the product must have `planning-mds/operations/evidence/` ready for first feature run
-- Pre-populating REGISTRY.md with non-empty `Archived Features` or `Retired Features` tables; both start empty
-- Setting Evidence Contract Effective Date earlier than the framework default (must be the framework default `2026-05-19` or later for new products)
-
-REQUIRED TOOL INVOCATIONS:
-- All shell commands appended to {INIT_RUN_FOLDER}/commands.log per §13 JSONL schema (once the folder exists)
-- Final validator sweep at exit (see EXIT VALIDATION)
-
-OWNERSHIP:
-- product-manager (initialization mode) owns every scaffolded file
+RUN_ID: var=INIT_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
+SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/init.md -> agents/product-manager/SKILL.md (initialization mode) -> agents/templates/** (templates for the scaffolded files)
 
 GATES:
-- I0  PROJECT INPUTS CAPTURED — PROJECT_NAME, DOMAIN_DESCRIPTION, TARGET_USERS, CORE_ENTITIES recorded
-- I1  PRODUCT_ROOT SCAFFOLD — create the canonical directory structure
-- I2  BLUEPRINT TEMPLATE — produce {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md from template
-- I3  REGISTRY + ROADMAP — produce REGISTRY.md (empty Active/Planned/Archived/Retired sections), ROADMAP.md (empty Now/Next/Later/Completed)
-- I4  EVIDENCE INFRASTRUCTURE — create planning-mds/operations/evidence/ with README explaining base run vs feature profile vs global lanes per §§7, 8, 9, 20; create the Path Class Extensions section (§7) empty by default. IF the product's intended top-level layout differs from the framework defaults (engine/, experience/) — for example a monorepo using apps/api/, apps/web/, or services/ — the operator MUST populate Path Class Extensions before the first feature action runs; init emits an info notice when BLUEPRINT.md mentions a non-default layout and the extensions section is still empty
-- I5  KG INFRASTRUCTURE — create planning-mds/knowledge-graph/ with empty solution-ontology.yaml, canonical-nodes.yaml, feature-mappings.yaml, code-index.yaml
-- I6  VALIDATOR SANITY — run all validators against the empty product; each must exit 0
+- I0 role=product-manager artifacts=[action-context.md]
+- I1 role=product-manager artifacts=[]
+- I2 role=product-manager artifacts=[BLUEPRINT.md]
+- I3 role=product-manager artifacts=[REGISTRY.md, ROADMAP.md]
+- I4 role=product-manager artifacts=[]
+- I5 role=product-manager artifacts=[]
+- I6 role=product-manager artifacts=[]
+    - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
 
-EVIDENCE OUTPUTS (in {INIT_RUN_FOLDER}):
-- README.md (Run Summary = "Product bootstrap", Status, Evidence Index, Validation Summary)
-- action-context.md (Run Identity, Inputs, Assumptions, Scope Boundaries = "Bootstrap only", Lifecycle Stage = "Init")
-- artifact-trace.md (every file scaffolded under {PRODUCT_ROOT})
-- gate-decisions.md (I0..I6)
-- commands.log
-- lifecycle-gates.log
-
-EVIDENCE OUTPUTS (in {PRODUCT_ROOT}/planning-mds/operations/evidence/README.md):
-- Sections: "Base Run Profile" (§8), "Feature Evidence Profile" (§9), "Global Lanes" (§20)
-- "Path Class Extensions" section (§7) — empty by default; the operator fills in any product-specific globs after I4
-
-STOP CONDITIONS:
-- Operator refuses to confirm scaffold into non-empty {PRODUCT_ROOT}
-- Any validator exits non-zero at I6 (root cause must be fixed before init can complete)
-- INSUFFICIENT_CONTEXT for any required input
-
-EXIT VALIDATION (run in order; all exit 0):
-- `python3 agents/product-manager/scripts/validate-trackers.py`
-- `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT}` (registry-wide scan; should report 0 governed features and 0 retired records)
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols`
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
-- `python3 agents/scripts/validate_templates.py`
-
-CONFLICT RESOLUTION:
-- Operator wants effective date earlier than framework default → refuse; new products inherit the framework default at minimum
-- Operator wants to backfill historical features during init → out of scope for init; init creates an empty registry only
+SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
+OWNERSHIP:
+- product-manager: every scaffolded file (initialization mode)
+FORBIDDEN:
+- Generate INIT_RUN_ID with uuid4.
+- Scaffold into a non-empty {PRODUCT_ROOT} without explicit operator confirmation.
+- Skip the evidence directory bootstrap — the product must have planning-mds/operations/evidence/ ready for the first feature run.
+- Pre-populate REGISTRY.md with non-empty Archived or Retired tables; both start empty.
+- Set the Evidence Contract Effective Date earlier than the framework default (must be 2026-05-19 or later for new products).
+STOP_CONDITIONS:
+- The operator refuses to confirm scaffolding into a non-empty {PRODUCT_ROOT}.
+- Any validator exits non-zero at I6 (fix the root cause before init can complete).
+- INSUFFICIENT_CONTEXT for any required input.
+CONFLICT_RESOLUTION:
+- operator wants an effective date earlier than the framework default -> refuse; new products inherit the framework default at minimum.
+- operator wants to backfill historical features during init -> out of scope for init; init creates an empty registry only.
+NOTE[evidence_readme]: The product's planning-mds/operations/evidence/README.md gets the sections Base Run Profile (§8), Feature
+Evidence Profile (§9), and Global Lanes (§20), plus a Path Class Extensions section (§7) that starts empty —
+the operator fills product-specific globs there after I4 for non-default layouts.
+NOTE[preconditions]: nebula-agents is checked out and is the current session working directory; {PRODUCT_ROOT} is resolved and
+either empty or accepting scaffold; the operator has basic project context (domain, goals, target users,
+initial entities).
+NOTE[session_setup]: Resolve {PRODUCT_ROOT} per agents/docs/AGENT-USE.md (operator input, the NEBULA_PRODUCT_ROOT env var, or the
+default ../<product-repo>) and echo the resolved absolute path. Confirm it is empty or a new repo accepting
+scaffold. Mint INIT_RUN_ID once in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
+suffix); never uuid4. Create {INIT_RUN_FOLDER} (after scaffolding lands operations/evidence/) and initialize
+the six §8 base run files.
+NOTE[telemetry]: Append every shell command to {INIT_RUN_FOLDER}/commands.log per the §13 JSONL schema (schema_version,
+timestamp with timezone, cwd, command, exit_code, artifacts[], redactions[]) once the folder exists.
