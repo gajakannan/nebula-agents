@@ -74,7 +74,7 @@ def test_security_scan_unbacked_fails(tmp_path: Path) -> None:
         manifest_updates={"security_sensitive_scope": True, "contract_effective_date": LATE_DATE},
     )
     scans = _complete_scans(run_folder)
-    # Claims a scan ran but points at an artifact that does not exist.
+    # Asserts a scan ran but points at an artifact that does not exist.
     scans["sast"] = {"ran": True, "result": "clean", "artifact": "artifacts/security/sast-semgrep.sarif", "waiver": None}
     write_manifest_run(
         product, "F0001-new", "F0001",

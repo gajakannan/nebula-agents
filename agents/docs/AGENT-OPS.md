@@ -22,7 +22,7 @@ proved the tests passed?", "who signed off, and on what evidence?", or
 Agent Ops is that record. Each run writes a structured **evidence
 package**: a manifest, role/gate reports, an append-only command log, and
 a lifecycle-gate log. The package is the contract surface — gate decisions
-must be backed by recorded evidence, not by prose claims. A validator reads
+must be backed by recorded evidence, not by prose assertions. A validator reads
 the package at every stage so gaps are caught *during* the run, not at
 closeout.
 

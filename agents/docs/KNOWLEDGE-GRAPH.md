@@ -328,7 +328,7 @@ the **artifact**.
 | Release-readiness checkpoint | Architect | `validate.py --check-orphans` (decide remove/bind/exempt for each), `dead-code.py --safe-only`, `risk.py` (high/critical band review), `bus_factor_flag` review in `coverage-report.yaml` |
 | Touching an interface/base method | Architect | `lookup.py --implementers <id>` (or `--overrides`) — the returned set is the change scope |
 | Considering a new node/service/method name | Architect | `lookup.py --defines <name>` before introducing, to catch duplicate surfaces |
-| Plan claims blast radius X | Architect | `diff-impact.py <feature-branch-range>` — surfaced nodes outside the stated scope mean widen the plan or narrow the change |
+| Plan asserts blast radius X | Architect | `diff-impact.py <feature-branch-range>` — surfaced nodes outside the stated scope mean widen the plan or narrow the change |
 
 ## Health Checks
 
