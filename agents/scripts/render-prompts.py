@@ -78,9 +78,18 @@ def _op_lines(gate: dict[str, Any]) -> list[str]:
 
 
 def _common_facts(spec: dict[str, Any], shared: dict[str, Any]) -> dict[str, Any]:
+    # The shared contract defines the `contract` run-id scheme (date + token_hex). The
+    # `integrate` scheme uses a UTC-timestamp id minted by the integrator, not init-run.
+    scheme = (spec.get("run_id", {}) or {}).get("scheme", "contract")
+    if scheme == "integrate":
+        run_id_format = "integrate-YYYYMMDD-HHMMSS (UTC)"
+        run_id_method = "date -u +%Y%m%d-%H%M%S"
+    else:
+        run_id_format = shared.get("run_id_format", "")
+        run_id_method = _run_id_method(shared)
     return {
-        "run_id_format": shared.get("run_id_format", ""),
-        "run_id_method": _run_id_method(shared),
+        "run_id_format": run_id_format,
+        "run_id_method": run_id_method,
         "run_id_forbidden": shared.get("run_id_forbidden", []),
         "base_run_files": ", ".join(shared.get("base_run_files", [])),
         "artifacts_subdirs": ", ".join(shared.get("artifacts_subdirs", [])),
