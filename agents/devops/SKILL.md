@@ -293,13 +293,9 @@ Phase 3: Implementation (Generate Configs)
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
-patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
-evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
-read only exact evidence files required for audit, validation, closeout, failure
-triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
+Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
+`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
 
@@ -399,57 +395,14 @@ Pre-deploy, run `python3 {PRODUCT_ROOT}/scripts/kg/diff-impact.py <release-range
 
 ## Development Workflow
 
-### 1. Understand Requirements
-- Read infrastructure requirements from Architect
-- Understand service dependencies
-- Identify environment needs (dev, staging, prod)
-- Review performance and security requirements
-
-### 2. Containerize Applications
-- Write Dockerfile for backend (C# .NET)
-- Write Dockerfile for frontend (React + Vite)
-- Write Dockerfile for AI/neuron (Python)
-- Optimize images (multi-stage builds)
-- Test containers locally
-
-### 3. Set Up Local Development
-- Create docker-compose.yml
-- Add PostgreSQL, authentik, Temporal services
-- Configure service networking
-- Add volume mounts for development
-- Test local setup
-
-### 4. Configure Environments
-- Define environment variables (.env files)
-- Create .env.example template
-- Set up secrets management for production
-- Document configuration
-
-### 5. Set Up CI/CD
-- Create GitHub Actions workflows
-- Configure build jobs
-- Configure test jobs
-- Configure deployment jobs
-- Add quality gates
-
-### 6. Set Up Monitoring
-- Configure Prometheus
-- Create Grafana dashboards
-- Set up Loki for logs
-- Configure alerts
-- Test monitoring locally
-
-### 7. Write Documentation
-- Deployment runbook
-- Environment setup guide
-- Troubleshooting guide
-- Architecture diagrams
-
-### 8. Test Deployment
-- Deploy to staging environment
-- Run smoke tests
-- Verify monitoring and logging
-- Test rollback procedure
+1. **Understand requirements** — infra requirements from Architect, service dependencies, env needs (dev/staging/prod), performance/security.
+2. **Containerize** — Dockerfiles for backend (.NET), frontend (React+Vite), AI/neuron (Python); multi-stage builds; test locally.
+3. **Local dev** — docker-compose.yml with PostgreSQL/authentik/Temporal, service networking, dev volume mounts; test the setup.
+4. **Environments** — env vars (.env + .env.example template), production secrets management, documented config.
+5. **CI/CD** — GitHub Actions build / test / deploy jobs + quality gates.
+6. **Monitoring** — Prometheus, Grafana dashboards, Loki logs, alerts; test locally.
+7. **Documentation** — deployment runbook, environment setup guide, troubleshooting, architecture diagrams.
+8. **Test deployment** — deploy to staging, smoke tests, verify monitoring/logging, test rollback.
 
 ## Troubleshooting
 
@@ -508,23 +461,12 @@ Solution-specific references:
 
 ## Feature Evidence Contract (§10, §15)
 
-DevOps produces two evidence artifacts:
-
-- `deployability-check.md` — required for **every** completed terminal feature. Template: `agents/templates/deployability-check-template.md`.
-- `g1-runtime-preflight.md` — required when `runtime_bearing = true`. Template: `agents/templates/runtime-preflight-template.md`.
-
-Both live under:
-
-```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/
-```
-
-### Forced DevOps Role (§7)
-
-DevOps is a required role when `deployment_config_changed = true` (Docker, compose, CI, env-var contracts, migrations, startup scripts, runtime topology changed). The manifest `required_roles[]` must include `DevOps`; absent it, the validator fires `manifest_required_roles_mismatch_fails`.
-
-`deployability-check.md` must enumerate the changed deployment config, migrations/rollback steps, env/config contract, manifest boolean cross-check, build/start/smoke results, and runtime warnings.
-
-### Recommendation Severity Scale (§15)
-
-Use the canonical bullet `- [severity] text — owner: X; follow-up: Y` with `low` / `medium` / `high` / `critical`. `high`/`critical` recommendations require PM mitigation per §15 PM Acceptance Line Format in `pm-closeout.md`.
+DevOps owns `deployability-check.md` (required for every completed-terminal feature) and
+`g1-runtime-preflight.md` (required when `runtime_bearing = true`), in the feature run folder
+(`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`; templates under `agents/templates/`).
+DevOps is a **forced** required role when `deployment_config_changed = true` (Docker/compose/CI/env
+contracts/migrations/startup/topology) — the manifest `required_roles[]` must list `DevOps` or
+`manifest_required_roles_mismatch_fails` fires. `deployability-check.md` enumerates the changed config,
+migrations/rollback, env/config contract, manifest boolean cross-check, build/start/smoke results, and
+runtime warnings. Recommendation bullet + severity rules per `CONSUMER-CONTRACT.md` §15
+(`- [severity] text — owner: X; follow-up: Y`; `high`/`critical` need PM mitigation in `pm-closeout.md`).

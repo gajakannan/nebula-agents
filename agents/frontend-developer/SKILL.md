@@ -186,13 +186,9 @@ Your responsibility is to implement the **user-facing layer** ({PRODUCT_ROOT}/ex
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
-patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
-evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
-read only exact evidence files required for audit, validation, closeout, failure
-triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
+Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
+`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
 
@@ -374,16 +370,10 @@ Also run `lookup.py --symbol <name>` (or `hint.py --symbol <name>`) before editi
 ## Development Workflow
 
 ### 1. Understand Requirements
-- Read user story and acceptance criteria
-- Review screen specifications
-- Check API contracts for endpoints
-- Identify data requirements and validations
+- Read the user story + acceptance criteria, screen specs, API contracts, and data requirements/validations.
 
 ### 2. Set Up Structure
-- Create feature module directory
-- Define TypeScript types from API contracts
-- Create or load JSON Schemas for forms
-- Scaffold page and component files
+- Create the feature module directory; define TypeScript types from API contracts; create/load form JSON Schemas; scaffold page + component files.
 
 ### 3. Build UI Components
 - Implement layout using Tailwind CSS

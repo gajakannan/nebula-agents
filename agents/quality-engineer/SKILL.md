@@ -199,13 +199,9 @@ QE must not mark `PASS` based solely on visual smoke or broad E2E summaries when
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
-patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
-evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
-read only exact evidence files required for audit, validation, closeout, failure
-triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
+Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
+`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
 
@@ -424,47 +420,12 @@ For code examples of common test patterns (Testing Error Scenarios, Testing Asyn
 
 ## Quick Reference
 
-### Frontend ({PRODUCT_ROOT}/experience/)
+Test tooling by stack (exact commands live in each project's config):
 
-| Type | Tool | Command |
-|------|------|---------|
-| **Unit/Component** | Vitest + React Testing Library | `npm test` |
-| **Integration** | Vitest + MSW | `npm run test:integration` |
-| **E2E** | Playwright | `npx playwright test` |
-| **Accessibility** | @axe-core/playwright | `npm run test:a11y` |
-| **Performance** | Lighthouse CI | `npm run lighthouse` |
-| **Coverage** | Vitest | `npm run test:coverage` |
-
-### Backend ({PRODUCT_ROOT}/engine/)
-
-| Type | Tool | Command |
-|------|------|---------|
-| **Unit** | xUnit + Shouldly | `dotnet test` |
-| **Integration** | xUnit + WebApplicationFactory | `dotnet test --filter Category=Integration` |
-| **Database** | xUnit + Testcontainers | `dotnet test --filter Category=Database` |
-| **API** | Bruno CLI | `bru run --env dev` |
-| **Load** | k6 | `k6 run load-test.js` |
-| **Coverage** | Coverlet | `dotnet test --collect:"XPlat Code Coverage"` |
-
-### AI/Neuron ({PRODUCT_ROOT}/neuron/)
-
-| Type | Tool | Command |
-|------|------|---------|
-| **Unit** | pytest | `pytest {PRODUCT_ROOT}/neuron/tests/` |
-| **Integration** | pytest + FastAPI TestClient | `pytest {PRODUCT_ROOT}/neuron/tests/integration/` |
-| **Evaluation** | pytest + custom metrics | `pytest {PRODUCT_ROOT}/neuron/tests/evaluation/` |
-| **Performance** | pytest-benchmark | `pytest {PRODUCT_ROOT}/neuron/tests/ --benchmark-only` |
-| **Coverage** | pytest-cov | `pytest --cov=neuron --cov-report=html` |
-
-### Security (Cross-Cutting)
-
-| Type | Tool | Command |
-|------|------|---------|
-| **Vulnerabilities** | Trivy | `trivy fs .` |
-| **DAST** | OWASP ZAP | `docker run -t owasp/zap2docker-stable zap-baseline.py -t http://localhost` |
-| **SAST** (per-feature gate) | Semgrep | `sh agents/security/scripts/run-sast-scan.sh --path . --report-dir <RUN>/artifacts/security` |
-| **Secrets** | Gitleaks | `gitleaks detect --source .` |
-| **Quality reporting** (release cadence) | SonarQube Community | `dotnet sonarscanner begin && dotnet build && dotnet sonarscanner end` (needs the `docker-compose.qe.yml` overlay up; not part of the per-feature `security_scans` gate) |
+- **Frontend** (`{PRODUCT_ROOT}/experience/`) — Vitest+RTL (unit/component), Vitest+MSW (integration), Playwright (E2E), @axe-core/playwright (a11y), Lighthouse CI (perf), Vitest (coverage).
+- **Backend** (`{PRODUCT_ROOT}/engine/`) — xUnit+Shouldly (unit), WebApplicationFactory (integration), Testcontainers (database), Bruno CLI (API), k6 (load), Coverlet (coverage).
+- **AI/Neuron** (`{PRODUCT_ROOT}/neuron/`) — pytest (unit), pytest+FastAPI TestClient (integration), pytest+custom metrics (evaluation), pytest-benchmark (perf), pytest-cov (coverage).
+- **Security (cross-cutting)** — Trivy (vulns), OWASP ZAP (DAST), Semgrep (SAST — the per-feature gate: `sh agents/security/scripts/run-sast-scan.sh --path . --report-dir <RUN>/artifacts/security`), Gitleaks (secrets), SonarQube Community (release-cadence quality reporting via the `docker-compose.qe.yml` overlay — NOT the per-feature `security_scans` gate).
 
 ## Troubleshooting
 
@@ -504,31 +465,13 @@ Solution-specific references:
 
 ## Feature Evidence Contract (§10, §15, §18)
 
-Quality Engineer produces three QE-owned artifacts at G2 inside the feature evidence package:
-
-```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/
-  test-plan.md              # template: agents/templates/test-plan-template.md
-  test-execution-report.md  # template: agents/templates/test-execution-report-template.md
-  coverage-report.md        # template: agents/templates/coverage-report-template.md
-```
-
-`test-execution-report.md` is the QE verdict artifact for `role_results['Quality Engineer']` in the manifest.
-
-### Coverage Waiver Flow (§10, §11, §18)
-
-`coverage-report.md` is **required even when coverage is waived**. When coverage cannot be produced or is below target:
-
-1. Add a `Waiver Block` section to `coverage-report.md` with owner, date, scope, reason, follow-up.
-2. Record the waiver in `evidence-manifest.json` `waivers.coverage` with `required`, `reason`, `owner`, `approved_on`, `follow_up`.
-3. PM adds a §15 PM Acceptance Line in `pm-closeout.md` `Recommendation Acceptances`:
-
-```text
-- Accepted: coverage — <reason summary>; <approved_on YYYY-MM-DD>
-```
-
-Without that PM Acceptance Line, the validator fires `coverage_waiver_missing_pm_acceptance_fails`. If the waiver scope/owner/date does not match the report, `coverage_waiver_mismatch_fails` fires.
-
-### Recommendation Severity Scale (§15)
-
-Recommendations under a `PASS WITH RECOMMENDATIONS` verdict use the canonical bullet `- [severity] text — owner: X; follow-up: Y` with severity `low` / `medium` / `high` / `critical`. `high` / `critical` require PM mitigation in `pm-closeout.md`.
+QE owns three artifacts at G2 in the feature run folder
+(`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`): `test-plan.md`,
+`test-execution-report.md` (the QE verdict artifact for `role_results['Quality Engineer']`), and
+`coverage-report.md` — **required even when coverage is waived** (templates under `agents/templates/`).
+When waived, add a Waiver Block (owner/date/scope/reason/follow-up) to `coverage-report.md`, mirror it in
+`evidence-manifest.json` `waivers.coverage`, and have PM add the §15 PM Acceptance Line in `pm-closeout.md`
+— else `coverage_waiver_missing_pm_acceptance_fails` (or `coverage_waiver_mismatch_fails`) fires. The full
+waiver flow and the `- [severity] text — owner: X; follow-up: Y` recommendation bullet (severity
+`low`/`medium`/`high`/`critical`; `high`/`critical` need PM mitigation) live in `CONSUMER-CONTRACT.md`
+§10/§15/§18.

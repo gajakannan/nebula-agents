@@ -50,6 +50,10 @@ cases:
     prompt: "Write a development blog post summarizing what changed and lessons learned."
     expected_skill: blogger
 
+  - id: integrator_merge_train
+    prompt: "Run the merge train: integrate the contributor PR branch into the integration branch, reconciling the curated knowledge-graph and tracker tables at merge time."
+    expected_skill: integrator
+
 # Content assertions — each entry requires the listed skill's SKILL.md to
 # contain the given substring. Use to lock in cross-skill guidance that
 # regressions could quietly delete.

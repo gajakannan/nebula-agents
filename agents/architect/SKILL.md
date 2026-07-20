@@ -178,7 +178,7 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
    - **When refactoring an interface or base method**: run `lookup.py --implementers <interface-symbol-id>` (or `--overrides <method-id>`) — the returned set is the change scope.
    - **At every release-readiness checkpoint**:
      - `validate.py --check-orphans` — for each orphan, decide bind / remove / exempt. Pair with `dead-code.py --safe-only` for symbol-level review. Thresholds: `agents/architect/references/dead-code-review-guide.md`.
-     - `risk.py` — surface canonical nodes in the **high** (`kg.risk` ≥ 7) or **critical** (`kg.risk` ≥ 9) bands and propose mitigations. Weights/bands: `agents/architect/references/risk-scoring-guide.md`.
+     - `scripts/kg/risk.py` — surface canonical nodes in the **high** (`kg.risk` ≥ 7) or **critical** (`kg.risk` ≥ 9) bands and propose mitigations. Weights/bands: `agents/architect/references/risk-scoring-guide.md`.
      - Review `bus_factor_flag: true` entries in `coverage-report.yaml` and propose knowledge-share follow-ups. Thresholds: `agents/architect/references/hotspot-review-guide.md`.
 
 ## Capability Recommendation
@@ -193,13 +193,9 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
-patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
-evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
-read only exact evidence files required for audit, validation, closeout, failure
-triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
+Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
+`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
 
@@ -225,8 +221,9 @@ For KG query/health semantics and source-precedence rules see
 `agents/docs/KNOWLEDGE-GRAPH.md`. In short: when ontology coverage exists,
 run `lookup.py <feature-or-story-id>` before broad repo reads; after
 design sessions that add new aggregate methods or service operations,
-regenerate symbols (`validate.py --regenerate-symbols`) and confirm
-binding with `lookup.py --symbol <name>`.
+regenerate the symbol layer (`validate.py --regenerate-symbols`) and
+harvest novel inline decision markers (`validate.py --regenerate-decisions`), then
+confirm binding with `lookup.py --symbol <name>`.
 
 ## References
 
@@ -253,49 +250,20 @@ Generic references in `agents/architect/references/` only. Solution-specific exa
 
 ## Diagram Standards
 
-### Format Rules
+Two formats: **Mermaid** for all stored diagram files in `{PRODUCT_ROOT}/planning-mds/`, and **ASCII** inline
+in ADR decision sections / quick sketches / any context where rendering is uncertain. Every formal stored
+diagram gets Mermaid; an ADR decision section that includes a diagram also gets an ASCII companion (readable
+in terminals, PR inline comments, Slack).
 
-Two formats are used — choose based on context:
-
-| Format | When to Use | Rendering |
-|--------|-------------|-----------|
-| **Mermaid** | Primary format for all stored diagram files in `{PRODUCT_ROOT}/planning-mds/` | GitHub, GitLab, VS Code (native) |
-| **ASCII** | Inline in ADR decision sections; quick conversational sketches; any context where rendering is uncertain | Everywhere — zero dependency |
-
-**Rule of thumb:** Every formal stored diagram gets Mermaid. ADR decision sections that include a diagram get ASCII so the ADR is readable in terminals, PR inline comments, and Slack.
-
----
-
-### C4 Architecture Diagrams
-
-Use Mermaid `C4Context` / `C4Container` / `C4Component` syntax.
-
-| Level | Produce When | Stored In |
-|-------|-------------|-----------|
-| **L1 — System Context** | Once at project start; update when system boundary or actors change | `{PRODUCT_ROOT}/planning-mds/architecture/c4-context.md` |
-| **L2 — Container** | Per feature that adds a new service, changes inter-container communication, or introduces infrastructure | `{PRODUCT_ROOT}/planning-mds/architecture/c4-container.md` |
-| **L3 — Component** | For complex features with non-obvious internal structure (e.g. new AI integration, new workflow engine usage) | Feature README or `{PRODUCT_ROOT}/planning-mds/architecture/c4-component-{feature}.md` |
-| **L4 — Code** | Not required — auto-generated from code | — |
-
-Include an ASCII companion in the ADR for any C4 diagram that directly justifies a major architectural decision (e.g. ADR introducing a new service).
-
----
-
-### ERD (Entity Relationship Diagrams)
-
-Use Mermaid `erDiagram` syntax.
-
-| Scope | Produce When | Stored In |
-|-------|-------------|-----------|
-| **Domain ERD** | Once; update whenever entities or relationships change | Embedded in `{PRODUCT_ROOT}/planning-mds/architecture/data-model.md` |
-| **Feature ERD** | Per feature that introduces new entities or modifies existing relationships | Embedded in the feature README |
-
-ERD content rules:
-- Show entity names, primary key, foreign keys, and discriminating business fields (not every column)
-- Show cardinality (`||--o{`, `}|--|{`, etc.) with relationship labels
-- Omit audit fields (CreatedAt, UpdatedAt, etc.) — they are on all entities by convention
-
-Include an ASCII version of the feature ERD inline in the feature README for terminals and PR review readability.
+- **C4** (Mermaid `C4Context`/`C4Container`/`C4Component`): L1 System Context once at project start
+  (`architecture/c4-context.md`); L2 Container per feature that adds a service / changes inter-container
+  comms / introduces infra (`architecture/c4-container.md`); L3 Component for complex non-obvious internal
+  structure (feature README or `architecture/c4-component-{feature}.md`); L4 Code is auto-generated (skip).
+  Add an ASCII companion in the ADR for any C4 diagram justifying a major decision.
+- **ERD** (Mermaid `erDiagram`): Domain ERD once, updated when entities/relationships change (embedded in
+  `architecture/data-model.md`); Feature ERD per feature adding entities or changing relationships (feature
+  README). Show entity names, PK, FKs, and discriminating business fields (not every column) with cardinality
+  + labels; omit audit fields. Include an ASCII feature-ERD inline in the feature README.
 
 ---
 
@@ -511,20 +479,9 @@ Before declaring work complete, verify each deliverable:
 
 ## Feature Evidence Contract (§10, §15)
 
-Architect produces `g0-assembly-plan-validation.md` at G0 for every governed completed-terminal feature:
-
-```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/g0-assembly-plan-validation.md
-```
-
-Architect is also marked required in `STATUS.md` `Required Role Matrix` when explicit architect signoff is needed for the feature.
-
-### Recommendation Severity Scale (§15)
-
-Recommendations under a `PASS WITH RECOMMENDATIONS` verdict use the canonical bullet:
-
-```text
-- [severity] <recommendation text> — owner: <name-or-role>; follow-up: <ticket-id-or-deferred-no-followup>
-```
-
-Severity is exactly one of `low`, `medium`, `high`, `critical`. `high` and `critical` require PM mitigation in `pm-closeout.md` per §15 PM Acceptance Line Format.
+Architect produces `g0-assembly-plan-validation.md` at G0 for every governed completed-terminal feature, in
+the feature run folder (`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`), and is marked
+required in the `STATUS.md` Required Role Matrix when explicit architect signoff is needed. Recommendations
+under `PASS WITH RECOMMENDATIONS` use the canonical bullet `- [severity] text — owner: X; follow-up: Y`
+(severity `low`/`medium`/`high`/`critical`; `high`/`critical` need PM mitigation per §15) — full rules in
+`CONSUMER-CONTRACT.md` §10/§15.

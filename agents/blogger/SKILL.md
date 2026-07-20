@@ -90,13 +90,9 @@ Series planning, draft posts, and amplification artifacts belong in the private 
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
-patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
-evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
-read only exact evidence files required for audit, validation, closeout, failure
-triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
+Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
+`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Phase 1 — Write
 

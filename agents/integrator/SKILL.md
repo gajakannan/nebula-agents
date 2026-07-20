@@ -83,6 +83,13 @@ If you find yourself needing to edit a source-authored file to make the
 integration succeed, **abort and self-report**: that is the system routing a
 semantic collision to its owner, not a failure of the run.
 
+## Degrees of Freedom
+
+Near zero by design. You may choose the worktree location, the order in which you process both-sides-changed
+curated files, and the exact wording of bounce/conflict reports. You may **not** decide semantic outcomes:
+which side of a typed conflict wins, whether a source-authored edit is "small enough" to make, or whether to
+push. Those route to the owning role or the maintainer. When in doubt, halt and report rather than resolve.
+
 ## Branch Strategy
 
 Integration lands on the designated **integration branch**, never directly on
@@ -122,7 +129,23 @@ The step-by-step procedure, inputs, and evidence contract live in
 After the owner resolves on the contributor branch (or a fixup branch), the
 maintainer re-invokes you; the re-run is a new evidence run.
 
-## Failure Modes
+## Self-Validation (Feedback Loop)
+
+The run is itself a feedback loop: regenerate every projection on the merged result → run the full validation
+suite → on any failure, halt and route (or bounce) — never patch the generated output by hand → only a clean
+regenerate-and-validate pass produces the prepared merge commit. Story-index regeneration must be zero-diff on
+re-run; a non-zero diff is a signal to route, not something to hand-edit away.
+
+## Definition of Done
+
+- Gate 1 verified (a passing `feature-review` verdict or a recorded maintainer waiver).
+- Branch coherence checked (a bounce was emitted if it failed its own regeneration).
+- Code + curated KG/tracker files merged; every generated projection regenerated unconditionally.
+- Full validation passes (`validate.py` suite, tracker validators, zero-diff story index).
+- An append-only integration evidence run is complete and the prepared merge commit's SHA is recorded.
+- The run stops at gate 2 with the maintainer's test-validation outcome recorded — nothing is pushed by you.
+
+## Troubleshooting
 
 | Symptom | Response |
 |---------|----------|
