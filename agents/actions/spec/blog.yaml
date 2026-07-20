@@ -111,8 +111,8 @@ stop_conditions:
   - "The user refuses the EDITORIAL GATE."
 
 conflict_resolution:
-  - "blog claim disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post."
-  - "blog claim disagrees with code -> code wins; do not publish content that misleads."
+  - "a blog assertion disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post."
+  - "a blog assertion disagrees with code -> code wins; do not publish content that misleads."
 
 notes:
   session_setup: |

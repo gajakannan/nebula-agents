@@ -68,8 +68,8 @@ Stop conditions:
 - The user refuses the EDITORIAL GATE.
 
 Conflict resolution:
-- blog claim disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post.
-- blog claim disagrees with code -> code wins; do not publish content that misleads.
+- a blog assertion disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post.
+- a blog assertion disagrees with code -> code wins; do not publish content that misleads.
 
 Note (evidence_outputs): In {BLOG_RUN_FOLDER}: README.md (Run Summary = "Blog run", Status, Evidence Index pointing to TARGET_PATH
 and any amplification artifacts, Validation Summary, Open Follow-ups); action-context.md (Scope Boundaries =

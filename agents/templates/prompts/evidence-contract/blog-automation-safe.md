@@ -45,8 +45,8 @@ STOP_CONDITIONS:
 - Self-review identifies factual errors that cannot be resolved against source artifacts.
 - The user refuses the EDITORIAL GATE.
 CONFLICT_RESOLUTION:
-- blog claim disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post.
-- blog claim disagrees with code -> code wins; do not publish content that misleads.
+- a blog assertion disagrees with REGISTRY.md/STATUS.md/pm-closeout.md -> the registry/closeout wins; fix the post.
+- a blog assertion disagrees with code -> code wins; do not publish content that misleads.
 NOTE[evidence_outputs]: In {BLOG_RUN_FOLDER}: README.md (Run Summary = "Blog run", Status, Evidence Index pointing to TARGET_PATH
 and any amplification artifacts, Validation Summary, Open Follow-ups); action-context.md (Scope Boundaries =
 "Editorial content; not feature evidence", Lifecycle Stage = "Blog"); artifact-trace.md (TARGET_PATH + any
