@@ -2,29 +2,48 @@
 
 ## User Intent
 
-Write development logs, technical articles, blog posts, and channel amplification content about project progress, decisions, lessons learned, and interesting technical challenges. This action is conversational — the agent asks questions, makes recommendations, and reaches alignment with the user before writing anything.
+Write development logs, technical articles, blog posts, and channel amplification content about project progress, decisions, lessons learned, and interesting technical challenges. This action is **conversational** — the agent asks questions, makes recommendations, and reaches alignment with the user before writing anything.
 
 ## Agent Flow
 
 ```
-Blogger
+B0  Discovery         (conversational — ask, recommend, align)
   ↓
-[DISCOVERY: Conversational — ask, recommend, align]
+B1  Editorial brief   (user approves before drafting)
   ↓
-[EDITORIAL BRIEF: User approves before drafting]
+B2  Draft             (write primary post into TARGET_PATH)
   ↓
-[DRAFT: Write primary post]
+B3  Self-review gate  (accuracy and quality)
   ↓
-[SELF-REVIEW GATE: Accuracy and quality]
+B4  Editorial gate    (user reviews and approves)
   ↓
-[EDITORIAL GATE: User reviews and approves]
-  ↓
-[AMPLIFICATION: Optional Phase 2 — channel derivatives]
-  ↓
+B5  Amplification     (optional Phase 2 — channel derivatives)
 Blog Complete
 ```
 
-**Flow Type:** Single agent, discovery-first, with two editorial gates
+**Flow Type:** Single agent, discovery-first, with two editorial gates (B1, B4).
+
+---
+
+## Contract (generated — the spec is the source of truth)
+
+The fixed procedure for this action — the `B0`–`B5` gates, inputs (`POST_TYPE`, `TARGET_PATH`,
+`AMPLIFICATION`, `FEATURE_REF`), forbidden actions, stop conditions, and conflict resolution — is declared
+once in [`agents/actions/spec/blog.yaml`](spec/blog.yaml) and compiled into the operator/automation prompt
+pair at `agents/templates/prompts/evidence-contract/blog-operator-friendly.md` and `blog-automation-safe.md`.
+Regenerate with `python3 agents/scripts/render-prompts.py`; the `prompt_drift` lifecycle gate fails if the
+committed prompts drift from the spec. **Edit the spec, not this doc or the generated prompts.**
+
+- **Scope** — `base-run-only`, and **outside the feature evidence contract**: editorial content is never
+  evidence for a completed feature. `POST_TYPE ∈ {devlog | technical-article | release-post | retrospective |
+  other}`; the run writes a base run package under
+  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}/` and the post at `TARGET_PATH`.
+- **Gates** — B1 and B4 are user checkpoints: never draft before B1, never publish/amplify before B4. No
+  validators are required. Never misrepresent feature status/dates/decisions — cross-check `REGISTRY.md` and
+  the feature's `pm-closeout.md` when `FEATURE_REF` is set.
+
+Drive the gates with `python3 agents/scripts/run-gate.py --action blog --stage <B0..B5> ...` (`--list` prints
+the ordered runbook; it pauses at the B1/B4 editorial checkpoints).
 
 ---
 
@@ -33,235 +52,66 @@ Blog Complete
 - Runs entirely in the builder runtime. No application containers required.
 - Code examples must be verified against the actual codebase — the Blogger reads code but does not execute it.
 
----
-
 ## Required Reads Before Starting
-
-Load these before the discovery conversation begins:
 
 1. `agents/blogger/SKILL.md` — agent capabilities, two-phase model, quality gates
 2. `../nebula-blog/publication-profile.md` — voice, domain, audience, channel config (optional product override)
-3. `../nebula-blog/SERIES-PLAN.md` — full series roadmap, published posts, planned posts
+3. `../nebula-blog/SERIES-PLAN.md` — series roadmap, published + planned posts
 4. `agents/blogger/references/blogging-best-practices.md` — craft reference
 
 ---
 
-## Execution Steps
+## Blogger craft (not encoded in the spec)
 
-### Step 1: Discovery
+The spec owns the gate structure; the craft below is the Blogger's method (keep aligned with
+`agents/blogger/SKILL.md` and `publication-profile.md`).
 
-This is the most important step. Do not skip it. Do not produce an editorial brief until this conversation is complete.
+### B0 Discovery — the most important step
 
-**Purpose**: Understand what story the user wants to tell, surface the angle, find the hook, confirm series placement, and align on audience before a single word of the post is written.
+Ask questions conversationally (not a numbered list, not all at once); start with the most open question and follow the thread; make recommendations and push back when something doesn't feel right. The goal is a story worth telling, not just a topic. Core threads to work through:
 
-**How to run discovery:**
+- What did you build/decide/learn/observe that's worth writing about? What's the one takeaway for the reader?
+- Where's the moment of surprise, mistake, or shaping constraint? That's usually the real hook.
+- Does it fit a series in `SERIES-PLAN.md`, and where in that arc? What post type fits (devlog / deep dive / tutorial / case study / retrospective)?
+- Is there an opening hook? What source material exists (commits, ADRs, feature artifacts, benchmarks, tests)? Which amplification channels after publishing?
 
-Ask questions conversationally — not as a numbered list, not all at once. Start with the most open question and follow the thread. Make recommendations based on what the user shares. Push back if something doesn't feel right. The goal is to arrive at a story worth telling, not just a topic to cover.
+Offer interpretations back ("the mistake you mentioned feels like the real hook, not the feature itself — what do you think?"). When done, summarize the angle + series placement + hook in 2–3 sentences and get explicit confirmation before B1.
 
-**Core questions to work through** (weave these into conversation, don't recite them):
+### B1 Editorial brief
 
-- What's happening — what did you build, decide, learn, or observe that's worth writing about?
-- What's the one thing you want the reader to walk away with?
-- Is there a moment of surprise, a mistake, a decision that didn't go as expected, or a constraint that shaped everything? That's usually the real story.
-- Does this fit an existing series in `../nebula-blog/SERIES-PLAN.md`? Where does it sit in that arc?
-- What post type fits best — devlog, deep dive, tutorial, case study, retrospective? (Make a recommendation if the user isn't sure.)
-- Do you have an opening line or hook in mind? If not, suggest two or three options based on the hook patterns in `publication-profile.md`.
-- What source material exists — specific commits, ADRs, feature artifacts, benchmarks, test results?
-- After publishing: which amplification channels — LinkedIn, Reddit, dev.to, Bluesky, X?
+Present a brief and get explicit approval before drafting. Fields: Topic; The story (one sentence — the real angle); Hook; Post type; Series (name + number, or standalone); Target audience (specific); Estimated length; Source material; 3–5 Key points; Amplification channels; Output file `../nebula-blog/posts/YYYY-MM-DD-slug.md`.
 
-**How to make recommendations:**
+### B2 Draft — voice
 
-Don't just receive answers — offer interpretations and push them back to the user.
+First-person builder's voice; the agreed hook pattern; emoji anchors on section headers (sparingly); insurance-domain grounding (name the application explicitly); series continuity (open with a recap if part of a series, close with a specific preview). Reference source material directly (repo-relative paths, real snippets, actual decision records) — no invented metrics.
 
-Examples:
-- "Based on what you've described, this sounds like it belongs in the Agent Framework series as Post 4. Does that feel right?"
-- "The mistake you mentioned about the abstraction — that feels like the real hook, not the feature itself. What do you think?"
-- "You've framed this as a devlog but there's a decision in here that might be worth a Choices We Made post instead. Want to explore that?"
-- "I'd suggest opening with the question you asked yourself before you started — 'What if we...' — it pulls the reader into the thinking before the answer."
+### B3 Self-review checklist
 
-**When discovery is complete:**
+- **Technical accuracy:** every assertion traces to source material; code snippets match the codebase; architecture descriptions consistent with planning artifacts; no secrets/credentials/internal hostnames/customer data.
+- **Voice & craft:** hook matches the agreed pattern (not generic background); first-person throughout; insurance application named; register = experienced practitioner (not novice, not authority); series recap + forward preview.
+- **Readability:** scannable headings; excerpted + annotated code (not raw dumps); a concrete takeaway (not a vague close); length within the post-type target.
 
-Summarise what you've heard back to the user in two to three sentences. Confirm the angle, the series placement, and the hook. Ask: "Does that capture it, or is there something we're missing?"
+### B5 Amplification — channel rules
 
-Only proceed to Step 2 when the user confirms.
+Only when `AMPLIFICATION=phase-2`, and only after the primary post is approved. Translate for each channel (don't copy the primary), save to `../nebula-blog/amplification/YYYY-MM-DD-slug-[channel].md`, and honor the per-channel rule:
 
----
+- **LinkedIn** — link in the first comment, not the post body
+- **X/Twitter** — Substack link in a reply to the final tweet
+- **Bluesky** — link can go directly in the final post
+- **Reddit** — lead with value, not "I wrote a post"
+- **dev.to** — set the canonical URL to the Substack post
 
-### Step 2: Editorial Brief
-
-Produce the editorial brief based on the discovery conversation. Present it to the user for approval before writing.
-
-```markdown
-## Editorial Brief
-
-**Topic**: [what the post is about]
-**The story**: [one sentence — the real angle, not just the topic]
-**Hook**: [opening line or pattern]
-**Post type**: [devlog / deep dive / tutorial / case study / retrospective]
-**Series**: [series name and post number, or standalone]
-**Target audience**: [specific — not just "developers"]
-**Estimated length**: [word count range]
-**Source material**: [commits, ADRs, features, benchmarks to draw from]
-**Key points** (3–5):
-  -
-  -
-  -
-**Amplification channels**: [which channels for Phase 2]
-**Output file**: ../nebula-blog/posts/YYYY-MM-DD-slug.md
-```
-
-Ask: "Does this brief capture what you want to write? Any changes before I start drafting?"
-
-Do not proceed until the user explicitly approves the brief.
-
----
-
-### Step 3: Draft
-
-Write the primary post following the approved brief and the craft guidance in `blogging-best-practices.md`.
-
-Apply the voice, formatting, and domain conventions from `publication-profile.md`:
-- First-person builder's voice
-- Hook pattern as agreed in the brief
-- Emoji anchors on section headers (sparingly)
-- Insurance domain grounding — name the insurance application explicitly
-- Series continuity — open with a recap if this is part of a series; close with a specific preview of what's next
-
-Reference source material directly — repository-relative paths, real code snippets, actual decision records. No invented metrics.
-
-**Save to**: `../nebula-blog/posts/YYYY-MM-DD-slug.md`
-
----
-
-### Step 4: Self-Review Gate
-
-Before presenting to the user, validate:
-
-**Technical accuracy:**
-- [ ] All assertions trace to source material (commits, ADRs, tests, metrics)
-- [ ] Code snippets match actual codebase
-- [ ] Architecture descriptions are consistent with planning artifacts
-- [ ] No secrets, credentials, internal hostnames, or customer data
-
-**Voice and craft:**
-- [ ] Opening hook matches the agreed pattern — not generic background
-- [ ] First-person, builder's voice throughout
-- [ ] Insurance domain application named explicitly
-- [ ] Tone stays in the right register: experienced practitioner, not novice, not authority
-- [ ] Series context established (recap + forward preview)
-
-**Readability:**
-- [ ] Sections are scannable with clear headings
-- [ ] Code blocks are excerpted and annotated — not raw dumps
-- [ ] Conclusion has a concrete takeaway, not a vague close
-- [ ] Post length is within the target range for the post type
-
-If any check fails, fix and re-run before presenting to the user.
-
----
-
-### Step 5: Editorial Gate
-
-Present the post to the user for review.
-
-```
-═══════════════════════════════════════════════════════════
-Primary Post Ready for Review
-═══════════════════════════════════════════════════════════
-
-Title: [title]
-Series: [series name — post N of M] or [Standalone]
-Type: [post type]
-Length: [word count] words (~[reading time] min read)
-File: ../nebula-blog/posts/[filename]
-
-Sections:
-  - [heading]
-  - [heading]
-  - [heading]
-
-═══════════════════════════════════════════════════════════
-Options: approve / request changes / reject
-═══════════════════════════════════════════════════════════
-```
-
-- **approve** → proceed to Step 6
-- **request changes** → apply feedback, re-run self-review, return here
-- **reject** → capture what was wrong, return to Step 3
-
----
-
-### Step 6: Amplification (Phase 2 — Optional)
-
-Only run if amplification channels were confirmed in the editorial brief.
-
-**Do not start Phase 2 until the primary post is approved.**
-
-For each confirmed channel, produce a derivative following the channel specs in `publication-profile.md`.
-
-Remind the user of the key rule for each channel:
-- LinkedIn: link goes in the first comment, not the post body
-- X/Twitter: Substack link goes in a reply to the final tweet
-- Bluesky: link can go directly in the final post
-- Reddit: lead with value, not "I wrote a post"
-- dev.to: set canonical URL to the Substack post
-
-Save derivatives to: `../nebula-blog/amplification/YYYY-MM-DD-slug-[channel].md`
-
-Present all derivatives together for review before finalising.
-
----
-
-### Step 7: Complete
-
-```
-═══════════════════════════════════════════════════════════
-Blog Action Complete
-═══════════════════════════════════════════════════════════
-
-Primary post: ../nebula-blog/posts/[filename]
-Series: [series and post number]
-Length: [word count] words
-
-Phase 2 derivatives:
-  - ../nebula-blog/amplification/[filename]-linkedin.md
-  - ../nebula-blog/amplification/[filename]-reddit.md
-  - [etc.]
-
-Next: Update ../nebula-blog/SERIES-PLAN.md — mark this post as In Progress or Published.
-═══════════════════════════════════════════════════════════
-```
-
-Remind the user to update `../nebula-blog/SERIES-PLAN.md` with the post status and Substack URL once published.
-
----
-
-## Validation Criteria
-
-- [ ] Discovery conversation completed and user confirmed the angle
-- [ ] Editorial brief approved before drafting began
-- [ ] Primary post written to brief and approved by user
-- [ ] Self-review gate passed
-- [ ] Voice, domain grounding, and series continuity applied
-- [ ] No sensitive data in published content
-- [ ] Phase 2 derivatives produced and reviewed (if requested)
-- [ ] `../nebula-blog/SERIES-PLAN.md` update flagged
+After completion, remind the user to update `../nebula-blog/SERIES-PLAN.md` with the post status and Substack URL.
 
 ---
 
 ## Anti-Patterns to Avoid
 
-- Jumping to drafting before discovery is complete
-- Producing an editorial brief the user didn't see or approve
-- Writing a post that could belong to any blog — no insurance grounding, no personal voice
-- Amplification content that copies from the primary instead of translating for the channel
-- Marking a post complete without reminding the user to update `../nebula-blog/SERIES-PLAN.md`
-
----
+- Jumping to drafting before discovery is complete, or producing a brief the user didn't approve.
+- A post that could belong to any blog — no insurance grounding, no personal voice.
+- Amplification that copies the primary instead of translating for the channel.
+- Marking a post complete without flagging the `SERIES-PLAN.md` update.
 
 ## Related Files
 
-- `agents/blogger/SKILL.md`
-- `../nebula-blog/publication-profile.md`
-- `agents/blogger/references/blogging-best-practices.md`
-- `../nebula-blog/SERIES-PLAN.md`
+- `agents/blogger/SKILL.md` · `../nebula-blog/publication-profile.md` · `agents/blogger/references/blogging-best-practices.md` · `../nebula-blog/SERIES-PLAN.md`

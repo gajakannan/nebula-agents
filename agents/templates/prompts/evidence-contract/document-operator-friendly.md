@@ -1,53 +1,86 @@
-This prompt encodes the document action under the Feature Evidence Contract in `CONSUMER-CONTRACT.md` (effective `2026-05-19`). Document produces technical documentation (API docs, READMEs, runbooks, developer guides). It is OUTSIDE the feature evidence contract — it does NOT produce role reports for any feature evidence package and does NOT substitute for evidence on a completed terminal feature. It still produces a base run evidence package per §8 so the documentation run itself is auditable.
+<!-- GENERATED from agents/actions/spec/document.yaml + _contract.yaml — do not edit; run: python3 agents/scripts/render-prompts.py --action document -->
+<!-- policy_version: 2026-07-11 | renderer_version: 1 -->
 
-REQUIRED INPUTS (you must set):
-- `DOC_SCOPE={api | readme | runbook | developer-guide | release-notes | mixed}`
-- `TARGETS=[{path}, ...]` — destination doc files
 
-OPTIONAL INPUTS (defaults apply when omitted):
-- `SOURCE_CODE=[{path}, ...]` — source code basis for the docs (default: derived from `TARGETS`)
-- `FEATURE_REF={F####}` — optional reference for read-only feature context (does NOT make this a feature-scoped run)
-- `PRODUCT_ROOT=` — default: sister-repo per `agents/docs/AGENT-USE.md` → Session Setup; override only for non-standard layouts
+This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
-AUTO-RESOLVED (do not set; SESSION_SETUP and the orchestrator compute these):
-- `DOC_RUN_ID` — `YYYY-MM-DD-{secrets.token_hex(4)}` generated once at session start
-- `DOC_RUN_FOLDER` — `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}`
-- `FEATURE_REF_SLUG` — kebab-case slug for `{FEATURE_REF}` from `REGISTRY.md` (only when `FEATURE_REF` is set)
-- `FEATURE_REF_PATH` — `{PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG}` (only when `FEATURE_REF` is set)
+Required inputs:
+- `DOC_SCOPE`
+- `TARGETS` (format `[path, ...] destination doc files`)
 
-Echo the resolved absolute `{PRODUCT_ROOT}` path on your first turn before any shell command.
+Optional inputs (defaults apply when omitted):
+- `SOURCE_CODE`
+- `FEATURE_REF`
+- `PRODUCT_ROOT` — default `sister-repo`
 
-Generate `{DOC_RUN_ID}` once at session start using the contract format `YYYY-MM-DD-[a-z0-9]{8}` (suffix from `python3 -c "import secrets; print(secrets.token_hex(4))"`). Do not use `uuid4`.
+Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
+- `DOC_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}
+- `FEATURE_REF_PATH` — {PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)
+- `FEATURE_REF_SLUG` — kebab-case slug for {FEATURE_REF} from REGISTRY.md (only when FEATURE_REF is set)
 
-Create `DOC_RUN_FOLDER` at `{DOC_RUN_FOLDER}/` and initialize the six §8 base run files from templates.
+Generate `DOC_RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Run `agents/actions/document.md` with `DOC_SCOPE`, `TARGETS`, optionally `SOURCE_CODE`, and optionally `FEATURE_REF` for context only — `FEATURE_REF` does NOT make this a feature-scoped run.
+Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
-Load context in this order: `agents/ROUTER.md` → `agents/agent-map.yaml` → `agents/docs/AGENT-USE.md` → `agents/actions/document.md` → `agents/technical-writer/SKILL.md` → `SOURCE_CODE` paths read-only → for `FEATURE_REF`, `{FEATURE_REF_PATH}/README.md`, `{FEATURE_REF_PATH}/PRD.md`, and `{FEATURE_REF_PATH}/feature-assembly-plan.md` read-only.
+Load context in this order, then navigate rather than eager-load:
+1. `agents/ROUTER.md`
+2. `agents/agent-map.yaml`
+3. `agents/docs/AGENT-USE.md`
+4. `agents/actions/document.md`
+5. `agents/technical-writer/SKILL.md`
+6. `SOURCE_CODE paths (read-only)`
+7. `for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md`
 
-Don't generate `{DOC_RUN_ID}` with `uuid4`. Don't write into any feature evidence package (`####-*/`). Don't cite documentation as a substitute for required feature evidence reports such as `test-execution-report.md` or `code-review-report.md`. Don't execute compile/lint/runtime commands outside runtime containers. Don't skip the SELF-REVIEW or APPROVAL gates from `agents/actions/document.md`.
+Gates (run each stage through `agents/scripts/run-gate.py`, in order):
+- **D0 — Scope lock** (role: technical-writer; artifacts: gate-decisions.md)
+    - judgment: Confirm DOC_SCOPE, TARGETS, and SOURCE_CODE and record the row in gate-decisions.md.
+- **D1 — Draft** (role: technical-writer; artifacts: none)
+    - judgment: Produce or update the TARGETS from the source code (and any FEATURE_REF context). Format and headings
+depend on the doc type. Runtime verifications (API examples, CLI commands, health checks) run inside
+runtime containers when feasible, with artifact paths recorded — never run compile/lint/runtime commands
+outside runtime containers.
+- **D2 — Self-review gate** (role: technical-writer; artifacts: none)
+    - judgment: The author validates documentation quality and accuracy against the source code. Stop if self-review finds
+factual errors that cannot be resolved against the source, or a runtime verification fails such that the
+doc would mislead users.
+- **D3 — Approval gate** (role: technical-writer; artifacts: none)
+    - MANUAL checkpoint `doc-approval`: The user reviews the documentation and approves or requests changes. (requires: the TARGETS drafted at D1; produces: doc approval recorded in gate-decisions.md)
+    - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - judgment: After approval, run validate_templates.py (exit 0). Run `{PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
+ONLY when KG references changed. DO NOT call validate-feature-evidence.py — there is no feature evidence
+package for this run.
 
-Append every shell command to `{DOC_RUN_FOLDER}/commands.log` per the §13 JSONL schema. Runtime verifications (API examples, CLI commands, health checks) run in runtime containers when feasible and their artifact paths are recorded.
+Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 
-Ownership is simple: the technical writer (per `agents/technical-writer/SKILL.md`) owns every produced doc file.
+Ownership (strict):
+- **technical-writer** owns: every produced doc file (the TARGETS)
 
-Follow these gates exactly:
-- `D0 SCOPE LOCK` — confirm `DOC_SCOPE`, `TARGETS`, `SOURCE_CODE`; record in `gate-decisions.md`
-- `D1 DRAFT` — produce or update the `TARGETS`
-- `D2 SELF-REVIEW GATE` — author validates documentation quality and accuracy
-- `D3 APPROVAL GATE` — user reviews documentation
+Forbidden:
+- Generate DOC_RUN_ID with uuid4.
+- Write into any feature evidence package (####-*/).
+- Cite documentation as a substitute for required feature evidence reports (e.g. test-execution-report.md, code-review-report.md).
+- Execute compile/lint/runtime commands outside runtime containers.
+- Skip the SELF-REVIEW or APPROVAL gates.
 
-Evidence outputs land in two places. In `{DOC_RUN_FOLDER}`: the six §8 base run files; the `README.md` `Evidence Index` should point to `TARGETS`; `action-context.md` records `Scope Boundaries = "Documentation only; not feature evidence"`. In `TARGETS`: the documentation files themselves, with format and headings appropriate to the doc type.
+Stop conditions:
+- Self-review identifies factual errors that cannot be resolved against source code.
+- Runtime verification fails and the doc would mislead users.
+- The user refuses the approval gate.
 
-Stop immediately if self-review identifies factual errors that cannot be resolved against the source code, if a runtime verification fails and the doc would mislead users, or if approval is refused by the user.
+Conflict resolution:
+- doc disagrees with code -> code wins; update the doc, not the code.
+- doc disagrees with an API contract -> the contract wins; route to plan/architect if the contract itself is wrong.
+- doc cites a runtime example that does not work -> fix or remove the example; do not ship docs that mislead.
 
-Close the run by executing these in order, each exit 0:
-- `python3 agents/scripts/validate_templates.py`
-- `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (only required when KG references changed)
+Note (evidence_outputs): In {DOC_RUN_FOLDER}: README.md (Run Summary = "Documentation run", Status, Evidence Index pointing to
+TARGETS, Validation Summary, Open Follow-ups); action-context.md (Scope Boundaries = "Documentation only; not
+feature evidence", Lifecycle Stage = "Document"); artifact-trace.md (which TARGETS were created/updated +
+SOURCE_CODE pointers); gate-decisions.md (D0..D3); commands.log; lifecycle-gates.log. The documentation files
+themselves land at the TARGETS.
 
-Do NOT call `validate-feature-evidence.py` — there is no feature evidence package for this run.
+Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Mint DOC_RUN_ID once in contract format (an ISO
+YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Create {DOC_RUN_FOLDER} and initialize the
+six §8 base run files.
 
-Resolve conflicts like this:
-- doc disagrees with code → code wins; update the doc, not the code
-- doc disagrees with API contract → contract wins; route to plan or architect if the contract itself is wrong
-- doc cites a runtime example that does not work → fix or remove the example; do not ship docs that mislead
+Note (telemetry): Append every shell command to {DOC_RUN_FOLDER}/commands.log per the §13 JSONL schema (schema_version,
+timestamp with timezone, cwd, command, exit_code, artifacts[], redactions[]).
