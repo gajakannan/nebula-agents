@@ -75,5 +75,14 @@ gates:
           argv: [python3, -c, "pass"]
           cwd: product
 
+  - id: G5
+    title: Manual publish of latest-run.json
+    role: product-manager
+    operations:
+      - write:
+          artifact: latest-run.json
+          after: r4
+          mutates: [latest-run.json]
+
 stop_conditions:
   - "Stop if an operation fails."

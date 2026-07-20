@@ -169,6 +169,29 @@ def test_dry_run_executes_nothing(env):
 def test_list_runbook_marks_manual_checkpoint():
     book = rg.list_runbook(DRIVER_SPEC, "drive")
     stages = {s["stage"]: s for s in book["stages"]}
-    assert set(stages) == {"G0", "G1", "G2", "G3", "G4"}
+    assert set(stages) == {"G0", "G1", "G2", "G3", "G4", "G5"}
     g2_kinds = [o["kind"] for o in stages["G2"]["operations"]]
     assert any("MANUAL" in k for k in g2_kinds)
+
+
+def test_write_latest_run_resolves_under_feature_index_root(env):
+    # A `write: latest-run.json` op is satisfied only when latest-run.json exists under
+    # FEATURE_INDEX_ROOT (where the contract publishes it) — NOT under the run folder.
+    product, rf = env
+
+    # Nothing published yet -> the write op pauses for the manual publish.
+    verdict = run(product, rf, "G5")
+    assert verdict["status"] == "paused"
+    assert verdict["pending_write"] == "latest-run.json"
+
+    # Regression: latest-run.json in the RUN FOLDER must not satisfy the op.
+    (rf / "latest-run.json").write_text("{}")
+    verdict = run(product, rf, "G5")
+    assert verdict["status"] == "paused"
+
+    # Published under FEATURE_INDEX_ROOT -> op is idempotently skipped and the stage passes.
+    index_root = product / "planning-mds" / "operations" / "evidence" / "features" / "F0007-drive"
+    index_root.mkdir(parents=True, exist_ok=True)
+    (index_root / "latest-run.json").write_text("{}")
+    verdict = run(product, rf, "G5")
+    assert verdict["status"] == "pass"

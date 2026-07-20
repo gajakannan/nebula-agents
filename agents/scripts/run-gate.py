@@ -353,7 +353,12 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
 
             elif kind == "write":
                 artifact = body.get("artifact")
-                if (run_folder / artifact).exists():
+                artifact_path = (
+                    Path(variables["FEATURE_INDEX_ROOT"]) / artifact
+                    if artifact == "latest-run.json"
+                    else run_folder / artifact
+                )
+                if artifact_path.exists():
                     stage_state["completed_operations"].append(oid)
                     _atomic_write_json(run_folder / JOURNAL_NAME, journal)
                     continue
