@@ -19,9 +19,11 @@ Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
 - `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md (only when FEATURE_ID is set)
 - `VALIDATE_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{VALIDATE_RUN_ID}
 
-Generate `VALIDATE_RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
+Generate `VALIDATE_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Resuming an in-flight run in a new session: do NOT generate a new `VALIDATE_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <VALIDATE_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
 1. `agents/ROUTER.md`
@@ -115,8 +117,10 @@ REGISTRY.md OR FEATURE_ID set). When implementation targets an in-progress featu
 {G0..G5}, --run-id is mandatory; at STAGE G8/closeout, {FEATURE_INDEX_ROOT}/latest-run.json must exist.
 
 Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate
-VALIDATE_RUN_ID once at session start in contract format (an ISO YYYY-MM-DD date plus a
-secrets.token_hex(4) suffix); never uuid4. Create {VALIDATE_RUN_FOLDER}/artifacts and initialize the
+VALIDATE_RUN_ID once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a
+secrets.token_hex(4) suffix); never uuid4. When resuming an in-flight run in a new session, reuse the
+existing VALIDATE_RUN_ID and skip the setup below; start with resume-brief.py --run-id.
+Create {VALIDATE_RUN_FOLDER}/artifacts and initialize the
 six §8 base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log,
 lifecycle-gates.log).
 

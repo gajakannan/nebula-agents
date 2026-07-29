@@ -21,9 +21,11 @@ Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
 - `RUN_ID` — per-feature run id minted when a new feature package is produced (contract format YYYY-MM-DD-token_hex(4))
 - `RUN_ID_PRIOR` — prior approved run_id from {FEATURE_INDEX_ROOT}/latest-run.json (null if absent)
 
-Generate `BUILD_RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
+Generate `BUILD_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Resuming an in-flight run in a new session: do NOT generate a new `BUILD_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <BUILD_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
 1. `agents/ROUTER.md`
@@ -132,8 +134,10 @@ existing approved package referenced by {FEATURE_INDEX_ROOT}/latest-run.json or 
 produced during this build; `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start.
 
 Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate BUILD_RUN_ID
-once at session start in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix);
-never uuid4, never regenerate it after start. Create {BUILD_RUN_FOLDER} and initialize the base run
+once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
+suffix); never uuid4, never regenerate it after start. When resuming an in-flight run in a new session,
+reuse the existing BUILD_RUN_ID and skip the setup below; start with resume-brief.py --run-id.
+Create {BUILD_RUN_FOLDER} and initialize the base run
 files from templates: README.md,
 action-context.md, artifact-trace.md, gate-decisions.md, an empty commands.log (JSONL), and an empty
 lifecycle-gates.log. The build run folder is a base run package, NOT a feature evidence package — every

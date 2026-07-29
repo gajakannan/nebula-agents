@@ -43,7 +43,7 @@ context_load:
 
 ownership:
   product-manager: [PRD.md, "persona files", acceptance-criteria-checklist.md, "story breakdown", "STATUS.md skeleton"]
-  architect: [feature-assembly-plan.md, "ADRs", "API contract updates", "schema updates", canonical-nodes.yaml, solution-ontology.yaml, feature-mappings.yaml]
+  architect: [feature-assembly-plan.md, "ADRs", "API contract updates", "schema updates", "kg-source/** shards (nodes/** + the feature shard) — compiled by compile.py into canonical-nodes.yaml/feature-mappings.yaml/solution-ontology.yaml + REGISTRY/ROADMAP regions; never hand-edit the generated files"]
 
 gates:
   - id: G1
@@ -81,14 +81,24 @@ gates:
     artifacts: []
     operations:
       - run:
+          id: kg-compile
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"]
+          cwd: product
+          timeout_seconds: 300
+          mutates: [kg-source, kg-projection]
+      - run:
           id: kg-check-drift
           argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
     judgment: |
-      Step 3.5: feature-mappings.yaml + canonical-nodes.yaml + solution-ontology.yaml aligned with the
-      assembly plan; kg validate --check-drift must exit 0. Only the Architect edits canonical-nodes.yaml
-      or solution-ontology.yaml.
+      Step 3.5: align the ontology with the assembly plan by editing the kg-source shards — the feature
+      shard (planning-mds/kg-source/features/{FEATURE_ID}.yaml: status/name/rationale + affects/depends_on/
+      governed_by/uses_* + story_mappings) and the node shards (kg-source/nodes/**: capabilities one-file-per-node,
+      adrs/endpoints/schemas aggregate files). Then compile.py regenerates the projection trio + REGISTRY/ROADMAP
+      regions — NEVER hand-edit canonical-nodes.yaml / feature-mappings.yaml / solution-ontology.yaml or the
+      tracker regions (the product CI's kg-reproducibility gate rejects hand-edits). kg validate --check-drift
+      must exit 0. Only the Architect edits the kg-source shards feeding canonical-nodes/solution-ontology.
 
   - id: G5
     title: Phase B approval and exit validation
@@ -125,6 +135,11 @@ gates:
           cwd: product
           timeout_seconds: 300
       - run:
+          id: kg-check-reproducible
+          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-reproducible]
+          cwd: product
+          timeout_seconds: 300
+      - run:
           id: validate-templates
           argv: [python3, agents/scripts/validate_templates.py]
           cwd: framework
@@ -136,6 +151,10 @@ gates:
           produces: [phase-b-approved]
     judgment: |
       Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
+      kg validate --check-reproducible must pass: every committed compiled projection + REGISTRY/ROADMAP/
+      STORY-INDEX region must equal compile(source), so a hand-edited or un-recompiled generated file fails
+      here (mirrors the product's kg-reproducibility CI gate) — fix by editing kg-source shards and rerunning
+      compile.py, never by editing the generated file.
       Do NOT call validate-feature-evidence.py at plan — there is no feature evidence package yet.
       Do NOT run validate-trackers.py --all-feature-evidence as plan closeout; repo-wide feature-evidence validation is an explicit health/audit action.
 
@@ -150,6 +169,7 @@ forbidden:
   - "Create a feature evidence package at FEATURE_INDEX_ROOT during plan."
   - "Skip the APPROVAL or ONTOLOGY SYNC gates."
   - "Edit canonical-nodes.yaml or solution-ontology.yaml outside the Architect phase."
+  - "Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files)."
   - "Treat lookup/KG mappings as authoritative over raw artifacts."
   - "Climb past max_auto_tier without recording a workstate.py escalate event."
 
@@ -189,3 +209,15 @@ notes:
     Identify direct/impacted feature dependencies from the PRD, architecture notes, feature-mappings.yaml,
     and KG lookup output; record approved dependency evidence references or "audit pending" notes in
     artifact-trace.md or gate-decisions.md. Do not substitute repo-wide feature-evidence validation.
+  kg_generated_files: |
+    The KG projections (knowledge-graph/{canonical-nodes,feature-mappings,code-index,solution-ontology}.yaml)
+    and the REGISTRY/ROADMAP/STORY-INDEX generated regions are COMPILED from planning-mds/kg-source/** by
+    scripts/kg/compile.py — never hand-edit them (the product's kg-reproducibility CI gate, validate.py
+    --check-reproducible, fails a PR when a committed generated file != compile(source)). To map the feature
+    at Phase B: (1) edit the feature shard kg-source/features/{FEATURE_ID}.yaml — set status (e.g. planned),
+    name, rationale; remove any coverage_excluded; add affects/depends_on/governed_by/uses_api_contract/
+    uses_schema and inline story_mappings (story path = full path); (2) add node shards under kg-source/nodes/
+    (capabilities = one file per node; adrs/endpoints/schemas = aggregate files); node source_docs use logical
+    F####/file.md refs resolved via the feature shard path. Then run compile.py (G4 kg-compile), then
+    validate.py --check-drift (G4) and --check-reproducible (G5). A pre-commit hook mirroring the CI gate is
+    recommended in the product repo so drift is caught before push.

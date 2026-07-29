@@ -249,6 +249,13 @@ gates:
           cwd: product
           timeout_seconds: 300
       - run:
+          id: capture-run-telemetry
+          argv: [python3, agents/scripts/capture-run-telemetry.py,
+                 --product-root, "{PRODUCT_ROOT}", --run-id, "{RUN_ID}"]
+          cwd: framework
+          timeout_seconds: 120
+          mutates: [run-folder, evidence-manifest]
+      - run:
           id: validate-closeout
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
                  --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --stage, closeout]
@@ -265,6 +272,9 @@ gates:
       here, when latest-run.json is written — and only after patch-prior-manifest.py exits 0. Run
       --write-coverage-report ONLY after the archive move (path-sensitive). Finalize the manifest
       (status approved, feature_state Done/Completed/Archived, feature_path_at_closeout resolved).
+      capture-run-telemetry.py records token cost from the agent CLI's session transcript into
+      token-usage.json and mirrors headline totals into manifest.token_usage — advisory evidence
+      only; a missing transcript records nothing and never blocks closeout.
 
 severity_gate: standard
 

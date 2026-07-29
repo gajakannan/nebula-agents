@@ -79,8 +79,10 @@ implementation/all -> the validator run ops (precondition: at least one complete
 REGISTRY.md OR FEATURE_ID set). When implementation targets an in-progress feature with STAGE in
 {G0..G5}, --run-id is mandatory; at STAGE G8/closeout, {FEATURE_INDEX_ROOT}/latest-run.json must exist.
 NOTE[session_setup]: Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate
-VALIDATE_RUN_ID once at session start in contract format (an ISO YYYY-MM-DD date plus a
-secrets.token_hex(4) suffix); never uuid4. Create {VALIDATE_RUN_FOLDER}/artifacts and initialize the
+VALIDATE_RUN_ID once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a
+secrets.token_hex(4) suffix); never uuid4. When resuming an in-flight run in a new session, reuse the
+existing VALIDATE_RUN_ID and skip the setup below; start with resume-brief.py --run-id.
+Create {VALIDATE_RUN_FOLDER}/artifacts and initialize the
 six §8 base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log,
 lifecycle-gates.log).
 NOTE[telemetry]: Append every validator and KG command to {VALIDATE_RUN_FOLDER}/commands.log per the §13 JSONL schema

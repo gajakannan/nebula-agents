@@ -155,6 +155,7 @@ triggers, and failure modes live in `agents/docs/KNOWLEDGE-GRAPH.md`.
 | After ontology changes | `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` |
 | Merging KG YAML across branches (never by hand/git) | `python3 {PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base <ref> --ours <ref> --theirs <ref>` (also REGISTRY.md/ROADMAP.md; see `scripts/kg/README.md`) |
 | Long session start / decisions / escalations / post-compaction | `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py …` (see KNOWLEDGE-GRAPH.md for subcommands) |
+| Resuming an in-flight run in a fresh session (read this FIRST, before exploring) | `python3 agents/scripts/resume-brief.py --run-id <run-id>` — emits position, next gate, recorded decisions, current story, and scope in one read |
 | Hub / risk / undeclared-edge analysis | `pagerank.py`, `risk.py`, `cochange.py --coverage-gaps` (see KNOWLEDGE-GRAPH.md) |
 
 ---

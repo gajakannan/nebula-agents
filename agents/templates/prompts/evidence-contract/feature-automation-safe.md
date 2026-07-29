@@ -53,6 +53,7 @@ GATES:
     - write `latest-run.json` after `patch-prior-manifest`
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/scripts/capture-run-telemetry.py --product-root {PRODUCT_ROOT} --run-id {RUN_ID}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}` (cwd: framework, timeout: 300s)
 
