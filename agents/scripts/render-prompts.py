@@ -137,11 +137,22 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
         out.append("Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):")
         out.extend(f"- `{name}` — {value}" for name, value in auto)
     out.append("")
-    out.append(f"Generate `{spec['run_id']['var']}` once at session start in the contract format "
+    run_id_var = spec["run_id"]["var"]
+    out.append(f"Generate `{run_id_var}` once per run — not per session — in the contract format "
                f"`{facts['run_id_format']}` using `{facts['run_id_method']}`. "
                f"Do not use: {', '.join(facts['run_id_forbidden']) or 'n/a'}.")
     out.append("")
-    out.append(f"Session setup: create the run under `{PACKAGE_ROOT_REF}/`, initialize "
+    # A run may span several sessions (see agents/docs/SESSION-SEGMENTATION.md).
+    # Without this clause the line above reads as "mint one per session", which
+    # would fragment the evidence package across run folders.
+    out.append(f"Resuming an in-flight run in a new session: do NOT generate a new `{run_id_var}` "
+               f"and do NOT re-create the run. Run "
+               f"`python3 agents/scripts/resume-brief.py --run-id <{run_id_var}>` first — it reports "
+               f"position, next gate, recorded decisions, current story, and scope in one read, so the "
+               f"session does not re-derive them. `init-run.py --resume` reuses the existing run folder.")
+    out.append("")
+    out.append(f"Session setup (first session of the run only): create the run under "
+               f"`{PACKAGE_ROOT_REF}/`, initialize "
                f"`evidence-manifest.json` (status `draft`) with the active contract version stamped, "
                f"create the base run files ({facts['base_run_files']}) and artifact subdirs "
                f"({facts['artifacts_subdirs']}). Run `agents/scripts/init-run.py` to perform this.")

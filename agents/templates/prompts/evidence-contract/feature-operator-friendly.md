@@ -22,9 +22,11 @@ Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
 - `RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}
 - `RUN_ID_PRIOR` — prior approved run_id from {FEATURE_INDEX_ROOT}/latest-run.json (null if absent)
 
-Generate `RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
+Generate `RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Resuming an in-flight run in a new session: do NOT generate a new `RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Retrieval tier defaults: clean: [1, 2]; drift-reconcile: [3, 4]
 
@@ -93,12 +95,16 @@ projection trio + tracker regions — never hand-edit knowledge-graph/*.yaml. CO
     - write `latest-run.json` after `patch-prior-manifest`
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/scripts/capture-run-telemetry.py --product-root {PRODUCT_ROOT} --run-id {RUN_ID}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}` (cwd: framework, timeout: 300s)
     - judgment: MUST switch role (read agents/product-manager/SKILL.md). Manifest status becomes `approved` only
 here, when latest-run.json is written — and only after patch-prior-manifest.py exits 0. Run
 --write-coverage-report ONLY after the archive move (path-sensitive). Finalize the manifest
 (status approved, feature_state Done/Completed/Archived, feature_path_at_closeout resolved).
+capture-run-telemetry.py records token cost from the agent CLI's session transcript into
+token-usage.json and mirrors headline totals into manifest.token_usage — advisory evidence
+only; a missing transcript records nothing and never blocks closeout.
 
 Severity gate profile: `standard` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

@@ -18,9 +18,11 @@ Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
 - `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md
 - `PLAN_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}
 
-Generate `PLAN_RUN_ID` once at session start in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
+Generate `PLAN_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Session setup: create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Resuming an in-flight run in a new session: do NOT generate a new `PLAN_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <PLAN_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
 1. `agents/ROUTER.md`
@@ -45,26 +47,36 @@ STORY-INDEX.md) before Phase A approval.
     - judgment: Step 2 Phase A review. No gate may be passed without an explicit approval token recorded in
 gate-decisions.md.
 - **G4 — Ontology sync (Phase B)** (role: architect; artifacts: none)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
-    - judgment: Step 3.5: feature-mappings.yaml + canonical-nodes.yaml + solution-ontology.yaml aligned with the
-assembly plan; kg validate --check-drift must exit 0. Only the Architect edits canonical-nodes.yaml
-or solution-ontology.yaml.
+    - judgment: Step 3.5: align the ontology with the assembly plan by editing the kg-source shards — the feature
+shard (planning-mds/kg-source/features/{FEATURE_ID}.yaml: status/name/rationale + affects/depends_on/
+governed_by/uses_* + story_mappings) and the node shards (kg-source/nodes/**: capabilities one-file-per-node,
+adrs/endpoints/schemas aggregate files). Then compile.py regenerates the projection trio + REGISTRY/ROADMAP
+regions — NEVER hand-edit canonical-nodes.yaml / feature-mappings.yaml / solution-ontology.yaml or the
+tracker regions (the product CI's kg-reproducibility gate rejects hand-edits). kg validate --check-drift
+must exit 0. Only the Architect edits the kg-source shards feeding canonical-nodes/solution-ontology.
 - **G5 — Phase B approval and exit validation** (role: architect; artifacts: gate-decisions.md)
     - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
     - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. (requires: gate-decisions.md; produces: phase-b-approved)
     - judgment: Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
+kg validate --check-reproducible must pass: every committed compiled projection + REGISTRY/ROADMAP/
+STORY-INDEX region must equal compile(source), so a hand-edited or un-recompiled generated file fails
+here (mirrors the product's kg-reproducibility CI gate) — fix by editing kg-source shards and rerunning
+compile.py, never by editing the generated file.
 Do NOT call validate-feature-evidence.py at plan — there is no feature evidence package yet.
 Do NOT run validate-trackers.py --all-feature-evidence as plan closeout; repo-wide feature-evidence validation is an explicit health/audit action.
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 
 Ownership (strict):
-- **architect** owns: feature-assembly-plan.md, ADRs, API contract updates, schema updates, canonical-nodes.yaml, solution-ontology.yaml, feature-mappings.yaml
+- **architect** owns: feature-assembly-plan.md, ADRs, API contract updates, schema updates, kg-source/** shards (nodes/** + the feature shard) — compiled by compile.py into canonical-nodes.yaml/feature-mappings.yaml/solution-ontology.yaml + REGISTRY/ROADMAP regions; never hand-edit the generated files
 - **product-manager** owns: PRD.md, persona files, acceptance-criteria-checklist.md, story breakdown, STATUS.md skeleton
 
 Forbidden:
@@ -74,6 +86,7 @@ Forbidden:
 - Create a feature evidence package at FEATURE_INDEX_ROOT during plan.
 - Skip the APPROVAL or ONTOLOGY SYNC gates.
 - Edit canonical-nodes.yaml or solution-ontology.yaml outside the Architect phase.
+- Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files).
 - Treat lookup/KG mappings as authoritative over raw artifacts.
 - Climb past max_auto_tier without recording a workstate.py escalate event.
 
@@ -97,6 +110,18 @@ Note (feature_path_outputs): In {FEATURE_PATH}: PRD.md, persona files, acceptanc
 skeleton (Phase A); feature-assembly-plan.md, ADRs, README.md, GETTING-STARTED.md (Phase B).
 feature-assembly-plan.md is NOT a plan deliverable in the run folder — it is authored here but
 belongs to the feature action's G0 for the same FEATURE_ID.
+
+Note (kg_generated_files): The KG projections (knowledge-graph/{canonical-nodes,feature-mappings,code-index,solution-ontology}.yaml)
+and the REGISTRY/ROADMAP/STORY-INDEX generated regions are COMPILED from planning-mds/kg-source/** by
+scripts/kg/compile.py — never hand-edit them (the product's kg-reproducibility CI gate, validate.py
+--check-reproducible, fails a PR when a committed generated file != compile(source)). To map the feature
+at Phase B: (1) edit the feature shard kg-source/features/{FEATURE_ID}.yaml — set status (e.g. planned),
+name, rationale; remove any coverage_excluded; add affects/depends_on/governed_by/uses_api_contract/
+uses_schema and inline story_mappings (story path = full path); (2) add node shards under kg-source/nodes/
+(capabilities = one file per node; adrs/endpoints/schemas = aggregate files); node source_docs use logical
+F####/file.md refs resolved via the feature shard path. Then run compile.py (G4 kg-compile), then
+validate.py --check-drift (G4) and --check-reproducible (G5). A pre-commit hook mirroring the CI gate is
+recommended in the product repo so drift is caught before push.
 
 Note (phase_mode_matrix): PHASE=A,new -> create {FEATURE_PATH} and scaffold PRD/personas/stories/STATUS skeleton.
 PHASE=A,existing -> update existing planning artifacts; STATUS.md story provenance rows are

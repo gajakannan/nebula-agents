@@ -26,6 +26,7 @@ GATES:
 - G3 role=product-manager artifacts=[gate-decisions.md]
     - MANUAL checkpoint `approve-phase-a`: User reviews requirements; PM records the explicit approval token in gate-decisions.md. (requires: gate-decisions.md; produces: phase-a-approved)
 - G4 role=architect artifacts=[]
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
 - G5 role=architect artifacts=[gate-decisions.md]
     - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
@@ -33,12 +34,13 @@ GATES:
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
     - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. (requires: gate-decisions.md; produces: phase-b-approved)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
 OWNERSHIP:
-- architect: feature-assembly-plan.md, ADRs, API contract updates, schema updates, canonical-nodes.yaml, solution-ontology.yaml, feature-mappings.yaml
+- architect: feature-assembly-plan.md, ADRs, API contract updates, schema updates, kg-source/** shards (nodes/** + the feature shard) — compiled by compile.py into canonical-nodes.yaml/feature-mappings.yaml/solution-ontology.yaml + REGISTRY/ROADMAP regions; never hand-edit the generated files
 - product-manager: PRD.md, persona files, acceptance-criteria-checklist.md, story breakdown, STATUS.md skeleton
 FORBIDDEN:
 - Generate PLAN_RUN_ID with uuid4 or any non-contract format.
@@ -47,6 +49,7 @@ FORBIDDEN:
 - Create a feature evidence package at FEATURE_INDEX_ROOT during plan.
 - Skip the APPROVAL or ONTOLOGY SYNC gates.
 - Edit canonical-nodes.yaml or solution-ontology.yaml outside the Architect phase.
+- Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files).
 - Treat lookup/KG mappings as authoritative over raw artifacts.
 - Climb past max_auto_tier without recording a workstate.py escalate event.
 STOP_CONDITIONS:
@@ -66,6 +69,17 @@ NOTE[feature_path_outputs]: In {FEATURE_PATH}: PRD.md, persona files, acceptance
 skeleton (Phase A); feature-assembly-plan.md, ADRs, README.md, GETTING-STARTED.md (Phase B).
 feature-assembly-plan.md is NOT a plan deliverable in the run folder — it is authored here but
 belongs to the feature action's G0 for the same FEATURE_ID.
+NOTE[kg_generated_files]: The KG projections (knowledge-graph/{canonical-nodes,feature-mappings,code-index,solution-ontology}.yaml)
+and the REGISTRY/ROADMAP/STORY-INDEX generated regions are COMPILED from planning-mds/kg-source/** by
+scripts/kg/compile.py — never hand-edit them (the product's kg-reproducibility CI gate, validate.py
+--check-reproducible, fails a PR when a committed generated file != compile(source)). To map the feature
+at Phase B: (1) edit the feature shard kg-source/features/{FEATURE_ID}.yaml — set status (e.g. planned),
+name, rationale; remove any coverage_excluded; add affects/depends_on/governed_by/uses_api_contract/
+uses_schema and inline story_mappings (story path = full path); (2) add node shards under kg-source/nodes/
+(capabilities = one file per node; adrs/endpoints/schemas = aggregate files); node source_docs use logical
+F####/file.md refs resolved via the feature shard path. Then run compile.py (G4 kg-compile), then
+validate.py --check-drift (G4) and --check-reproducible (G5). A pre-commit hook mirroring the CI gate is
+recommended in the product repo so drift is caught before push.
 NOTE[phase_mode_matrix]: PHASE=A,new -> create {FEATURE_PATH} and scaffold PRD/personas/stories/STATUS skeleton.
 PHASE=A,existing -> update existing planning artifacts; STATUS.md story provenance rows are
 append-only. PHASE=B,new -> REJECT (run architecture only after requirements exist).

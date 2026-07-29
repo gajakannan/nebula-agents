@@ -89,6 +89,13 @@ after compaction instead of re-deriving it.
 | Separate framework from product | `{PRODUCT_ROOT}` placeholder keeps `agents/**` context out of product context | AGENT-USE.md |
 | Exclude outright | `{PRODUCT_ROOT}/.agentignore` removes paths from agent attention | AGENTIGNORE.md |
 | Delegate to bounded sub-tasks | action orchestration runs agents within their declared scope | actions/README.md |
+| Partition a long run across sessions | bound each session to one story or gate; resume from evidence with `resume-brief.py --run-id` instead of re-deriving | SESSION-SEGMENTATION.md |
+
+Isolate applies across **time** as well as responsibility. A run left in one
+session grows until the window fills and compaction truncates it at an arbitrary
+point, recovered from a generated summary. Segmenting at a story or gate
+boundary moves that cut to a place you choose and recovers it from validated
+evidence — the same move, applied to the session axis.
 
 ## Measurement — what makes it managed, not vibes
 
@@ -98,9 +105,16 @@ Context efficiency is observed, not assumed.
   `--run-id` on every retrieval.
 - `eval.py --since <ref>` scores retrieval quality against historical telemetry.
 - Run/command telemetry is captured per the evidence contract in `AGENT-OPS.md`.
+- `capture-run-telemetry.py` writes `token-usage.json` at closeout from the
+  agent CLI's own session transcript: whole-run and per-gate `context_tokens`,
+  `avg_context_tokens`, the cached/uncached split, and `compactions`. This is
+  measured cost, not an estimate — it is what shows whether a context change
+  actually paid. A null token field means the CLI does not report it, which is
+  deliberately distinct from a measured zero.
 
 If a retrieval pattern starts costing more tokens or returning worse slices, the
-telemetry shows it before it becomes habit.
+telemetry shows it before it becomes habit. Rising `avg_context_tokens` or a
+non-zero `compactions` count is the signal that a run needs segmenting.
 
 ## Known gaps — discipline, not enforcement
 
@@ -112,7 +126,14 @@ following it rather than being forced:
   *forces* the agent to run it or to load tier-1-first — it's an advisory gate, not a
   hard in-window ceiling.
 - **The write layer depends on the agent calling `workstate.py`.** Skip it and
-  post-compaction recovery degrades to re-derivation.
+  post-compaction recovery degrades to re-derivation — and so does session
+  segmentation, which reads the same state through `resume-brief.py`. A run that
+  never called `workstate.py` can still be segmented, but each session resumes
+  with its position and none of its reasoning, so decisions get re-litigated.
+  Nothing enforces the call; `init-run.py` does not seed a workstate file.
+- **Session boundaries are an instruction, not a control.** "Stop when …" in the
+  kickoff is the only thing that ends a session at a chosen point; without it the
+  window ends it instead. See SESSION-SEGMENTATION.md.
 - **Quality gating is partial.** Low-confidence / `ambiguous` edges *halt*
   action (good), but there is no automatic "you have loaded too much, compress"
   trigger.
@@ -131,5 +152,7 @@ model — but it changes the delivery channel, not this strategy.
   semantics.
 - `agents/docs/AGENT-OPS.md` — the telemetry/evidence contract behind
   Measurement.
+- `agents/docs/SESSION-SEGMENTATION.md` — Isolate across sessions: session
+  kickoff templates, boundary selection, and the `resume-brief.py` read surface.
 - `agents/ROUTER.md` — task-to-reference routing (Select for the reference
   corpus).

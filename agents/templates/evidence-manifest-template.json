@@ -46,6 +46,21 @@
     "assembly_plan_validation": "g0-assembly-plan-validation.md"
   },
   "role_results": {},
+  "token_usage": {
+    "_comment": "Written at G8 by agents/scripts/capture-run-telemetry.py from the agent CLI's local session transcript; advisory, never a gate. Headline figures only — per-gate detail lives in token-usage.json. context_tokens is the whole context fed to the model per turn (Codex input_tokens already includes cache; Claude Code input_tokens does not, so its cache fields are added in). uncached_input_tokens is the full-price portion. A null token field means the agent CLI does not report it (Codex reports no cache-write split; Claude Code does not break reasoning out of output_tokens) — null is 'not measured', never a measured zero. The 1h/5m cache-write split is kept because the two TTLs bill at different multiples. Absent for runs captured before this field existed, or when no session transcript is available.",
+    "artifact": "token-usage.json",
+    "agent_tool": null,
+    "turns": null,
+    "context_tokens": null,
+    "uncached_input_tokens": null,
+    "cached_input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "cache_creation_1h_input_tokens": null,
+    "cache_creation_5m_input_tokens": null,
+    "output_tokens": null,
+    "cache_hit_ratio": null,
+    "compactions": null
+  },
   "security_scans": {
     "_comment": "Required when security_sensitive_scope is true and contract_effective_date >= 2026-05-25. QE runs each class and publishes raw output under artifacts/security/; Security owns the verdict. Each class is either {\"ran\": true, \"result\": \"<clean|findings>\", \"artifact\": \"artifacts/security/<file>\", \"waiver\": null} or {\"ran\": false, \"result\": \"not_run\", \"artifact\": null, \"waiver\": {\"reason\": \"...\", \"owner\": \"...\", \"approved_on\": \"YYYY-MM-DD\"}}.",
     "dependency": {},

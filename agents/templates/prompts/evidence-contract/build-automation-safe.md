@@ -85,8 +85,10 @@ NOTE[preconditions]: {BUILD_RUN_FOLDER} created with base run files present; eve
 existing approved package referenced by {FEATURE_INDEX_ROOT}/latest-run.json or a planned package to be
 produced during this build; `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start.
 NOTE[session_setup]: Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate BUILD_RUN_ID
-once at session start in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix);
-never uuid4, never regenerate it after start. Create {BUILD_RUN_FOLDER} and initialize the base run
+once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
+suffix); never uuid4, never regenerate it after start. When resuming an in-flight run in a new session,
+reuse the existing BUILD_RUN_ID and skip the setup below; start with resume-brief.py --run-id.
+Create {BUILD_RUN_FOLDER} and initialize the base run
 files from templates: README.md,
 action-context.md, artifact-trace.md, gate-decisions.md, an empty commands.log (JSONL), and an empty
 lifecycle-gates.log. The build run folder is a base run package, NOT a feature evidence package — every
