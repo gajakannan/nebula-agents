@@ -1,8 +1,13 @@
 # F0007 Rollout and Rollback Report (S0009)
 
 **Status:** Rollout **HOLD** — awaiting required role signoffs and a live governed
-product pilot. Framework adoption of the spec-driven gates is in place; the
-destructive cutovers remain human-gated.
+product pilot. Framework adoption of the spec-driven gates is in place and the prompt
+cutover has since completed; the remaining destructive change (private-constant
+removal) is still human-gated.
+
+**Last updated:** 2026-08-17. The original report was written on 2026-07-18, before
+PRs #57/#58 landed. Sections 4 and 5 have been corrected accordingly; sections 1–3
+still describe the state as built.
 
 ## 1. Lifecycle / CI gates enforced
 
@@ -57,17 +62,27 @@ Procedure:
 
 ## 4. Residual risks
 
-- The 24 hand-written evidence-contract prompts are **not** yet replaced by generated
-  output; only the `feature` pilot pair exists under `generated/`. Cutover needs
-  role-owner semantic-equivalence approval (S0006).
+Two of the three risks recorded on 2026-07-18 have since been retired:
+
+- ~~The 24 hand-written evidence-contract prompts are not yet replaced by generated
+  output.~~ **Closed.** All 13 actions are spec-driven and all 24 prompts are generated
+  under `agents/templates/prompts/evidence-contract/` (#55, #56, #57); the `prompt_drift`
+  gate is green. **Residual:** role-owner semantic-equivalence approval of the generated
+  output has not been recorded (S0006).
+- ~~The 40% action/SKILL prose thinning is not done.~~ **Closed.** 12 action docs went
+  from 6788 to 2869 lines (~58%), and all 11 role SKILLs are under the regression cap
+  (#57, #58). **Residual:** `feature.md` (976 lines) and `plan.md` (785 lines) remain the
+  two heavy actions and were not thinned to the same degree.
 - The validator's private date matrices are **still active** (parity proven, removal
-  deferred to a recorded decision after the live pilot — S0007/S0008).
-- The 40% action/SKILL prose thinning is not done (role-owner-gated — S0008).
+  deferred to a recorded decision after the live pilot — S0007/S0008). **Unchanged.**
 
 ## 5. Rollout decision
 
-**HOLD.** Framework gate adoption and the toolchain are ready and green. Promotion of
-the spec-driven path to authoritative (prompt cutover, constant removal, prose
-thinning) requires: (a) a live governed product pilot reaching closeout, and (b) the
-required role signoffs in `STATUS.md` (Architect, QE, Code Reviewer, DevOps, Security).
-Recorded by: automated implementation (Claude), 2026-07-18. Owner for promotion: maintainer.
+**HOLD.** Framework gate adoption and the toolchain are ready and green, and the prompt
+cutover and prose thinning have landed. Promotion of the spec-driven path to fully
+authoritative (the remaining constant removal) requires: (a) a live governed product
+pilot reaching closeout, and (b) the required role signoffs in `STATUS.md` (Architect,
+QE, Code Reviewer, DevOps, Security).
+
+Recorded by: automated implementation (Claude), 2026-07-18. Corrected for the #57/#58
+cutover on 2026-08-17. Owner for promotion: maintainer.

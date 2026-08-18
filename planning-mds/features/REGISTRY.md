@@ -12,7 +12,7 @@
 <!-- generated:begin registry:active -->
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
-| F0007 | Spec-Driven Orchestration and Prompt Compilation | Planned | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
+| F0007 | Spec-Driven Orchestration and Prompt Compilation | In Progress | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
 <!-- generated:end registry:active -->
 
 ## Retired Features

@@ -1,6 +1,6 @@
 # F0007 - Spec-Driven Orchestration and Prompt Compilation
 
-**Status:** In Progress (Phase A)
+**Status:** In Progress — all stories implemented and merged; closeout pending
 **Priority:** Critical
 **Phase:** Framework Hardening
 
@@ -44,18 +44,18 @@ independent historical fixtures + semantic invariants
 
 | ID | Title | Status |
 |----|-------|--------|
-| [F0007-S0001](./F0007-S0001-versioned-action-policy-and-schema.md) | Versioned action policy and schema | Implemented (pending signoff) |
-| [F0007-S0002](./F0007-S0002-contract-conformance-and-behavioral-diff.md) | Contract conformance and behavioral diff | Implemented (pending signoff) |
-| [F0007-S0003](./F0007-S0003-run-initialization-and-product-scaffolding.md) | Run initialization and product scaffolding | Implemented (pending signoff) |
-| [F0007-S0004](./F0007-S0004-typed-command-runtime-and-telemetry.md) | Typed command runtime and complete telemetry | Implemented (pending signoff) |
-| [F0007-S0005](./F0007-S0005-gate-driver-checkpoints-and-severity-policy.md) | Gate driver, durable checkpoints, and severity policy | Implemented (pending signoff) |
-| [F0007-S0006](./F0007-S0006-generated-evidence-prompts-and-drift-gate.md) | Generated evidence prompts and drift gate | Machinery implemented; prompt cutover human-gated (deferred) |
-| [F0007-S0007](./F0007-S0007-version-aware-validator-convergence.md) | Version-aware validator convergence | Implemented (dual-read parity proven; constant removal deferred to S0008) |
-| [F0007-S0008](./F0007-S0008-shared-policy-consumers-and-prose-thinning.md) | Shared policy consumers and prose thinning | Consumer tooling implemented; prose thinning + constant removal role-owner-gated (deferred) |
-| [F0007-S0009](./F0007-S0009-governed-rollout-and-compatibility-pilot.md) | Governed rollout and compatibility pilot | CI adopted + pilot/rollback rehearsal; live pilot deferred |
+| [F0007-S0001](./F0007-S0001-versioned-action-policy-and-schema.md) | Versioned action policy and schema | Merged (pending signoff) |
+| [F0007-S0002](./F0007-S0002-contract-conformance-and-behavioral-diff.md) | Contract conformance and behavioral diff | Merged (pending signoff) |
+| [F0007-S0003](./F0007-S0003-run-initialization-and-product-scaffolding.md) | Run initialization and product scaffolding | Merged (pending signoff) |
+| [F0007-S0004](./F0007-S0004-typed-command-runtime-and-telemetry.md) | Typed command runtime and complete telemetry | Merged (pending signoff) |
+| [F0007-S0005](./F0007-S0005-gate-driver-checkpoints-and-severity-policy.md) | Gate driver, durable checkpoints, and severity policy | Merged (pending signoff) |
+| [F0007-S0006](./F0007-S0006-generated-evidence-prompts-and-drift-gate.md) | Generated evidence prompts and drift gate | Cutover complete — 13/13 actions spec-driven, 24/24 prompts generated; semantic-equivalence signoff pending |
+| [F0007-S0007](./F0007-S0007-version-aware-validator-convergence.md) | Version-aware validator convergence | Implemented (dual-read parity proven); private-constant removal is an open decision |
+| [F0007-S0008](./F0007-S0008-shared-policy-consumers-and-prose-thinning.md) | Shared policy consumers and prose thinning | Consumer tooling implemented; prose thinning done (~58% across action docs; SKILLs under the regression cap) |
+| [F0007-S0009](./F0007-S0009-governed-rollout-and-compatibility-pilot.md) | Governed rollout and compatibility pilot | Gates adopted + pilot/rollback rehearsal; live pilot outstanding |
 
 **Total Stories:** 9
-**Implemented:** 9 / 9 (all stories have landed deliverables). Rollout **HOLD** pending required role signoffs + a live governed product pilot. Human-gated remainders: prompt cutover (S0006), private-constant removal (S0007), 40% prose thinning (S0008), live product pilot + all-role review (S0009). See [rollout-report.md](./rollout-report.md).
+**Merged:** 9 / 9 (PRs #55–#61 on `main`; all six framework lifecycle gates green). Rollout **HOLD** pending required role signoffs + a live governed product pilot. Remaining: live pilot + all-role review (S0009), semantic-equivalence signoff of the generated prompts (S0006), and the private-constant removal decision (S0007/S0008). See [STATUS.md](./STATUS.md) → *Remaining Work to Close* and [rollout-report.md](./rollout-report.md).
 
 ## Phasing
 
@@ -68,7 +68,7 @@ independent historical fixtures + semantic invariants
 
 ## Architecture Review
 
-**Phase B status:** Planned; see [feature-assembly-plan.md](./feature-assembly-plan.md).
+**Phase B status:** Built and merged; see [feature-assembly-plan.md](./feature-assembly-plan.md). Independent architecture signoff is still outstanding — see [STATUS.md](./STATUS.md).
 
 ### Key Decisions
 

@@ -21,7 +21,8 @@ coverage:
       reason: Superseded planning scope; its delivered behavior is represented by feature:F0006 and capability:compiled-kg-projection.
     - id: feature:F0007
       path: planning-mds/features/F0007-spec-driven-orchestration-and-prompt-compilation
-      reason: Framework-hardening feature is planned but not yet implemented in this product repository.
+      reason: Implementation has landed under agents/ but canonical capability mappings are deferred to
+        this feature's closeout knowledge-graph reconciliation.
     - id: feature:F0008
       path: planning-mds/features/F0008-agent-cockpit-landing-shell
       reason: Planned feature with no implementation to bind; canonical mappings are deferred until its

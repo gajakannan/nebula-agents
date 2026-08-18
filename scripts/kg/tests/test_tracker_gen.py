@@ -1,6 +1,7 @@
 """Tests for tracker_gen.py — REGISTRY/ROADMAP generation from feature shards (F0006-S0007)."""
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -34,16 +35,35 @@ def test_every_feature_in_exactly_one_registry_table_and_roadmap_section():
         assert len(sections) == 1, (f["id"], sections)
 
 
-def test_registry_placement_counts():
-    feats = tracker_gen.load_features()
-    counts = {n: sum(1 for f in feats if s["select"](f)) for n, s in tracker_gen.REGISTRY_TABLES.items()}
-    assert counts == {"registry:active": 2, "registry:retired": 1,
-                      "registry:planned": 3, "registry:archived": 1}
+def test_registry_table_derivation_rules():
+    # A shard may omit `registry_section`, in which case placement is derived.
+    # Replaces a hard-coded per-table count snapshot that went stale on every
+    # feature registration or archive, and that exercised no logic.
+    derive = tracker_gen._registry_table
+    assert derive({"status": "superseded", "superseded_by": "feature:F0006"}) == "retired"
+    assert derive({"status": "done", "retired_date": "2026-01-01"}) == "retired"
+    assert derive({"status": "archived-done", "archived_date": "2026-01-01"}) == "archived"
+    assert derive({"status": "planned"}) == "planned"
+    assert derive({"status": "planned-provisional"}) == "planned"
+    assert derive({"status": "in-progress"}) == "active"
+    assert derive({"status": "done"}) == "active"
+    # Retirement outranks archival when a shard carries both dates.
+    assert derive({"retired_date": "2026-01-01", "archived_date": "2026-02-01"}) == "retired"
+    # An explicit section always wins over the derived placement.
+    assert derive({"status": "planned", "registry_section": "Active"}) == "active"
 
 
 def test_next_available_feature_number():
+    # REGISTRY.md's Numbering Rules: ids are sequential and never reused. Assert that
+    # contract rather than a literal id, which goes stale on every new registration.
+    feats = tracker_gen.load_features()
+    taken = {tracker_gen._id_num(f) for f in feats}
     reg = tracker_gen.generate(write=False)["REGISTRY.md"]
-    assert "**Next Available Feature Number:** F0008" in reg
+    match = re.search(r"\*\*Next Available Feature Number:\*\* F(\d{4})", reg)
+    assert match, "REGISTRY.md must publish a next-available feature number"
+    nxt = int(match.group(1))
+    assert nxt not in taken, f"F{nxt:04d} is already registered"
+    assert nxt > max(taken), "next-available number must never reuse a retired id"
 
 
 # ── ordering ──
