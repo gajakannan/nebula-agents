@@ -7,6 +7,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import sysconfig
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -30,7 +31,10 @@ def test_real_tmux_fake_provider_launch_and_attach_reuses_one_process(
     # tmux runs the `nebula-agents` console script, so the package must be installed in
     # the environment under test — importing from engine/src (what conftest arranges) is
     # not enough for the spawned session.
-    interpreter_bin = Path(sys.executable).resolve().parent
+    # sysconfig, not Path(sys.executable).resolve(): inside a venv the interpreter is a
+    # symlink to the base install, so resolving it yields /usr/bin and misses the venv's
+    # own scripts directory — where an editable install puts the console script.
+    interpreter_bin = sysconfig.get_path("scripts")
     session_path = f"{interpreter_bin}:{os.environ.get('PATH', '/usr/bin:/bin')}"
     if shutil.which("nebula-agents", path=session_path) is None:
         pytest.skip(
