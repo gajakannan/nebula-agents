@@ -134,9 +134,13 @@ def test_descriptor_rejects_unavailable_or_foreign_runtime_directory(
 ) -> None:
     runtime, descriptor, _, _ = _descriptor_tree(tmp_path, monkeypatch)
     original_stat = Path.stat
+    # Resolve once, before patching. On Python <= 3.12 Path.resolve() calls Path.stat()
+    # internally, so resolving inside the replacement re-enters it and recurses without
+    # bound; 3.13+ uses os.path.realpath and happens not to.
+    resolved_runtime = runtime.resolve()
 
     def unavailable(path: Path, *args, **kwargs):
-        if path == runtime.resolve():
+        if path == resolved_runtime:
             raise OSError("simulated runtime loss")
         return original_stat(path, *args, **kwargs)
 
