@@ -65,11 +65,17 @@ def test_tier_3_adds_source_docs_without_reading_file_contents(bundle: dict[str,
     payload = _lookup_target(bundle, tier=3)
 
     capability = _find_node(payload["affects"], "capability:local-run-registry")
-    assert capability["source_docs"] == [
-        "planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md",
-        "planning-mds/features/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md",
+    # Match on basename: the F0001 story doc moved under `features/archive/` when the
+    # feature was archived, and doc refs are deliberately move-invariant.
+    docs = capability["source_docs"]
+    assert [path.rsplit("/", 1)[-1] for path in docs] == [
+        "ADR-002-f0001-runtime-persistence.md",
+        "F0001-S0003-run-registry-and-evidence-watchers.md",
     ]
-    assert all(isinstance(path, str) and "/" in path for path in capability["source_docs"])
+    assert all(isinstance(path, str) and "/" in path for path in docs)
+    assert all((REPO_ROOT / path).exists() for path in docs), (
+        f"tier-3 source_docs must resolve to real files: {docs}"
+    )
     assert "Persists typed run state" not in capability["source_docs"][0]
 
 

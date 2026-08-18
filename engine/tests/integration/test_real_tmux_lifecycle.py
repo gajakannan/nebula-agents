@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
+import pytest
+
 from nebula_agents.domain.enums import ProviderKey
 from nebula_agents.domain.models import LaunchDescriptor, serialize_record
 from nebula_agents.infrastructure.process import SubprocessRunner
@@ -25,6 +27,16 @@ def test_real_tmux_fake_provider_launch_and_attach_reuses_one_process(
 
     assert shutil.which("tmux") is not None
     assert shutil.which("script") is not None
+    # tmux runs the `nebula-agents` console script, so the package must be installed in
+    # the environment under test — importing from engine/src (what conftest arranges) is
+    # not enough for the spawned session.
+    interpreter_bin = Path(sys.executable).resolve().parent
+    session_path = f"{interpreter_bin}:{os.environ.get('PATH', '/usr/bin:/bin')}"
+    if shutil.which("nebula-agents", path=session_path) is None:
+        pytest.skip(
+            "nebula-agents console script not resolvable on the session PATH; "
+            "run `pip install -e engine` in the environment under test"
+        )
     suffix = secrets.token_hex(4)
     run_id = f"2026-07-13-{suffix}"
     session = f"nebula-F0001-{suffix}"
@@ -64,9 +76,10 @@ def test_real_tmux_fake_provider_launch_and_attach_reuses_one_process(
         json.dumps(serialize_record(descriptor)), encoding="utf-8"
     )
     descriptor_path.chmod(0o600)
-    monkeypatch.setenv(
-        "PATH", f"/tmp/f0001-venv/bin:{os.environ.get('PATH', '/usr/bin:/bin')}"
-    )
+    # Put the interpreter running the tests on PATH for the spawned session. This was
+    # previously a hard-coded `/tmp/f0001-venv/bin`, which only existed on the original
+    # author's machine and made the test fail everywhere else.
+    monkeypatch.setenv("PATH", session_path)
     adapter = TmuxAdapter(SubprocessRunner())
     try:
         adapter.create_session(session, descriptor_path)

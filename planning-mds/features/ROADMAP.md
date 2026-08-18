@@ -1,6 +1,6 @@
 # Feature Roadmap (Now / Next / Later)
 
-**Last Reviewed:** 2026-07-13
+**Last Reviewed:** 2026-08-17
 
 ## Purpose
 
@@ -17,7 +17,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 <!-- generated:begin roadmap:now -->
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
-| [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | Planned | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
+| [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | In Progress | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
 <!-- generated:end roadmap:now -->
 
 ## Next
@@ -64,3 +64,5 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 - F0005 was superseded by F0006 on 2026-07-04 (see `REGISTRY.md` Retired Features): its logical doc-ref design is fully absorbed as the compiled-projection compiler's reference format.
 - F0006 is independent of the F0001 → F0003 → F0002 runtime line and does not displace F0001. Phase A promoted on 2026-07-06; Phase B completed and promoted on 2026-07-11; recovery G8 closeout archived it on 2026-07-12.
 - F0007 is framework hardening and may proceed alongside F0001 because it reduces prompt/contract maintenance risk without changing the runtime product sequence.
+- F0007 stories S0001-S0009 are implemented and merged (PRs #55-#61). It stays in `Now` rather than moving to `Completed` because its validation gate is not fully met: the live governed pilot and the five required role signoffs are outstanding. See its `STATUS.md` and `rollout-report.md` for the remaining closeout items.
+- F0003's entry criteria are met: F0001 completed and archived on 2026-07-15, so its session registry and transcript model are available as implementation dependencies. F0003 is the natural candidate to serve as F0007's live governed pilot rather than a throwaway pilot feature.

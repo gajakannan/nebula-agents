@@ -39,13 +39,14 @@ def test_pytest_metadata_matches_approved_compatible_branch_contract(
 
 
 def test_six_approved_story_contracts_remain_present(repository_root: Path) -> None:
-    feature_root = (
-        repository_root
-        / "planning-mds"
-        / "features"
-        / "F0001-tmux-native-agent-cockpit"
+    # F0001 was archived on 2026-07-15, moving the folder under `features/archive/`.
+    # The six contracts must remain present wherever the folder currently lives.
+    features_root = repository_root / "planning-mds" / "features"
+    candidates = sorted(features_root.glob("**/F0001-tmux-native-agent-cockpit"))
+    assert len(candidates) == 1, (
+        f"expected exactly one F0001 feature folder, found {candidates}"
     )
-    stories = sorted(feature_root.glob("F0001-S*.md"))
+    stories = sorted(candidates[0].glob("F0001-S*.md"))
     assert [path.name[:11] for path in stories] == [
         "F0001-S0001",
         "F0001-S0002",

@@ -64,7 +64,9 @@ The F0007-specific completion gate additionally requires:
 
 ## Rollback
 
-- Before S0009, disable new lifecycle gates and keep hand-written prompts/current constants active.
-- After S0009, select the previous active policy version and regenerate prompts; do not edit a
-  published historical bundle.
+- S0009 has landed, so the second path below is the live one. Select the previous active policy
+  version and regenerate prompts; do not edit a published historical bundle. The full procedure is
+  in [rollout-report.md](./rollout-report.md) §3.
+- The pre-S0009 path (disable the new lifecycle gates and keep hand-written prompts and the current
+  constants active) no longer applies: the gates are adopted and the hand-written prompts are gone.
 - Never roll back by changing `contract_version` in existing evidence manifests.

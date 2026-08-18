@@ -1,30 +1,30 @@
 # F0007 - Spec-Driven Orchestration and Prompt Compilation - Status
 
-**Overall Status:** Implemented (S0001–S0009); rollout **HOLD** pending required role signoffs and a live governed product pilot
-**Last Updated:** 2026-07-18
+**Overall Status:** Implemented and merged to `main` (S0001–S0009, PRs #55–#61); rollout **HOLD** pending required role signoffs and a live governed product pilot
+**Last Updated:** 2026-08-17
 
 ## Story Checklist
 
 | Story | Title | Phase | Status |
 |-------|-------|-------|--------|
-| F0007-S0001 | Versioned action policy and schema | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0002 | Contract conformance and behavioral diff | A | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0003 | Run initialization and product scaffolding | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0004 | Typed command runtime and complete telemetry | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [x] Implemented (branch `feat/F0007-spec-driven-orchestration`; pending review/signoff) |
-| F0007-S0006 | Generated evidence prompts and drift gate | C | [~] Machinery implemented (renderer + drift/semantic gate + CI wiring + `feature` pilot); remaining-action rollout & semantic-equivalence cutover of the 24 hand-written prompts are human-gated (PM + role owners) and deferred |
-| F0007-S0007 | Version-aware validator convergence | C | [x] Implemented (version-aware selection + dual-read parity proven zero-disagreement across all cutovers; private constants kept — their removal is deferred to S0008 per the parity-approval gate) |
-| F0007-S0008 | Shared policy consumers and prose thinning | C | [~] Consumer tooling implemented (contract-value resolver + inverse-literal/drift audit, vague-language linter, coverage-script migration); prose thinning (40% reduction, retrieval-guard extraction, disposition inventory) and private-constant removal are role-owner-gated and deferred (removal also follows the S0009 pilot per PRD rollout) |
-| F0007-S0009 | Governed rollout and compatibility pilot | D | [~] CI/lifecycle gates adopted + end-to-end pilot rehearsal + rollback rehearsal + rollout report; LIVE product pilot and independent all-role review are human-gated and deferred |
+| F0007-S0001 | Versioned action policy and schema | A | [x] Merged (#55); pending review/signoff |
+| F0007-S0002 | Contract conformance and behavioral diff | A | [x] Merged (#55); pending review/signoff |
+| F0007-S0003 | Run initialization and product scaffolding | B | [x] Merged (#55); pending review/signoff |
+| F0007-S0004 | Typed command runtime and complete telemetry | B | [x] Merged (#55, #61); pending review/signoff |
+| F0007-S0005 | Gate driver, durable checkpoints, and severity policy | B | [x] Merged (#55, #59); pending review/signoff |
+| F0007-S0006 | Generated evidence prompts and drift gate | C | [x] Cutover **complete**: all 13 actions are spec-driven and all 24 evidence prompts are generated under `agents/templates/prompts/evidence-contract/` (#55 feature/plan, #56 build/feature-review/integrate/review/test/validate, #57 blog/defect-bugfix/document/init/plan-review). `prompt_drift` gate green. Independent semantic-equivalence signoff by role owners is still outstanding |
+| F0007-S0007 | Version-aware validator convergence | C | [x] Merged (#55); dual-read parity proven zero-disagreement across all cutovers. Private date constants in `validate-feature-evidence.py` are **still active** — removal remains a recorded decision (see Open Decisions) |
+| F0007-S0008 | Shared policy consumers and prose thinning | C | [x] Consumer tooling merged (#55) and prose thinning **done** (#57, #58): 12 action docs cut 6788→2869 lines (~58%, exceeding the 40% target), shared Retrieval Guard extracted to an `AGENTIGNORE.md` pointer, FEC trailers pointerized to `CONSUMER-CONTRACT.md`, all 11 role SKILLs brought under the 500-line regression cap. `feature.md` (976) and `plan.md` (785) remain the two heavy actions. Private-constant removal is tracked under S0007 |
+| F0007-S0009 | Governed rollout and compatibility pilot | D | [~] Lifecycle gates adopted + end-to-end pilot rehearsal + rollback rehearsal + rollout report merged (#55). **LIVE** product pilot and independent all-role review remain outstanding |
 
 ## Phase Gates
 
 | Gate | Required Evidence | Status |
 |------|-------------------|--------|
-| A - Policy foundation | Schema report, behavioral diff fixture, historical baseline matrix | Implemented (pending signoff) |
-| B - Runtime | Concurrency tests, shell-free subprocess tests, checkpoint failure/resume tests, telemetry samples | Implemented (pending signoff) |
-| C - Compilation | Prompt snapshots, semantic-equivalence review, dual-read parity report, literal-owner audit | Not Started |
-| D - Rollout | Pilot run evidence, closeout validator result, migration/rollback report | Implemented (rehearsal + rollback report; `rollout-report.md`); live pilot deferred |
+| A - Policy foundation | Schema report, behavioral diff fixture, historical baseline matrix | Merged (pending signoff) |
+| B - Runtime | Concurrency tests, shell-free subprocess tests, checkpoint failure/resume tests, telemetry samples | Merged (pending signoff) |
+| C - Compilation | Prompt snapshots, semantic-equivalence review, dual-read parity report, literal-owner audit | Merged (24/24 prompts generated, parity zero-disagreement, prose thinned); **semantic-equivalence review by role owners pending** |
+| D - Rollout | Pilot run evidence, closeout validator result, migration/rollback report | Merged (rehearsal + rollback report; `rollout-report.md`); live pilot outstanding |
 
 ## Required Signoff Roles
 
@@ -54,11 +54,19 @@ Complete these rows before moving the feature to `Done`.
 
 ## Open Decisions
 
+The three planning decisions below were all resolved during implementation.
+
+| Decision | Options | Owner | Resolution |
+|----------|---------|-------|------------|
+| Prompt renderer | Jinja2 or a stdlib renderer | Architect | **Stdlib renderer** — `render-prompts.py` takes no third-party dependency |
+| Lock primitive | Portable lock-file protocol or platform-specific advisory lock with fallback | Architect + Security | **Portable lock file** — `run-gate.py` uses `O_CREAT\|O_EXCL` with a timeout and fails closed |
+| Historical bundle granularity | Full multi-action bundle per version or per-action snapshots with a signed index | Architect | **Full multi-action bundle per version** — five bundles published under `agents/actions/spec/history/`, each currently snapshotting the `feature` action (the only action with versioned historical evidence) |
+
+One decision remains open.
+
 | Decision | Options | Owner | Due Before |
 |----------|---------|-------|------------|
-| Prompt renderer | Jinja2 or a stdlib renderer | Architect | S0006 kickoff |
-| Lock primitive | Portable lock-file protocol or platform-specific advisory lock with fallback | Architect + Security | S0003 kickoff |
-| Historical bundle granularity | Full multi-action bundle per version or per-action snapshots with a signed index | Architect | S0001 completion |
+| Private-constant removal (S0007/S0008) | Remove the date-gated requirement matrix from `validate-feature-evidence.py` and read policy only, or keep the dual-read indefinitely | Architect + QE | Feature closeout. Parity evidence is in hand — `contract_compat.py --matrix` reports zero disagreement across all cutovers — so this is a recorded decision, not further implementation |
 
 ## Tracker Sync Checklist
 
@@ -66,6 +74,15 @@ Complete these rows before moving the feature to `Done`.
 - [x] F0007 added to `ROADMAP.md`.
 - [x] F0007 stories added to `STORY-INDEX.md`.
 - [x] F0007 feature and stories added to `BLUEPRINT.md`.
-- [ ] Story implementation evidence recorded.
+- [x] Story implementation evidence recorded (PRs #55–#61 merged to `main`; all six framework lifecycle gates green).
 - [ ] Required signoffs complete.
+- [ ] Canonical knowledge-graph mappings bound (the F0007 shard still carries `coverage_excluded`; capability nodes and `node_bindings` for the spec-driven surface are deferred to closeout KG reconciliation).
 - [ ] Feature closeout and archive decision recorded.
+
+## Remaining Work to Close
+
+1. **Live governed pilot** (S0009 D-gate) — one real feature run end-to-end through `run-gate.py` to closeout. `test_pilot_end_to_end.py` proves the toolchain against a fixture product root; it does not substitute for a live run. F0003 is the recommended pilot subject: it is next on the roadmap and its entry criteria are already met.
+2. **Five role signoffs** — Architect, Quality Engineer, Code Reviewer, DevOps, Security Reviewer; every row in *Story Signoff Provenance* is still `TBD`.
+3. **Semantic-equivalence review of the generated prompts** (S0006) — the cutover shipped; role-owner acceptance that generated output preserves the accepted semantics has not been recorded.
+4. **Private-constant removal decision** (S0007/S0008) — see *Open Decisions*.
+5. **Canonical KG mappings** — bind the spec-driven surface and drop `coverage_excluded` from the F0007 shard.
