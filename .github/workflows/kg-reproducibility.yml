@@ -4,10 +4,12 @@
 # shard schemas remain valid, and generated-file git policy has not drifted.
 name: kg-reproducibility
 
+# `main` is included deliberately: admin/squash merges can land without a PR run,
+# and shard-vs-generated drift on main is exactly what this gate exists to catch.
 on:
   pull_request:
   push:
-    branches-ignore: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install Python dependencies

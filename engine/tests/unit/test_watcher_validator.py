@@ -180,10 +180,14 @@ def test_watcher_classifies_permission_and_other_os_errors(
     original_stat = Path.stat
 
     def fake_stat(path: Path, *args, **kwargs):
-        if path == denied:
-            raise PermissionError("denied")
-        if path == malformed:
-            raise OSError("I/O")
+        # Only the following-symlinks call is the one this test means to fail. On
+        # Python <= 3.12 Path.is_symlink() routes through stat(follow_symlinks=False),
+        # so an unscoped patch also breaks the watcher's symlink guard.
+        if kwargs.get("follow_symlinks", True):
+            if path == denied:
+                raise PermissionError("denied")
+            if path == malformed:
+                raise OSError("I/O")
         return original_stat(path, *args, **kwargs)
 
     monkeypatch.setattr(Path, "stat", fake_stat)

@@ -1,0 +1,110 @@
+# Framework CI for nebula-agents itself.
+#
+# Runs the two things that previously ran nowhere: the stage-scoped lifecycle gates
+# and the three test suites. Distinct from `kg-reproducibility.yml`, which stays its
+# own workflow so any required-status-check configuration keeps resolving.
+#
+# Downstream products wire their own gates from agents/templates/ci-gates-template.yml;
+# this file is the framework repo's own pipeline, not that template.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Stage-scoped lifecycle gates (lifecycle-stage.yaml current_stage) ──
+  lifecycle-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install framework script dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r agents/scripts/requirements.txt
+
+      - name: Show configured lifecycle stages
+        run: python3 agents/scripts/run-lifecycle-gates.py --list
+
+      - name: Run required gates for the current lifecycle stage
+        run: python3 agents/scripts/run-lifecycle-gates.py
+
+  # ── Framework tooling tests: agents/** scripts and the compiled-KG toolchain ──
+  framework-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install framework script dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r agents/scripts/requirements.txt
+
+      - name: Run agents/** script tests
+        run: python3 -m pytest agents -q
+
+      - name: Run compiled-KG toolchain tests
+        run: python3 -m pytest scripts/kg/tests -q
+
+  # ── Engine (F0001 cockpit runtime) tests, with coverage enforced by pyproject ──
+  #
+  # Matrixed because engine/pyproject.toml declares requires-python >= 3.11 but the
+  # suite had only ever been run on the maintainer's 3.14. That hid two tests which
+  # monkeypatch Path.stat and depended on 3.13+ pathlib internals: one recursed without
+  # bound on 3.12, the other broke the watcher's symlink guard. Endpoints plus the
+  # middle, so the declared floor is actually exercised.
+  engine-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # test_real_tmux_lifecycle.py drives the real tmux seam through `script`.
+      # Without these it self-skips, so install them to keep that coverage live.
+      - name: Install tmux and util-linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux util-linux
+
+      # Editable install, not just sys.path: tmux launches the `nebula-agents`
+      # console script, which only exists once the package is installed.
+      - name: Install engine with test extras
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -e "engine[test]"
+
+      - name: Run engine tests with coverage
+        working-directory: engine
+        run: python3 -m pytest -q --cov --cov-report=term
+
+      - name: Assert the tmux integration test was not skipped
+        working-directory: engine
+        run: |
+          python3 -m pytest tests/integration/test_real_tmux_lifecycle.py \
+            -q --no-header -p no:cacheprovider --no-cov -rs \
+            | tee /tmp/tmux-test.txt
+          if grep -q "SKIPPED" /tmp/tmux-test.txt; then
+            echo "::error::The real-tmux integration test skipped in CI; its preconditions regressed."
+            exit 1
+          fi
