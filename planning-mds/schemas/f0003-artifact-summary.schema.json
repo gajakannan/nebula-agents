@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-artifact-summary.schema.json",
+  "title": "F0003 Artifact Summary",
+  "description": "Deterministic rule-extracted summary of one evidence artifact (F0003-S0005). Never model-generated; a navigation aid, never authoritative evidence (ADR-008).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "summary_id",
+    "artifact_id",
+    "artifact_kind",
+    "summary_status",
+    "redaction_status",
+    "rule_set_version",
+    "generated_at",
+    "source_reference",
+    "key_events",
+    "failure_markers"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "summary_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "artifact_id": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}/[a-z-]+/[0-9a-f]{12}$"
+    },
+    "artifact_kind": {
+      "type": "string",
+      "enum": [
+        "transcript",
+        "command-log",
+        "validator-output",
+        "manifest",
+        "status",
+        "metric",
+        "learning-proposal"
+      ]
+    },
+    "summary_status": {
+      "type": "string",
+      "enum": ["Pass", "Failed", "Blocked", "Unsupported", "Partial"],
+      "description": "Partial when size bounds would otherwise force dropping a failure marker."
+    },
+    "redaction_status": {"type": "string", "enum": ["Pass", "Fail", "Pending", "NotRequired"]},
+    "rule_set_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "description": "Extraction rules are versioned so an older summary stays re-derivable."
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Local retrieval reference back to the full artifact."
+    },
+    "key_events": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {"$ref": "#/$defs/marker"}
+    },
+    "failure_markers": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {"$ref": "#/$defs/marker"},
+      "description": "Never dropped to satisfy a size bound; summary_status becomes Partial instead."
+    },
+    "warning_markers": {"type": "array", "maxItems": 512, "items": {"$ref": "#/$defs/marker"}},
+    "open_questions": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"type": "string", "maxLength": 1024}
+    },
+    "truncation_count": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Count of omitted low-signal passing lines."
+    },
+    "last_observed_marker": {
+      "type": ["string", "null"],
+      "maxLength": 1024,
+      "description": "Where extraction stopped for an interrupted or Partial summary."
+    }
+  },
+  "$defs": {
+    "marker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinal", "label"],
+      "properties": {
+        "ordinal": {"type": "integer", "minimum": 0},
+        "label": {"type": "string", "minLength": 1, "maxLength": 1024},
+        "detail": {"type": ["string", "null"], "maxLength": 4096},
+        "exit_code": {"type": ["integer", "null"]},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  }
+}

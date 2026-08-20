@@ -1,0 +1,28 @@
+id: workflow:evidence-indexing
+label: Evidence indexing and summarization lifecycle
+related_nodes:
+  - capability:evidence-artifact-index
+  - capability:deterministic-evidence-summaries
+  - entity:artifact-index-entry
+source_docs:
+  - F0003/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+  - F0003/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+states:
+  - id: state:evidence-indexing:discovered
+    label: Discovered
+    transitions_to: [state:evidence-indexing:indexed, state:evidence-indexing:rejected]
+  - id: state:evidence-indexing:rejected
+    label: Rejected for path policy
+    transitions_to: []
+  - id: state:evidence-indexing:indexed
+    label: Indexed
+    transitions_to: [state:evidence-indexing:summarized, state:evidence-indexing:blocked, state:evidence-indexing:missing]
+  - id: state:evidence-indexing:summarized
+    label: Summarized
+    transitions_to: [state:evidence-indexing:blocked, state:evidence-indexing:missing]
+  - id: state:evidence-indexing:blocked
+    label: Blocked by redaction failure
+    transitions_to: [state:evidence-indexing:summarized]
+  - id: state:evidence-indexing:missing
+    label: Missing at retrieval
+    transitions_to: [state:evidence-indexing:indexed]

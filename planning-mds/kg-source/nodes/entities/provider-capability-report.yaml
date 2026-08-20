@@ -1,0 +1,9 @@
+id: entity:provider-capability-report
+label: Provider capability report
+notes: Per-provider probe result set with capability requirements, probe outcomes, fallback availability, and a freshness timestamp consumed by the launch guard.
+related_nodes:
+  - capability:provider-capability-matrix
+  - schema:f0003-capability-report
+source_docs:
+  - F0003/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+  - planning-mds/architecture/f0003-runtime-contract.md

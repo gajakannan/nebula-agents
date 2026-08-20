@@ -1,0 +1,11 @@
+id: entity:learning-proposal
+label: Learning proposal
+notes: Inert draft correction linked to source evidence, restricted to an allowlisted target document, with append-only attributed review decisions.
+related_nodes:
+  - capability:runtime-metrics-and-learning-review
+  - entity:artifact-index-entry
+  - schema:f0003-learning-proposal
+  - workflow:learning-proposal-review
+source_docs:
+  - F0003/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+  - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md

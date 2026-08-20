@@ -1,0 +1,11 @@
+id: capability:evidence-artifact-index
+label: Evidence artifact index
+notes: Assigns run-scoped stable artifact identifiers and records kind, redaction status, retrieval policy, and freshness for local evidence.
+related_nodes:
+  - capability:evidence-and-gate-control
+  - entity:artifact-index-entry
+  - schema:f0003-artifact-index
+  - workflow:evidence-indexing
+source_docs:
+  - F0003/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+  - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md

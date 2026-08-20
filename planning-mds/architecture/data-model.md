@@ -2,7 +2,7 @@
 
 ## Scope
 
-This model covers F0001 local state only. It is filesystem-backed and single-host. F0003 may add an artifact index, summaries, metrics, and learning records without changing the F0001 run identity contract.
+This model covers F0001 local state, plus the F0003 control-plane records added in §"F0003 Control-Plane Records". It is filesystem-backed and single-host. F0003 adds an artifact index, summaries, metrics, and learning records without changing the F0001 run identity contract.
 
 ## Aggregate and Record Model
 
@@ -145,6 +145,36 @@ If step 6 fails after the event append, recovery replays the event into the last
 
 F0001 does not delete or soft-delete run records. Manual removal is an operator filesystem action outside the application contract. Automated retention, archive indexes, and cross-run analytics belong to F0003.
 
+F0003 adds no deletion path either. Its artifact index and summaries are regenerable projections and may be discarded safely. Learning proposals accumulate and need a retention policy fixed at feature G0 (ADR-009).
+
+## F0003 Control-Plane Records
+
+| Record | Identity | Purpose | Mutability |
+|--------|----------|---------|------------|
+| `ProviderCapabilityReport` | `(provider_key, report_generated_at)` | Capability matrix consumed by the launch guard | Atomic replacement; freshness by age |
+| `ArtifactIndexEntry` | `artifact_id` = `{run_id}/{artifact_kind}/{12 hex path digest}` | Stable handle from summaries, MCP, and proposals to local evidence | Replaced by idempotent re-index |
+| `ArtifactSummary` | `summary_id` | Deterministic rule-extracted projection of one artifact | Regenerable; replaced wholesale |
+| `RuntimeMetricSnapshot` | `(run_id, metric_generated_at)` | Derived run health view | Derived; never authoritative |
+| `LearningProposal` | `proposal_id` | Draft correction awaiting review | Status transitions; decisions append-only |
+
+**Identity rule (ADR-006).** `artifact_id` derives from the artifact's canonical path *relative to the run root*, not its content. Re-indexing the same artifact therefore yields the same ID, while two artifacts with identical bytes keep distinct IDs. `content_hash` is a separate full SHA-256 attribute used for duplicate linking and staleness detection, never for identity. A truncated-digest collision within one run and kind raises a conflict rather than overwriting.
+
+**Exposure rule.** `redaction_status` and `retrieval_policy` are index attributes, so an exposure decision never requires reading the artifact. `redaction_status: Fail` forces `retrieval_policy: Blocked`.
+
+**Persistence layout additions:**
+
+```text
+.nebula-agents/runtime/                  mode 0700
+  providers/<provider>.report.json       mode 0600
+  runs/<run-id>/
+    artifacts.json                       atomic artifact index, mode 0600
+    summaries/<artifact-id-digest>.json  mode 0600
+    proposals/<proposal-id>.json         mode 0600
+    proposals/decisions.jsonl            append-only, mode 0600
+```
+
+The artifact index follows the same commit discipline as `run.json`: per-run lock, revision check, same-directory temporary file, `fsync`, atomic replace, corrupt files preserved.
+
 ## Schema Sources
 
 - `planning-mds/schemas/f0001-run-record.schema.json`
@@ -152,3 +182,8 @@ F0001 does not delete or soft-delete run records. Manual removal is an operator 
 - `planning-mds/schemas/f0001-preflight-result.schema.json`
 - `planning-mds/schemas/f0001-local-policy.schema.json`
 - `planning-mds/schemas/f0001-launch-descriptor.schema.json`
+- `planning-mds/schemas/f0003-capability-report.schema.json`
+- `planning-mds/schemas/f0003-artifact-index.schema.json`
+- `planning-mds/schemas/f0003-artifact-summary.schema.json`
+- `planning-mds/schemas/f0003-learning-proposal.schema.json`
+- `planning-mds/schemas/f0003-mcp-response.schema.json`

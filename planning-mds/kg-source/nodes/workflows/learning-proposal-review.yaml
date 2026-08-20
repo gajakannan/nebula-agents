@@ -1,0 +1,28 @@
+id: workflow:learning-proposal-review
+label: Learning proposal review lifecycle
+related_nodes:
+  - capability:runtime-metrics-and-learning-review
+  - entity:learning-proposal
+source_docs:
+  - F0003/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+  - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+states:
+  - id: state:learning-proposal-review:draft
+    label: Draft
+    transitions_to:
+      - state:learning-proposal-review:accepted
+      - state:learning-proposal-review:edited
+      - state:learning-proposal-review:rejected
+      - state:learning-proposal-review:archived
+  - id: state:learning-proposal-review:accepted
+    label: Accepted
+    transitions_to: [state:learning-proposal-review:archived]
+  - id: state:learning-proposal-review:edited
+    label: Edited
+    transitions_to: [state:learning-proposal-review:accepted, state:learning-proposal-review:rejected, state:learning-proposal-review:archived]
+  - id: state:learning-proposal-review:rejected
+    label: Rejected
+    transitions_to: [state:learning-proposal-review:draft]
+  - id: state:learning-proposal-review:archived
+    label: Archived
+    transitions_to: []

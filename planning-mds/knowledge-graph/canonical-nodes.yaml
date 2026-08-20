@@ -28,6 +28,38 @@ adrs:
     related_nodes:
       - capability:redacted-transcript-recovery
       - workflow:transcript-capture
+  - id: adr:005-f0003-control-plane-packaging
+    label: F0003 control-plane packaging
+    path: planning-mds/architecture/decisions/ADR-005-f0003-control-plane-packaging.md
+    related_nodes:
+      - capability:readonly-mcp-runtime-surface
+      - capability:runtime-command-surface
+  - id: adr:006-f0003-artifact-identity-and-index
+    label: F0003 artifact identity and index
+    path: planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
+    related_nodes:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+      - workflow:evidence-indexing
+  - id: adr:007-f0003-readonly-mcp-surface
+    label: F0003 read-only MCP surface
+    path: planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
+    related_nodes:
+      - capability:readonly-mcp-runtime-surface
+      - schema:f0003-mcp-response
+  - id: adr:008-f0003-deterministic-summaries
+    label: F0003 deterministic summaries
+    path: planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+  - id: adr:009-f0003-review-gated-learning-proposals
+    label: F0003 review-gated learning proposals
+    path: planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+      - workflow:learning-proposal-review
 capabilities:
   - id: capability:compiled-kg-projection
     label: Compiled knowledge-graph projection
@@ -37,6 +69,18 @@ capabilities:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0005-deterministic-kg-compiler.md
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
+  - id: capability:deterministic-evidence-summaries
+    label: Deterministic evidence summaries
+    notes: Produces rule-extracted summaries of transcripts, command logs, validator output, and manifests
+      without any model call.
+    related_nodes:
+      - capability:evidence-artifact-index
+      - capability:redacted-transcript-recovery
+      - entity:artifact-summary
+      - schema:f0003-artifact-summary
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
   - id: capability:evidence-and-gate-control
     label: Evidence and gate control
     notes: Watches governed evidence, records validator results, and applies authorized gate decisions
@@ -48,6 +92,18 @@ capabilities:
     source_docs:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
+  - id: capability:evidence-artifact-index
+    label: Evidence artifact index
+    notes: Assigns run-scoped stable artifact identifiers and records kind, redaction status, retrieval
+      policy, and freshness for local evidence.
+    related_nodes:
+      - capability:evidence-and-gate-control
+      - entity:artifact-index-entry
+      - schema:f0003-artifact-index
+      - workflow:evidence-indexing
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
   - id: capability:local-run-registry
     label: Local run registry
     notes: Persists typed run state and append-only runtime events in the product-local filesystem.
@@ -71,6 +127,18 @@ capabilities:
     source_docs:
       - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
+  - id: capability:provider-capability-matrix
+    label: Provider capability matrix
+    notes: Probes local provider CLIs and gates wrapped launch on required capabilities, explicit fallbacks,
+      and report freshness.
+    related_nodes:
+      - capability:native-session-preflight
+      - capability:runtime-command-surface
+      - entity:provider-capability-report
+      - schema:f0003-capability-report
+    source_docs:
+      - planning-mds/architecture/f0003-runtime-contract.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
   - id: capability:read-only-run-queries
     label: Read-only run queries
     notes: Exposes status, review, audit, and recovery information through CLI and terminal UI views without
@@ -80,6 +148,19 @@ capabilities:
       - entity:run-record
     source_docs:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
+  - id: capability:readonly-mcp-runtime-surface
+    label: Read-only MCP runtime surface
+    notes: Exposes session, gate, validator, and evidence status to MCP hosts over stdio through a query-only
+      application facade.
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - capability:evidence-artifact-index
+      - capability:read-only-run-queries
+      - schema:f0003-mcp-response
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
+      - planning-mds/architecture/f0003-runtime-contract.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
   - id: capability:redacted-transcript-recovery
     label: Redacted transcript recovery
     notes: Captures optional terminal transcripts through fail-closed redaction and uses safe transcript
@@ -91,6 +172,31 @@ capabilities:
     source_docs:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0005-native-session-transcript-and-recovery.md
+  - id: capability:runtime-command-surface
+    label: Runtime command surface
+    notes: Single local command entry point for preflight, wrapped launch, session listing, status, validators,
+      evidence, and attach guidance.
+    related_nodes:
+      - capability:evidence-artifact-index
+      - capability:local-run-registry
+      - capability:provider-capability-matrix
+      - entity:run-record
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-005-f0003-control-plane-packaging.md
+      - planning-mds/architecture/f0003-runtime-contract.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+  - id: capability:runtime-metrics-and-learning-review
+    label: Runtime metrics and learning review
+    notes: Derives run health metrics and drafts review-gated correction proposals from failed-run evidence
+      without mutating any target document.
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - capability:evidence-artifact-index
+      - entity:learning-proposal
+      - workflow:learning-proposal-review
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
   - id: capability:tmux-session-lifecycle
     label: Tmux session lifecycle
     notes: Launches native provider CLIs in governed tmux sessions and supports attach, detach, recovery,
@@ -103,6 +209,51 @@ capabilities:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
 entities:
+  - id: entity:artifact-index-entry
+    label: Artifact index entry
+    notes: Stable handle for one evidence artifact; identity derives from the run-relative canonical path,
+      while the content hash links duplicates and detects staleness.
+    related_nodes:
+      - capability:evidence-artifact-index
+      - entity:artifact-summary
+      - schema:f0003-artifact-index
+      - workflow:evidence-indexing
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+  - id: entity:artifact-summary
+    label: Artifact summary
+    notes: Deterministic rule-extracted projection of one artifact that preserves every failure marker
+      and always references the full local source.
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-index-entry
+      - schema:f0003-artifact-summary
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+  - id: entity:learning-proposal
+    label: Learning proposal
+    notes: Inert draft correction linked to source evidence, restricted to an allowlisted target document,
+      with append-only attributed review decisions.
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:artifact-index-entry
+      - schema:f0003-learning-proposal
+      - workflow:learning-proposal-review
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+  - id: entity:provider-capability-report
+    label: Provider capability report
+    notes: Per-provider probe result set with capability requirements, probe outcomes, fallback availability,
+      and a freshness timestamp consumed by the launch guard.
+    related_nodes:
+      - capability:provider-capability-matrix
+      - schema:f0003-capability-report
+    source_docs:
+      - planning-mds/architecture/f0003-runtime-contract.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
   - id: entity:run-record
     label: Run record
     notes: Durable current-state record for one local provider run, including ownership, gate, transcript,
@@ -217,7 +368,73 @@ schemas:
     related_nodes:
       - capability:local-run-registry
       - entity:runtime-event
+  - id: schema:f0003-artifact-index
+    label: F0003 artifact index
+    path: planning-mds/schemas/f0003-artifact-index.schema.json
+    related_nodes:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+  - id: schema:f0003-artifact-summary
+    label: F0003 artifact summary
+    path: planning-mds/schemas/f0003-artifact-summary.schema.json
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+  - id: schema:f0003-capability-report
+    label: F0003 provider capability report
+    path: planning-mds/schemas/f0003-capability-report.schema.json
+    related_nodes:
+      - capability:provider-capability-matrix
+      - entity:provider-capability-report
+  - id: schema:f0003-learning-proposal
+    label: F0003 learning proposal
+    path: planning-mds/schemas/f0003-learning-proposal.schema.json
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+  - id: schema:f0003-mcp-response
+    label: F0003 MCP response envelope
+    path: planning-mds/schemas/f0003-mcp-response.schema.json
+    related_nodes:
+      - capability:readonly-mcp-runtime-surface
 workflows:
+  - id: workflow:evidence-indexing
+    label: Evidence indexing and summarization lifecycle
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+    source_docs:
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+    states:
+      - id: state:evidence-indexing:discovered
+        label: Discovered
+        transitions_to:
+          - state:evidence-indexing:indexed
+          - state:evidence-indexing:rejected
+      - id: state:evidence-indexing:rejected
+        label: Rejected for path policy
+        transitions_to: []
+      - id: state:evidence-indexing:indexed
+        label: Indexed
+        transitions_to:
+          - state:evidence-indexing:summarized
+          - state:evidence-indexing:blocked
+          - state:evidence-indexing:missing
+      - id: state:evidence-indexing:summarized
+        label: Summarized
+        transitions_to:
+          - state:evidence-indexing:blocked
+          - state:evidence-indexing:missing
+      - id: state:evidence-indexing:blocked
+        label: Blocked by redaction failure
+        transitions_to:
+          - state:evidence-indexing:summarized
+      - id: state:evidence-indexing:missing
+        label: Missing at retrieval
+        transitions_to:
+          - state:evidence-indexing:indexed
   - id: workflow:gate-decision
     label: Gate decision lifecycle
     related_nodes:
@@ -242,6 +459,39 @@ workflows:
         label: Blocked
         transitions_to:
           - state:gate-decision:pending
+  - id: workflow:learning-proposal-review
+    label: Learning proposal review lifecycle
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+    source_docs:
+      - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+    states:
+      - id: state:learning-proposal-review:draft
+        label: Draft
+        transitions_to:
+          - state:learning-proposal-review:accepted
+          - state:learning-proposal-review:edited
+          - state:learning-proposal-review:rejected
+          - state:learning-proposal-review:archived
+      - id: state:learning-proposal-review:accepted
+        label: Accepted
+        transitions_to:
+          - state:learning-proposal-review:archived
+      - id: state:learning-proposal-review:edited
+        label: Edited
+        transitions_to:
+          - state:learning-proposal-review:accepted
+          - state:learning-proposal-review:rejected
+          - state:learning-proposal-review:archived
+      - id: state:learning-proposal-review:rejected
+        label: Rejected
+        transitions_to:
+          - state:learning-proposal-review:draft
+      - id: state:learning-proposal-review:archived
+        label: Archived
+        transitions_to: []
   - id: workflow:local-agent-session
     label: Local agent session lifecycle
     related_nodes:

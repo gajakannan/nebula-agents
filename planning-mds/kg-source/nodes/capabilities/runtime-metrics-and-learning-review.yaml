@@ -1,0 +1,11 @@
+id: capability:runtime-metrics-and-learning-review
+label: Runtime metrics and learning review
+notes: Derives run health metrics and drafts review-gated correction proposals from failed-run evidence without mutating any target document.
+related_nodes:
+  - capability:evidence-artifact-index
+  - capability:deterministic-evidence-summaries
+  - entity:learning-proposal
+  - workflow:learning-proposal-review
+source_docs:
+  - F0003/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+  - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
