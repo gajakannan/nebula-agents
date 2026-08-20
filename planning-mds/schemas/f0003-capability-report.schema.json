@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-capability-report.schema.json",
+  "title": "F0003 Provider Capability Report",
+  "description": "Per-provider capability matrix consumed by the wrap launch guard (F0003-S0002).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "provider_key",
+    "provider_mode",
+    "report_generated_at",
+    "capabilities",
+    "launch_decision"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "provider_key": {"type": "string", "enum": ["codex", "claude"]},
+    "provider_mode": {
+      "type": "string",
+      "enum": ["tmux-native", "managed-exec", "managed-sdk", "unavailable"]
+    },
+    "report_generated_at": {"type": "string", "format": "date-time"},
+    "provider_cli_path": {"type": ["string", "null"], "maxLength": 4096},
+    "provider_version": {
+      "type": ["string", "null"],
+      "maxLength": 256,
+      "description": "Redacted before persistence; a secret-bearing version string is withheld."
+    },
+    "freshness_status": {"type": "string", "enum": ["fresh", "stale", "unknown"]},
+    "launch_decision": {
+      "type": "string",
+      "enum": ["allowed", "allowed_with_fallback", "blocked"],
+      "description": "Blocked whenever a required capability is not pass and has no explicit fallback."
+    },
+    "blocked_reason": {"type": ["string", "null"], "maxLength": 512},
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {"$ref": "#/$defs/capability"}
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_name", "capability_requirement", "probe_result"],
+      "properties": {
+        "capability_name": {
+          "type": "string",
+          "enum": [
+            "launch",
+            "attach",
+            "transcript",
+            "status_probe",
+            "approval_visibility",
+            "fallback"
+          ]
+        },
+        "capability_requirement": {
+          "type": "string",
+          "enum": ["required", "optional", "unsupported", "fallback"]
+        },
+        "probe_result": {"type": "string", "enum": ["pass", "fail", "timeout", "skipped"]},
+        "fallback_available": {"type": "boolean"},
+        "failure_reason": {"type": ["string", "null"], "maxLength": 512},
+        "probe_artifact_id": {
+          "type": ["string", "null"],
+          "description": "Artifact ID for detailed probe output; see f0003-artifact-index.schema.json."
+        },
+        "probe_duration_ms": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  }
+}

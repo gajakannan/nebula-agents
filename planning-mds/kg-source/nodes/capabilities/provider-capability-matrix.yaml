@@ -1,0 +1,11 @@
+id: capability:provider-capability-matrix
+label: Provider capability matrix
+notes: Probes local provider CLIs and gates wrapped launch on required capabilities, explicit fallbacks, and report freshness.
+related_nodes:
+  - capability:runtime-command-surface
+  - capability:native-session-preflight
+  - entity:provider-capability-report
+  - schema:f0003-capability-report
+source_docs:
+  - F0003/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+  - planning-mds/architecture/f0003-runtime-contract.md

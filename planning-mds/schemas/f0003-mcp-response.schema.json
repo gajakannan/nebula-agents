@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-mcp-response.schema.json",
+  "title": "F0003 MCP Response Envelope",
+  "description": "Envelope for the six read-only MCP tools (F0003-S0003). Payloads are bounded and paged; no tool returns raw artifact bytes (ADR-007).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "tool_name", "generated_at"],
+  "oneOf": [
+    {"required": ["data"], "not": {"required": ["error"]}},
+    {"required": ["error"], "not": {"required": ["data"]}}
+  ],
+  "properties": {
+    "contract_version": {"const": "1.1"},
+    "tool_name": {
+      "type": "string",
+      "enum": [
+        "nebula_session_list",
+        "nebula_session_status",
+        "nebula_gate_status",
+        "nebula_validator_status",
+        "nebula_evidence_list",
+        "nebula_evidence_show"
+      ],
+      "description": "Tool names are a public contract; renaming one breaks host configuration."
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "data": {"type": "object"},
+    "next_cursor": {
+      "type": ["string", "null"],
+      "maxLength": 256,
+      "description": "Present on list tools when more results remain."
+    },
+    "error": {"$ref": "#/$defs/error"}
+  },
+  "$defs": {
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "category"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "NOT_FOUND",
+            "FORBIDDEN",
+            "REDACTION_FAILED",
+            "RUNTIME_UNREADABLE",
+            "WORKSPACE_NOT_CONFIGURED",
+            "INVALID_INPUT"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "description": "User-safe. Never a stack trace, credential, or unredacted output."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "not_found",
+            "authorization",
+            "evidence_blocked",
+            "permission",
+            "setup_required",
+            "usage"
+          ]
+        },
+        "remediation": {"type": ["string", "null"], "maxLength": 1024},
+        "details": {"type": "array", "maxItems": 16, "items": {"type": "object"}}
+      }
+    }
+  }
+}

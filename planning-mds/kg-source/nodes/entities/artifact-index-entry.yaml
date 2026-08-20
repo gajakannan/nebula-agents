@@ -1,0 +1,11 @@
+id: entity:artifact-index-entry
+label: Artifact index entry
+notes: Stable handle for one evidence artifact; identity derives from the run-relative canonical path, while the content hash links duplicates and detects staleness.
+related_nodes:
+  - capability:evidence-artifact-index
+  - entity:artifact-summary
+  - schema:f0003-artifact-index
+  - workflow:evidence-indexing
+source_docs:
+  - F0003/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+  - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md

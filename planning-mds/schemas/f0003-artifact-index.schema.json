@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-artifact-index.schema.json",
+  "title": "F0003 Artifact Index",
+  "description": "Per-run evidence artifact index (F0003-S0004). A regenerable projection, not evidence; identity derives from run-relative path, never content (ADR-006).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "revision", "updated_at", "entries"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "entries": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "run_id",
+        "artifact_kind",
+        "source_path",
+        "created_at",
+        "redaction_status",
+        "retrieval_policy"
+      ],
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}/[a-z-]+/[0-9a-f]{12}$",
+          "description": "{run_id}/{artifact_kind}/{12 hex of SHA-256 over the run-relative canonical path}."
+        },
+        "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
+        "artifact_kind": {
+          "type": "string",
+          "enum": [
+            "transcript",
+            "command-log",
+            "validator-output",
+            "manifest",
+            "status",
+            "metric",
+            "learning-proposal"
+          ]
+        },
+        "source_path": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "summary_path": {"type": ["string", "null"], "maxLength": 4096},
+        "created_at": {"type": "string", "format": "date-time"},
+        "redaction_status": {"type": "string", "enum": ["Pass", "Fail", "Pending", "NotRequired"]},
+        "retrieval_policy": {
+          "type": "string",
+          "enum": ["LocalOnly", "SummaryOnly", "Blocked", "Missing"],
+          "description": "Forced to Blocked whenever redaction_status is Fail."
+        },
+        "content_hash": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Full SHA-256 of the bytes. Links duplicates and detects staleness; never identity."
+        },
+        "freshness_status": {"type": "string", "enum": ["fresh", "stale", "missing", "unknown"]},
+        "superseded_by": {
+          "type": ["string", "null"],
+          "description": "Set when an artifact moved within the run; the move is delete-plus-add."
+        },
+        "related_gate": {"type": ["string", "null"], "maxLength": 64},
+        "validator_name": {"type": ["string", "null"], "maxLength": 64},
+        "size_bytes": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  }
+}

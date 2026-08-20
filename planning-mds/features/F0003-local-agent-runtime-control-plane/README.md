@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane
 
-**Status:** Planned
+**Status:** Planned — Phase B architecture drafted 2026-08-19, pending operator approval
 **Priority:** High
 **Phase:** Platform Hardening
 
@@ -34,12 +34,27 @@ The feature does not replace native provider CLIs. It makes the surrounding Nebu
 
 ## Architecture Review
 
-**Phase B status:** Drafted
+**Phase B status:** Drafted 2026-08-19; operator approval outstanding. See [BLUEPRINT §5](../../BLUEPRINT.md) and the [runtime contract](../../architecture/f0003-runtime-contract.md).
 **Execution Plan:** Implement as a local-only runtime layer with explicit CLI and MCP contracts.
 
 ### Key Findings
 
 - Runtime state must be append-only or reconcilable from the actual local session state.
-- Status and evidence tools should be read-only by default so agents can inspect without mutating gates.
+- Status and evidence tools are read-only by default so agents can inspect without mutating gates.
 - Summaries are navigation aids, not authoritative evidence. Full local artifacts remain retrievable by stable ID.
 - Failure learning must produce proposed corrections for review, not automatic instruction edits.
+
+### Architecture Decisions
+
+| ADR | Decision | Status |
+|-----|----------|--------|
+| [ADR-005](../../architecture/decisions/ADR-005-f0003-control-plane-packaging.md) | Extend the existing local package; no daemon, port, or second distributable | Proposed |
+| [ADR-006](../../architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md) | Artifact identity from run-relative path, not content; content hash links duplicates | Proposed |
+| [ADR-007](../../architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md) | Dependency-free stdio MCP server; read-only enforced structurally by a query-only facade | Proposed |
+| [ADR-008](../../architecture/decisions/ADR-008-f0003-deterministic-summaries.md) | Rule-based deterministic summaries; no model call generates a summary | Proposed |
+| [ADR-009](../../architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md) | Learning proposals are inert, allowlisted, and append-only reviewed | Proposed |
+
+### Pilot Note
+
+Running F0003 through the `feature` action G0–G8 is the intended subject of F0007's live
+governed pilot (F0007-S0009), so this feature carries that dependency as well as its own.

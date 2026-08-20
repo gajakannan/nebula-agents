@@ -3,8 +3,8 @@
 ## Metadata
 
 - Project: Nebula Agents local runtime
-- Version: 1.0
-- Last Updated: 2026-07-13
+- Version: 1.1
+- Last Updated: 2026-08-19
 - Owners: Architect; Security co-signs authorization and transcript changes
 - Scope: F0001 local cockpit and the F0001 -> F0003 -> F0002 runtime line
 
@@ -17,7 +17,7 @@
 - The runtime MUST be one local process with Presentation, Application, Domain, and Infrastructure Adapter modules.
 - Dependencies MUST point inward. The domain MUST NOT import terminal, subprocess, filesystem, tmux, or provider libraries.
 - Provider, tmux, filesystem, watcher, clock, and OS identity behavior MUST sit behind ports owned by the Application layer.
-- F0001 MUST NOT add an HTTP daemon, remote transport, database, MCP server, or managed-provider SDK.
+- F0001 MUST NOT add an HTTP daemon, remote transport, database, MCP server, or managed-provider SDK. F0003 relaxes exactly one of these — a read-only stdio MCP adapter — under §12; the rest remain prohibited for the whole local runtime line.
 
 Rationale: a local modular process preserves the native terminal trust boundary while keeping adapters replaceable for F0002.
 
@@ -120,6 +120,23 @@ The tuple shape is compatible with a future Casbin adapter, but F0001 does not r
 - The narrow target is 80x24. Rendering MUST remain a pure projection and cannot authorize or persist directly.
 - Provider UI stays inside the attached tmux session; Nebula MUST NOT screen-scrape it to infer approval or lifecycle state.
 
+## 12. Control-Plane Extensions (F0003)
+
+**Scope:** Stack-Specific — the F0003 local runtime control plane.
+
+- F0003 MUST extend the existing local package rather than add a daemon, listening port, database, or second distributable.
+- F0003 MAY add exactly one transport: a read-only MCP adapter speaking stdio on a process the host spawns and terminates. Every other §1 prohibition still holds.
+- The MCP adapter MUST be constructed with a query-only application facade. Read-only MUST be structural, not a per-handler check; adding a mutating tool MUST require an ADR.
+- The application layer MUST expose a genuine query/command split so that facade is meaningful.
+- MCP tool names, CLI command names, and record shapes are public contracts. Additive evolution requires a new schema version and explicit dual-read support.
+- Evidence artifact identity MUST be stable across re-index and MUST NOT be derived from content, so that byte-identical artifacts keep distinct IDs. Content hashes MAY link duplicates and detect staleness.
+- Path containment for indexed artifacts MUST resolve symlinks before the ancestry check.
+- Summaries MUST be produced by deterministic rule-based extraction. A model call MUST NOT participate in generating a summary artifact. Extraction MAY collapse passing output to counts but MUST NOT drop a failure marker to satisfy a size bound; it MUST report `Partial` instead.
+- Redaction MUST complete before a summary is written. Failed redaction MUST block exposure through every surface.
+- Learning proposals MUST be inert: generation MUST NOT mutate any target document, targets MUST be allowlisted, decisions MUST be append-only and attributed, and rejection MUST persist until source evidence changes.
+
+Rationale: F0003 adds the observability surfaces F0001 deferred without acquiring the operational surface F0001 was scoped to avoid.
+
 ## Pattern Update Process
 
 1. Propose a change in an ADR or feature architecture review.
@@ -130,3 +147,4 @@ The tuple shape is compatible with a future Casbin adapter, but F0001 does not r
 ## Change Log
 
 - 2026-07-13: Initial project-specific pattern set for F0001 Phase B.
+- 2026-08-19: Added §12 for F0003 Phase B; narrowed the §1 MCP prohibition to admit the read-only stdio adapter.

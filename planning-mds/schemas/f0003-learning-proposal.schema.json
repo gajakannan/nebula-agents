@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-learning-proposal.schema.json",
+  "title": "F0003 Learning Proposal",
+  "description": "Inert draft correction from failed-run evidence (F0003-S0006). Generation never mutates a target document; targets are allowlisted and decisions are append-only (ADR-009).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "proposal_id",
+    "run_id",
+    "generated_at",
+    "source_artifact_ids",
+    "target_document",
+    "proposal_summary",
+    "proposal_status",
+    "decisions"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "proposal_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_artifact_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}/[a-z-]+/[0-9a-f]{12}$"
+      },
+      "description": "At least one; a proposal without evidence is refused at generation."
+    },
+    "source_content_hashes": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "description": "Pins the evidence a rejection was made against; a rejected proposal regenerates only when these change."
+    },
+    "target_document": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Must appear in the committed target allowlist; anything else is refused at generation."
+    },
+    "proposal_summary": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "proposal_status": {
+      "type": "string",
+      "enum": ["Draft", "Accepted", "Edited", "Rejected", "Archived"]
+    },
+    "confidence": {"type": ["string", "null"], "enum": ["Low", "Medium", "High", null]},
+    "patch_plan": {
+      "type": ["string", "null"],
+      "maxLength": 16384,
+      "description": "Approved change plan. Never applied by proposal generation."
+    },
+    "decisions": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"$ref": "#/$defs/decision"},
+      "description": "Append-only; entries are never rewritten."
+    }
+  },
+  "$defs": {
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decided_at", "decision", "reviewer_role"],
+      "properties": {
+        "decided_at": {"type": "string", "format": "date-time"},
+        "decision": {"type": "string", "enum": ["Accepted", "Edited", "Rejected", "Archived"]},
+        "reviewer_role": {
+          "type": "string",
+          "enum": ["architect", "security", "product-manager"],
+          "description": "Authorization follows the target document, not the proposal."
+        },
+        "reviewer": {"type": ["string", "null"], "maxLength": 128},
+        "decision_reason": {"type": ["string", "null"], "maxLength": 4096}
+      }
+    }
+  }
+}

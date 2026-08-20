@@ -24,3 +24,35 @@ adrs:
     related_nodes:
       - capability:redacted-transcript-recovery
       - workflow:transcript-capture
+  - id: adr:005-f0003-control-plane-packaging
+    label: F0003 control-plane packaging
+    path: planning-mds/architecture/decisions/ADR-005-f0003-control-plane-packaging.md
+    related_nodes:
+      - capability:runtime-command-surface
+      - capability:readonly-mcp-runtime-surface
+  - id: adr:006-f0003-artifact-identity-and-index
+    label: F0003 artifact identity and index
+    path: planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
+    related_nodes:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+      - workflow:evidence-indexing
+  - id: adr:007-f0003-readonly-mcp-surface
+    label: F0003 read-only MCP surface
+    path: planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
+    related_nodes:
+      - capability:readonly-mcp-runtime-surface
+      - schema:f0003-mcp-response
+  - id: adr:008-f0003-deterministic-summaries
+    label: F0003 deterministic summaries
+    path: planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+  - id: adr:009-f0003-review-gated-learning-proposals
+    label: F0003 review-gated learning proposals
+    path: planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+      - workflow:learning-proposal-review

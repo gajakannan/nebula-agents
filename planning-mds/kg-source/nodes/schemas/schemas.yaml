@@ -28,3 +28,32 @@ schemas:
     related_nodes:
       - capability:local-run-registry
       - entity:runtime-event
+  - id: schema:f0003-artifact-index
+    label: F0003 artifact index
+    path: planning-mds/schemas/f0003-artifact-index.schema.json
+    related_nodes:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+  - id: schema:f0003-artifact-summary
+    label: F0003 artifact summary
+    path: planning-mds/schemas/f0003-artifact-summary.schema.json
+    related_nodes:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+  - id: schema:f0003-capability-report
+    label: F0003 provider capability report
+    path: planning-mds/schemas/f0003-capability-report.schema.json
+    related_nodes:
+      - capability:provider-capability-matrix
+      - entity:provider-capability-report
+  - id: schema:f0003-learning-proposal
+    label: F0003 learning proposal
+    path: planning-mds/schemas/f0003-learning-proposal.schema.json
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+  - id: schema:f0003-mcp-response
+    label: F0003 MCP response envelope
+    path: planning-mds/schemas/f0003-mcp-response.schema.json
+    related_nodes:
+      - capability:readonly-mcp-runtime-surface

@@ -1,0 +1,12 @@
+id: capability:readonly-mcp-runtime-surface
+label: Read-only MCP runtime surface
+notes: Exposes session, gate, validator, and evidence status to MCP hosts over stdio through a query-only application facade.
+related_nodes:
+  - capability:read-only-run-queries
+  - capability:evidence-artifact-index
+  - capability:deterministic-evidence-summaries
+  - schema:f0003-mcp-response
+source_docs:
+  - F0003/F0003-S0003-mcp-status-and-evidence-tools.md
+  - planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
+  - planning-mds/architecture/f0003-runtime-contract.md

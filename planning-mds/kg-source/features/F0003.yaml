@@ -8,5 +8,85 @@ roadmap_section: Next
 roadmap_order: 1
 rationale: Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default.
 validation_gate: F0001 session registry and transcript model are accepted or available as implementation dependencies.
-coverage_excluded:
-  reason: Planned feature with no implementation to bind; canonical mappings are deferred until its architecture and code are activated.
+affects:
+  - capability:runtime-command-surface
+  - capability:provider-capability-matrix
+  - capability:readonly-mcp-runtime-surface
+  - capability:evidence-artifact-index
+  - capability:deterministic-evidence-summaries
+  - capability:runtime-metrics-and-learning-review
+  - entity:provider-capability-report
+  - entity:artifact-index-entry
+  - entity:artifact-summary
+  - entity:learning-proposal
+  - workflow:evidence-indexing
+  - workflow:learning-proposal-review
+depends_on:
+  - feature:F0001
+governed_by:
+  - adr:005-f0003-control-plane-packaging
+  - adr:006-f0003-artifact-identity-and-index
+  - adr:007-f0003-readonly-mcp-surface
+  - adr:008-f0003-deterministic-summaries
+  - adr:009-f0003-review-gated-learning-proposals
+uses_schema:
+  - schema:f0003-capability-report
+  - schema:f0003-artifact-index
+  - schema:f0003-artifact-summary
+  - schema:f0003-learning-proposal
+  - schema:f0003-mcp-response
+restricted_to_role:
+  - role:local-operator
+  - role:reviewer
+story_mappings:
+  - id: story:F0003-S0001
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+    affects:
+      - capability:runtime-command-surface
+      - entity:run-record
+    governed_by:
+      - adr:005-f0003-control-plane-packaging
+  - id: story:F0003-S0002
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+    affects:
+      - capability:provider-capability-matrix
+      - entity:provider-capability-report
+    uses_schema:
+      - schema:f0003-capability-report
+  - id: story:F0003-S0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+    affects:
+      - capability:readonly-mcp-runtime-surface
+    governed_by:
+      - adr:007-f0003-readonly-mcp-surface
+    uses_schema:
+      - schema:f0003-mcp-response
+  - id: story:F0003-S0004
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+    affects:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+      - workflow:evidence-indexing
+    governed_by:
+      - adr:006-f0003-artifact-identity-and-index
+    uses_schema:
+      - schema:f0003-artifact-index
+  - id: story:F0003-S0005
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+    affects:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+    governed_by:
+      - adr:008-f0003-deterministic-summaries
+    uses_schema:
+      - schema:f0003-artifact-summary
+  - id: story:F0003-S0006
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+    affects:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+      - workflow:learning-proposal-review
+    governed_by:
+      - adr:009-f0003-review-gated-learning-proposals
+    uses_schema:
+      - schema:f0003-learning-proposal

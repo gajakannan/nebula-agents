@@ -1,0 +1,10 @@
+id: entity:artifact-summary
+label: Artifact summary
+notes: Deterministic rule-extracted projection of one artifact that preserves every failure marker and always references the full local source.
+related_nodes:
+  - capability:deterministic-evidence-summaries
+  - entity:artifact-index-entry
+  - schema:f0003-artifact-summary
+source_docs:
+  - F0003/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+  - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md

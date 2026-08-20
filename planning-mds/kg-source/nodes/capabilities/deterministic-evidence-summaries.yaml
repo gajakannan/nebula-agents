@@ -1,0 +1,11 @@
+id: capability:deterministic-evidence-summaries
+label: Deterministic evidence summaries
+notes: Produces rule-extracted summaries of transcripts, command logs, validator output, and manifests without any model call.
+related_nodes:
+  - capability:evidence-artifact-index
+  - capability:redacted-transcript-recovery
+  - entity:artifact-summary
+  - schema:f0003-artifact-summary
+source_docs:
+  - F0003/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+  - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md

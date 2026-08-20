@@ -1,0 +1,12 @@
+id: capability:runtime-command-surface
+label: Runtime command surface
+notes: Single local command entry point for preflight, wrapped launch, session listing, status, validators, evidence, and attach guidance.
+related_nodes:
+  - capability:local-run-registry
+  - capability:provider-capability-matrix
+  - capability:evidence-artifact-index
+  - entity:run-record
+source_docs:
+  - F0003/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+  - planning-mds/architecture/decisions/ADR-005-f0003-control-plane-packaging.md
+  - planning-mds/architecture/f0003-runtime-contract.md

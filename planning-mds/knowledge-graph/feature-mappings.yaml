@@ -8,10 +8,6 @@ coverage:
       path: planning-mds/features/F0002-managed-agent-orchestration
       reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
         architecture and code are activated.
-    - id: feature:F0003
-      path: planning-mds/features/F0003-local-agent-runtime-control-plane
-      reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
-        architecture and code are activated.
     - id: feature:F0004
       path: planning-mds/features/F0004-reflective-learning-loop
       reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
@@ -62,6 +58,39 @@ features:
       - schema:f0001-preflight-result
       - schema:f0001-run-record
       - schema:f0001-runtime-event
+  - status: planned
+    id: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane
+    affects:
+      - capability:deterministic-evidence-summaries
+      - capability:evidence-artifact-index
+      - capability:provider-capability-matrix
+      - capability:readonly-mcp-runtime-surface
+      - capability:runtime-command-surface
+      - capability:runtime-metrics-and-learning-review
+      - entity:artifact-index-entry
+      - entity:artifact-summary
+      - entity:learning-proposal
+      - entity:provider-capability-report
+      - workflow:evidence-indexing
+      - workflow:learning-proposal-review
+    depends_on:
+      - feature:F0001
+    governed_by:
+      - adr:005-f0003-control-plane-packaging
+      - adr:006-f0003-artifact-identity-and-index
+      - adr:007-f0003-readonly-mcp-surface
+      - adr:008-f0003-deterministic-summaries
+      - adr:009-f0003-review-gated-learning-proposals
+    restricted_to_role:
+      - role:local-operator
+      - role:reviewer
+    uses_schema:
+      - schema:f0003-artifact-index
+      - schema:f0003-artifact-summary
+      - schema:f0003-capability-report
+      - schema:f0003-learning-proposal
+      - schema:f0003-mcp-response
   - status: archived-done
     id: feature:F0006
     path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration
@@ -141,6 +170,63 @@ stories:
       - adr:002-f0001-runtime-persistence
     uses_schema:
       - schema:f0001-run-record
+  - id: story:F0003-S0001
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+    affects:
+      - capability:runtime-command-surface
+      - entity:run-record
+    governed_by:
+      - adr:005-f0003-control-plane-packaging
+  - id: story:F0003-S0002
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+    affects:
+      - capability:provider-capability-matrix
+      - entity:provider-capability-report
+    uses_schema:
+      - schema:f0003-capability-report
+  - id: story:F0003-S0003
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+    affects:
+      - capability:readonly-mcp-runtime-surface
+    governed_by:
+      - adr:007-f0003-readonly-mcp-surface
+    uses_schema:
+      - schema:f0003-mcp-response
+  - id: story:F0003-S0004
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+    affects:
+      - capability:evidence-artifact-index
+      - entity:artifact-index-entry
+      - workflow:evidence-indexing
+    governed_by:
+      - adr:006-f0003-artifact-identity-and-index
+    uses_schema:
+      - schema:f0003-artifact-index
+  - id: story:F0003-S0005
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+    affects:
+      - capability:deterministic-evidence-summaries
+      - entity:artifact-summary
+    governed_by:
+      - adr:008-f0003-deterministic-summaries
+    uses_schema:
+      - schema:f0003-artifact-summary
+  - id: story:F0003-S0006
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+    affects:
+      - capability:runtime-metrics-and-learning-review
+      - entity:learning-proposal
+      - workflow:learning-proposal-review
+    governed_by:
+      - adr:009-f0003-review-gated-learning-proposals
+    uses_schema:
+      - schema:f0003-learning-proposal
   - id: story:F0006-S0001
     feature: feature:F0006
     path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
