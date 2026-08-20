@@ -1,0 +1,29 @@
+{
+  "action": "plan-review",
+  "contract_version": "2026-07-11",
+  "run_id": "2026-08-19-ec0a97ce",
+  "schema_version": 1,
+  "stages": {
+    "PR0": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR1": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR2": {
+      "attestations": [],
+      "completed_operations": [
+        "pr2-validate-stories",
+        "pr2-validate-trackers"
+      ],
+      "pending_checkpoint": null,
+      "status": "failed"
+    }
+  }
+}
