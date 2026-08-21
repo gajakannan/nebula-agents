@@ -195,3 +195,57 @@ def test_write_latest_run_resolves_under_feature_index_root(env):
     (index_root / "latest-run.json").write_text("{}")
     verdict = run(product, rf, "G5")
     assert verdict["status"] == "pass"
+
+
+# ── feature-slug resolution (regression: a missing slug used to build ".../F####-None") ──
+def _args(slug):
+    import argparse
+    return argparse.Namespace(feature_slug=slug)
+
+
+def test_slug_prefers_explicit_flag_over_manifest(tmp_path):
+    (tmp_path / "evidence-manifest.json").write_text(json.dumps({"feature_slug": "from-manifest"}))
+    assert rg._resolve_feature_slug(_args("from-flag"), tmp_path) == "from-flag"
+
+
+def test_slug_falls_back_to_run_manifest(tmp_path):
+    # init-run.py records feature_slug in the run folder the driver already resolved,
+    # so the caller should not have to re-supply it.
+    (tmp_path / "evidence-manifest.json").write_text(json.dumps({"feature_slug": "from-manifest"}))
+    assert rg._resolve_feature_slug(_args(None), tmp_path) == "from-manifest"
+
+
+@pytest.mark.parametrize("payload", ["{ not json", json.dumps({"feature_slug": None}),
+                                     json.dumps({})])
+def test_slug_unresolvable_returns_none(tmp_path, payload):
+    (tmp_path / "evidence-manifest.json").write_text(payload)
+    assert rg._resolve_feature_slug(_args(None), tmp_path) is None
+
+
+def test_slug_missing_manifest_returns_none(tmp_path):
+    assert rg._resolve_feature_slug(_args(None), tmp_path) is None
+
+
+def test_feature_paths_omitted_when_slug_unresolved(tmp_path):
+    """Omitted, not interpolated: _expand() then fails closed on {FEATURE_PATH} instead
+    of silently building a path containing the literal string 'None'."""
+    resolved = rg.build_variables(product_root=tmp_path, feature_id="F0003", slug="slug",
+                                  run_id=RUN_ID, run_folder=tmp_path, stage="PR2")
+    assert "F0003-slug" in resolved["FEATURE_PATH"]
+
+    unresolved = rg.build_variables(product_root=tmp_path, feature_id="F0003", slug=None,
+                                    run_id=RUN_ID, run_folder=tmp_path, stage="PR2")
+    assert "FEATURE_PATH" not in unresolved
+    assert "FEATURE_INDEX_ROOT" not in unresolved
+    assert not any("None" in str(v) for v in unresolved.values())
+
+
+def test_unresolved_slug_raises_rather_than_running_a_none_path(env):
+    """The end-to-end shape of the original defect: PR2-style stage with {FEATURE_PATH}."""
+    import gate_runtime as gr
+    product, run_folder = env
+    variables = rg.build_variables(product_root=product, feature_id="F0003", slug=None,
+                                   run_id=RUN_ID, run_folder=run_folder, stage="PR2")
+    with pytest.raises(gr.GateRuntimeError) as exc:
+        gr._expand("{FEATURE_PATH}", variables)
+    assert exc.value.code == "unresolved_placeholder"
