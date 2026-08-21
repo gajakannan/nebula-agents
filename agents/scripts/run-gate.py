@@ -160,18 +160,25 @@ def _verify_attested(stage_state: dict[str, Any], checkpoint_id: str, run_folder
 # --------------------------------------------------------------------------- #
 def build_variables(*, product_root: Path, feature_id: str, slug: str, run_id: str,
                     run_folder: Path, stage: str) -> dict[str, str]:
-    index_root = product_root / "planning-mds" / "operations" / "evidence" / "features" / f"{feature_id}-{slug}"
-    return {
+    variables = {
         "PRODUCT_ROOT": str(product_root),
         "FEATURE_ID": feature_id,
-        "FEATURE_SLUG": slug,
         "RUN_ID": run_id,
         "RUN_FOLDER": str(run_folder),
-        "FEATURE_INDEX_ROOT": str(index_root),
-        "FEATURE_PATH": str(product_root / "planning-mds" / "features" / f"{feature_id}-{slug}"),
         "start_tier": "1",
         "stage": stage,
     }
+    # Feature-scoped paths only exist once the slug resolves. Omitting them rather than
+    # interpolating a falsy slug makes _expand() raise unresolved_placeholder for an
+    # action that needs them, instead of silently building ".../F0003-None" and failing
+    # later as a confusing validator error. Base-run-only actions never reference them.
+    if slug:
+        variables["FEATURE_SLUG"] = slug
+        variables["FEATURE_INDEX_ROOT"] = str(
+            product_root / "planning-mds" / "operations" / "evidence" / "features" / f"{feature_id}-{slug}")
+        variables["FEATURE_PATH"] = str(
+            product_root / "planning-mds" / "features" / f"{feature_id}-{slug}")
+    return variables
 
 
 def check_constraints(gate: dict[str, Any], argv: list[str], stage: str) -> None:
@@ -353,6 +360,12 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
 
             elif kind == "write":
                 artifact = body.get("artifact")
+                if artifact == "latest-run.json" and "FEATURE_INDEX_ROOT" not in variables:
+                    raise GateDriverError(
+                        "unresolved_feature_slug",
+                        f"{stage} writes latest-run.json under the feature index, but the "
+                        "feature slug did not resolve; pass --feature-slug or run in a run "
+                        "folder whose evidence-manifest.json records feature_slug")
                 artifact_path = (
                     Path(variables["FEATURE_INDEX_ROOT"]) / artifact
                     if artifact == "latest-run.json"
@@ -410,6 +423,23 @@ def _resolve_run_folder(args, product_root: Path) -> Path:
             / "runs" / args.run_id).resolve()
 
 
+def _resolve_feature_slug(args, run_folder: Path) -> str | None:
+    """Explicit --feature-slug, else the slug init-run.py recorded in the run manifest.
+
+    The manifest already sits in the run folder the driver resolved, so requiring the
+    caller to re-supply a value the run itself knows is needless ceremony — and omitting
+    it used to interpolate the literal string "None" into feature paths.
+    """
+    if args.feature_slug:
+        return args.feature_slug
+    manifest = run_folder / "evidence-manifest.json"
+    try:
+        recorded = (json.loads(manifest.read_text(encoding="utf-8")) or {}).get("feature_slug")
+    except (OSError, ValueError):
+        return None
+    return recorded or None
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     add_product_root_arg(parser)
@@ -450,7 +480,8 @@ def main(argv: list[str] | None = None) -> int:
 
         verdict = run_stage(
             spec_dir=args.spec_dir, action=args.action, stage=args.stage,
-            product_root=product_root, feature_id=args.feature, slug=args.feature_slug,
+            product_root=product_root, feature_id=args.feature,
+            slug=_resolve_feature_slug(args, run_folder),
             run_id=args.run_id, run_folder=run_folder, dry_run=args.dry_run,
             from_op=args.from_op, force=args.force)
     except GateDriverError as exc:

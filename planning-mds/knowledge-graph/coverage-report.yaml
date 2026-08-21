@@ -81,7 +81,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-20'
-      source_hash: 9f8628b287bf1188
+      source_hash: 7261cf4834f9d241
     entity:provider-capability-report:
       source_paths:
       - planning-mds/architecture/f0003-runtime-contract.md
@@ -122,7 +122,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-20'
-      source_hash: 9f8628b287bf1188
+      source_hash: 7261cf4834f9d241
     workflow:local-agent-session:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
@@ -141,7 +141,7 @@ freshness:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
       source_count: 3
-      last_modified: '2026-08-17'
+      last_modified: '2026-08-19'
       source_hash: 4b72a3326240a6c3
       hotspot_rank: 1
       hotspot_score: 1.0
@@ -182,7 +182,7 @@ freshness:
       last_modified: '2026-07-16'
       source_hash: b7c7bd47f37c992c
       hotspot_rank: 3
-      hotspot_score: 0.03
+      hotspot_score: 0.02
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -212,7 +212,7 @@ freshness:
       last_modified: '2026-08-17'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.04
+      hotspot_score: 0.03
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -223,7 +223,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
       last_modified: '2026-08-20'
-      source_hash: 2dce885df92aa915
+      source_hash: 4635c69e506ceafb
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -250,7 +250,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-20'
-      source_hash: 9f8628b287bf1188
+      source_hash: 7261cf4834f9d241
     capability:tmux-session-lifecycle:
       source_paths:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
@@ -259,7 +259,7 @@ freshness:
       last_modified: '2026-08-18'
       source_hash: 7468b5a43ad41e36
       hotspot_rank: 4
-      hotspot_score: 0.02
+      hotspot_score: 0.01
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -340,7 +340,7 @@ freshness:
       - planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
       source_count: 1
       last_modified: '2026-08-20'
-      source_hash: 8a1662018bba9f9a
+      source_hash: 7829e6d51be76213
     adr:008-f0003-deterministic-summaries:
       source_paths:
       - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
@@ -352,7 +352,7 @@ freshness:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
       source_count: 1
       last_modified: '2026-08-20'
-      source_hash: d884a3844e291388
+      source_hash: 3180e4069053ff97
     schema:f0001-launch-descriptor:
       source_paths:
       - planning-mds/schemas/f0001-launch-descriptor.schema.json
@@ -443,8 +443,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
       source_count: 10
-      last_modified: '2026-07-06'
-      source_hash: 2bc6d34f0eecfe0c
+      last_modified: '2026-08-20'
+      source_hash: 8cb1194d9d9cdd96
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
