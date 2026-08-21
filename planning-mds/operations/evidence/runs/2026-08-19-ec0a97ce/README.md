@@ -1,5 +1,10 @@
 # Plan Review Run 2026-08-19-ec0a97ce
 
+> **SUPERSEDED 2026-08-21.** This run halted at PR2 and never produced a gate verdict.
+> Its findings were acted on (C1, C2, H1, H2, H3, H4, M2 resolved via PRs #66 and #68),
+> and a re-run supersedes it. Retained as the audit trail for how those findings were
+> found. Manifest status: `superseded`.
+
 **Action:** `plan-review` · **Target:** F0003 Local Agent Runtime Control Plane
 **Scope:** `read-only-audit` · **Contract:** `2026-07-11`
 

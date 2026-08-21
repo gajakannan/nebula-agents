@@ -2,15 +2,15 @@
   "schema_version": 1,
   "feature_id": "F0003",
   "feature_slug": "local-agent-runtime-control-plane",
-  "run_id": "2026-08-19-ec0a97ce",
-  "status": "superseded",
-  "recorded_on": "2026-08-19",
+  "run_id": "2026-08-20-45b7ccd8",
+  "status": "draft",
+  "recorded_on": "2026-08-20",
   "contract_version": "2026-07-11",
   "contract_effective_date": "2026-07-11",
   "feature_path_at_run_start": "planning-mds/features/F0003-local-agent-runtime-control-plane",
   "feature_path_at_closeout": null,
   "feature_state": "In Progress",
-  "rerun_of": null,
+  "rerun_of": "2026-08-19-ec0a97ce",
   "changed_paths": [
     "planning-mds/features/F0003-local-agent-runtime-control-plane"
   ],
@@ -64,13 +64,7 @@
     "sast": {},
     "dast": {}
   },
-  "omissions": [
-    {
-      "item": "PR3 and PR4 never executed",
-      "reason": "Run halted at PR2 under the spec stop condition when pr2-kg-validate failed on H4 (stale coverage-report.yaml). The verdict NOT READY was determinable from PR1 findings and is recorded, but no readiness gate produced it.",
-      "disposition": "Superseded by a re-run after C1, C2, H1, H2, H3, H4 and M2 were resolved."
-    }
-  ],
+  "omissions": [],
   "waivers": {},
   "global_evidence_refs": {},
   "run_scope": "read-only-audit"
