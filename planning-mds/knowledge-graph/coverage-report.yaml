@@ -142,7 +142,7 @@ freshness:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
       source_count: 3
-      last_modified: '2026-08-19'
+      last_modified: '2026-08-20'
       source_hash: 4b72a3326240a6c3
       hotspot_rank: 1
       hotspot_score: 1.0
