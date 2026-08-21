@@ -1,8 +1,8 @@
 version: 0
 summary:
-  canonical_nodes: 72
+  canonical_nodes: 73
   features_mapped: 3
-  stories_mapped: 21
+  stories_mapped: 22
   features_excluded: 5
   features_uncovered: 0
   code_bindings: 7
@@ -50,6 +50,7 @@ coverage:
   - story:F0003-S0004
   - story:F0003-S0005
   - story:F0003-S0006
+  - story:F0003-S0007
   - story:F0006-S0001
   - story:F0006-S0002
   - story:F0006-S0003
@@ -88,7 +89,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
       last_modified: '2026-08-21'
-      source_hash: 9f3ba6eb796cafaf
+      source_hash: f0b1ff487270588c
     entity:run-record:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -204,7 +205,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
       last_modified: '2026-08-21'
-      source_hash: 9f3ba6eb796cafaf
+      source_hash: f0b1ff487270588c
     capability:read-only-run-queries:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
@@ -223,7 +224,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
       last_modified: '2026-08-21'
-      source_hash: fb70a2e7ca50cc27
+      source_hash: 98bbe1a67321adfc
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -243,7 +244,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
       last_modified: '2026-08-21'
-      source_hash: 3c2a3b75c325cf77
+      source_hash: 721b103743d88da0
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
@@ -413,6 +414,12 @@ freshness:
       source_count: 1
       last_modified: '2026-08-20'
       source_hash: e271745daca0dfc8
+    schema:f0003-metric-snapshot:
+      source_paths:
+      - planning-mds/schemas/f0003-metric-snapshot.schema.json
+      source_count: 1
+      last_modified: '2026-08-21'
+      source_hash: 1c3fe744065fb6a4
   mappings:
     feature:F0001:
       source_paths:
@@ -438,13 +445,14 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/GETTING-STARTED.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/PRD.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
-      source_count: 10
+      source_count: 11
       last_modified: '2026-08-21'
-      source_hash: 9e042da1d69ef955
+      source_hash: c7b0b7bf5e74dad2
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -541,6 +549,12 @@ freshness:
       source_count: 1
       last_modified: '2026-08-21'
       source_hash: 17a1f60ea2d4e2d9
+    story:F0003-S0007:
+      source_paths:
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+      source_count: 1
+      last_modified: '2026-08-21'
+      source_hash: c32ae9c6e0232d32
     story:F0006-S0001:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -689,8 +703,8 @@ freshness:
       - scripts/kg/tests/test_tracker_merge.py
       - scripts/kg/tests/test_workstate_digest.py
       source_count: 90
-      last_modified: '2026-08-20'
-      source_hash: 633c2923cf4c46b6
+      last_modified: '2026-08-21'
+      source_hash: 655fa9b45e985ad3
     capability:evidence-and-gate-control:
       source_paths:
       - engine/src/nebula_agents/application/gates.py

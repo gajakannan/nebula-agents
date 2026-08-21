@@ -98,7 +98,7 @@ F0003 reuses the F0001 classes without addition. Mappings specific to F0003:
 | 3 | Preflight blocked | Required provider capability failed with no fallback |
 | 4 | Not found | Unknown run, artifact, or proposal |
 | 5 | Forbidden | Reviewer attempted `wrap`; proposal target outside the allowlist |
-| 6 | Conflict | Duplicate run ID; artifact-ID digest collision within run and kind |
+| 6 | Conflict | Duplicate run ID; artifact-ID digest collision within run, kind, and root |
 | 7 | Gate blocked | Proposal generation blocked on stale or missing evidence |
 | 9 | State I/O | Artifact index write failure; unreadable runtime directory |
 | 10 | Timeout | Provider probe exceeded its configured timeout |
@@ -139,7 +139,7 @@ F0003 adds five record types alongside F0001's `RunRecord`, `RuntimeEvent`, and
 | `ProviderCapabilityReport` | `providers doctor` | Atomic JSON per provider, with `report_generated_at` for freshness |
 | `ArtifactIndexEntry` | `evidence index` | Atomic JSON index per run (ADR-006) |
 | `ArtifactSummary` | `evidence summarize` | One summary artifact per source artifact (ADR-008) |
-| `RuntimeMetricSnapshot` | `metrics` | Derived; recomputable from run state and index |
+| `RuntimeMetricSnapshot` | `metrics` | Derived; recomputable from run state and index, with `derived_from` pinning the revisions used |
 | `LearningProposal` | `learn review` | Proposal artifact plus append-only decision records (ADR-009) |
 
 All five are filesystem/CLI contracts rather than HTTP resources. Metrics are derived, not
@@ -165,6 +165,7 @@ authoritative: they must be recomputable from runtime state and the artifact ind
 - Artifact index: `planning-mds/schemas/f0003-artifact-index.schema.json`
 - Artifact summary: `planning-mds/schemas/f0003-artifact-summary.schema.json`
 - Learning proposal: `planning-mds/schemas/f0003-learning-proposal.schema.json`
+- Runtime metric snapshot: `planning-mds/schemas/f0003-metric-snapshot.schema.json`
 - MCP response envelope: `planning-mds/schemas/f0003-mcp-response.schema.json`
 
 ## 9. Compatibility

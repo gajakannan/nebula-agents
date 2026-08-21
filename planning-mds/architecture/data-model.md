@@ -188,4 +188,5 @@ The artifact index follows the same commit discipline as `run.json`: per-run loc
 - `planning-mds/schemas/f0003-artifact-index.schema.json`
 - `planning-mds/schemas/f0003-artifact-summary.schema.json`
 - `planning-mds/schemas/f0003-learning-proposal.schema.json`
+- `planning-mds/schemas/f0003-metric-snapshot.schema.json`
 - `planning-mds/schemas/f0003-mcp-response.schema.json`

@@ -397,6 +397,11 @@ schemas:
     path: planning-mds/schemas/f0003-mcp-response.schema.json
     related_nodes:
       - capability:readonly-mcp-runtime-surface
+  - id: schema:f0003-metric-snapshot
+    label: F0003 runtime metric snapshot
+    path: planning-mds/schemas/f0003-metric-snapshot.schema.json
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
 workflows:
   - id: workflow:evidence-indexing
     label: Evidence indexing and summarization lifecycle

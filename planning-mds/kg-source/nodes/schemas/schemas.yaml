@@ -52,6 +52,11 @@ schemas:
     related_nodes:
       - capability:runtime-metrics-and-learning-review
       - entity:learning-proposal
+  - id: schema:f0003-metric-snapshot
+    label: F0003 runtime metric snapshot
+    path: planning-mds/schemas/f0003-metric-snapshot.schema.json
+    related_nodes:
+      - capability:runtime-metrics-and-learning-review
   - id: schema:f0003-mcp-response
     label: F0003 MCP response envelope
     path: planning-mds/schemas/f0003-mcp-response.schema.json

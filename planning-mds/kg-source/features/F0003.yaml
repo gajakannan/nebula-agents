@@ -30,6 +30,7 @@ governed_by:
   - adr:008-f0003-deterministic-summaries
   - adr:009-f0003-review-gated-learning-proposals
 uses_schema:
+  - schema:f0003-metric-snapshot
   - schema:f0003-capability-report
   - schema:f0003-artifact-index
   - schema:f0003-artifact-summary
@@ -90,3 +91,10 @@ story_mappings:
       - adr:009-f0003-review-gated-learning-proposals
     uses_schema:
       - schema:f0003-learning-proposal
+      - schema:f0003-metric-snapshot
+  - id: story:F0003-S0007
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+    affects:
+      - capability:readonly-mcp-runtime-surface
+    governed_by:
+      - adr:007-f0003-readonly-mcp-surface

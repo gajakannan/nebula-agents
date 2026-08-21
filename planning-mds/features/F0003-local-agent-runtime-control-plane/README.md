@@ -28,9 +28,10 @@ The feature does not replace native provider CLIs. It makes the surrounding Nebu
 | [F0003-S0004](./F0003-S0004-evidence-artifact-store-and-retrieval-index.md) | Evidence artifact store and retrieval index | Not Started |
 | [F0003-S0005](./F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) | Deterministic transcript, log, and validator summaries | Not Started |
 | [F0003-S0006](./F0003-S0006-runtime-metrics-and-failure-learning-review.md) | Runtime metrics and failure-learning review | Not Started |
+| [F0003-S0007](./F0003-S0007-application-query-command-split.md) | Application query/command service split | Not Started |
 
-**Total Stories:** 6
-**Completed:** 0 / 6
+**Total Stories:** 7
+**Completed:** 0 / 7
 
 ## Architecture Review
 
