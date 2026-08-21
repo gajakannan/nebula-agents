@@ -117,7 +117,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: MCP tool configuration, runtime status view.
+- Command surfaces involved: `mcp serve` plus host-side MCP configuration; `status` covers the same state from the CLI.
 - Key interactions: Query session list, inspect status, inspect evidence summary.
 
 ## Questions & Assumptions

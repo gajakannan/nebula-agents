@@ -42,9 +42,9 @@ Once runtime status, evidence, and summaries exist, Nebula can compute useful lo
 | Surface / Entry Point | User Action | Editable State | Save / Mutation Result | Reload / Persistence Evidence | Roles / Status Constraints |
 |-----------------------|-------------|----------------|-------------------------|-------------------------------|----------------------------|
 | CLI `metrics` | Inspect run metrics | No editable state | None | Reads runtime records and summaries | Local Operator, Reviewer |
-| Metrics View | Inspect runtime health | No editable state | None | Reads latest metrics snapshot | Local Operator, Reviewer |
+| CLI `metrics --run <run_id>` | Inspect runtime health | No editable state | None | Recomputed from runtime records and the artifact index | Local Operator, Reviewer |
 | CLI `learn review` | Generate proposals | Run ID and optional scope | Writes proposal artifacts in draft state | Learning review shows proposals after restart | Local Operator, Architect |
-| Learning Review | Accept, edit, reject, archive | Proposal review fields | Writes proposal decision and optional approved patch plan | Decisions are append-only and linked to evidence IDs | Architect, Security Reviewer when security docs are targeted |
+| CLI `learn decide <proposal-id>` | Accept, edit, reject, archive | Decision, reason, optional patch plan | Appends a decision record and sets `proposal_status`; never opens the target document | Decisions are append-only and linked to evidence IDs | Authorized by `DecideProposal` against the target document: Architect for architecture/process, Security Reviewer for security guidance, PM for planning process |
 
 Required checks for mutation stories:
 - [ ] Metrics are derived from runtime records, not free-form prose.
@@ -122,7 +122,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: Metrics view, learning review.
+- Command surfaces involved: `metrics`, `learn review`, `learn list`, `learn show`, `learn decide`.
 - Key interactions: Inspect metrics, generate proposals, accept/edit/reject/archive proposals.
 
 ## Questions & Assumptions

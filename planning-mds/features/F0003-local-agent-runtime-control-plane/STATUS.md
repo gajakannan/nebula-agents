@@ -27,8 +27,8 @@ operator approves; approval is recorded in BLUEPRINT §5.9 and flips them to `Ac
 | ID | Severity | Finding | State |
 |----|----------|---------|-------|
 | C1 | Critical | Artifact-identity base directory ambiguous across S0004's three approved roots | **Resolved 2026-08-21** — ADR-006 revised to root-scoped identity with a `root_key` discriminator and longest-match root selection; propagated to 3 schemas, the runtime contract, data-model, and BLUEPRINT §5.2 |
-| C2 | Critical | Operator surfaces undefined — five PRD screens and the proposal-decision surface | **Open** — needs a scope decision: F0003, F0008, or CLI-only with the PRD screen table revised |
-| H1 | High | No authorization action for proposal decisions; `RunValidator` overloaded | Open |
+| C2 | Critical | Operator surfaces undefined — five PRD screens and the proposal-decision surface | **Resolved 2026-08-21** — operator chose **CLI-only**. PRD screen table replaced by a command-surface table; `learn decide` defined as the proposal-decision command; terminal UI deferred to F0008 |
+| H1 | High | No authorization action for proposal decisions; `RunValidator` overloaded | **Resolved 2026-08-21** — added `IndexEvidence`, `DraftProposal`, `DecideProposal`; `RunValidator` returned to its F0001 meaning (the `validate` command alone) |
 | H2 | High | `RuntimeMetricSnapshot` declared as a record with no schema | Open |
 | H3 | High | Query/command split is an unscoped refactor of F0001 code that no story owns | Open |
 | H4 | High | `coverage-report.yaml` committed stale in PR #64 | **Resolved** — regenerated |
@@ -36,8 +36,11 @@ operator approves; approval is recorded in BLUEPRINT §5.9 and flips them to `Ac
 | M2 | Medium | ADR-006 deferred digest length to G0 while the schema pinned 12 hex | **Resolved 2026-08-21** — 12 fixed in the ADR; the contradictory follow-up removed |
 | L1 | Low | S0001 open question answered by ADR-005 but not reconciled in the story | Open |
 
-C2 remains blocking. Re-run `plan-review` once the open findings are addressed; the PR4
-readiness gate never executed in the original run (it halted at PR2 on H4).
+No critical findings remain. H2, H3, M1, and L1 are open and non-blocking under the
+`review-family` profile (critical = 0 + high > 0 → CONDITIONALLY READY). Re-run
+`plan-review` before the Phase B approval so the verdict rests on gate evidence rather
+than on this table. The PR4 readiness gate never executed in the original run — it
+halted at PR2 on H4 — so no gate verdict has yet been recorded.
 
 ## Story Checklist
 
