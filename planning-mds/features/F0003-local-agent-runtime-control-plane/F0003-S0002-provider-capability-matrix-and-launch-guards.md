@@ -40,7 +40,7 @@ The runtime control plane should not assume every provider CLI exposes the same 
 | Surface / Entry Point | User Action | Editable State | Save / Mutation Result | Reload / Persistence Evidence | Roles / Status Constraints |
 |-----------------------|-------------|----------------|-------------------------|-------------------------------|----------------------------|
 | CLI `providers doctor` | Probe one or more providers | Provider selection | Writes capability report | `wrap` reads latest report and freshness timestamp | Local Operator, Reviewer |
-| Capability Matrix View | Inspect readiness | No editable state | None | Reads persisted reports | Local Operator, Reviewer, Architect |
+| CLI `providers doctor --format table` | Inspect readiness | No editable state | None | Reads persisted reports | Local Operator, Reviewer, Architect |
 | CLI `wrap` | Attempt launch | Provider and mode | Blocks or allows launch based on report | Blocked launch writes sanitized audit entry | Local Operator only |
 
 Required checks for mutation stories:
@@ -113,7 +113,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: Capability matrix, runtime home, blocked launch panel.
+- Command surfaces involved: `providers doctor` for the readiness matrix; `wrap` reports the blocked-launch reason and remediation inline.
 - Key interactions: Run probe, inspect missing capabilities, follow fallback guidance.
 
 ## Questions & Assumptions

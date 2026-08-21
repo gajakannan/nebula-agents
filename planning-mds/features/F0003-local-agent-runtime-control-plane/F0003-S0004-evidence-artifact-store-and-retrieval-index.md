@@ -116,7 +116,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: Evidence browser, session detail, validator output.
+- Command surfaces involved: `evidence index`, `evidence list`, `evidence show`.
 - Key interactions: List artifacts, inspect summary, copy local retrieval path.
 
 ## Questions & Assumptions

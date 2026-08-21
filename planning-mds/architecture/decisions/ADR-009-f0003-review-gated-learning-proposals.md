@@ -32,10 +32,19 @@ but it also must not create a path F0004 has to undo.
 ## Decision
 
 **Proposals are inert.** `learn review` writes proposal artifacts in `Draft` and changes
-no other file. Generation and application are separate operations with separate
-authorization; there is no flag on `learn review` that applies a proposal. Applying an
-accepted proposal is a distinct, explicitly invoked action that takes a decided proposal
-as input.
+no other file. Generation, decision, and application are three separate operations with
+three separate authorizations; no flag on `learn review` decides or applies.
+
+- `learn review` drafts — authorized by `DraftProposal`.
+- `learn decide <proposal-id> --decision accept|edit|reject|archive` records the outcome —
+  authorized by `DecideProposal`, evaluated against the target document. It appends a
+  decision record and never opens the target.
+- Applying an accepted proposal is a distinct, explicitly invoked action that takes a
+  decided proposal as input, and remains outside F0003's automated scope.
+
+Splitting `DraftProposal` from `DecideProposal` matters: drafting is safe to run
+automatically, deciding is not, and a single capability covering both would let an
+automated caller approve its own proposals.
 
 **Targets are allowlisted.** A proposal names a `target_document` that must appear in a
 committed allowlist of framework and product instruction paths. A proposal targeting

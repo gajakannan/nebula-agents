@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nebula-agents.local/schemas/f0003-metric-snapshot.schema.json",
+  "title": "F0003 Runtime Metric Snapshot",
+  "description": "Derived run-health view (F0003-S0006). Never authoritative: every metric must be recomputable from runtime state and the artifact index, and `derived_from` pins the inputs it was computed against so a reader can verify that.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "metric_generated_at", "derived_from", "metrics"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
+    "metric_generated_at": {"type": "string", "format": "date-time"},
+    "derived_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_revision", "artifact_index_revision"],
+      "description": "Inputs this snapshot was computed from. Recomputing against the same revisions must reproduce the same values; differing revisions mean the snapshot is superseded, not wrong.",
+      "properties": {
+        "run_revision": {"type": "integer", "minimum": 1},
+        "artifact_index_revision": {"type": "integer", "minimum": 0}
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {"$ref": "#/$defs/metric"}
+    }
+  },
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_name", "metric_value"],
+      "properties": {
+        "metric_name": {
+          "type": "string",
+          "enum": [
+            "run_duration_seconds",
+            "gate_wait_seconds",
+            "validator_pass_count",
+            "validator_fail_count",
+            "latest_failing_validator",
+            "transcript_health",
+            "evidence_freshness",
+            "artifact_count",
+            "blocked_launch_count"
+          ],
+          "description": "Closed set. A new metric is a schema change, so consumers never meet an unknown key."
+        },
+        "metric_value": {
+          "type": ["number", "string", "null"],
+          "description": "Numeric for counts and durations; categorical for transcript_health and evidence_freshness; the validator name for latest_failing_validator. Null when not applicable to this run — e.g. blocked_launch_count on a run that never attempted a guarded launch."
+        },
+        "metric_kind": {
+          "type": "string",
+          "enum": ["count", "duration_seconds", "category", "identifier"],
+          "description": "Lets a consumer format the value without special-casing each metric_name."
+        },
+        "applicable": {
+          "type": "boolean",
+          "default": true,
+          "description": "False when the metric does not apply to this run. Distinguishes 'not applicable' from a genuine zero."
+        }
+      }
+    }
+  }
+}

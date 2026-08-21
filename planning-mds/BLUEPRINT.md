@@ -34,6 +34,7 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
   - [F0003-S0004 - Evidence artifact store and retrieval index](features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) - Not Started
   - [F0003-S0005 - Deterministic transcript, log, and validator summaries](features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) - Not Started
   - [F0003-S0006 - Runtime metrics and failure-learning review](features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) - Not Started
+  - [F0003-S0007 - Application query/command service split](features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) - Not Started
 
 - [F0004 - Reflective Learning Loop and Strategy Playbook](features/F0004-reflective-learning-loop/README.md) - Planned / Later
   - [F0004-S0001 - Strategy playbook artifact and entry schema](features/F0004-reflective-learning-loop/F0004-S0001-strategy-playbook-artifact-and-schema.md) - Not Started
@@ -158,7 +159,7 @@ F0003 extends the existing local package rather than adding a service, daemon, o
 
 | Boundary | F0003 additions | Must Not Own |
 |----------|-----------------|--------------|
-| Presentation | Added `nebula-agents` subcommands (`wrap`, `providers doctor`, `evidence *`, `metrics`, `learn review`) and the stdio MCP adapter | Filesystem access, redaction decisions, or authorization |
+| Presentation | Added `nebula-agents` subcommands (`wrap`, `providers doctor`, `evidence *`, `metrics`, `learn *`) and the stdio MCP adapter. **CLI and MCP only — F0003 ships no screens.** | Filesystem access, redaction decisions, authorization, or any terminal-UI surface |
 | Application | Capability probing, artifact indexing, summarization, metric derivation, proposal drafting — split into **query** and **command** services | Transport framing or provider-specific probe syntax |
 | Domain | Artifact identity, retrieval policy, freshness, capability requirement, proposal lifecycle invariants | Terminal rendering, subprocesses, or files |
 | Infrastructure adapters | Provider probes, artifact index store, summary extractors, proposal store | Gate policy or exposure decisions |
@@ -172,9 +173,9 @@ F0003 owns MCP tools, stable artifact IDs, deterministic summaries, metrics, and
 F0003 adds five records to F0001's `RunRecord`, `RuntimeEvent`, and `LocalPolicy`:
 
 - `ProviderCapabilityReport` — per-provider probe results with `report_generated_at` for freshness. Each capability is `required`, `optional`, `unsupported`, or `fallback`; each probe is `pass`, `fail`, `timeout`, or `skipped`.
-- `ArtifactIndexEntry` — one entry per evidence artifact, keyed by an ID of `{run_id}/{artifact_kind}/{12 hex of path digest}`. Identity derives from location within the run, so re-indexing is idempotent; `content_hash` is a separate attribute used for duplicate linking and staleness, deliberately not for identity (ADR-006).
+- `ArtifactIndexEntry` — one entry per evidence artifact, keyed by an ID of `{run_id}/{artifact_kind}/{root_key}-{12 hex of path digest}`. Identity derives from location within a named approved root — `ws`, `rt`, or `ev`, chosen by longest-match across the workspace, runtime, and evidence roots with a runtime > evidence > workspace tiebreak — so re-indexing is idempotent and the rule stays defined however those roots nest. The chosen root is persisted as `source_root`, making an entry readable without the configuration that produced it. `content_hash` is a separate attribute used for duplicate linking and staleness, deliberately not for identity (ADR-006).
 - `ArtifactSummary` — rule-extracted, deterministic, with `summary_status`, `redaction_status`, ordered `key_events`, `failure_markers`, and a `source_reference` back to the full artifact.
-- `RuntimeMetricSnapshot` — derived, never authoritative; recomputable from run state and the artifact index.
+- `RuntimeMetricSnapshot` — derived, never authoritative; recomputable from run state and the artifact index. `derived_from` records the run and index revisions it was computed against, so recomputability is checkable rather than asserted; a snapshot taken at older revisions is superseded, not wrong. Metric names are a closed set, so a consumer never meets an unknown key.
 - `LearningProposal` — draft correction with `source_artifact_ids`, `target_document`, `proposal_status`, plus append-only decision records.
 
 The artifact index is one atomic JSON document per run under `{runtime_dir}/{run_id}/artifacts.json`, written with ADR-002's discipline: per-run lock, monotonic `revision`, same-directory temporary file, `fsync`, atomic replace, corrupt files preserved. It is a projection — losing it costs a re-index, never evidence. There is still no database.
@@ -189,10 +190,20 @@ The artifact index is one atomic JSON document per run under `{runtime_dir}/{run
 
 ### 5.4 Authorization Model
 
-F0003 adds no new actions. It reuses F0001's default-deny subject/resource/action contract with `Probe`, `Launch`, `ReadState`, and `RunValidator`, mapping its commands onto them (see the runtime contract §1). Two F0003-specific rules apply:
+F0003 keeps F0001's default-deny subject/resource/action contract and reuses `Probe`, `Launch`, and `ReadState` unchanged. It adds three actions rather than overloading `RunValidator`, which F0001 defined narrowly as "execute an allowlisted validator" and which does not describe indexing, summarizing, or drafting:
+
+| Action | Covers | Notes |
+|--------|--------|-------|
+| `IndexEvidence` | `evidence index`, `evidence summarize` | Writes F0003's own projections; never mutates F0001 records or gate state |
+| `DraftProposal` | `learn review` | Writes inert `Draft` proposals only |
+| `DecideProposal` | `learn decide` | Separate from drafting, so generation and decision cannot be granted as one capability |
+
+`RunValidator` keeps its F0001 meaning and continues to cover the `validate` command alone.
+
+Two F0003-specific rules apply:
 
 - Every MCP tool call evaluates authorization with action `ReadState`, in addition to the structural query-only facade. Both mechanisms are kept deliberately; a policy misconfiguration alone must not widen the surface.
-- Proposal review authorization follows the **target document**, not the proposal: Security Reviewer for security guidance, Architect for architecture and process, Product Manager for planning process. A target outside the committed allowlist is refused at generation.
+- `DecideProposal` is evaluated against the **target document**, not the proposal: Security Reviewer for security guidance, Architect for architecture and process, Product Manager for planning process. The resource attribute is the target path; the action is the same verb regardless of who holds it. A target outside the committed allowlist is refused at generation, so `learn decide` never sees one.
 
 ### 5.5 API and CLI Contracts
 
@@ -222,7 +233,7 @@ The MCP surface is six read-only tools over stdio on a host-spawned child proces
 
 ### 5.8 Architecture Boundary Decision
 
-F0003 deliberately has no HTTP service, database, daemon, listening port, managed provider SDK, or automatic document mutation. Model-generated summaries are excluded by decision, not by omission (ADR-008), and applying an accepted learning proposal is outside F0003's automated scope (ADR-009). Curation lifecycle, decay, counters, and strategy selection belong to F0004; managed orchestration belongs to F0002.
+F0003 deliberately has no HTTP service, database, daemon, listening port, managed provider SDK, automatic document mutation, or terminal-UI surface. The CLI-only boundary is a decision recorded 2026-08-21 in response to plan-review finding C2: an earlier PRD revision named five screens the architecture never defined, and rather than grow a second UI inside a runtime feature, those screens are delivered as commands and the shell that presents them is left to F0008. Model-generated summaries are excluded by decision, not by omission (ADR-008), and applying an accepted learning proposal is outside F0003's automated scope (ADR-009). Curation lifecycle, decay, counters, and strategy selection belong to F0004; managed orchestration belongs to F0002.
 
 ### 5.9 Phase B Approval
 

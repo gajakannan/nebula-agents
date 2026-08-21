@@ -91,6 +91,7 @@ features:
       - schema:f0003-capability-report
       - schema:f0003-learning-proposal
       - schema:f0003-mcp-response
+      - schema:f0003-metric-snapshot
   - status: archived-done
     id: feature:F0006
     path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration
@@ -227,6 +228,14 @@ stories:
       - adr:009-f0003-review-gated-learning-proposals
     uses_schema:
       - schema:f0003-learning-proposal
+      - schema:f0003-metric-snapshot
+  - id: story:F0003-S0007
+    feature: feature:F0003
+    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+    affects:
+      - capability:readonly-mcp-runtime-surface
+    governed_by:
+      - adr:007-f0003-readonly-mcp-surface
   - id: story:F0006-S0001
     feature: feature:F0006
     path: planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md

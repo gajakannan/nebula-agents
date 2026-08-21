@@ -28,9 +28,10 @@ The feature does not replace native provider CLIs. It makes the surrounding Nebu
 | [F0003-S0004](./F0003-S0004-evidence-artifact-store-and-retrieval-index.md) | Evidence artifact store and retrieval index | Not Started |
 | [F0003-S0005](./F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) | Deterministic transcript, log, and validator summaries | Not Started |
 | [F0003-S0006](./F0003-S0006-runtime-metrics-and-failure-learning-review.md) | Runtime metrics and failure-learning review | Not Started |
+| [F0003-S0007](./F0003-S0007-application-query-command-split.md) | Application query/command service split | Not Started |
 
-**Total Stories:** 6
-**Completed:** 0 / 6
+**Total Stories:** 7
+**Completed:** 0 / 7
 
 ## Architecture Review
 
@@ -49,7 +50,7 @@ The feature does not replace native provider CLIs. It makes the surrounding Nebu
 | ADR | Decision | Status |
 |-----|----------|--------|
 | [ADR-005](../../architecture/decisions/ADR-005-f0003-control-plane-packaging.md) | Extend the existing local package; no daemon, port, or second distributable | Proposed |
-| [ADR-006](../../architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md) | Artifact identity from run-relative path, not content; content hash links duplicates | Proposed |
+| [ADR-006](../../architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md) | Artifact identity from the path relative to its owning approved root (longest-match, `ws`/`rt`/`ev`), not content; content hash links duplicates | Proposed (rev. 2026-08-21) |
 | [ADR-007](../../architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md) | Dependency-free stdio MCP server; read-only enforced structurally by a query-only facade | Proposed |
 | [ADR-008](../../architecture/decisions/ADR-008-f0003-deterministic-summaries.md) | Rule-based deterministic summaries; no model call generates a summary | Proposed |
 | [ADR-009](../../architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md) | Learning proposals are inert, allowlisted, and append-only reviewed | Proposed |

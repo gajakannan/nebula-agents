@@ -2,7 +2,7 @@
 
 Auto-generated index of all user stories across feature folders.
 
-**Total Stories:** 45
+**Total Stories:** 46
 
 ---
 
@@ -41,6 +41,7 @@ Auto-generated index of all user stories across feature folders.
 | [F0003-S0004](./F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) | Evidence artifact store and retrieval index | High | Platform Hardening | code reviewer |
 | [F0003-S0005](./F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) | Deterministic transcript, log, and validator summaries | High | Platform Hardening | reviewer |
 | [F0003-S0006](./F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) | Runtime metrics and failure-learning review | Medium | Platform Hardening | framework maintainer |
+| [F0003-S0007](./F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) | Application query/command service split | Critical | Platform Hardening | platform maintainer |
 
 ---
 
@@ -108,7 +109,7 @@ Auto-generated index of all user stories across feature folders.
 | Framework Hardening | 9 |
 | Future | 5 |
 | MVP | 6 |
-| Platform Hardening | 10 |
+| Platform Hardening | 11 |
 | Platform Hardening (Feature Phase A) | 3 |
 | Platform Hardening (Feature Phase B) | 6 |
 
@@ -118,7 +119,7 @@ Auto-generated index of all user stories across feature folders.
 
 | Priority | Count |
 |----------|-------|
-| Critical | 19 |
+| Critical | 20 |
 | High | 23 |
 | Medium | 3 |
 

@@ -118,7 +118,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: Runtime home, session list, session detail.
+- Command surfaces involved: `doctor`, `wrap`, `sessions`, `status`, `attach`. F0003 is CLI-only; a terminal-UI presentation of these belongs to F0008.
 - Key interactions: Run preflight, launch, list, inspect, attach.
 
 ## Questions & Assumptions

@@ -56,15 +56,30 @@
 - [ ] Runtime metrics are visible in a local dashboard or status view.
 - [ ] Failed-run learning produces reviewable proposals with provenance and never mutates instructions without approval.
 
-## UX / Screens
+## UX / Surfaces
 
-| Screen | Purpose | Key Actions |
-|--------|---------|-------------|
-| Runtime Home | Show local runtime health, active sessions, and latest gate status. | Launch, inspect, attach, run validation. |
-| Capability Matrix | Show provider readiness and blocked capabilities. | Run probe, inspect remediation, select fallback. |
-| Evidence Browser | Browse summaries and retrieve full artifacts by stable ID. | Open summary, copy path, verify redaction status. |
-| Metrics View | Show run duration, gate wait time, validator history, and transcript health. | Filter by run, export status, inspect failures. |
-| Learning Review | Show proposed corrections from failed runs. | Accept, edit, reject, link evidence. |
+**F0003 is CLI-only.** It ships no screens. Every capability below is delivered as a
+command with `--format table|json`; the table form is the human surface. A terminal-UI
+presentation of these same application services belongs to F0008 (Agent Cockpit Landing
+Shell) and is explicitly out of scope here.
+
+This is a deliberate narrowing, recorded 2026-08-21. An earlier revision of this PRD named
+five screens — Runtime Home, Capability Matrix, Evidence Browser, Metrics View, Learning
+Review — which the Phase B architecture never defined; plan-review run
+`2026-08-19-ec0a97ce` raised that gap as finding C2. Rather than grow a second UI surface
+inside a runtime feature, the screens are replaced by the commands that already carry
+their behavior, and the shell that presents them is left to the feature that owns shells.
+
+| Capability | Command surface | Key actions |
+|------------|-----------------|-------------|
+| Runtime health and sessions | `sessions`, `status --run <id>` | Inspect run state, gate status, attach guidance |
+| Provider readiness | `providers doctor` | Probe, inspect remediation, see blocked-launch reason |
+| Evidence browsing | `evidence list --run <id>`, `evidence show <artifact-id>` | List artifacts, read redacted summary, get retrieval metadata |
+| Runtime metrics | `metrics --run <id>` | Run duration, gate wait, validator counts, transcript health, evidence freshness |
+| Learning review | `learn review --run <id>`, `learn decide <proposal-id>` | Draft proposals from failed-run evidence; record accept / edit / reject / archive |
+
+Machine consumers use `--format json` or the read-only MCP tools (S0003). Nothing in this
+feature renders a persistent screen, owns a layout, or manages terminal focus.
 
 ## Key Workflows
 

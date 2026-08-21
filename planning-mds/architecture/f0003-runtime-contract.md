@@ -19,20 +19,34 @@ record shape. Machine output keeps the F0001 envelope: `contract_version`, `comm
 |---------|----------------|----------|---------------|----------------|
 | `wrap <provider>` | `--action`, `--feature`; optional `--story`, `--run-id`, `--transcript` | Creates run, event stream, launch descriptor, session | `Launch` | Run summary with attach guidance |
 | `providers doctor` | none; optional `--provider` | Writes a capability report | `Probe` | Capability matrix with per-probe results and freshness |
-| `evidence index` | `--run-id`; optional `--path` | Writes artifact index entries | `RunValidator` | Indexed artifact IDs and policy results |
+| `evidence index` | `--run-id`; optional `--path` | Writes artifact index entries | `IndexEvidence` | Indexed artifact IDs and policy results |
 | `evidence list` | `--run-id` | None | `ReadState` | Artifact IDs, kinds, summaries, freshness, retrieval availability |
 | `evidence show` | `<artifact-id>` | None | `ReadState` | Redacted summary and retrieval metadata |
-| `evidence summarize` | `--run-id` or `<artifact-id>` | Writes summary artifacts; updates the index | `RunValidator` | Summary IDs and per-artifact status |
+| `evidence summarize` | `--run-id` or `<artifact-id>` | Writes summary artifacts; updates the index | `IndexEvidence` | Summary IDs and per-artifact status |
 | `metrics` | `--run-id` | None | `ReadState` | Run duration, gate wait, validator counts, transcript health, evidence freshness |
-| `learn review` | `--run-id`; optional `--scope` | Writes proposal artifacts in `Draft` | `RunValidator` | Proposal IDs with source artifact IDs and confidence |
+| `learn review` | `--run-id`; optional `--scope` | Writes proposal artifacts in `Draft` | `DraftProposal` | Proposal IDs with source artifact IDs and confidence |
+| `learn list` | optional `--run-id`, `--status` | None | `ReadState` | Proposals with status, target document, source artifact IDs |
+| `learn show` | `<proposal-id>` | None | `ReadState` | Proposal detail, evidence excerpts, decision history |
+| `learn decide` | `<proposal-id>`, `--decision`, `--reason`; optional `--patch-plan` | Appends a decision record; sets `proposal_status` | `DecideProposal` | Recorded decision with reviewer role and timestamp |
 | `mcp serve` | none | None | `ReadState` | Serves MCP over stdio until the host closes it |
 
 `wrap` supersedes nothing: F0001's `launch` remains the primitive, and `wrap` is preflight
 plus capability guard plus `launch` plus registration, as one operator step.
 
-Proposal *decisions* (accept, edit, reject, archive) are recorded through the review
-surface, not through `learn review`, which only drafts (ADR-009). Applying an accepted
-proposal is outside F0003's automated scope.
+### Proposal decisions
+
+`learn review` only drafts. Decisions are recorded by `learn decide`, a separate command
+with separate authorization (ADR-009) — there is no flag on `learn review` that decides,
+and none that applies. `--decision` takes exactly one of `accept`, `edit`, `reject`,
+`archive`; `--reason` is required for `reject` and `archive`. Decision records are
+append-only: a later decision appends, it never rewrites an earlier one.
+
+Applying an accepted proposal remains outside F0003's automated scope. `learn decide
+--decision accept` records the decision and an optional `--patch-plan`; it does not open
+the target document.
+
+F0003 is **CLI-only** and ships no screens. A terminal-UI presentation of these commands
+belongs to F0008.
 
 ## 2. MCP Tools
 
@@ -60,11 +74,14 @@ a structured redaction-failure error instead.
 F0001's rules hold unchanged (`run_id` is `YYYY-MM-DD-8hex`, `feature` is `F####`, `story`
 is `F####-S####`, `provider` is `codex` or `claude`). F0003 adds:
 
-- `artifact_id`: `{run_id}/{artifact_kind}/{12 hex}` (ADR-006). Callers pass it opaquely;
-  it is never a filesystem path.
+- `artifact_id`: `{run_id}/{artifact_kind}/{root_key}-{12 hex}`, where `root_key` is `ws`,
+  `rt`, or `ev` (ADR-006). Callers pass it opaquely; it is never a filesystem path, and
+  `root_key` must not be parsed to reconstruct one.
 - `artifact_kind`: exactly one of `transcript`, `command-log`, `validator-output`,
   `manifest`, `status`, `metric`, `learning-proposal`.
 - `proposal_id`: allocated by `learn review`; opaque to callers.
+- `--decision`: exactly one of `accept`, `edit`, `reject`, `archive`. `--reason` is
+  required for `reject` and `archive`.
 - `--path` for `evidence index`: must resolve inside the run's workspace, runtime, or
   evidence root. Symlinks are resolved before the containment check, never after.
 - `--scope` for `learn review`: a bounded enumeration, not free text.
@@ -81,7 +98,7 @@ F0003 reuses the F0001 classes without addition. Mappings specific to F0003:
 | 3 | Preflight blocked | Required provider capability failed with no fallback |
 | 4 | Not found | Unknown run, artifact, or proposal |
 | 5 | Forbidden | Reviewer attempted `wrap`; proposal target outside the allowlist |
-| 6 | Conflict | Duplicate run ID; artifact-ID digest collision within run and kind |
+| 6 | Conflict | Duplicate run ID; artifact-ID digest collision within run, kind, and root |
 | 7 | Gate blocked | Proposal generation blocked on stale or missing evidence |
 | 9 | State I/O | Artifact index write failure; unreadable runtime directory |
 | 10 | Timeout | Provider probe exceeded its configured timeout |
@@ -102,7 +119,7 @@ Identical to F0001, with F0003 codes:
     "code": "REDACTION_FAILED",
     "message": "The artifact summary is withheld because redaction did not complete.",
     "category": "evidence_blocked",
-    "details": [{"artifact_id": "2026-08-19-1a2b3c4d/transcript/9f2c1a8e0b47", "redaction_status": "Fail"}],
+    "details": [{"artifact_id": "2026-08-19-1a2b3c4d/transcript/rt-9f2c1a8e0b47", "redaction_status": "Fail"}],
     "remediation": "Re-run evidence summarize after resolving the redaction failure.",
     "correlation_id": "0b7c1d2e-3f40-4a51-9b62-7c83d94e5f60"
   }
@@ -122,7 +139,7 @@ F0003 adds five record types alongside F0001's `RunRecord`, `RuntimeEvent`, and
 | `ProviderCapabilityReport` | `providers doctor` | Atomic JSON per provider, with `report_generated_at` for freshness |
 | `ArtifactIndexEntry` | `evidence index` | Atomic JSON index per run (ADR-006) |
 | `ArtifactSummary` | `evidence summarize` | One summary artifact per source artifact (ADR-008) |
-| `RuntimeMetricSnapshot` | `metrics` | Derived; recomputable from run state and index |
+| `RuntimeMetricSnapshot` | `metrics` | Derived; recomputable from run state and index, with `derived_from` pinning the revisions used |
 | `LearningProposal` | `learn review` | Proposal artifact plus append-only decision records (ADR-009) |
 
 All five are filesystem/CLI contracts rather than HTTP resources. Metrics are derived, not
@@ -148,6 +165,7 @@ authoritative: they must be recomputable from runtime state and the artifact ind
 - Artifact index: `planning-mds/schemas/f0003-artifact-index.schema.json`
 - Artifact summary: `planning-mds/schemas/f0003-artifact-summary.schema.json`
 - Learning proposal: `planning-mds/schemas/f0003-learning-proposal.schema.json`
+- Runtime metric snapshot: `planning-mds/schemas/f0003-metric-snapshot.schema.json`
 - MCP response envelope: `planning-mds/schemas/f0003-mcp-response.schema.json`
 
 ## 9. Compatibility

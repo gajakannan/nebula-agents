@@ -40,7 +40,7 @@ Raw terminal transcripts and validator logs are often too long for fast review. 
 | Surface / Entry Point | User Action | Editable State | Save / Mutation Result | Reload / Persistence Evidence | Roles / Status Constraints |
 |-----------------------|-------------|----------------|-------------------------|-------------------------------|----------------------------|
 | CLI `evidence summarize` | Summarize one artifact or run | Artifact ID or run ID | Writes summary artifact and updates index | `evidence show` reads latest summary | Local Operator, automation |
-| Evidence Browser | Inspect summary | No editable state | None | Reads summary artifact | Reviewer, Local Operator |
+| CLI `evidence show <artifact-id>` | Inspect summary | No editable state | None | Reads summary artifact | Reviewer, Local Operator |
 | MCP `nebula_evidence_show` | Query summary | No editable state | None | Reads same summary artifact | Reviewer, Local Operator |
 
 Required checks for mutation stories:
@@ -115,7 +115,7 @@ Required checks for mutation stories:
 
 ## UI/UX Notes
 
-- Screens involved: Evidence browser, validator output, learning review.
+- Command surfaces involved: `evidence summarize`, `evidence show`.
 - Key interactions: Generate summary, inspect failed sections, open source artifact path.
 
 ## Questions & Assumptions
