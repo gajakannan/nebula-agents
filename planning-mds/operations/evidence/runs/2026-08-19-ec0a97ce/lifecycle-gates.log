@@ -1,0 +1,32 @@
+
+### PR2
+Command: python3 agents/product-manager/scripts/validate-stories.py /home/gajap/uSandbox/repos/nebula/nebula-agents/planning-mds/features/F0003-None
+Stage: PR2
+Exit Code: 1
+Result: FAIL
+Output References: -
+Skipped Gates: -
+
+### PR2
+Command: python3 agents/product-manager/scripts/validate-stories.py /home/gajap/uSandbox/repos/nebula/nebula-agents/planning-mds/features/F0003-local-agent-runtime-control-plane
+Stage: PR2
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### PR2
+Command: python3 agents/product-manager/scripts/validate-trackers.py
+Stage: PR2
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### PR2
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py
+Stage: PR2
+Exit Code: 1
+Result: FAIL
+Output References: -
+Skipped Gates: -
