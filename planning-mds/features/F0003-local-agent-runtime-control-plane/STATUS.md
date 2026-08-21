@@ -22,6 +22,23 @@ Exit validation is green: `validate-stories`, `generate-story-index`, `validate-
 **The Phase B approval checkpoint is outstanding.** The five ADRs stay `Proposed` until the
 operator approves; approval is recorded in BLUEPRINT §5.9 and flips them to `Accepted`.
 
+## Plan-Review Findings (run `2026-08-19-ec0a97ce`, verdict NOT READY)
+
+| ID | Severity | Finding | State |
+|----|----------|---------|-------|
+| C1 | Critical | Artifact-identity base directory ambiguous across S0004's three approved roots | **Resolved 2026-08-21** — ADR-006 revised to root-scoped identity with a `root_key` discriminator and longest-match root selection; propagated to 3 schemas, the runtime contract, data-model, and BLUEPRINT §5.2 |
+| C2 | Critical | Operator surfaces undefined — five PRD screens and the proposal-decision surface | **Open** — needs a scope decision: F0003, F0008, or CLI-only with the PRD screen table revised |
+| H1 | High | No authorization action for proposal decisions; `RunValidator` overloaded | Open |
+| H2 | High | `RuntimeMetricSnapshot` declared as a record with no schema | Open |
+| H3 | High | Query/command split is an unscoped refactor of F0001 code that no story owns | Open |
+| H4 | High | `coverage-report.yaml` committed stale in PR #64 | **Resolved** — regenerated |
+| M1 | Medium | S0003 open question (MCP install vs manual host config) unanswered | Open |
+| M2 | Medium | ADR-006 deferred digest length to G0 while the schema pinned 12 hex | **Resolved 2026-08-21** — 12 fixed in the ADR; the contradictory follow-up removed |
+| L1 | Low | S0001 open question answered by ADR-005 but not reconciled in the story | Open |
+
+C2 remains blocking. Re-run `plan-review` once the open findings are addressed; the PR4
+readiness gate never executed in the original run (it halted at PR2 on H4).
+
 ## Story Checklist
 
 | Story | Title | Status |

@@ -66,8 +66,8 @@ freshness:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
-      last_modified: '2026-08-20'
-      source_hash: dcbed1fc165c3c5f
+      last_modified: '2026-08-21'
+      source_hash: ebedfb58d3fdbedb
     entity:artifact-summary:
       source_paths:
       - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
@@ -87,8 +87,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
-      last_modified: '2026-08-20'
-      source_hash: ada7c6a481b24bf1
+      last_modified: '2026-08-21'
+      source_hash: 49ad55211d133a4e
     entity:run-record:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -172,8 +172,8 @@ freshness:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
-      last_modified: '2026-08-20'
-      source_hash: dcbed1fc165c3c5f
+      last_modified: '2026-08-21'
+      source_hash: ebedfb58d3fdbedb
     capability:local-run-registry:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -203,8 +203,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
-      last_modified: '2026-08-20'
-      source_hash: ada7c6a481b24bf1
+      last_modified: '2026-08-21'
+      source_hash: 49ad55211d133a4e
     capability:read-only-run-queries:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
@@ -222,8 +222,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
-      last_modified: '2026-08-20'
-      source_hash: 4635c69e506ceafb
+      last_modified: '2026-08-21'
+      source_hash: cb6892a6c2729542
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -242,8 +242,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
-      last_modified: '2026-08-20'
-      source_hash: 1cdee355be49c7f0
+      last_modified: '2026-08-21'
+      source_hash: 742e94db25e33ab4
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
@@ -333,8 +333,8 @@ freshness:
       source_paths:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
       source_count: 1
-      last_modified: '2026-08-20'
-      source_hash: 921ed844e0c43209
+      last_modified: '2026-08-21'
+      source_hash: 88ba75bc2f10160c
     adr:007-f0003-readonly-mcp-surface:
       source_paths:
       - planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
@@ -387,14 +387,14 @@ freshness:
       source_paths:
       - planning-mds/schemas/f0003-artifact-index.schema.json
       source_count: 1
-      last_modified: '2026-08-20'
-      source_hash: 92c0e8ba00ca260a
+      last_modified: '2026-08-21'
+      source_hash: ec9f95adbbe1dd4c
     schema:f0003-artifact-summary:
       source_paths:
       - planning-mds/schemas/f0003-artifact-summary.schema.json
       source_count: 1
-      last_modified: '2026-08-20'
-      source_hash: ebd8edecaeed4529
+      last_modified: '2026-08-21'
+      source_hash: e47e2a96bab47a89
     schema:f0003-capability-report:
       source_paths:
       - planning-mds/schemas/f0003-capability-report.schema.json
@@ -405,8 +405,8 @@ freshness:
       source_paths:
       - planning-mds/schemas/f0003-learning-proposal.schema.json
       source_count: 1
-      last_modified: '2026-08-20'
-      source_hash: eae9c7a2e267b8a8
+      last_modified: '2026-08-21'
+      source_hash: 3fb56481071f12bd
     schema:f0003-mcp-response:
       source_paths:
       - planning-mds/schemas/f0003-mcp-response.schema.json
@@ -443,8 +443,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
       source_count: 10
-      last_modified: '2026-08-20'
-      source_hash: 8cb1194d9d9cdd96
+      last_modified: '2026-08-21'
+      source_hash: c615c011698050a1
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md

@@ -49,7 +49,7 @@ The feature does not replace native provider CLIs. It makes the surrounding Nebu
 | ADR | Decision | Status |
 |-----|----------|--------|
 | [ADR-005](../../architecture/decisions/ADR-005-f0003-control-plane-packaging.md) | Extend the existing local package; no daemon, port, or second distributable | Proposed |
-| [ADR-006](../../architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md) | Artifact identity from run-relative path, not content; content hash links duplicates | Proposed |
+| [ADR-006](../../architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md) | Artifact identity from the path relative to its owning approved root (longest-match, `ws`/`rt`/`ev`), not content; content hash links duplicates | Proposed (rev. 2026-08-21) |
 | [ADR-007](../../architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md) | Dependency-free stdio MCP server; read-only enforced structurally by a query-only facade | Proposed |
 | [ADR-008](../../architecture/decisions/ADR-008-f0003-deterministic-summaries.md) | Rule-based deterministic summaries; no model call generates a summary | Proposed |
 | [ADR-009](../../architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md) | Learning proposals are inert, allowlisted, and append-only reviewed | Proposed |

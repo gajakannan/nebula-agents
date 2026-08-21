@@ -152,12 +152,14 @@ F0003 adds no deletion path either. Its artifact index and summaries are regener
 | Record | Identity | Purpose | Mutability |
 |--------|----------|---------|------------|
 | `ProviderCapabilityReport` | `(provider_key, report_generated_at)` | Capability matrix consumed by the launch guard | Atomic replacement; freshness by age |
-| `ArtifactIndexEntry` | `artifact_id` = `{run_id}/{artifact_kind}/{12 hex path digest}` | Stable handle from summaries, MCP, and proposals to local evidence | Replaced by idempotent re-index |
+| `ArtifactIndexEntry` | `artifact_id` = `{run_id}/{artifact_kind}/{root_key}-{12 hex path digest}` | Stable handle from summaries, MCP, and proposals to local evidence | Replaced by idempotent re-index |
 | `ArtifactSummary` | `summary_id` | Deterministic rule-extracted projection of one artifact | Regenerable; replaced wholesale |
 | `RuntimeMetricSnapshot` | `(run_id, metric_generated_at)` | Derived run health view | Derived; never authoritative |
 | `LearningProposal` | `proposal_id` | Draft correction awaiting review | Status transitions; decisions append-only |
 
-**Identity rule (ADR-006).** `artifact_id` derives from the artifact's canonical path *relative to the run root*, not its content. Re-indexing the same artifact therefore yields the same ID, while two artifacts with identical bytes keep distinct IDs. `content_hash` is a separate full SHA-256 attribute used for duplicate linking and staleness detection, never for identity. A truncated-digest collision within one run and kind raises a conflict rather than overwriting.
+**Identity rule (ADR-006).** `artifact_id` derives from the artifact's canonical path *relative to its owning approved root*, not its content. The owning root is the longest of the three approved roots (workspace, runtime, evidence) that is an ancestor of the artifact, with ties broken runtime > evidence > workspace; it is persisted as `source_root` and abbreviated in the ID as `ws`/`rt`/`ev`. Longest-match keeps the result stable when the roots nest — the evidence root and the default runtime directory both sit inside the workspace, and `NEBULA_AGENTS_RUNTIME_DIR` can move the runtime root outside it. An artifact under no approved root is refused at indexing with a policy violation.
+
+Re-indexing the same artifact therefore yields the same ID, while two artifacts with identical bytes keep distinct IDs. `content_hash` is a separate full SHA-256 attribute used for duplicate linking and staleness detection, never for identity. A truncated-digest collision within one run, kind, and root raises a conflict rather than overwriting. Relocating an approved root re-homes the artifacts under it and changes those IDs; re-indexing is the migration.
 
 **Exposure rule.** `redaction_status` and `retrieval_policy` are index attributes, so an exposure decision never requires reading the artifact. `redaction_status: Fail` forces `retrieval_policy: Blocked`.
 

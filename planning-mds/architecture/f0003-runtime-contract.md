@@ -60,8 +60,9 @@ a structured redaction-failure error instead.
 F0001's rules hold unchanged (`run_id` is `YYYY-MM-DD-8hex`, `feature` is `F####`, `story`
 is `F####-S####`, `provider` is `codex` or `claude`). F0003 adds:
 
-- `artifact_id`: `{run_id}/{artifact_kind}/{12 hex}` (ADR-006). Callers pass it opaquely;
-  it is never a filesystem path.
+- `artifact_id`: `{run_id}/{artifact_kind}/{root_key}-{12 hex}`, where `root_key` is `ws`,
+  `rt`, or `ev` (ADR-006). Callers pass it opaquely; it is never a filesystem path, and
+  `root_key` must not be parsed to reconstruct one.
 - `artifact_kind`: exactly one of `transcript`, `command-log`, `validator-output`,
   `manifest`, `status`, `metric`, `learning-proposal`.
 - `proposal_id`: allocated by `learn review`; opaque to callers.
@@ -102,7 +103,7 @@ Identical to F0001, with F0003 codes:
     "code": "REDACTION_FAILED",
     "message": "The artifact summary is withheld because redaction did not complete.",
     "category": "evidence_blocked",
-    "details": [{"artifact_id": "2026-08-19-1a2b3c4d/transcript/9f2c1a8e0b47", "redaction_status": "Fail"}],
+    "details": [{"artifact_id": "2026-08-19-1a2b3c4d/transcript/rt-9f2c1a8e0b47", "redaction_status": "Fail"}],
     "remediation": "Re-run evidence summarize after resolving the redaction failure.",
     "correlation_id": "0b7c1d2e-3f40-4a51-9b62-7c83d94e5f60"
   }
