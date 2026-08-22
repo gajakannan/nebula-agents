@@ -451,8 +451,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
       source_count: 11
-      last_modified: '2026-08-21'
-      source_hash: c7b0b7bf5e74dad2
+      last_modified: '2026-08-22'
+      source_hash: dfb5c429414e476a
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
