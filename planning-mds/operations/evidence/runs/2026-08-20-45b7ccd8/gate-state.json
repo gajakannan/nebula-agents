@@ -1,0 +1,44 @@
+{
+  "action": "plan-review",
+  "contract_version": "2026-07-11",
+  "run_id": "2026-08-20-45b7ccd8",
+  "schema_version": 1,
+  "stages": {
+    "PR0": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR1": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR2": {
+      "attestations": [],
+      "completed_operations": [
+        "pr2-validate-stories",
+        "pr2-validate-trackers",
+        "pr2-kg-validate",
+        "pr2-kg-check-drift",
+        "pr2-validate-templates"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR3": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "PR4": {
+      "attestations": [],
+      "completed_operations": [],
+      "pending_checkpoint": null,
+      "status": "completed"
+    }
+  }
+}
