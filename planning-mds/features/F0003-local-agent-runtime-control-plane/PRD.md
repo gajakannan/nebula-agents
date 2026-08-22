@@ -35,7 +35,7 @@
 - MCP-compatible read-only tools for session status, gate status, validator status, and evidence lookup.
 - Local evidence artifact store with stable artifact IDs, redacted public summaries, and full local retrieval paths.
 - Deterministic summarizers for transcripts, command logs, validator output, and evidence manifests.
-- Runtime metrics dashboard for run duration, gate wait time, validator results, transcript health, and evidence freshness.
+- Runtime metrics command reporting run duration, gate wait time, validator results, transcript health, and evidence freshness.
 - Failure-learning proposal workflow that drafts process corrections for human review instead of writing them automatically.
 
 **Out of Scope:**
@@ -53,7 +53,7 @@
 - [ ] MCP-compatible read-only tools expose session, gate, validator, and evidence status.
 - [ ] Evidence artifacts receive stable IDs and can be summarized or retrieved locally without storing secrets.
 - [ ] Deterministic summarizers preserve errors, failed commands, gate decisions, artifact paths, and open questions.
-- [ ] Runtime metrics are visible in a local dashboard or status view.
+- [ ] Runtime metrics are available from `nebula-agents metrics --run <run_id>` in both table and JSON form.
 - [ ] Failed-run learning produces reviewable proposals with provenance and never mutates instructions without approval.
 
 ## UX / Surfaces
@@ -94,7 +94,7 @@ feature renders a persistent screen, owns a layout, or manages terminal focus.
 ```text
 +------------------+        +-----------------------------+
 | Local Operator   |        | AI Tool / Reviewer          |
-| CLI or TUI       |        | MCP-compatible host         |
+| CLI              |        | MCP-compatible host         |
 +--------+---------+        +--------------+--------------+
          |                                 |
          | nebula-agents doctor/wrap       | nebula_* status/evidence tools
@@ -138,7 +138,7 @@ feature renders a persistent screen, owns a layout, or manages terminal focus.
 +---------------------------------------------------------+
 ```
 
-The runtime registry is the coordination point. Native sessions remain interactive, while CLI, TUI, and MCP surfaces read the same structured state and evidence indexes.
+The runtime registry is the coordination point. Native sessions remain interactive, while the CLI and MCP surfaces read the same structured state and evidence indexes. F0003 adds no terminal-UI surface; see *UX / Surfaces*.
 
 ## Data Requirements
 

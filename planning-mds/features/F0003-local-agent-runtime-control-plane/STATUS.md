@@ -22,7 +22,24 @@ Exit validation is green: `validate-stories`, `generate-story-index`, `validate-
 **The Phase B approval checkpoint is outstanding.** The five ADRs stay `Proposed` until the
 operator approves; approval is recorded in BLUEPRINT §5.9 and flips them to `Accepted`.
 
-## Plan-Review Findings (run `2026-08-19-ec0a97ce`, verdict NOT READY)
+## Plan-Review Findings
+
+### Re-run `2026-08-20-45b7ccd8` — verdict CONDITIONALLY READY (`requires_justification: true`)
+
+First recorded readiness verdict for F0003; all five gates PR0-PR4 executed.
+
+| ID | Severity | Finding | State |
+|----|----------|---------|-------|
+| N1 | High | PRD contradicted its own CLI-only decision at lines 38, 56, 97, 141 | **Resolved 2026-08-21** — all four reconciled; line 56's acceptance criterion now names `metrics --run <id>` |
+| N2 | High | `security/f0001-authorization-model.md` omitted F0003's three actions | **Resolved 2026-08-21** — *F0003 Action Extensions* section added with the role matrix and the target-document rule for `DecideProposal` |
+| N3 | Low | STATUS *Runtime Progress* had no item for S0007 | **Resolved 2026-08-21** |
+| M1 | Medium | S0003 MCP install vs manual host configuration | Open (deferred by owner) |
+| L1 | Low | S0001 open question unreconciled against ADR-005 | Open (deferred by owner) |
+
+With N1 and N2 resolved, a further re-run should compute READY on severity alone. The
+recorded verdict remains CONDITIONALLY READY until a gate produces a new one.
+
+### Superseded run `2026-08-19-ec0a97ce` — verdict NOT READY
 
 | ID | Severity | Finding | State |
 |----|----------|---------|-------|
@@ -65,6 +82,7 @@ halted at PR2 on H4.
 - [ ] Deterministic summarizers implemented
 - [ ] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
 - [ ] Failure-learning proposal review flow implemented
+- [ ] Application query/command service split implemented (S0007; prerequisite for the MCP surface)
 
 ## Cross-Cutting
 
