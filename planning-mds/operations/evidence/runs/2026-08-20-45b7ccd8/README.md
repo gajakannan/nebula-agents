@@ -1,5 +1,11 @@
 # Plan Review Run 2026-08-20-45b7ccd8
 
+> **SUPERSEDED 2026-08-22.** This run completed all five gates and its
+> CONDITIONALLY READY verdict was valid for the package as it stood. Findings N1, N2 and N3
+> were then remediated (PR #70), so a re-run supersedes it. Unlike the run this one
+> superseded, nothing here failed — the evidence stands as the record of that verdict.
+> Manifest status: `superseded`.
+
 **Action:** `plan-review` (re-run) · **Target:** F0003 Local Agent Runtime Control Plane
 **Scope:** `read-only-audit` · **Contract:** `2026-07-11`
 **Supersedes:** `2026-08-19-ec0a97ce`
