@@ -1,0 +1,5 @@
+{"schema_version":1,"timestamp":"2026-08-22T22:26:10-04:00","cwd":"nebula-agents","command":"python3 agents/product-manager/scripts/validate-stories.py /home/gajap/uSandbox/repos/nebula/nebula-agents/planning-mds/features/F0003-local-agent-runtime-control-plane","exit_code":0,"artifacts":[],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-08-22T22:26:11-04:00","cwd":"nebula-agents","command":"python3 agents/product-manager/scripts/validate-trackers.py","exit_code":0,"artifacts":[],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-08-22T22:26:12-04:00","cwd":"{PRODUCT_ROOT}","command":"python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py","exit_code":0,"artifacts":[],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-08-22T22:26:13-04:00","cwd":"{PRODUCT_ROOT}","command":"python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py --check-drift","exit_code":0,"artifacts":[],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-08-22T22:26:13-04:00","cwd":"nebula-agents","command":"python3 agents/scripts/validate_templates.py","exit_code":0,"artifacts":[],"redactions":[]}
