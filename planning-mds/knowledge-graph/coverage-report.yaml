@@ -67,8 +67,8 @@ freshness:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
-      last_modified: '2026-08-21'
-      source_hash: 291f962340373d94
+      last_modified: '2026-08-23'
+      source_hash: 4765624bc140e579
     entity:artifact-summary:
       source_paths:
       - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
@@ -109,8 +109,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       source_count: 2
-      last_modified: '2026-08-21'
-      source_hash: 0e526abd714e69e1
+      last_modified: '2026-08-23'
+      source_hash: 8912229d714b1f74
     workflow:gate-decision:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
@@ -173,8 +173,8 @@ freshness:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
-      last_modified: '2026-08-21'
-      source_hash: 291f962340373d94
+      last_modified: '2026-08-23'
+      source_hash: 4765624bc140e579
     capability:local-run-registry:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -243,8 +243,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
-      last_modified: '2026-08-21'
-      source_hash: 721b103743d88da0
+      last_modified: '2026-08-23'
+      source_hash: ebb20ff74a6a566c
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
@@ -451,8 +451,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
       source_count: 11
-      last_modified: '2026-08-22'
-      source_hash: dfb5c429414e476a
+      last_modified: '2026-08-23'
+      source_hash: 3803a2cd6f216815
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -517,8 +517,8 @@ freshness:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 1
-      last_modified: '2026-08-21'
-      source_hash: 835a122e5401e623
+      last_modified: '2026-08-23'
+      source_hash: d6e28370a210e697
     story:F0003-S0002:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
@@ -535,8 +535,8 @@ freshness:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 1
-      last_modified: '2026-08-21'
-      source_hash: b43cf424b651272e
+      last_modified: '2026-08-23'
+      source_hash: bfb402647dc1a2ed
     story:F0003-S0005:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md

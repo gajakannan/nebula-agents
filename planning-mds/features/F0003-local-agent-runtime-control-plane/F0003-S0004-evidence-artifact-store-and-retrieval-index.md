@@ -12,7 +12,7 @@
 
 **As a** code reviewer
 **I want** every runtime evidence artifact to have a stable ID, summary, kind, path, and redaction status
-**So that** I can trace dashboard and MCP summaries back to full local evidence without guessing filenames.
+**So that** I can trace CLI and MCP summaries back to full local evidence without guessing filenames.
 
 ## Context & Background
 

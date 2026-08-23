@@ -1,7 +1,7 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** Phase B architecture drafted; pending operator approval before the `feature` action
-**Last Updated:** 2026-08-21
+**Overall Status:** Phase B architecture complete; plan-review verdict **READY**; pending operator approval before the `feature` action
+**Last Updated:** 2026-08-23
 
 ## Phase B Architecture (drafted 2026-08-19)
 
@@ -33,6 +33,7 @@ First recorded readiness verdict for F0003; all five gates PR0-PR4 executed.
 | N1 | High | PRD contradicted its own CLI-only decision at lines 38, 56, 97, 141 | **Resolved 2026-08-21** — all four reconciled; line 56's acceptance criterion now names `metrics --run <id>` |
 | N2 | High | `security/f0001-authorization-model.md` omitted F0003's three actions | **Resolved 2026-08-21** — *F0003 Action Extensions* section added with the role matrix and the target-document rule for `DecideProposal` |
 | N3 | Low | STATUS *Runtime Progress* had no item for S0007 | **Resolved 2026-08-21** |
+| N4 | Medium | `F0003-S0004` line 15 and `F0003-S0001` line 130 still described a dashboard/TUI surface | **Resolved 2026-08-23** — reworded to the command surface; swept on the generic terms `dashboard`/`TUI`/`GUI` rather than the five screen names, which is what let this survive three runs |
 | M1 | Medium | S0003 MCP install vs manual host configuration | Open (deferred by owner) |
 | L1 | Low | S0001 open question unreconciled against ADR-005 | Open (deferred by owner) |
 

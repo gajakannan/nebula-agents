@@ -127,7 +127,7 @@ Required checks for mutation stories:
 - [ ] Should the first command entry point live under `agents/runtime/` or a root-level package wrapper?
 
 **Assumptions (to be validated):**
-- A local CLI surface is sufficient for the first TUI and MCP implementations to consume.
+- A local CLI surface is sufficient for the MCP implementation to consume, and for any later terminal-UI surface F0008 may add.
 
 ## Definition of Done
 
