@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Mapping
 
 from nebula_agents.application.authorization import AuthorizationService
+from nebula_agents.application.capabilities import CapabilityService
 from nebula_agents.application.commands import CommandService
 from nebula_agents.application.evidence import EvidenceService
 from nebula_agents.application.gates import GateService
@@ -20,6 +21,10 @@ from nebula_agents.domain.errors import ErrorCode, error
 from nebula_agents.domain.models import Actor, JsonValue
 from nebula_agents.infrastructure.config import resolve_config
 from nebula_agents.infrastructure.artifact_index import FilesystemArtifactIndex
+from nebula_agents.infrastructure.capability_probe import (
+    FilesystemCapabilityReports,
+    ProviderCapabilityProber,
+)
 from nebula_agents.infrastructure.filesystem_store import FilesystemRunRepository
 from nebula_agents.infrastructure.identity import OsIdentity
 from nebula_agents.infrastructure.policy_store import LocalPolicyStore
@@ -116,6 +121,10 @@ class Application:
     def evidence(self) -> EvidenceService:
         return self.commands.evidence
 
+    @property
+    def capabilities(self) -> CapabilityService:
+        return self.commands.capabilities
+
 
 def build_application(workspace_root: Path, runtime_override: Path | None = None) -> Application:
     config = resolve_config(workspace_root, runtime_override)
@@ -161,5 +170,16 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
         repository=repository, authorization=authorization, identity=identity,
         tmux=tmux, index=artifact_index,
     )
-    commands = CommandService(runs=runs, gates=gates, transcripts=transcripts, evidence=evidence)
+    capabilities = CapabilityService(
+        prober=ProviderCapabilityProber(providers, tmux, process, clock),
+        reports=FilesystemCapabilityReports(config.runtime_root, schema, config.lock_timeout_seconds),
+        authorization=authorization,
+        clock=clock,
+        workspace_root=config.workspace_root,
+        max_age_seconds=config.capability_report_max_age_seconds,
+    )
+    commands = CommandService(
+        runs=runs, gates=gates, transcripts=transcripts, evidence=evidence,
+        capabilities=capabilities,
+    )
     return Application(queries=queries, commands=commands, preflight=preflight, identity=identity)

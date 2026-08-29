@@ -91,6 +91,24 @@ def build_parser() -> ContractParser:
     launch.add_argument("--transcript", action="store_true")
     _format_argument(launch)
 
+    # F0003. `wrap` takes the same arguments as `launch` because it IS `launch` plus a
+    # preflight and capability guard -- a divergent argument set would imply otherwise.
+    wrap = subcommands.add_parser("wrap", help="Guarded launch: preflight, capability guard, then launch.")
+    wrap.add_argument("provider", choices=_PROVIDERS)
+    wrap.add_argument("--feature", required=True, type=_feature_id)
+    wrap.add_argument("--action", required=True, choices=_ACTIONS)
+    wrap.add_argument("--story", type=_story_id)
+    wrap.add_argument("--run-id", type=_run_id)
+    wrap.add_argument("--label", type=_label)
+    wrap.add_argument("--transcript", action="store_true")
+    _format_argument(wrap)
+
+    providers = subcommands.add_parser("providers", help="Inspect provider capability reports.")
+    providers_commands = providers.add_subparsers(dest="providers_command", metavar="SUBCOMMAND", required=True)
+    providers_doctor = providers_commands.add_parser("doctor", help="Probe providers and write capability reports.")
+    providers_doctor.add_argument("--provider", choices=_PROVIDERS)
+    _format_argument(providers_doctor)
+
     attach = subcommands.add_parser("attach", help="Attach to the exact tmux session recorded for a run.")
     attach.add_argument("--run-id", required=True, type=_run_id)
 
@@ -250,6 +268,34 @@ def _dispatch(
         return 0 if status in {"ready", "ok", "passed"} else 3
 
     actor = current_actor(application)
+    if command == "providers":
+        result = invoke(
+            application.capabilities.doctor,
+            actor=actor,
+            provider_key=enum_member("ProviderKey", namespace.provider) if namespace.provider else None,
+        )
+        _emit_success("providers doctor", to_data(result), output_format)
+        # A blocked provider is reported, not raised: `providers doctor` is a diagnostic
+        # and must describe an unusable environment rather than refuse to run in one.
+        blocked = any(
+            str(item.get("launch_decision")) == "blocked"
+            for item in (to_data(result) if isinstance(to_data(result), list) else [])
+            if isinstance(item, dict)
+        )
+        return 3 if blocked else 0
+    if command == "wrap":
+        launched = invoke(
+            application.commands.wrap,
+            request=launch_request({**vars(namespace), "provider": namespace.provider}),
+            actor=actor,
+        )
+        result = invoke(
+            application.queries.status,
+            run_id=_result_run_id(launched),
+            actor=actor,
+        )
+        _emit_success("wrap", result, output_format)
+        return 0
     if command == "launch":
         if namespace.story and not namespace.story.startswith(f"{namespace.feature}-"):
             raise UsageFault("--story must belong to --feature.", "nebula-agents launch --help")

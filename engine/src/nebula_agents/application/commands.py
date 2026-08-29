@@ -18,6 +18,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from nebula_agents.domain.models import Actor, LaunchRequest
+
+from .capabilities import CapabilityService
 from .evidence import EvidenceService
 from .gates import GateService
 from .runs import RunService
@@ -28,12 +31,25 @@ from .transcripts import TranscriptService
 class CommandService:
     """Aggregates the mutating application services.
 
-    Steps 4 and 6 of the F0003 assembly plan add `capabilities` and `learning` here.
-    They are absent rather than stubbed, so the facade never claims a capability that
-    does not exist yet.
+    Step 6 of the F0003 assembly plan adds `learning` here. It is absent rather than
+    stubbed, so the facade never claims a capability that does not exist yet.
     """
 
     runs: RunService
     gates: GateService
     transcripts: TranscriptService
     evidence: EvidenceService
+    capabilities: CapabilityService
+
+    def wrap(self, request: LaunchRequest, actor: Actor):
+        """Preflight + capability guard + launch + registration, as one operator step.
+
+        `wrap` supersedes nothing: F0001's `launch` remains the primitive and is called
+        unchanged. The only thing `wrap` adds ahead of it is the guard.
+
+        Guard BEFORE launch is the whole point -- a blocked launch must persist no
+        session and create no run. `guard` raises exit 3, so control never reaches
+        `launch`.
+        """
+        self.capabilities.guard(request.provider_key, actor)
+        return self.runs.launch(request, actor)

@@ -183,7 +183,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: b7c7bd47f37c992c
       hotspot_rank: 3
-      hotspot_score: 0.02
+      hotspot_score: 0.03
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -192,7 +192,7 @@ freshness:
       - planning-mds/architecture/decisions/ADR-003-f0001-provider-execution-boundary.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0001-provider-auth-and-environment-preflight.md
       source_count: 2
-      last_modified: '2026-07-16'
+      last_modified: '2026-08-29'
       source_hash: 152c8cf7958f1661
       hotspot_rank: 6
       hotspot_score: 0.01
@@ -213,7 +213,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.04
+      hotspot_score: 0.05
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-29'
-      source_hash: 2b8a599c66f71488
+      source_hash: 2bf5774a531e9bb4
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -814,7 +814,7 @@ freshness:
       - engine/tests/unit/test_tui_behavioral_coverage.py
       source_count: 63
       last_modified: '2026-08-29'
-      source_hash: f6bbaa6cda7832dc
+      source_hash: 4937578d3afe8673
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -842,7 +842,7 @@ freshness:
       - engine/tests/unit/test_tmux_adapter.py
       source_count: 9
       last_modified: '2026-08-29'
-      source_hash: 04f6a1637826d561
+      source_hash: 0e9e0042d6beaae3
 symbols:
   symbol_count: 1608
   bound_symbol_count: 1608
