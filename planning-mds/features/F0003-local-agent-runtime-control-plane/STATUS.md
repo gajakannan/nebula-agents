@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; implementation begins at Step 1 (S0007)
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Step 1 (S0007) implemented, Checkpoint A met
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -45,6 +45,26 @@ the MCP adapter cannot be constructed with a query-only facade that does not yet
 because the 514 existing engine tests are that step's regression boundary.
 
 This run is also F0007-S0009's live governed pilot; F0007 cannot reach closeout without it.
+
+### Step 1 — S0007 query/command facade split · Checkpoint A met
+
+| Criterion | Result |
+|-----------|--------|
+| 514 existing engine tests pass **unmodified** | PASS — 522 total (514 + 8 new guards) |
+| Audit stream byte-identical across the split | PASS — pre/post captured from `main` vs this tree and diffed; see `artifacts/facade-split/` |
+| Query-facade operations append **zero** runtime events | PASS — the stream is exactly the two launch events |
+| Adding a mutating method to the query facade fails the build | PASS — proven by injecting each failure and observing the guard fire |
+| Executing the whole query surface leaves the runtime tree untouched | PASS — asserted against an **absent** runtime root, which must stay absent |
+| Neither facade reaches the other | PASS |
+
+`CommandService` holds `runs`, `gates`, `transcripts`. `QueryService` is the read facade
+and declares `QUERY_SURFACE`. `PreflightService` sits on the read side because it only
+inspects — the runtime directory is created by the first authorized mutation, not by
+probing for it.
+
+`Application` declares `queries`, `commands`, `preflight`, `identity`; `runs`, `gates`, and
+`transcripts` are properties delegating to `commands`. That delegation is what lets the
+514 existing tests pass without one of them being rewritten — see *Deviations* below.
 
 ## Plan-Review Findings
 
@@ -95,7 +115,7 @@ table.
 | F0003-S0004 | Evidence artifact store and retrieval index | [ ] Not Started |
 | F0003-S0005 | Deterministic transcript, log, and validator summaries | [ ] Not Started |
 | F0003-S0006 | Runtime metrics and failure-learning review | [ ] Not Started |
-| F0003-S0007 | Application query/command service split | [ ] Not Started (prerequisite for S0003) |
+| F0003-S0007 | Application query/command service split | [x] **Implemented** 2026-08-29 (Step 1; prerequisite for S0003) |
 
 ## Runtime Progress
 
@@ -108,7 +128,7 @@ table.
 - [ ] Deterministic summarizers implemented
 - [ ] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
 - [ ] Failure-learning proposal review flow implemented
-- [ ] Application query/command service split implemented (S0007; prerequisite for the MCP surface)
+- [x] Application query/command service split implemented (S0007; prerequisite for the MCP surface)
 
 ## Cross-Cutting
 
@@ -138,6 +158,12 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 | F0003-S0001 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0003-S0001 | Security Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
 | F0003-S0001 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
+
+## Deviations From the Assembly Plan
+
+| Plan said | Built | Why |
+|-----------|-------|-----|
+| `Application` exposes exactly two facades plus `identity` | `Application` also declares `preflight`, and exposes `runs`/`gates`/`transcripts` as delegating properties | The two statements were in tension. `test_bootstrap.py` asserts `isinstance(application.runs, RunService)` and several tests monkeypatch `application.queries.status`, `application.gates.run_validator`, and `application.preflight.run`. The literal two-field shape would have required rewriting those tests, which S0007 forbids. The properties return **the same objects** `commands` holds, so there is one owner per service and no second path; the guarantee ADR-007 needs — that the MCP adapter receives only the read facade — is unaffected. |
 
 ## Deferred Non-Blocking Follow-ups
 

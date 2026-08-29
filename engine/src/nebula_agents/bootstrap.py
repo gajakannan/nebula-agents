@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Mapping
 
 from nebula_agents.application.authorization import AuthorizationService
+from nebula_agents.application.commands import CommandService
 from nebula_agents.application.gates import GateService
 from nebula_agents.application.preflight import PreflightService
 from nebula_agents.application.queries import QueryService
@@ -72,15 +73,42 @@ class DeferredLocalPolicy:
 
 @dataclass(frozen=True, slots=True)
 class Application:
-    preflight: PreflightService
-    runs: RunService
-    gates: GateService
-    transcripts: TranscriptService
+    """Composition root, split into a read side and a write side (F0003-S0007).
+
+    `queries` and `preflight` never write; `commands` holds every mutating service.
+    The MCP adapter added in S0003 is constructed with `queries` alone, which is what
+    makes its read-only guarantee structural — passing `commands` to it would be a
+    visible architectural edit rather than a forgotten check (ADR-007).
+
+    `preflight` sits on the read side because `PreflightService.run` only inspects: it
+    stats the workspace, runtime root, and providers and reports. The runtime directory
+    is created by the first authorized mutation, not by probing it.
+
+    `runs`, `gates`, and `transcripts` remain reachable as properties. They are the same
+    objects `commands` holds — delegation, not a second path — so a caller written
+    against the F0001 shape keeps working and the existing engine suite passes without
+    a single test being rewritten to accommodate the split.
+    """
+
     queries: QueryService
+    commands: CommandService
+    preflight: PreflightService
     identity: OsIdentity
 
     def current_actor(self) -> Actor:
         return self.identity.current_actor()
+
+    @property
+    def runs(self) -> RunService:
+        return self.commands.runs
+
+    @property
+    def gates(self) -> GateService:
+        return self.commands.gates
+
+    @property
+    def transcripts(self) -> TranscriptService:
+        return self.commands.transcripts
 
 
 def build_application(workspace_root: Path, runtime_override: Path | None = None) -> Application:
@@ -116,4 +144,5 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
     gates = GateService(repository=repository, authorization=authorization, runner=validator, clock=clock, watcher=watcher)
     transcripts = TranscriptService(repository=repository, authorization=authorization, pipe=transcript_pipe, clock=clock)
     queries = QueryService(repository=repository, authorization=authorization, identity=identity, tmux=tmux)
-    return Application(preflight, runs, gates, transcripts, queries, identity)
+    commands = CommandService(runs=runs, gates=gates, transcripts=transcripts)
+    return Application(queries=queries, commands=commands, preflight=preflight, identity=identity)
