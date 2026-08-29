@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-5 of 8 implemented, Checkpoints A, B and C met
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-6 of 8 implemented, Checkpoints A-D met; Step 7 blocked on M1
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -163,6 +163,38 @@ reaches the application layer through a `SummaryExtractor` port, and
 `tests/contract/test_layering.py` fails the build on any outward import — verified by
 reintroducing the violation and watching it name the exact file.
 
+### Step 6 — metrics and learning proposals · Checkpoint D met
+
+| Criterion | Result |
+|-----------|--------|
+| Metrics recompute identically from the pinned `derived_from` revisions | PASS |
+| A clean run generates no proposal and exits 0 | PASS |
+| A rejected proposal is not regenerated while source `content_hash` is unchanged | PASS — and *is* regenerated once the evidence changes |
+| The run owner, lacking the target-document role, is denied `DecideProposal` | PASS — exit 5 |
+| `learn decide --decision accept` does not open the target document | PASS — asserted the target path is never created |
+
+Every metric in the closed set is emitted; one that does not apply carries a null value
+with `applicable: false` rather than being omitted or zeroed. Omission and zero are both
+misreadings — "no gate wait recorded" is not "waited zero seconds". `evidence_freshness`
+reports the **worst** entry rather than an average, because an index 90% fresh and 10%
+missing is not "mostly fresh": the missing artifacts are exactly the ones a reviewer will
+fail to open.
+
+Drafting and deciding are separate operations with separate authorization, which is what
+closes the escalation path ADR-009 names: one capability covering both would let an
+automated caller approve its own proposals.
+
+**One behavioural fix found by the end-to-end smoke, not by a unit test.** `infer_kind`
+classified a file named `validator.txt` as `status`, which has no failure rules — so a
+real validator failure could never reach a learning proposal. Name hints now take
+precedence over the extension.
+
+### Remaining
+
+Step 7 (S0003, the MCP adapter) is the only implementation step left, and it is **blocked
+on M1** — `nebula-agents mcp install` versus documented manual host configuration. Step 8
+is test and evidence closure.
+
 ## Plan-Review Findings
 
 ### Re-run `2026-08-20-45b7ccd8` — verdict CONDITIONALLY READY (`requires_justification: true`)
@@ -206,25 +238,25 @@ table.
 
 | Story | Title | Status |
 |-------|-------|--------|
-| F0003-S0001 | Runtime command surface and wrap launch | [~] **In Progress** — `wrap` guarded launch done; `metrics`/`learn` are S0006 |
+| F0003-S0001 | Runtime command surface and wrap launch | [x] **Implemented** 2026-08-29 (Steps 4+6) |
 | F0003-S0002 | Provider capability matrix and launch guards | [x] **Implemented** 2026-08-29 (Step 4) |
 | F0003-S0003 | MCP status and evidence tools | [ ] Not Started |
 | F0003-S0004 | Evidence artifact store and retrieval index | [x] **Implemented** 2026-08-29 (Steps 3+5) |
 | F0003-S0005 | Deterministic transcript, log, and validator summaries | [x] **Implemented** 2026-08-29 (Step 5) |
-| F0003-S0006 | Runtime metrics and failure-learning review | [ ] Not Started |
+| F0003-S0006 | Runtime metrics and failure-learning review | [x] **Implemented** 2026-08-29 (Step 6) |
 | F0003-S0007 | Application query/command service split | [x] **Implemented** 2026-08-29 (Step 1; prerequisite for S0003) |
 
 ## Runtime Progress
 
-- [ ] Local command surface implemented
+- [x] Local command surface implemented
 - [x] Wrapped launch records run metadata
 - [ ] Session status reconciles against real local session state
 - [x] Provider capability reports and launch guards implemented
 - [ ] MCP read-only status tools implemented
 - [x] Evidence artifact store and retrieval index implemented
 - [x] Deterministic summarizers implemented
-- [ ] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
-- [ ] Failure-learning proposal review flow implemented
+- [x] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
+- [x] Failure-learning proposal review flow implemented
 - [x] Application query/command service split implemented (S0007; prerequisite for the MCP surface)
 
 ## Cross-Cutting

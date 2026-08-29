@@ -13,7 +13,12 @@ from pathlib import Path
 from typing import Any, NoReturn, TextIO
 from uuid import uuid4
 
-from nebula_agents.domain.enums import ArtifactKind
+from nebula_agents.domain.enums import (
+    ArtifactKind,
+    ProposalDecisionKind,
+    ProposalStatus,
+    ReviewerRole,
+)
 
 from .formatters import (
     MAX_LIST_RECORDS,
@@ -36,6 +41,16 @@ _PROVIDERS = ("codex", "claude")
 _ACTIONS = ("plan", "feature", "build", "review", "validate")
 _VALIDATORS = ("stories", "trackers", "templates")
 _ARTIFACT_KINDS = tuple(kind.value for kind in ArtifactKind)
+_DECISIONS = ("accept", "edit", "reject", "archive")
+_REVIEWER_ROLES = tuple(role.value for role in ReviewerRole)
+_PROPOSAL_STATUSES = tuple(status.value for status in ProposalStatus)
+#: A bounded enumeration, never free text (runtime contract, section 3).
+_LEARN_SCOPES = ("run", "validators", "commands", "transcript")
+#: `learn decide --decision` values map to the recorded status. `Draft` is a status, not
+#: a decision, so it is deliberately unreachable from the CLI.
+_DECISION_KIND = {
+    "accept": "Accepted", "edit": "Edited", "reject": "Rejected", "archive": "Archived",
+}
 _RUN_STATUSES = (
     "PreflightPending",
     "Launching",
@@ -154,6 +169,37 @@ def build_parser() -> ContractParser:
     evidence_summarize.add_argument("--artifact-id")
     _sub_format_argument(evidence_summarize)
 
+    metrics = subcommands.add_parser("metrics", help="Report derived runtime metrics for a run.")
+    metrics.add_argument("--run-id", required=True, type=_run_id)
+    _format_argument(metrics)
+
+    learn = subcommands.add_parser("learn", help="Draft and decide failure-learning proposals.")
+    learn_commands = learn.add_subparsers(dest="learn_command", metavar="SUBCOMMAND", required=True)
+
+    learn_review = learn_commands.add_parser("review", help="Draft proposals from failed run evidence.")
+    learn_review.add_argument("--run-id", required=True, type=_run_id)
+    learn_review.add_argument("--scope", choices=_LEARN_SCOPES)
+    _format_argument(learn_review)
+
+    learn_list = learn_commands.add_parser("list", help="List recorded proposals.")
+    learn_list.add_argument("--run-id", required=True, type=_run_id)
+    learn_list.add_argument("--status", choices=_PROPOSAL_STATUSES)
+    _format_argument(learn_list)
+
+    learn_show = learn_commands.add_parser("show", help="Show one proposal with its decision history.")
+    learn_show.add_argument("proposal_id")
+    learn_show.add_argument("--run-id", required=True, type=_run_id)
+    _format_argument(learn_show)
+
+    learn_decide = learn_commands.add_parser("decide", help="Record accept, edit, reject, or archive.")
+    learn_decide.add_argument("proposal_id")
+    learn_decide.add_argument("--run-id", required=True, type=_run_id)
+    learn_decide.add_argument("--decision", required=True, choices=_DECISIONS)
+    learn_decide.add_argument("--role", required=True, choices=_REVIEWER_ROLES)
+    learn_decide.add_argument("--reason")
+    learn_decide.add_argument("--patch-plan")
+    _format_argument(learn_decide)
+
     validate = subcommands.add_parser("validate", help="Run one committed allowlisted validator.")
     validate.add_argument("--run-id", required=True, type=_run_id)
     validate.add_argument("--validator", required=True, choices=_VALIDATORS)
@@ -186,7 +232,7 @@ def main(
         namespace = parser.parse_args(arguments)
         command = namespace.command
         output_format = getattr(namespace, "format", "table")
-        _require_evidence_run_id(namespace)
+        _validate_usage(namespace)
         resolved_product_root = _resolve_product_root(product_root)
         application = _build_application(resolved_product_root)
         return _dispatch(application, namespace, output_format, product_root=resolved_product_root)
@@ -346,6 +392,46 @@ def _dispatch(
         result = invoke(application.queries.status, run_id=namespace.run_id, actor=actor)
         _emit_success(command, result, output_format)
         return 0
+    if command == "metrics":
+        result = invoke(application.queries.metrics, run_id=namespace.run_id, actor=actor)
+        _emit_success(command, to_data(result), output_format)
+        return 0
+    if command == "learn":
+        subcommand = namespace.learn_command
+        if subcommand == "review":
+            result = invoke(
+                application.learning.review,
+                run_id=namespace.run_id, actor=actor, scope=namespace.scope,
+            )
+            _emit_success("learn review", to_data(result), output_format)
+            return 0
+        if subcommand == "list":
+            result = invoke(
+                application.queries.proposals,
+                run_id=namespace.run_id, actor=actor, status=namespace.status,
+            )
+            _emit_success("learn list", to_data(result), output_format)
+            return 0
+        if subcommand == "show":
+            result = invoke(
+                application.queries.proposal,
+                run_id=namespace.run_id, proposal_id=namespace.proposal_id, actor=actor,
+            )
+            _emit_success("learn show", to_data(result), output_format)
+            return 0
+        if subcommand == "decide":
+            result = invoke(
+                application.learning.decide,
+                run_id=namespace.run_id,
+                proposal_id=namespace.proposal_id,
+                decision=enum_member("ProposalDecisionKind", _DECISION_KIND[namespace.decision]),
+                actor=actor,
+                reviewer_role=enum_member("ReviewerRole", namespace.role),
+                reason=namespace.reason,
+                patch_plan=namespace.patch_plan,
+            )
+            _emit_success("learn decide", to_data(result), output_format)
+            return 0
     if command == "evidence":
         subcommand = getattr(namespace, "evidence_command", None)
         if subcommand is None:
@@ -441,22 +527,39 @@ def _format_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--format", choices=_FORMATS, default="table")
 
 
-def _require_evidence_run_id(namespace: argparse.Namespace) -> None:
-    """`evidence` without a subcommand still requires `--run-id`.
+def _validate_usage(namespace: argparse.Namespace) -> None:
+    """Argument rules argparse cannot express, checked before anything is built.
 
-    The parser cannot express "required unless a subcommand is given" -- the F0003
-    subcommands carry their own `--run-id` -- so it is enforced here. Deliberately
-    before the application is built: a usage error must not depend on a workspace being
-    resolvable, which is how F0001 behaved when argparse enforced it.
+    Deliberately ahead of the application: a usage error must not depend on a workspace
+    being resolvable, which is how F0001 behaved when argparse enforced these.
     """
-    if getattr(namespace, "command", None) != "evidence":
-        return
-    if getattr(namespace, "evidence_command", None) is not None:
-        return
-    if getattr(namespace, "run_id", None) is None:
+    command = getattr(namespace, "command", None)
+
+    # `evidence` without a subcommand still requires `--run-id`. The parser cannot say
+    # "required unless a subcommand is given", and the F0003 subcommands carry their own.
+    if (
+        command == "evidence"
+        and getattr(namespace, "evidence_command", None) is None
+        and getattr(namespace, "run_id", None) is None
+    ):
         raise UsageFault(
             "the following arguments are required: --run-id",
             "nebula-agents evidence --run-id RUN_ID [--format {table,json}]",
+        )
+
+    # `--reason` is required for reject and archive (runtime contract, section 1).
+    # Enforced here as well as in the domain so the operator gets a usage error rather
+    # than a state-io one surfacing from deeper in the stack.
+    if (
+        command == "learn"
+        and getattr(namespace, "learn_command", None) == "decide"
+        and namespace.decision in ("reject", "archive")
+        and not namespace.reason
+    ):
+        raise UsageFault(
+            f"--reason is required for {namespace.decision}.",
+            "nebula-agents learn decide PROPOSAL_ID --run-id RUN_ID "
+            "--decision {accept,edit,reject,archive} --role ROLE [--reason REASON]",
         )
 
 

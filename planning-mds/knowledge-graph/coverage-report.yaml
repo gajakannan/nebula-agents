@@ -213,7 +213,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.06
+      hotspot_score: 0.07
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-29'
-      source_hash: bdd56318cc4ca2c0
+      source_hash: 0b68e6880eb1fa43
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -825,7 +825,7 @@ freshness:
       - engine/tests/unit/test_tui_behavioral_coverage.py
       source_count: 74
       last_modified: '2026-08-29'
-      source_hash: e70a451e0c5a73ee
+      source_hash: 34d85b13916e7e15
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -853,7 +853,7 @@ freshness:
       - engine/tests/unit/test_tmux_adapter.py
       source_count: 9
       last_modified: '2026-08-29'
-      source_hash: 64cde662dcbf5212
+      source_hash: 468e714e0e7aa4f6
 symbols:
   symbol_count: 1608
   bound_symbol_count: 1608

@@ -18,10 +18,16 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from nebula_agents.domain.enums import ArtifactKind
+from datetime import datetime, timezone
+
+from nebula_agents.domain.enums import (
+    ArtifactKind,
+    ArtifactRedactionStatus,
+    SummaryStatus,
+)
 from nebula_agents.domain.models import serialize_record
 from nebula_agents.domain.redaction import StreamingRedactor
-from nebula_agents.domain.summaries import SummaryMarker
+from nebula_agents.domain.summaries import ArtifactSummary, SummaryMarker
 
 from .atomic import (
     assert_owner_only_directory,
@@ -281,6 +287,22 @@ class FilesystemSummaryStore:
     def relative_path(self, summary_id: str) -> str:
         return f"summaries/{summary_id}.json"
 
+    def load(self, run_id: str, relative_path: str):
+        """Read one summary back. An unreadable summary reads as absent, never raises.
+
+        A caller deciding whether to draft a proposal must not be taken down by one bad
+        summary file; the artifact is still indexed and the failure is still visible.
+        """
+        path = self._runs_root / run_id / relative_path
+        if not path.is_file() or path.is_symlink():
+            return None
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+            self._schema.validate("f0003-artifact-summary.schema.json", document)
+            return _summary_from(document)
+        except Exception:
+            return None
+
     def save(self, run_id: str, summary) -> None:
         directory = self._runs_root / run_id / "summaries"
         directory.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -292,3 +314,34 @@ class FilesystemSummaryStore:
             pending = directory / f"{summary.summary_id}.pending.json"
             write_owner_only(pending, json_bytes(payload, pretty=True))
             publish_atomic(directory, pending, directory / f"{summary.summary_id}.json")
+
+
+def _summary_from(document: dict) -> ArtifactSummary:
+    def markers(items) -> tuple[SummaryMarker, ...]:
+        return tuple(
+            SummaryMarker(
+                ordinal=int(item["ordinal"]), label=str(item["label"]),
+                detail=item.get("detail"), exit_code=item.get("exit_code"),
+                duration_ms=item.get("duration_ms"),
+            )
+            for item in items or ()
+        )
+
+    return ArtifactSummary(
+        summary_id=str(document["summary_id"]),
+        artifact_id=str(document["artifact_id"]),
+        artifact_kind=ArtifactKind(document["artifact_kind"]),
+        summary_status=SummaryStatus(document["summary_status"]),
+        redaction_status=ArtifactRedactionStatus(document["redaction_status"]),
+        rule_set_version=str(document["rule_set_version"]),
+        generated_at=datetime.fromisoformat(
+            str(document["generated_at"]).replace("Z", "+00:00")
+        ).astimezone(timezone.utc),
+        source_reference=str(document["source_reference"]),
+        key_events=markers(document.get("key_events")),
+        failure_markers=markers(document.get("failure_markers")),
+        warning_markers=markers(document.get("warning_markers")),
+        open_questions=tuple(document.get("open_questions", ())),
+        truncation_count=document.get("truncation_count"),
+        last_observed_marker=document.get("last_observed_marker"),
+    )
