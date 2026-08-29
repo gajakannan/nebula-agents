@@ -29,6 +29,15 @@ class ErrorCode(str, Enum):
     PATH_DENIED = "PATH_DENIED"
     TRANSCRIPT_UNAVAILABLE = "TRANSCRIPT_UNAVAILABLE"
     INTERNAL_ERROR = "INTERNAL_ERROR"
+    # F0003 additions. Each maps to an existing exit class -- contract 1.1 adds no new
+    # class (runtime contract, section 4).
+    ARTIFACT_NOT_FOUND = "ARTIFACT_NOT_FOUND"          # not-found  -> 4
+    PROPOSAL_NOT_FOUND = "PROPOSAL_NOT_FOUND"          # not-found  -> 4
+    REDACTION_FAILED = "REDACTION_FAILED"              # gate-blocked -> 7
+    PROPOSAL_TARGET_FORBIDDEN = "PROPOSAL_TARGET_FORBIDDEN"  # forbidden -> 5
+    EVIDENCE_STALE = "EVIDENCE_STALE"                  # gate-blocked -> 7
+    CAPABILITY_BLOCKED = "CAPABILITY_BLOCKED"          # preflight  -> 3
+    DIGEST_COLLISION = "DIGEST_COLLISION"              # conflict   -> 6
 
 
 EXIT_BY_CATEGORY = {
