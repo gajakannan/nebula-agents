@@ -2,10 +2,12 @@
 
 ## Status
 
-- [x] Proposed
-- [ ] Accepted
+- [ ] Proposed
+- [x] Accepted
 - [ ] Superseded
 - [ ] Rejected
+
+**Accepted:** 2026-08-29T11:15:45-04:00 by explicit operator approval.
 
 ## Context
 
@@ -102,3 +104,4 @@ silently redefine their meaning").
 
 - [ ] At feature G0, fix the module map for the new application/infrastructure units.
 - [ ] Confirm the `mcp serve` subcommand name against host configuration conventions.
+- [x] Accepted through the Phase B operator approval gate.

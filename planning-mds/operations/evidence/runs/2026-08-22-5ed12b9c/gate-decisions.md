@@ -43,3 +43,19 @@ justification.
 READY is a statement about the completeness of the planning package. It is **not** the
 Phase B approval. The five ADRs remain `Proposed`, and BLUEPRINT §5.9 remains pending the
 operator's decision.
+
+## Downstream: Phase B Approval Recorded
+
+Recorded after this run closed; noted here so the verdict and the decision it supported are
+traceable from one place.
+
+| Field | Value |
+|-------|-------|
+| Decision | Phase B architecture **approved** |
+| Recorded | `2026-08-29T11:15:45-04:00` |
+| Approved against | this run's PR4 verdict (READY, `requires_justification: false`) |
+| Effect | ADR-005 … ADR-009 `Proposed` → `Accepted`; BLUEPRINT §5.9 stamped; F0003 may enter `feature` G0 |
+| Carried open | N4 fixed post-run (PR #72). M1 (medium) and L1 (low) accepted open by owner decision |
+
+The approval is the operator's, not this run's. This run supplied the severity evidence it
+was taken against and asserts nothing about the decision itself.

@@ -2,10 +2,12 @@
 
 ## Status
 
-- [x] Proposed
-- [ ] Accepted
+- [ ] Proposed
+- [x] Accepted
 - [ ] Superseded
 - [ ] Rejected
+
+**Accepted:** 2026-08-29T11:15:45-04:00 by explicit operator approval.
 
 ## Context
 
@@ -180,6 +182,7 @@ Root-selection alternatives, considered separately:
 - [ ] Specify the `superseded_by` transition for artifacts moved within a root.
 - [ ] At feature G0, decide whether `source_root` values are also surfaced through MCP
       responses or remain index-internal.
+- [x] Accepted through the Phase B operator approval gate.
 
 ## Revision History
 
@@ -190,3 +193,5 @@ Root-selection alternatives, considered separately:
   while S0004 admits three approved roots. Identity is now root-scoped with an explicit
   `root_key`, and root selection is longest-match with a fixed tiebreak. M2 resolved in
   the same pass. The ADR remains `Proposed`; this revision precedes any approval.
+- **2026-08-29 — accepted.** The root-scoped identity rule above is the approved one; the
+  Phase B operator approval was recorded against plan-review run `2026-08-22-5ed12b9c`.
