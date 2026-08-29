@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import BinaryIO, Mapping, Protocol, Sequence
+from typing import Any, BinaryIO, Mapping, Protocol, Sequence
 
 from nebula_agents.domain.enums import ProviderKey, RedactionStatus, RunStatus, ValidatorKey
 from nebula_agents.domain.models import (
@@ -127,3 +127,16 @@ class TranscriptPipePort(Protocol):
     def filter_stream(self, source: BinaryIO, output_path: Path) -> tuple[RedactionStatus, int]: ...
 
     def capture_status(self, *, run: RunRecord) -> TranscriptState | None: ...
+
+
+class ArtifactIndexStore(Protocol):
+    """The per-run artifact index (F0003-S0004).
+
+    `load` never writes -- an absent index is an empty document, not a file to create.
+    """
+
+    def load(self, run_id: str) -> Any: ...
+
+    def commit(
+        self, *, run_id: str, expected_revision: int, entries: tuple[Any, ...], now: datetime
+    ) -> Any: ...

@@ -15,9 +15,17 @@
     "payload"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
-    "run_id": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"},
-    "sequence": {"type": "integer", "minimum": 1},
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}-[0-9a-f]{8}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
     "event_type": {
       "type": "string",
       "enum": [
@@ -44,17 +52,45 @@
         "TranscriptFailed",
         "RecoveryAttempted",
         "AuthorizationDenied",
-        "StateRecoveryApplied"
-      ]
+        "StateRecoveryApplied",
+        "ArtifactIndexed",
+        "ArtifactPolicyViolation",
+        "ArtifactSummarized",
+        "SummaryFailed",
+        "SummaryBlocked",
+        "CapabilityProbed",
+        "CapabilityProbeTimedOut",
+        "LaunchBlocked",
+        "ProposalDrafted",
+        "ProposalBlocked",
+        "ProposalDecided"
+      ],
+      "description": "Runtime event types. The first 24 are F0001's; the remainder are added by F0003 (contract 1.1). Adding a member keeps every previously written event valid, but a strict 1.0 reader will reject an event type it does not know -- see the runtime contract, section 9."
     },
-    "occurred_at": {"type": "string", "format": "date-time"},
-    "actor": {"$ref": "#/$defs/actor"},
-    "correlation_id": {"type": "string", "format": "uuid"},
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "$ref": "#/$defs/actor"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
     "payload": {
       "type": "object",
       "maxProperties": 32,
       "additionalProperties": {
-        "type": ["string", "number", "integer", "boolean", "null", "array", "object"]
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null",
+          "array",
+          "object"
+        ]
       }
     }
   },
@@ -62,12 +98,36 @@
     "actor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["uid", "username", "role"],
+      "required": [
+        "uid",
+        "username",
+        "role"
+      ],
       "properties": {
-        "uid": {"type": "integer", "minimum": 0},
-        "username": {"type": "string", "minLength": 1, "maxLength": 256},
-        "role": {"type": "string", "enum": ["LocalOperator", "Reviewer", "System"]},
-        "display_label": {"type": ["string", "null"], "maxLength": 80}
+        "uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "username": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "LocalOperator",
+            "Reviewer",
+            "System"
+          ]
+        },
+        "display_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
       }
     }
   }

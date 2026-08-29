@@ -31,7 +31,7 @@ required rather than omitted.
 | tmux isolation | PASS | `nebula-g1-16075bda` confirmed absent before use; no existing session targeted |
 | tmux lifecycle smoke | PASS | Unique session created, found, destroyed, confirmed absent |
 | Real-tmux integration test | PASS | `test_real_tmux_lifecycle.py` **ran** — it did not skip |
-| Six F0003 schemas resolve | PASS | All load through the existing `JsonSchemaRegistry` with **no registry change** |
+| Six F0003 schemas resolve | ~~PASS~~ **CORRECTED — see below** | The claim was wrong; the registry allowlist accepted only `f0001-` names |
 | ADR-006 root selection | PASS | See *Approved Roots* below |
 | Dependency-free MCP precedent | PASS | `scripts/kg/mcp_server.py` uses stdlib plus local siblings only — no third-party package |
 | Engine baseline, full CI matrix | PASS | **514 tests pass on 3.11, 3.12, and 3.14** |
@@ -86,6 +86,28 @@ tmux session were both removed.
 `evidence_root`**, which F0003 needs as its third approved root. The directory exists and is
 readable; only the config field is absent. This is already an "Existing Code (Must Be
 Modified)" row in the assembly plan, and G1 confirms the environment supports it.
+
+## Correction — issued 2026-08-29 during Step 3
+
+**The "six F0003 schemas resolve" row above was wrong**, and is corrected here rather than
+edited away.
+
+`JsonSchemaRegistry._load` allowlisted schema names beginning `f0001-` only. Every F0003
+schema name was refused. The G1 probe called `registry.validate(name, {})` and read the
+resulting `NebulaError` as "rejects an empty document" — the expected outcome — when it was
+in fact "Schema name is not allowlisted". A refusal was mistaken for a validation.
+
+The underlying capability claim — that the six schemas are loadable without rewriting the
+registry — held. What was wrong was "no registry change": widening the allowlist to
+`("f0001-", "f0003-")` is a real, if small, change, and it was made in Step 3.
+
+The probe was weak in a specific way worth naming: it asserted only that *an* error was
+raised, never which one. Any error would have passed it. The replacement,
+`test_the_schema_registry_allowlists_f0003_but_not_arbitrary_names`, loads each F0003
+schema and requires success, and separately requires refusal for a non-allowlisted name,
+a traversal attempt, and a non-schema file.
+
+This does not change the G1 verdict. No blocker was missed, and no other row depended on it.
 
 ## Blockers
 

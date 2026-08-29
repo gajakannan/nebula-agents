@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-2 implemented, Checkpoints A and B met
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-3 implemented, Checkpoints A and B met
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -93,6 +93,30 @@ rather than merged — merging would change an F0001 record shape, which contrac
 forbids. The bridge `artifact_redaction_of` is total, asserted by test, so a future F0001
 member added without a mapping fails rather than silently defaulting to `Pass`.
 
+### Step 3 — artifact index store and retrieval · S0004 substantially done
+
+`FilesystemArtifactIndex` writes one atomic JSON document per run at
+`{runtime_root}/runs/{run_id}/artifacts.json` — per-run lock, monotonic revision,
+same-directory temp file, fsync, atomic replace, mode `0600`. It takes **its own** lock
+rather than the run lock: the index is a projection and must never block a launch.
+
+The ADR-002 primitives are **extracted** into `infrastructure/atomic.py` and shared with
+`FilesystemRunRepository` rather than copied. A second hand-written locking and fsync
+routine is how two copies drift — one gets a fix the other never sees. The 514 F0001 tests
+verified the refactor changed no behavior.
+
+CLI: `evidence index|list|show` are added as **optional subcommands** of the existing
+`evidence` parser, so F0001's `evidence --run-id X` is untouched. `--run-id` moved off
+`required=True` there, and the bare form's usage error moved into `main` — before the
+application is built, matching how argparse behaved when it enforced it.
+
+**Two findings, both recorded in the run's `gate-decisions.md`:**
+
+| ID | Severity | Finding |
+|----|----------|---------|
+| S3-F1 | High | Contract `1.1` could not be "no F0001 schema changes": BLUEPRINT §5.3 requires indexing to append runtime events, and `event_type` is a closed enum. Resolved by extending the enum and correcting runtime-contract §9. **Architect confirmation needed at G3** |
+| S3-F2 | Low | A G1 row claimed the six F0003 schemas load with "no registry change". The registry allowlisted `f0001-` only; the probe read a refusal as a validation. Corrected in the G1 artifact and replaced by a real test |
+
 ## Plan-Review Findings
 
 ### Re-run `2026-08-20-45b7ccd8` — verdict CONDITIONALLY READY (`requires_justification: true`)
@@ -139,7 +163,7 @@ table.
 | F0003-S0001 | Runtime command surface and wrap launch | [ ] Not Started |
 | F0003-S0002 | Provider capability matrix and launch guards | [ ] Not Started |
 | F0003-S0003 | MCP status and evidence tools | [ ] Not Started |
-| F0003-S0004 | Evidence artifact store and retrieval index | [ ] Not Started |
+| F0003-S0004 | Evidence artifact store and retrieval index | [~] **In Progress** — index, `evidence index\|list\|show` done; summaries are S0005 |
 | F0003-S0005 | Deterministic transcript, log, and validator summaries | [ ] Not Started |
 | F0003-S0006 | Runtime metrics and failure-learning review | [ ] Not Started |
 | F0003-S0007 | Application query/command service split | [x] **Implemented** 2026-08-29 (Step 1; prerequisite for S0003) |
@@ -151,7 +175,7 @@ table.
 - [ ] Session status reconciles against real local session state
 - [ ] Provider capability reports and launch guards implemented
 - [ ] MCP read-only status tools implemented
-- [ ] Evidence artifact store and retrieval index implemented
+- [x] Evidence artifact store and retrieval index implemented
 - [ ] Deterministic summarizers implemented
 - [ ] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
 - [ ] Failure-learning proposal review flow implemented

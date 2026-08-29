@@ -48,13 +48,18 @@ class QueryService:
         "evidence",
         "recovery_candidates",
         "recovery_status",
+        "artifacts",
+        "artifact",
     })
 
-    def __init__(self, *, repository: RunRepository, authorization: AuthorizationService, identity: IdentityPort, tmux: TmuxPort | None = None) -> None:
+    def __init__(self, *, repository: RunRepository, authorization: AuthorizationService, identity: IdentityPort, tmux: TmuxPort | None = None, index: object | None = None) -> None:
         self._repository = repository
         self._authorization = authorization
         self._identity = identity
         self._tmux = tmux
+        # The artifact index is optional so a composition without F0003 wiring still
+        # builds. An absent index reads as an empty one, never as an error.
+        self._index = index
 
     def _actor(self, actor: Actor | None) -> Actor:
         return actor or self._identity.current_actor()
@@ -125,6 +130,40 @@ class QueryService:
             "not-found",
             "List recovery candidates and select an available run.",
             run_id=run_id,
+        )
+
+    def artifacts(self, run_id: str, actor: Actor | None = None, kind: str | None = None) -> tuple:
+        """List indexed artifacts for a run. Reads the index; never creates it."""
+        subject = self._actor(actor)
+        run = self._repository.load(run_id)
+        require_authorized(self._repository, self._authorization, run, subject, Action.READ_STATE)
+        if self._index is None:
+            return ()
+        entries = self._index.load(run_id).entries
+        if kind is not None:
+            entries = tuple(e for e in entries if e.artifact_kind.value == kind)
+        return entries
+
+    def artifact(self, artifact_id: str, actor: Actor | None = None):
+        """Resolve one artifact by its opaque id.
+
+        The run id is the first ID segment, so no scan is needed. `root_key` is *not*
+        parsed -- it identifies which root the digest is relative to, and reconstructing
+        a path from it would defeat the point of an opaque identifier.
+        """
+        parts = artifact_id.split("/")
+        if len(parts) != 3 or not parts[0]:
+            raise error(
+                ErrorCode.USAGE_ERROR, "Malformed artifact id.", "usage",
+                "Pass an artifact id exactly as `evidence list` reported it.",
+                artifact_id=artifact_id,
+            )
+        for entry in self.artifacts(parts[0], actor):
+            if entry.artifact_id == artifact_id:
+                return entry
+        raise error(
+            ErrorCode.ARTIFACT_NOT_FOUND, "Artifact is not indexed.", "not-found",
+            "Run evidence index for this run, then retry.", artifact_id=artifact_id,
         )
 
     def _recovery_projection(self, recoverable: RecoverableRun, subject: Actor) -> RecoveryProjection:

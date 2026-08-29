@@ -144,3 +144,24 @@ def test_every_committed_f0003_schema_has_a_record_exercised_here(schema_root: P
         "f0003-metric-snapshot.schema.json",
     }
     assert committed - exercised == {"f0003-mcp-response.schema.json"}
+
+
+def test_the_schema_registry_allowlists_f0003_but_not_arbitrary_names(schema_root: Path) -> None:
+    """The allowlist is a containment control, not a formality.
+
+    G1 recorded that the six F0003 schemas "load through the existing registry with no
+    registry change". That was wrong: the allowlist accepted only `f0001-` names, and the
+    refusal it raised was misread as a validation failure. Widening it to `f0003-` is a
+    real change, and this test is what would have caught the mistake at G1.
+    """
+    from nebula_agents.domain.errors import NebulaError
+    from nebula_agents.infrastructure.schema_registry import JsonSchemaRegistry
+
+    registry = JsonSchemaRegistry(schema_root)
+    for name in sorted(p.name for p in schema_root.glob("f0003-*.schema.json")):
+        registry._load(name)  # must not raise
+
+    for rejected in ("f0002-anything.schema.json", "../escape.schema.json",
+                     "f0003-not-a-schema.json", "policy.json"):
+        with pytest.raises(NebulaError):
+            registry._load(rejected)

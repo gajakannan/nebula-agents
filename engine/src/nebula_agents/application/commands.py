@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .evidence import EvidenceService
 from .gates import GateService
 from .runs import RunService
 from .transcripts import TranscriptService
@@ -27,11 +28,12 @@ from .transcripts import TranscriptService
 class CommandService:
     """Aggregates the mutating application services.
 
-    Steps 3, 4, and 6 of the F0003 assembly plan add `evidence`, `capabilities`, and
-    `learning` here. They are absent rather than stubbed, so the facade never claims a
-    capability that does not exist yet.
+    Steps 4 and 6 of the F0003 assembly plan add `capabilities` and `learning` here.
+    They are absent rather than stubbed, so the facade never claims a capability that
+    does not exist yet.
     """
 
     runs: RunService
     gates: GateService
     transcripts: TranscriptService
+    evidence: EvidenceService
