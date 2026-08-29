@@ -2,10 +2,12 @@
 
 ## Status
 
-- [x] Proposed
-- [ ] Accepted
+- [ ] Proposed
+- [x] Accepted
 - [ ] Superseded
 - [ ] Rejected
+
+**Accepted:** 2026-08-29T11:15:45-04:00 by explicit operator approval.
 
 ## Context
 
@@ -119,3 +121,4 @@ approved roots.
 
 - [ ] At feature G0, pin the MCP protocol revision targeted and its conformance fixtures.
 - [ ] Record the query/command service split in the module map.
+- [x] Accepted through the Phase B operator approval gate.

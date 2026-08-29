@@ -1,7 +1,7 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** Phase B architecture complete; plan-review verdict **READY**; pending operator approval before the `feature` action
-**Last Updated:** 2026-08-23
+**Overall Status:** Phase B architecture approved; plan-review verdict **READY**; ready to enter the `feature` action at G0
+**Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
 
@@ -9,7 +9,7 @@
 |-------------|-------|----------|
 | Technical architecture | Drafted | `planning-mds/BLUEPRINT.md` §5 |
 | Runtime contract (CLI + MCP + records) | Drafted | `planning-mds/architecture/f0003-runtime-contract.md` |
-| ADRs | 5 authored, all `Proposed` | `ADR-005` … `ADR-009` |
+| ADRs | 5 authored, all `Accepted` | `ADR-005` … `ADR-009` |
 | Solution patterns | §12 added; §1 MCP prohibition narrowed | `planning-mds/architecture/SOLUTION-PATTERNS.md` |
 | Data model | F0003 records added | `planning-mds/architecture/data-model.md` |
 | JSON schemas | 6 authored and schema-valid | `planning-mds/schemas/f0003-*.schema.json` |
@@ -19,8 +19,10 @@ Exit validation is green: `validate-stories`, `generate-story-index`, `validate-
 `kg --write-coverage-report`, `kg --check-drift`, `kg --check-reproducible`, and
 `validate_templates` all pass, as do the six framework lifecycle gates.
 
-**The Phase B approval checkpoint is outstanding.** The five ADRs stay `Proposed` until the
-operator approves; approval is recorded in BLUEPRINT §5.9 and flips them to `Accepted`.
+**The Phase B approval checkpoint is closed.** The operator approved at
+`2026-08-29T11:15:45-04:00` against plan-review run `2026-08-22-5ed12b9c` (verdict READY,
+`requires_justification: false`). The five ADRs are `Accepted` and the approval is recorded
+in BLUEPRINT §5.9. F0003 may now enter the `feature` action at G0.
 
 ## Plan-Review Findings
 
@@ -37,8 +39,9 @@ First recorded readiness verdict for F0003; all five gates PR0-PR4 executed.
 | M1 | Medium | S0003 MCP install vs manual host configuration | Open (deferred by owner) |
 | L1 | Low | S0001 open question unreconciled against ADR-005 | Open (deferred by owner) |
 
-With N1 and N2 resolved, a further re-run should compute READY on severity alone. The
-recorded verdict remains CONDITIONALLY READY until a gate produces a new one.
+Superseded by run `2026-08-22-5ed12b9c`, which computed **READY** (critical = 0, high = 0,
+`requires_justification: false`) and is the verdict the Phase B approval was recorded
+against.
 
 ### Superseded run `2026-08-19-ec0a97ce` — verdict NOT READY
 
@@ -54,11 +57,11 @@ recorded verdict remains CONDITIONALLY READY until a gate produces a new one.
 | M2 | Medium | ADR-006 deferred digest length to G0 while the schema pinned 12 hex | **Resolved 2026-08-21** — 12 fixed in the ADR; the contradictory follow-up removed |
 | L1 | Low | S0001 open question answered by ADR-005 but not reconciled in the story | Open |
 
-No critical or high findings remain. M1 and L1 are open, both non-blocking under the
-`review-family` profile (critical = 0 + high = 0 → READY on severity alone). Re-run
-`plan-review` before the Phase B approval so the verdict rests on gate evidence rather
-than on this table: the PR4 readiness gate has never executed, since the original run
-halted at PR2 on H4.
+No critical or high findings remain. M1 and L1 stay open by owner decision, both
+non-blocking under the `review-family` profile. The PR4 readiness gate — which never
+executed in this run, because it halted at PR2 on H4 — ran to completion in
+`2026-08-22-5ed12b9c`, so the recorded verdict rests on gate evidence rather than on this
+table.
 
 ## Story Checklist
 
@@ -90,7 +93,7 @@ halted at PR2 on H4.
 - [x] Story validator passes
 - [x] Tracker validator passes
 - [ ] Security review of redaction and retrieval boundaries completed
-- [~] Architecture review of runtime contract drafted; operator approval outstanding
+- [x] Architecture review of runtime contract complete; operator approved 2026-08-29 (BLUEPRINT §5.9)
 - [ ] Tests cover command surface, MCP tools, artifact retrieval, summaries, metrics, and proposal workflow
 
 ## Required Signoff Roles (Set in Planning)

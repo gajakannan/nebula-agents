@@ -2,10 +2,12 @@
 
 ## Status
 
-- [x] Proposed
-- [ ] Accepted
+- [ ] Proposed
+- [x] Accepted
 - [ ] Superseded
 - [ ] Rejected
+
+**Accepted:** 2026-08-29T11:15:45-04:00 by explicit operator approval.
 
 ## Context
 
@@ -124,3 +126,4 @@ on partial input.
 - [ ] At feature G0, author the initial target allowlist and its review process.
 - [ ] Define proposal retention and archival policy.
 - [ ] Confirm the F0004 handoff shape for proposal and decision records.
+- [x] Accepted through the Phase B operator approval gate.

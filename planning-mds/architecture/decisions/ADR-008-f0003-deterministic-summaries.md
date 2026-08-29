@@ -2,10 +2,12 @@
 
 ## Status
 
-- [x] Proposed
-- [ ] Accepted
+- [ ] Proposed
+- [x] Accepted
 - [ ] Superseded
 - [ ] Rejected
+
+**Accepted:** 2026-08-29T11:15:45-04:00 by explicit operator approval.
 
 ## Context
 
@@ -114,3 +116,4 @@ evidence, never a replacement for it.
 
 - [ ] At feature G0, fix the per-kind rule sets and their fixture corpus.
 - [ ] Define the summary rule-set version field and its compatibility policy.
+- [x] Accepted through the Phase B operator approval gate.

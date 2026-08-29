@@ -237,6 +237,8 @@ F0003 deliberately has no HTTP service, database, daemon, listening port, manage
 
 ### 5.9 Phase B Approval
 
-**Status: pending operator approval.** The five F0003 ADRs are `Proposed`. This section, the runtime contract, the ontology bindings, and the exit validation must be reviewed before F0003 enters the `feature` action at G0.
+The operator approved the F0003 architecture at `2026-08-29T11:15:45-04:00`. The five F0003 ADRs (ADR-005 through ADR-009) are Accepted, architecture validation is clean, and F0003 is ready to enter the `feature` action at G0.
+
+The approval was recorded against plan-review run `2026-08-22-5ed12b9c`, which returned **READY** on the `review-family` severity profile (critical = 0, high = 0, `requires_justification: false`). That run verified this section, the runtime contract, the six schemas, the ontology bindings, and the F0003 authorization extensions. Two non-blocking findings remain open by owner decision: M1 (`nebula-agents mcp install` versus documented manual host configuration, needed before S0003 is built) and L1 (S0001's open question, answered by ADR-005 but unreconciled in the story).
 
 This Phase B package is also the intended subject of F0007's live governed pilot: running F0003 through `feature` G0-G8 supplies the pilot evidence F0007-S0009 requires, rather than exercising a throwaway feature.
