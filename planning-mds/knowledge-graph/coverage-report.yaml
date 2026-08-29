@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-29'
-      source_hash: 670cac7d430c859f
+      source_hash: 99a6beaec886309c
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -772,6 +772,9 @@ freshness:
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.0.3.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_facade_split.cpython-311-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_facade_split.cpython-312-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_facade_split.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_formatter_interop_edges.cpython-314-pytest-8.4.2.pyc
@@ -793,6 +796,7 @@ freshness:
       - engine/tests/contract/test_cli.py
       - engine/tests/contract/test_cli_edge_contracts.py
       - engine/tests/contract/test_contract_files.py
+      - engine/tests/contract/test_facade_split.py
       - engine/tests/contract/test_formatter_interop_edges.py
       - engine/tests/contract/test_formatters.py
       - engine/tests/contract/test_json_schemas.py
@@ -800,9 +804,9 @@ freshness:
       - engine/tests/security/test_static_execution_boundary.py
       - engine/tests/unit/test_tui_actions.py
       - engine/tests/unit/test_tui_behavioral_coverage.py
-      source_count: 51
-      last_modified: '2026-08-18'
-      source_hash: 0a13396d860bba4d
+      source_count: 55
+      last_modified: '2026-08-29'
+      source_hash: 35823fbc6cdd01d2
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -829,8 +833,8 @@ freshness:
       - engine/tests/integration/test_real_tmux_lifecycle.py
       - engine/tests/unit/test_tmux_adapter.py
       source_count: 9
-      last_modified: '2026-08-18'
-      source_hash: caa1f1f662f6a107
+      last_modified: '2026-08-29'
+      source_hash: ed1054240e8e11c4
 symbols:
   symbol_count: 1608
   bound_symbol_count: 1608

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import replace
+from typing import ClassVar
 from datetime import datetime
 from pathlib import Path
 
@@ -23,6 +24,32 @@ from .runs import require_authorized
 
 
 class QueryService:
+    """The query facade (F0003-S0007).
+
+    Read-only projections over persisted state. No method here may write to the
+    filesystem, append a runtime event, or change run, gate, transcript, artifact, or
+    proposal state. That is not a convention: `QUERY_SURFACE` below is the declared
+    public surface, and `tests/contract/test_facade_split.py` fails the build when a
+    method is added that is not declared, when a declared name reads as a mutation, or
+    when executing the surface leaves any trace on disk.
+
+    `_fresh` reconciles a stale session reference *in memory* to report an accurate
+    status. It deliberately does not commit that correction — a probe that only reports
+    is a query; reconciliation that persists is `CommandService.runs.reconcile`.
+
+    A query must not lazily initialize state either. Against an absent runtime root the
+    surface returns empty projections rather than creating the directory; the first
+    authorized mutation creates it.
+    """
+
+    QUERY_SURFACE: ClassVar[frozenset[str]] = frozenset({
+        "sessions",
+        "status",
+        "evidence",
+        "recovery_candidates",
+        "recovery_status",
+    })
+
     def __init__(self, *, repository: RunRepository, authorization: AuthorizationService, identity: IdentityPort, tmux: TmuxPort | None = None) -> None:
         self._repository = repository
         self._authorization = authorization
