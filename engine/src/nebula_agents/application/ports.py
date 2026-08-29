@@ -140,3 +140,24 @@ class ArtifactIndexStore(Protocol):
     def commit(
         self, *, run_id: str, expected_revision: int, entries: tuple[Any, ...], now: datetime
     ) -> Any: ...
+
+
+class SummaryExtractor(Protocol):
+    """Rule-based extraction over artifact bytes (F0003-S0005, ADR-008).
+
+    A port, not a direct import: extractors are infrastructure per BLUEPRINT 5.1, and
+    application must not depend inward-out. Injecting also makes the "no model call
+    participates" guarantee checkable -- the application layer cannot reach a model
+    because it cannot reach anything it was not given.
+    """
+
+    @property
+    def rule_set_version(self) -> str: ...
+
+    def extract(self, kind: Any, payload: bytes) -> tuple[Any, bool, bool]: ...
+
+
+class SummaryStore(Protocol):
+    def save(self, run_id: str, summary: Any) -> None: ...
+
+    def relative_path(self, summary_id: str) -> str: ...

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "feature_id": "F0003",
+  "run_id": "2026-08-29-16075bda",
+  "status": "in-progress",
+  "run_scope": "feature-completion",
+  "gate_results": {
+    "assembly_plan_validation": {"required": true, "result": "PASS"},
+    "runtime_preflight": {"required": true, "result": "PASS"}
+  },
+  "omissions": [],
+  "waivers": {}
+}

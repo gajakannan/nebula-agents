@@ -31,6 +31,10 @@ from nebula_agents.infrastructure.policy_store import LocalPolicyStore
 from nebula_agents.infrastructure.process import SubprocessRunner
 from nebula_agents.infrastructure.providers import ClaudeAdapter, CodexAdapter
 from nebula_agents.infrastructure.schema_registry import JsonSchemaRegistry
+from nebula_agents.infrastructure.summarizers import (
+    FilesystemSummaryStore,
+    RuleBasedSummaryExtractor,
+)
 from nebula_agents.infrastructure.tmux import TmuxAdapter
 from nebula_agents.infrastructure.transcript import TmuxTranscriptAdapter
 from nebula_agents.infrastructure.watcher import AllowlistedValidatorRunner, PollingEvidenceWatcher
@@ -165,6 +169,9 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
         authorization=authorization,
         clock=clock,
         roots=config.approved_roots,
+        summaries=FilesystemSummaryStore(config.runs_root, schema, config.lock_timeout_seconds),
+        extractor=RuleBasedSummaryExtractor(),
+        marker_limit=config.summary_marker_limit,
     )
     queries = QueryService(
         repository=repository, authorization=authorization, identity=identity,

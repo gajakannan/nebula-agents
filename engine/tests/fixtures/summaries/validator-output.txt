@@ -1,0 +1,12 @@
+Validating story: F0003-S0001-runtime-command-surface-and-wrap-launch.md
+------------------------------------------------------------
+[PASS] story_header_present
+[PASS] user_story_format
+[FAIL] acceptance_criteria_testable: line 24 uses "fast" without a threshold
+       remediation: state a measurable threshold, e.g. "within 1 second"
+[PASS] interaction_contract_present
+[FAIL] out_of_scope_present: section is empty
+       remediation: state what this story does not cover
+============================================================
+Story validation FAILED - 2 issues
+exit code: 1

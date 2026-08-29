@@ -1,8 +1,8 @@
-"""Evidence indexing (F0003-S0004).
+"""Evidence indexing and summarization (F0003-S0004, F0003-S0005).
 
-`index` is a command: it authorizes `IndexEvidence`, derives identity, enforces path
-containment, commits the projection, and appends one runtime event per entry — because
-indexing changes what a reviewer sees, and BLUEPRINT §5.3 requires that to be audited.
+Both are commands: each authorizes `IndexEvidence`, writes a projection, and appends a
+runtime event — because both change what a reviewer sees, and BLUEPRINT §5.3 requires
+that to be audited.
 
 Reads live on the query facade. Nothing here is reachable from the MCP adapter.
 """
@@ -10,11 +10,12 @@ Reads live on the query facade. Nothing here is reachable from the MCP adapter.
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace as _replace
 from datetime import datetime
 from pathlib import Path
 from typing import Mapping, Sequence
 
-from nebula_agents.domain.artifacts import content_digest, new_entry
+from nebula_agents.domain.artifacts import content_digest, new_entry, retrieval_policy_for
 from nebula_agents.domain.enums import (
     Action,
     ArtifactKind,
@@ -22,7 +23,9 @@ from nebula_agents.domain.enums import (
     FreshnessStatus,
     SourceRoot,
 )
+from nebula_agents.domain.errors import ErrorCode, error
 from nebula_agents.domain.models import Actor
+from nebula_agents.domain.summaries import ArtifactSummary, resolve_status, truncate
 from nebula_agents.domain.transitions import advance
 
 from .authorization import AuthorizationService
@@ -43,12 +46,18 @@ class EvidenceService:
         authorization: AuthorizationService,
         clock: Clock,
         roots: Mapping[SourceRoot, Path],
+        summaries=None,
+        extractor=None,
+        marker_limit: int = 200,
     ) -> None:
         self._repository = repository
         self._index = index
         self._authorization = authorization
         self._clock = clock
         self._roots = dict(roots)
+        self._summaries = summaries
+        self._extractor = extractor
+        self._marker_limit = marker_limit
 
     def index_artifacts(
         self,
@@ -152,6 +161,137 @@ class EvidenceService:
             return None
         return digest.hexdigest()
 
+    def summarize(self, run_id: str, actor: Actor, artifact_id: str | None = None) -> tuple:
+        """Summarize one artifact, or every artifact in a run.
+
+        Summarization is a command: it authorizes `IndexEvidence`, writes summary
+        artifacts, and updates the index with each summary's path and resolved redaction
+        status. A summary failure leaves the artifact indexed with
+        `summary_status: Failed` -- an artifact whose summary could not be produced is
+        still evidence, and dropping the entry would lose the only record of it.
+        """
+        run = self._repository.load(run_id)
+        require_authorized(
+            self._repository, self._authorization, run, actor, Action.INDEX_EVIDENCE
+        )
+        if self._summaries is None:
+            raise error(
+                ErrorCode.COMMAND_FAILED, "Summary store is unavailable.", "command-failed",
+                "Rebuild the application composition.",
+            )
+
+        now = self._clock.now()
+        current = self._index.load(run_id)
+        targets = [
+            entry for entry in current.entries
+            if artifact_id is None or entry.artifact_id == artifact_id
+        ]
+        if artifact_id is not None and not targets:
+            raise error(
+                ErrorCode.ARTIFACT_NOT_FOUND, "Artifact is not indexed.", "not-found",
+                "Run evidence index for this run, then retry.", artifact_id=artifact_id,
+            )
+
+        produced, updated = [], []
+        for entry in targets:
+            summary, redaction = self._summarize_one(entry, now)
+            self._summaries.save(run_id, summary)
+            produced.append(summary)
+            updated.append(
+                _replace(
+                    entry,
+                    summary_path=self._summaries.relative_path(summary.summary_id),
+                    redaction_status=redaction,
+                    retrieval_policy=retrieval_policy_for(redaction, entry.freshness_status),
+                )
+            )
+
+        if updated:
+            self._index.commit(
+                run_id=run_id, expected_revision=current.revision,
+                entries=tuple(updated), now=now,
+            )
+            blocked = sum(
+                1 for s in produced if s.summary_status.value in {"Blocked", "Failed"}
+            )
+            commit_authorized(
+                self._repository,
+                self._authorization,
+                expected_revision=run.revision,
+                next_record=advance(run, now=now),
+                event=runtime_event(
+                    run, actor,
+                    "SummaryBlocked" if blocked and blocked == len(produced) else "ArtifactSummarized",
+                    now,
+                    {
+                        "summary_count": len(produced),
+                        "rule_set_version": self._extractor.rule_set_version,
+                        "summaries": [
+                            {
+                                "artifact_id": s.artifact_id,
+                                "summary_status": s.summary_status.value,
+                                "redaction_status": s.redaction_status.value,
+                            }
+                            for s in produced
+                        ],
+                    },
+                ),
+                actor=actor,
+                action=Action.INDEX_EVIDENCE,
+            )
+        return tuple(produced)
+
+    def _summarize_one(self, entry, now):
+        """Extract, resolve status, and truncate -- keeping every failure marker."""
+        root = self._roots[entry.source_root]
+        path = root / entry.source_path
+        try:
+            payload = path.read_bytes()
+            readable = True
+        except OSError:
+            payload, readable = b"", False
+
+        extraction, supported, extracted = self._extractor.extract(entry.artifact_kind, payload)
+        # Findings mean a credential was present and replaced. The artifact is still
+        # summarizable -- the marker is in the output -- so this is Pass, not Fail. A
+        # Fail is reserved for redaction that could not complete.
+        redaction = (
+            ArtifactRedactionStatus.NOT_REQUIRED if not supported
+            else ArtifactRedactionStatus.PASS if readable
+            else ArtifactRedactionStatus.PENDING
+        )
+        key_events, dropped = truncate(
+            extraction.key_events, extraction.failure_markers, self._marker_limit
+        )
+        status = resolve_status(
+            extracted=extracted and readable,
+            redaction=redaction,
+            supported=supported,
+            dropped_failure_markers=dropped,
+            input_complete=extraction.input_complete and readable,
+        )
+        return (
+            ArtifactSummary(
+                summary_id=summary_id_for(entry.artifact_id),
+                artifact_id=entry.artifact_id,
+                artifact_kind=entry.artifact_kind,
+                summary_status=status,
+                redaction_status=redaction,
+                rule_set_version=self._extractor.rule_set_version,
+                generated_at=now,
+                source_reference=entry.artifact_id,
+                key_events=key_events,
+                failure_markers=extraction.failure_markers,
+                warning_markers=extraction.warning_markers,
+                open_questions=extraction.open_questions,
+                truncation_count=dropped or None,
+                last_observed_marker=extraction.last_observed_marker,
+            ),
+            redaction,
+        )
+
+
+
 
 #: Filename conventions the runtime already writes, mapped to artifact kinds.
 _KIND_BY_NAME = {
@@ -178,3 +318,7 @@ def infer_kind(path: Path) -> ArtifactKind:
     if "manifest" in path.name:
         return ArtifactKind.MANIFEST
     return ArtifactKind.STATUS
+
+def summary_id_for(artifact_id: str) -> str:
+    """Derived from the artifact id, so re-summarizing overwrites rather than accumulates."""
+    return hashlib.sha256(artifact_id.encode("utf-8")).hexdigest()[:16]
