@@ -1,13 +1,13 @@
 id: feature:F0003
 name: Local Agent Runtime Control Plane
 path: planning-mds/features/F0003-local-agent-runtime-control-plane
-status: planned
-registry_section: Planned
+status: in-progress
+registry_section: Active
 phase: Platform Hardening
-roadmap_section: Next
-roadmap_order: 1
-rationale: Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default.
-validation_gate: F0001 session registry and transcript model are accepted or available as implementation dependencies.
+roadmap_section: Now
+roadmap_order: 2
+rationale: Phase B architecture approved 2026-08-29; the feature action is running. Adds concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. Doubles as F0007's live governed pilot.
+validation_gate: All 7 stories reach Done through feature G0-G8; the 514 existing engine tests pass unmodified across the S0007 facade split; summaries are byte-identical across the 3.11/3.12/3.14 matrix; no mutating service is reachable from the MCP adapter.
 affects:
   - capability:runtime-command-surface
   - capability:provider-capability-matrix

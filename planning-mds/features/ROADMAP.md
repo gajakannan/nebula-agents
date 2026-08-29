@@ -18,6 +18,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
 | [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | In Progress | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
+| [F0003 — Local Agent Runtime Control Plane](./F0003-local-agent-runtime-control-plane/README.md) | In Progress | Phase B architecture approved 2026-08-29; the feature action is running. Adds concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. Doubles as F0007's live governed pilot. | All 7 stories reach Done through feature G0-G8; the 514 existing engine tests pass unmodified across the S0007 facade split; summaries are byte-identical across the 3.11/3.12/3.14 matrix; no mutating service is reachable from the MCP adapter. |
 <!-- generated:end roadmap:now -->
 
 ## Next
@@ -25,7 +26,6 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 <!-- generated:begin roadmap:next -->
 | Feature | Status | Why Next | Entry Criteria |
 |---------|--------|----------|----------------|
-| [F0003 — Local Agent Runtime Control Plane](./F0003-local-agent-runtime-control-plane/README.md) | Planned | Add concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. | F0001 session registry and transcript model are accepted or available as implementation dependencies. |
 | [F0002 — Managed Agent Orchestration](./F0002-managed-agent-orchestration/README.md) | Planned | Add provider adapters and richer orchestration once tmux behavior and runtime control-plane contracts are understood and testable. | F0001 is implemented, F0003 runtime contracts are validated, and evidence shows native interactivity can be preserved or matched. |
 <!-- generated:end roadmap:next -->
 

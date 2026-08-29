@@ -58,7 +58,7 @@ features:
       - schema:f0001-preflight-result
       - schema:f0001-run-record
       - schema:f0001-runtime-event
-  - status: planned
+  - status: in-progress
     id: feature:F0003
     path: planning-mds/features/F0003-local-agent-runtime-control-plane
     affects:

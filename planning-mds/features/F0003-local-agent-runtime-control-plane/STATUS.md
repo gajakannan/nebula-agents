@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** Phase B architecture approved; plan-review verdict **READY**; ready to enter the `feature` action at G0
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0 PASS**; implementation begins at Step 1 (S0007)
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -22,7 +22,29 @@ Exit validation is green: `validate-stories`, `generate-story-index`, `validate-
 **The Phase B approval checkpoint is closed.** The operator approved at
 `2026-08-29T11:15:45-04:00` against plan-review run `2026-08-22-5ed12b9c` (verdict READY,
 `requires_justification: false`). The five ADRs are `Accepted` and the approval is recorded
-in BLUEPRINT §5.9. F0003 may now enter the `feature` action at G0.
+in BLUEPRINT §5.9.
+
+## Feature Action — run `2026-08-29-16075bda`
+
+| Gate | Role | State | Evidence |
+|------|------|-------|----------|
+| G0 Architect assembly plan | Architect | **PASS** 2026-08-29 | `g0-assembly-plan-validation.md` |
+| G1 Runtime preflight | DevOps | Not started | — |
+| G2 Self-review + QE + deployability | QE, DevOps | Not started | — |
+| G3 Code + security review | Code Reviewer, Security | Not started | — |
+| G4 Approval | Operator | Not started | — |
+| G5 Signoff | PM | Not started | — |
+| G6 Candidate evidence | PM | Not started | — |
+| G7 KG reconciliation | Architect | Not started | — |
+| G8 Closeout | PM | Not started | — |
+
+The assembly plan is
+[`feature-assembly-plan.md`](./feature-assembly-plan.md) — 8 build steps, all 7 stories
+covered. **Step 1 (S0007, the query/command facade split) lands first and alone**, because
+the MCP adapter cannot be constructed with a query-only facade that does not yet exist, and
+because the 514 existing engine tests are that step's regression boundary.
+
+This run is also F0007-S0009's live governed pilot; F0007 cannot reach closeout without it.
 
 ## Plan-Review Findings
 

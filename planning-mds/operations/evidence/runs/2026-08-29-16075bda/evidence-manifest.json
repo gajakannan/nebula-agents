@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "feature_id": "F0003",
+  "feature_slug": "local-agent-runtime-control-plane",
+  "run_id": "2026-08-29-16075bda",
+  "status": "in-progress",
+  "recorded_on": "2026-08-29",
+  "contract_version": "2026-07-11",
+  "contract_effective_date": "2026-07-11",
+  "feature_path_at_run_start": "planning-mds/features/F0003-local-agent-runtime-control-plane",
+  "feature_path_at_closeout": null,
+  "feature_state": "In Progress",
+  "rerun_of": null,
+  "changed_paths": [
+    "planning-mds/features/F0003-local-agent-runtime-control-plane",
+    "planning-mds/features/REGISTRY.md",
+    "planning-mds/features/ROADMAP.md",
+    "planning-mds/kg-source/features/F0003.yaml",
+    "planning-mds/knowledge-graph",
+    "planning-mds/operations/evidence/runs/2026-08-29-16075bda",
+    "engine"
+  ],
+  "scm": {
+    "base_ref": "main",
+    "head_ref": "feat/F0003-local-agent-runtime-control-plane",
+    "diff_artifact": "artifacts/diffs/changed-files.txt"
+  },
+  "runtime_bearing": true,
+  "deployment_config_changed": false,
+  "frontend_in_scope": false,
+  "security_sensitive_scope": false,
+  "required_roles": [
+    "Quality Engineer",
+    "Code Reviewer",
+    "Security Reviewer",
+    "Architect"
+  ],
+  "gate_results": {
+    "assembly_plan_validation": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "g0-assembly-plan-validation.md"
+    }
+  },
+  "files": {
+    "readme": "README.md",
+    "action_context": "action-context.md",
+    "artifact_trace": "artifact-trace.md",
+    "gate_decisions": "gate-decisions.md",
+    "commands_log": "commands.log",
+    "lifecycle_gates_log": "lifecycle-gates.log",
+    "assembly_plan_validation": "g0-assembly-plan-validation.md"
+  },
+  "role_results": {},
+  "token_usage": {
+    "artifact": "token-usage.json",
+    "agent_tool": null,
+    "turns": null,
+    "context_tokens": null,
+    "uncached_input_tokens": null,
+    "cached_input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "cache_creation_1h_input_tokens": null,
+    "cache_creation_5m_input_tokens": null,
+    "output_tokens": null,
+    "cache_hit_ratio": null,
+    "compactions": null
+  },
+  "security_scans": {
+    "dependency": {},
+    "secrets": {},
+    "sast": {},
+    "dast": {}
+  },
+  "omissions": [],
+  "waivers": {},
+  "global_evidence_refs": {},
+  "run_scope": "feature-completion"
+}

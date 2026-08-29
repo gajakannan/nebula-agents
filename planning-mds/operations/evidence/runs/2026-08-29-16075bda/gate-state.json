@@ -1,0 +1,16 @@
+{
+  "action": "feature",
+  "contract_version": "2026-07-11",
+  "run_id": "2026-08-29-16075bda",
+  "schema_version": 1,
+  "stages": {
+    "G0": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g0"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
+    }
+  }
+}
