@@ -137,14 +137,14 @@ def test_preflight_inspects_without_creating(
 
 
 def test_command_facade_holds_every_mutating_service() -> None:
-    """Grows deliberately: Steps 4 and 6 add `capabilities` and `learning`.
+    """Grows deliberately: Step 6 adds `learning`.
 
     The equality is the point. A mutating service wired anywhere else -- straight onto
     `Application`, or reachable from the query side -- fails here rather than passing
     unnoticed because nothing named it.
     """
     assert set(CommandService.__dataclass_fields__) == {
-        "runs", "gates", "transcripts", "evidence",
+        "runs", "gates", "transcripts", "evidence", "capabilities",
     }
 
 
@@ -176,6 +176,7 @@ def test_application_properties_delegate_to_the_command_facade(
     assert application.gates is application.commands.gates
     assert application.transcripts is application.commands.transcripts
     assert application.evidence is application.commands.evidence
+    assert application.capabilities is application.commands.capabilities
 
 
 def test_application_declares_the_read_and_write_sides(application: Application) -> None:

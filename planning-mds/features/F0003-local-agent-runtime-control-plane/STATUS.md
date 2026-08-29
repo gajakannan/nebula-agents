@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-3 implemented, Checkpoints A and B met
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-4 of 8 implemented, Checkpoints A and B met
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -117,6 +117,26 @@ application is built, matching how argparse behaved when it enforced it.
 | S3-F1 | High | Contract `1.1` could not be "no F0001 schema changes": BLUEPRINT §5.3 requires indexing to append runtime events, and `event_type` is a closed enum. Resolved by extending the enum and correcting runtime-contract §9. **Architect confirmation needed at G3** |
 | S3-F2 | Low | A G1 row claimed the six F0003 schemas load with "no registry change". The registry allowlisted `f0001-` only; the probe read a refusal as a validation. Corrected in the G1 artifact and replaced by a real test |
 
+### Step 4 — provider capability matrix and the `wrap` guard · S0002 done
+
+Six capabilities per provider, each with a **declared** requirement level rather than one
+decided per probe. Two of those levels carry reasoning worth keeping:
+`approval_visibility` is `required`, because preserving interactive approval prompts is
+the reason F0003 stays tmux-native at all — a provider that cannot surface them fails the
+premise rather than degrading quietly; `transcript` is `optional`, because Nebula captures
+transcripts itself (ADR-004).
+
+`wrap` is preflight + capability guard + F0001's `launch`, unchanged, in that order. The
+ordering is the point and is asserted by test: a blocked launch creates no run and starts
+no session. A stale report triggers a **re-probe**, not a warning — a guard deciding from
+a report of unknown age is a guard in name only.
+
+Probe output is redacted before persistence, tested against three secret shapes.
+
+| ID | Severity | Finding |
+|----|----------|---------|
+| S4-F1 | Medium | A blocked launch has no run to append a runtime event to, because the guard deliberately runs before any run exists. The persisted capability report is the durable sanitized record. **Architect confirmation needed at G3** |
+
 ## Plan-Review Findings
 
 ### Re-run `2026-08-20-45b7ccd8` — verdict CONDITIONALLY READY (`requires_justification: true`)
@@ -160,8 +180,8 @@ table.
 
 | Story | Title | Status |
 |-------|-------|--------|
-| F0003-S0001 | Runtime command surface and wrap launch | [ ] Not Started |
-| F0003-S0002 | Provider capability matrix and launch guards | [ ] Not Started |
+| F0003-S0001 | Runtime command surface and wrap launch | [~] **In Progress** — `wrap` guarded launch done; `metrics`/`learn` are S0006 |
+| F0003-S0002 | Provider capability matrix and launch guards | [x] **Implemented** 2026-08-29 (Step 4) |
 | F0003-S0003 | MCP status and evidence tools | [ ] Not Started |
 | F0003-S0004 | Evidence artifact store and retrieval index | [~] **In Progress** — index, `evidence index\|list\|show` done; summaries are S0005 |
 | F0003-S0005 | Deterministic transcript, log, and validator summaries | [ ] Not Started |
@@ -171,9 +191,9 @@ table.
 ## Runtime Progress
 
 - [ ] Local command surface implemented
-- [ ] Wrapped launch records run metadata
+- [x] Wrapped launch records run metadata
 - [ ] Session status reconciles against real local session state
-- [ ] Provider capability reports and launch guards implemented
+- [x] Provider capability reports and launch guards implemented
 - [ ] MCP read-only status tools implemented
 - [x] Evidence artifact store and retrieval index implemented
 - [ ] Deterministic summarizers implemented

@@ -20,6 +20,24 @@ from .enums import (
 )
 
 
+#: Requirement level per capability, declared once rather than decided per probe.
+#:
+#: `approval_visibility` is REQUIRED deliberately: preserving interactive approval
+#: prompts is the reason F0003 stays tmux-native at all (ADR-001), so a provider that
+#: cannot surface them fails the premise rather than degrading quietly.
+#:
+#: `transcript` is OPTIONAL because Nebula captures transcripts itself (ADR-004); the
+#: provider not offering its own is not a launch blocker.
+DEFAULT_REQUIREMENTS: dict[CapabilityName, CapabilityRequirement] = {
+    CapabilityName.LAUNCH: CapabilityRequirement.REQUIRED,
+    CapabilityName.ATTACH: CapabilityRequirement.REQUIRED,
+    CapabilityName.APPROVAL_VISIBILITY: CapabilityRequirement.REQUIRED,
+    CapabilityName.TRANSCRIPT: CapabilityRequirement.OPTIONAL,
+    CapabilityName.STATUS_PROBE: CapabilityRequirement.OPTIONAL,
+    CapabilityName.FALLBACK: CapabilityRequirement.OPTIONAL,
+}
+
+
 @dataclass(frozen=True, slots=True)
 class Capability:
     capability_name: CapabilityName

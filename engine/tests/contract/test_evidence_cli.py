@@ -71,3 +71,35 @@ def test_bare_evidence_without_a_run_id_is_a_usage_error(
     document = json.loads(capfd.readouterr().err)   # errors go to stderr
     assert document["error"]["code"] == "USAGE_ERROR"
     assert "--run-id" in document["error"]["message"]
+
+
+# --------------------------------------------------------------------------- #
+# F0003 Step 4 surfaces
+# --------------------------------------------------------------------------- #
+def test_wrap_takes_the_same_arguments_as_launch() -> None:
+    """A divergent argument set would imply `wrap` is something other than a guarded
+    `launch`, which is exactly the confusion the runtime contract avoids."""
+    wrapped = parse(["wrap", "codex", "--feature", "F0001", "--action", "feature"])
+    assert wrapped.command == "wrap"
+    assert (wrapped.provider, wrapped.feature, wrapped.action) == ("codex", "F0001", "feature")
+
+    launch = build_parser().parse_args(
+        ["launch", "--provider", "codex", "--feature", "F0001", "--action", "feature"]
+    )
+    optional = {"story", "run_id", "label", "transcript", "format"}
+    assert optional <= set(vars(wrapped)) and optional <= set(vars(launch))
+
+
+def test_wrap_rejects_an_unsupported_provider() -> None:
+    with pytest.raises(Exception):
+        parse(["wrap", "gemini", "--feature", "F0001", "--action", "feature"])
+
+
+def test_providers_requires_a_subcommand() -> None:
+    with pytest.raises(Exception):
+        parse(["providers"])
+
+
+def test_providers_doctor_parses_with_and_without_a_provider() -> None:
+    assert parse(["providers", "doctor"]).providers_command == "doctor"
+    assert parse(["providers", "doctor", "--provider", "claude"]).provider == "claude"

@@ -72,3 +72,36 @@ raised and read a refusal as a validation.
 Corrected in the G1 artifact with the reasoning kept, and replaced by a test that requires
 each F0003 schema to **load** and a non-allowlisted name, a traversal attempt, and a
 non-schema file to be **refused**. No blocker was missed and the G1 verdict is unchanged.
+
+## Step 4 Findings
+
+### S4-F1 (Medium) — a blocked launch has no run to append an audit entry to
+
+Runtime contract §7 and the assembly plan both say a blocked launch "appends a sanitized
+audit entry". In this codebase an audit entry is a `RuntimeEvent` in a run's
+`events.jsonl`, and every append goes through `RunRepository.commit`, which requires an
+existing run record.
+
+But the guard runs **before** `launch` — deliberately, so a blocked launch persists no
+session and creates no run. There is therefore no run to append to, and creating one just
+to record that nothing was created would defeat the property the ordering exists to
+protect.
+
+**Resolved as:** the persisted `ProviderCapabilityReport` is the durable sanitized record.
+It is atomic, owner-only, carries `launch_decision: blocked` with `blocked_reason` and the
+failing capability, and is what `providers doctor` reads back. A test asserts it is
+written even on the blocked path.
+
+**This is an interpretation, not a literal reading.** "Audit entry" elsewhere in this
+codebase means a runtime event. Two alternatives were considered and rejected: creating a
+run to hold the event (defeats "creates no run"), and adding a runtime-level event log
+outside any run (a new persistence surface, which ADR-005 constrains).
+
+**Owner: Architect.** Confirm at G3, or direct a run-less audit log. Carried alongside
+S3-F1, which is also a contract-text question rather than an implementation defect.
+
+### Note — `providers doctor` exits 3 when a provider is blocked
+
+A diagnostic must describe an unusable environment rather than refuse to run in one, so
+`doctor` reports the blocked provider and exits 3 rather than raising. This mirrors
+F0001's `doctor`, which returns 3 on a non-ready overall status instead of erroring.
