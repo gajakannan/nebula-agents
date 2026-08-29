@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Step 1 (S0007) implemented, Checkpoint A met
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-2 implemented, Checkpoints A and B met
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -65,6 +65,33 @@ probing for it.
 `Application` declares `queries`, `commands`, `preflight`, `identity`; `runs`, `gates`, and
 `transcripts` are properties delegating to `commands`. That delegation is what lets the
 514 existing tests pass without one of them being rewritten — see *Deviations* below.
+
+### Step 2 — domain records, artifact identity, containment · Checkpoint B met
+
+| Criterion | Result |
+|-----------|--------|
+| `artifact_id` stable across re-index, restart, and a **moved runtime root** | PASS |
+| Longest-match root selection correct under all three nesting configurations | PASS — including a runtime root moved outside the workspace |
+| Tie-break `runtime > evidence > workspace` exercised with colliding roots | PASS |
+| A path outside all approved roots records a policy violation, does not crash | PASS — `PATH_DENIED`, exit 5 |
+| Duplicate content yields distinct IDs linked by `content_hash` | PASS |
+| A digest collision raises exit 6 and never overwrites | PASS |
+| Records validate against the six committed JSON schemas | PASS — proven strict in both directions |
+| Artifact IDs byte-identical across 3.11 / 3.12 / 3.14 | PASS |
+
+New domain modules: `artifacts`, `summaries`, `capabilities`, `proposals`, `metrics`.
+`enums` gains the F0003 vocabularies and the three authorization actions; `errors` gains
+seven codes, all mapping to **existing** exit classes — contract `1.1` adds no new class.
+
+Three invariants are enforced by construction rather than checked at call sites:
+`redaction_status = Fail` forces `retrieval_policy = Blocked`; a summary that would drop
+a failure marker for size becomes `Partial`, never `Pass`; and a proposal decision whose
+reviewer role does not own the target document is refused where the decision is appended.
+
+`ArtifactRedactionStatus` is deliberately **separate** from F0001's `RedactionStatus`
+rather than merged — merging would change an F0001 record shape, which contract `1.1`
+forbids. The bridge `artifact_redaction_of` is total, asserted by test, so a future F0001
+member added without a mapping fails rather than silently defaulting to `Pass`.
 
 ## Plan-Review Findings
 

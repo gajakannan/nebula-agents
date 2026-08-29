@@ -210,7 +210,7 @@ freshness:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
       source_count: 1
-      last_modified: '2026-08-17'
+      last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
       hotspot_score: 0.03
@@ -257,7 +257,7 @@ freshness:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
       source_count: 2
-      last_modified: '2026-08-18'
+      last_modified: '2026-08-29'
       source_hash: 7468b5a43ad41e36
       hotspot_rank: 4
       hotspot_score: 0.01
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-29'
-      source_hash: 99a6beaec886309c
+      source_hash: c23e23a23362dab6
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -733,8 +733,8 @@ freshness:
       - engine/tests/unit/test_models.py
       - engine/tests/unit/test_transitions.py
       source_count: 14
-      last_modified: '2026-07-14'
-      source_hash: 67755fffba9f8a97
+      last_modified: '2026-08-29'
+      source_hash: a5706ecf8b6de85b
     capability:native-session-preflight:
       source_paths:
       - engine/src/nebula_agents/application/preflight.py
@@ -772,6 +772,9 @@ freshness:
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.0.3.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-311-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-312-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_facade_split.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_facade_split.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_facade_split.cpython-314-pytest-9.1.1.pyc
@@ -796,6 +799,7 @@ freshness:
       - engine/tests/contract/test_cli.py
       - engine/tests/contract/test_cli_edge_contracts.py
       - engine/tests/contract/test_contract_files.py
+      - engine/tests/contract/test_f0003_record_schemas.py
       - engine/tests/contract/test_facade_split.py
       - engine/tests/contract/test_formatter_interop_edges.py
       - engine/tests/contract/test_formatters.py
@@ -804,9 +808,9 @@ freshness:
       - engine/tests/security/test_static_execution_boundary.py
       - engine/tests/unit/test_tui_actions.py
       - engine/tests/unit/test_tui_behavioral_coverage.py
-      source_count: 55
+      source_count: 59
       last_modified: '2026-08-29'
-      source_hash: 35823fbc6cdd01d2
+      source_hash: 5d62f4f60ab2269b
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
