@@ -12,6 +12,7 @@
 <!-- generated:begin registry:active -->
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
+| F0003 | Local Agent Runtime Control Plane | In Progress | Platform Hardening | `F0003-local-agent-runtime-control-plane/` |
 | F0007 | Spec-Driven Orchestration and Prompt Compilation | In Progress | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
 <!-- generated:end registry:active -->
 
@@ -31,7 +32,6 @@ Replaces the legacy `Abandoned Features` section. Retired features are registry 
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
 | F0002 | Managed Agent Orchestration | Planned | Future Platform | `F0002-managed-agent-orchestration/` |
-| F0003 | Local Agent Runtime Control Plane | Planned | Platform Hardening | `F0003-local-agent-runtime-control-plane/` |
 | F0004 | Reflective Learning Loop and Strategy Playbook | Planned | Context Engineering | `F0004-reflective-learning-loop/` |
 | F0008 | Agent Cockpit Landing Shell | Planned | Operator Experience | `F0008-agent-cockpit-landing-shell/` |
 <!-- generated:end registry:planned -->

@@ -450,9 +450,10 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/PRD.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
-      source_count: 11
+      - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
+      source_count: 12
       last_modified: '2026-08-29'
-      source_hash: 0f5aca4b872b775d
+      source_hash: b90a29829aa766b1
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -703,8 +704,8 @@ freshness:
       - scripts/kg/tests/test_tracker_merge.py
       - scripts/kg/tests/test_workstate_digest.py
       source_count: 90
-      last_modified: '2026-08-21'
-      source_hash: 655fa9b45e985ad3
+      last_modified: '2026-08-29'
+      source_hash: a5ead9c2ba7794bb
     capability:evidence-and-gate-control:
       source_paths:
       - engine/src/nebula_agents/application/gates.py
