@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-4 of 8 implemented, Checkpoints A and B met
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-5 of 8 implemented, Checkpoints A, B and C met
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -137,6 +137,32 @@ Probe output is redacted before persistence, tested against three secret shapes.
 |----|----------|---------|
 | S4-F1 | Medium | A blocked launch has no run to append a runtime event to, because the guard deliberately runs before any run exists. The persisted capability report is the durable sanitized record. **Architect confirmation needed at G3** |
 
+### Step 5 — deterministic summarizers · Checkpoint C met
+
+| Criterion | Result |
+|-----------|--------|
+| Byte-identical across repeated calls | PASS |
+| Byte-identical across **separate processes** | PASS — fresh interpreter, so nothing depends on hash seed or iteration order |
+| Byte-identical across **3.11 / 3.12 / 3.14** | PASS — identical corpus digest `26bc7bec…` on all three |
+| A truncation that would drop a failure marker yields `Partial`, not `Pass` | PASS |
+| No model call reachable from any extractor | PASS — asserted at import level, structurally |
+| `redaction_status = Fail` blocks summary exposure | PASS |
+
+The fixture corpus in `engine/tests/fixtures/summaries/` was authored **before** the
+extractors, and immediately earned it: the validator rule-name pattern used a greedy
+`\S+` that swallowed the delimiting colon, so every failed rule was reported as
+`out_of_scope_present:`. Rules written after their fixtures would have matched the bug.
+
+Extraction runs on **bytes, before decoding** — a lossy decode first could split a
+credential into halves no byte pattern matches, and the summary would carry the pieces.
+
+**A layering guard was added, and Step 5 is why.** The first draft of
+`application/evidence.py` imported `infrastructure.summarizers` directly, violating the
+inward dependency rule BLUEPRINT §4.1/§5.1 states. No test enforced it. Extraction now
+reaches the application layer through a `SummaryExtractor` port, and
+`tests/contract/test_layering.py` fails the build on any outward import — verified by
+reintroducing the violation and watching it name the exact file.
+
 ## Plan-Review Findings
 
 ### Re-run `2026-08-20-45b7ccd8` — verdict CONDITIONALLY READY (`requires_justification: true`)
@@ -183,8 +209,8 @@ table.
 | F0003-S0001 | Runtime command surface and wrap launch | [~] **In Progress** — `wrap` guarded launch done; `metrics`/`learn` are S0006 |
 | F0003-S0002 | Provider capability matrix and launch guards | [x] **Implemented** 2026-08-29 (Step 4) |
 | F0003-S0003 | MCP status and evidence tools | [ ] Not Started |
-| F0003-S0004 | Evidence artifact store and retrieval index | [~] **In Progress** — index, `evidence index\|list\|show` done; summaries are S0005 |
-| F0003-S0005 | Deterministic transcript, log, and validator summaries | [ ] Not Started |
+| F0003-S0004 | Evidence artifact store and retrieval index | [x] **Implemented** 2026-08-29 (Steps 3+5) |
+| F0003-S0005 | Deterministic transcript, log, and validator summaries | [x] **Implemented** 2026-08-29 (Step 5) |
 | F0003-S0006 | Runtime metrics and failure-learning review | [ ] Not Started |
 | F0003-S0007 | Application query/command service split | [x] **Implemented** 2026-08-29 (Step 1; prerequisite for S0003) |
 
@@ -196,7 +222,7 @@ table.
 - [x] Provider capability reports and launch guards implemented
 - [ ] MCP read-only status tools implemented
 - [x] Evidence artifact store and retrieval index implemented
-- [ ] Deterministic summarizers implemented
+- [x] Deterministic summarizers implemented
 - [ ] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)
 - [ ] Failure-learning proposal review flow implemented
 - [x] Application query/command service split implemented (S0007; prerequisite for the MCP surface)

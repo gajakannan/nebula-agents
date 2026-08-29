@@ -1,0 +1,4 @@
+{"timestamp":"2026-08-29T12:00:00Z","command":"python -m pytest engine -q","exit_code":0,"duration_ms":3120}
+{"timestamp":"2026-08-29T12:01:00Z","command":"python scripts/kg/validate.py","exit_code":0,"duration_ms":890}
+{"timestamp":"2026-08-29T12:02:00Z","command":"python agents/scripts/run-lifecycle-gates.py","exit_code":1,"duration_ms":4210}
+{"timestamp":"2026-08-29T12:03:00Z","command":"python -m pytest engine -q","exit_code":0,"duration_ms":3050}

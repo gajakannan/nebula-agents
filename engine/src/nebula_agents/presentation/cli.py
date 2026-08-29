@@ -149,6 +149,11 @@ def build_parser() -> ContractParser:
     evidence_show.add_argument("artifact_id")
     _sub_format_argument(evidence_show)
 
+    evidence_summarize = evidence_commands.add_parser("summarize", help="Summarize indexed artifacts deterministically.")
+    evidence_summarize.add_argument("--run-id", required=True, type=_run_id, dest="sub_run_id")
+    evidence_summarize.add_argument("--artifact-id")
+    _sub_format_argument(evidence_summarize)
+
     validate = subcommands.add_parser("validate", help="Run one committed allowlisted validator.")
     validate.add_argument("--run-id", required=True, type=_run_id)
     validate.add_argument("--validator", required=True, choices=_VALIDATORS)
@@ -367,6 +372,15 @@ def _dispatch(
                 kind=namespace.kind,
             )
             _emit_success("evidence list", to_data(result), output_format)
+            return 0
+        if subcommand == "summarize":
+            result = invoke(
+                application.evidence.summarize,
+                run_id=namespace.sub_run_id,
+                actor=actor,
+                artifact_id=namespace.artifact_id,
+            )
+            _emit_success("evidence summarize", to_data(result), output_format)
             return 0
         if subcommand == "show":
             result = invoke(
