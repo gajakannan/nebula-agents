@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0 PASS**; implementation begins at Step 1 (S0007)
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; implementation begins at Step 1 (S0007)
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -29,7 +29,7 @@ in BLUEPRINT §5.9.
 | Gate | Role | State | Evidence |
 |------|------|-------|----------|
 | G0 Architect assembly plan | Architect | **PASS** 2026-08-29 | `g0-assembly-plan-validation.md` |
-| G1 Runtime preflight | DevOps | Not started | — |
+| G1 Runtime preflight | DevOps | **PASS** 2026-08-29 | `g1-runtime-preflight.md` |
 | G2 Self-review + QE + deployability | QE, DevOps | Not started | — |
 | G3 Code + security review | Code Reviewer, Security | Not started | — |
 | G4 Approval | Operator | Not started | — |

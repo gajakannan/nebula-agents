@@ -11,6 +11,14 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G1": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g1"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }
