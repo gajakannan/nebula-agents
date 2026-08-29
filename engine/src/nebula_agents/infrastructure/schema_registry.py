@@ -11,14 +11,21 @@ from nebula_agents.domain.errors import ErrorCode, error
 from nebula_agents.domain.models import JsonValue
 
 
+#: Schema families the runtime may load. The allowlist is the point -- it stops a caller
+#: naming an arbitrary file in the schema root -- so it is widened deliberately, one
+#: feature at a time, rather than relaxed to a wildcard.
+ALLOWED_SCHEMA_PREFIXES = ("f0001-", "f0003-")
+
+
 class JsonSchemaRegistry:
     def __init__(self, schema_root: Path) -> None:
         self._root = schema_root.expanduser().resolve()
         self._validators: dict[str, Draft202012Validator] = {}
 
     def _load(self, name: str) -> Draft202012Validator:
-        if Path(name).name != name or not name.startswith("f0001-") or not name.endswith(".schema.json"):
-            raise error(ErrorCode.SCHEMA_INVALID, "Schema name is not allowlisted", "state-io", "Use a committed F0001 schema.")
+        allowed = name.startswith(ALLOWED_SCHEMA_PREFIXES)
+        if Path(name).name != name or not allowed or not name.endswith(".schema.json"):
+            raise error(ErrorCode.SCHEMA_INVALID, "Schema name is not allowlisted", "state-io", "Use a committed runtime schema.")
         if name in self._validators:
             return self._validators[name]
         path = (self._root / name).resolve()

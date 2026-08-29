@@ -170,11 +170,33 @@ authoritative: they must be recomputable from runtime state and the artifact ind
 
 ## 9. Compatibility
 
-`1.1` is additive over `1.0`: no F0001 command, exit-code class, record, or schema
-changes. Readers must reject unknown major versions and may ignore unknown additive fields
-only where the schema permits. F0003 schemas set `additionalProperties: false`, so additive
+`1.1` is additive over `1.0`: no F0001 command, exit-code class, or record shape changes.
+Readers must reject unknown major versions and may ignore unknown additive fields only
+where the schema permits. F0003 schemas set `additionalProperties: false`, so additive
 evolution requires a new schema version and explicit dual-read support, exactly as in
 F0001.
+
+### The one F0001 schema change `1.1` makes
+
+`f0001-runtime-event.schema.json` gains eleven members in its `event_type` enum:
+`ArtifactIndexed`, `ArtifactPolicyViolation`, `ArtifactSummarized`, `SummaryFailed`,
+`SummaryBlocked`, `CapabilityProbed`, `CapabilityProbeTimedOut`, `LaunchBlocked`,
+`ProposalDrafted`, `ProposalBlocked`, `ProposalDecided`.
+
+This is recorded rather than hidden, because an earlier revision of this section claimed
+`1.1` made *no* F0001 schema change at all. That claim could not hold: BLUEPRINT §5.3
+requires indexing, summarization, and proposal drafting to append runtime events, and the
+`event_type` enum is closed. The three statements — no schema change, closed enum, new
+events — are mutually exclusive, and implementation is where that surfaced.
+
+The change is **backward-compatible for data**: every event written under `1.0` remains
+valid, and no field, type, or existing member changed. It is **not** transparent to a
+strict `1.0` reader, which will reject an event type it does not know. A reader that must
+tolerate both should treat an unrecognised `event_type` as opaque rather than invalid.
+
+Extending the enum was chosen over a separate `f0003-runtime-event` schema because both
+break a strict `1.0` reader identically — the events share one `events.jsonl` — and a
+second schema over the same stream adds machinery without adding compatibility.
 
 A client written against `1.0` continues to work; it simply does not see the added
 commands. An MCP host configured for these six tools must tolerate additive fields in

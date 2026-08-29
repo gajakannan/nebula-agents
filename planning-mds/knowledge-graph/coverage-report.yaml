@@ -88,8 +88,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
-      last_modified: '2026-08-21'
-      source_hash: f0b1ff487270588c
+      last_modified: '2026-08-29'
+      source_hash: 89a7bd2a5d160811
     entity:run-record:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -180,7 +180,7 @@ freshness:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
       source_count: 2
-      last_modified: '2026-07-16'
+      last_modified: '2026-08-29'
       source_hash: b7c7bd47f37c992c
       hotspot_rank: 3
       hotspot_score: 0.02
@@ -204,8 +204,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
-      last_modified: '2026-08-21'
-      source_hash: f0b1ff487270588c
+      last_modified: '2026-08-29'
+      source_hash: 89a7bd2a5d160811
     capability:read-only-run-queries:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
@@ -213,7 +213,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.03
+      hotspot_score: 0.04
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -224,7 +224,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
       last_modified: '2026-08-29'
-      source_hash: 6ab70cae4f5fafac
+      source_hash: ab5cfbb132c8b27a
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -244,7 +244,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
       last_modified: '2026-08-29'
-      source_hash: 9602e494201cb452
+      source_hash: 83e2628f6e65af01
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
@@ -382,8 +382,8 @@ freshness:
       source_paths:
       - planning-mds/schemas/f0001-runtime-event.schema.json
       source_count: 1
-      last_modified: '2026-07-14'
-      source_hash: ae84277797473c3a
+      last_modified: '2026-08-29'
+      source_hash: e7a0f61ed30c62fd
     schema:f0003-artifact-index:
       source_paths:
       - planning-mds/schemas/f0003-artifact-index.schema.json
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-29'
-      source_hash: c23e23a23362dab6
+      source_hash: 2b8a599c66f71488
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -734,7 +734,7 @@ freshness:
       - engine/tests/unit/test_transitions.py
       source_count: 14
       last_modified: '2026-08-29'
-      source_hash: a5706ecf8b6de85b
+      source_hash: 15b55030257d53bb
     capability:native-session-preflight:
       source_paths:
       - engine/src/nebula_agents/application/preflight.py
@@ -745,8 +745,8 @@ freshness:
       - engine/tests/unit/test_preflight.py
       - engine/tests/unit/test_runtime_config_identity_policy.py
       source_count: 7
-      last_modified: '2026-07-14'
-      source_hash: 0fdd2c07802465f3
+      last_modified: '2026-08-29'
+      source_hash: 1ea3cca25acb37ed
     capability:read-only-run-queries:
       source_paths:
       - engine/src/nebula_agents/application/queries.py
@@ -772,6 +772,9 @@ freshness:
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.0.3.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_contract_files.cpython-314.pyc
+      - engine/tests/contract/__pycache__/test_evidence_cli.cpython-311-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_evidence_cli.cpython-312-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_evidence_cli.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_f0003_record_schemas.cpython-314-pytest-9.1.1.pyc
@@ -799,6 +802,7 @@ freshness:
       - engine/tests/contract/test_cli.py
       - engine/tests/contract/test_cli_edge_contracts.py
       - engine/tests/contract/test_contract_files.py
+      - engine/tests/contract/test_evidence_cli.py
       - engine/tests/contract/test_f0003_record_schemas.py
       - engine/tests/contract/test_facade_split.py
       - engine/tests/contract/test_formatter_interop_edges.py
@@ -808,9 +812,9 @@ freshness:
       - engine/tests/security/test_static_execution_boundary.py
       - engine/tests/unit/test_tui_actions.py
       - engine/tests/unit/test_tui_behavioral_coverage.py
-      source_count: 59
+      source_count: 63
       last_modified: '2026-08-29'
-      source_hash: 5d62f4f60ab2269b
+      source_hash: f6bbaa6cda7832dc
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -838,7 +842,7 @@ freshness:
       - engine/tests/unit/test_tmux_adapter.py
       source_count: 9
       last_modified: '2026-08-29'
-      source_hash: ed1054240e8e11c4
+      source_hash: 04f6a1637826d561
 symbols:
   symbol_count: 1608
   bound_symbol_count: 1608

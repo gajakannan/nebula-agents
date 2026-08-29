@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import re
@@ -25,6 +24,7 @@ from nebula_agents.domain.models import (
     serialize_record,
 )
 
+from .atomic import json_bytes, owner_only_lock, publish_atomic, write_owner_only
 from .schema_registry import JsonSchemaRegistry
 
 
@@ -77,38 +77,8 @@ class FilesystemRunRepository:
 
     @contextmanager
     def _lock(self, directory: Path) -> Iterator[None]:
-        try:
-            directory_details = directory.lstat()
-        except OSError as exc:
-            raise error(ErrorCode.STATE_CORRUPT, "Run directory is unavailable", "state-io", "Restore the owner-only run directory.") from exc
-        if directory.is_symlink() or not stat.S_ISDIR(directory_details.st_mode) or directory_details.st_uid != os.getuid() or stat.S_IMODE(directory_details.st_mode) != 0o700:
-            raise error(ErrorCode.STATE_CORRUPT, "Run directory ownership or permissions are unsafe", "state-io", "Restore the owner-only run directory mode to 0700.")
-        lock_path = directory / ".lock"
-        try:
-            fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0), 0o600)
-            lock_details = os.fstat(fd)
-            if not stat.S_ISREG(lock_details.st_mode) or lock_details.st_uid != os.getuid() or stat.S_IMODE(lock_details.st_mode) != 0o600:
-                raise PermissionError("unsafe run lock")
-        except OSError as exc:
-            if "fd" in locals():
-                os.close(fd)
-            raise error(ErrorCode.STATE_CORRUPT, "Run state lock is unsafe", "state-io", "Restore the owner-only run lock.") from exc
-        deadline = time.monotonic() + self._lock_timeout
-        try:
-            while True:
-                try:
-                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except BlockingIOError:
-                    if time.monotonic() >= deadline:
-                        raise error(ErrorCode.STATE_LOCK_TIMEOUT, "Run state lock timed out", "timeout", "Wait for the active operation and retry.")
-                    time.sleep(0.05)
+        with owner_only_lock(directory, self._lock_timeout):
             yield
-        finally:
-            try:
-                fcntl.flock(fd, fcntl.LOCK_UN)
-            finally:
-                os.close(fd)
 
     def _load_path(self, path: Path) -> RunRecord:
         try:
@@ -203,24 +173,11 @@ class FilesystemRunRepository:
 
     @staticmethod
     def _data(document: object, *, pretty: bool) -> bytes:
-        if pretty:
-            return (json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
-        return (json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+        return json_bytes(document, pretty=pretty)
 
     @staticmethod
     def _write_file(path: Path, data: bytes) -> None:
-        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0), 0o600)
-        try:
-            remaining = memoryview(data)
-            while remaining:
-                written = os.write(fd, remaining)
-                if written <= 0:
-                    raise OSError("run state write did not progress")
-                remaining = remaining[written:]
-            os.fsync(fd)
-        finally:
-            os.close(fd)
-        os.chmod(path, 0o600)
+        write_owner_only(path, data)
 
     def _prepare(self, directory: Path, record: RunRecord) -> Path:
         document = serialize_record(record)
@@ -257,18 +214,7 @@ class FilesystemRunRepository:
 
     @staticmethod
     def _publish(directory: Path, pending: Path) -> None:
-        snapshot = directory / "run.json"
-        backup = directory / "run.json.bak"
-        if snapshot.exists():
-            os.replace(snapshot, backup)
-            os.chmod(backup, 0o600)
-        os.replace(pending, snapshot)
-        os.chmod(snapshot, 0o600)
-        dir_fd = os.open(directory, os.O_RDONLY)
-        try:
-            os.fsync(dir_fd)
-        finally:
-            os.close(dir_fd)
+        publish_atomic(directory, pending, directory / "run.json", directory / "run.json.bak")
 
     def create(self, record: RunRecord, event: RuntimeEvent) -> RunRecord:
         self.initialize()

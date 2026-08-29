@@ -12,13 +12,15 @@
   "feature_state": "In Progress",
   "rerun_of": null,
   "changed_paths": [
+    "engine",
+    "planning-mds/architecture",
     "planning-mds/features/F0003-local-agent-runtime-control-plane",
     "planning-mds/features/REGISTRY.md",
     "planning-mds/features/ROADMAP.md",
     "planning-mds/kg-source/features/F0003.yaml",
     "planning-mds/knowledge-graph",
     "planning-mds/operations/evidence/runs/2026-08-29-16075bda",
-    "engine"
+    "planning-mds/schemas"
   ],
   "scm": {
     "base_ref": "main",

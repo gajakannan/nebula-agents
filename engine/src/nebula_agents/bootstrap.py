@@ -9,6 +9,7 @@ from typing import Mapping
 
 from nebula_agents.application.authorization import AuthorizationService
 from nebula_agents.application.commands import CommandService
+from nebula_agents.application.evidence import EvidenceService
 from nebula_agents.application.gates import GateService
 from nebula_agents.application.preflight import PreflightService
 from nebula_agents.application.queries import QueryService
@@ -18,6 +19,7 @@ from nebula_agents.domain.enums import ProviderKey
 from nebula_agents.domain.errors import ErrorCode, error
 from nebula_agents.domain.models import Actor, JsonValue
 from nebula_agents.infrastructure.config import resolve_config
+from nebula_agents.infrastructure.artifact_index import FilesystemArtifactIndex
 from nebula_agents.infrastructure.filesystem_store import FilesystemRunRepository
 from nebula_agents.infrastructure.identity import OsIdentity
 from nebula_agents.infrastructure.policy_store import LocalPolicyStore
@@ -110,6 +112,10 @@ class Application:
     def transcripts(self) -> TranscriptService:
         return self.commands.transcripts
 
+    @property
+    def evidence(self) -> EvidenceService:
+        return self.commands.evidence
+
 
 def build_application(workspace_root: Path, runtime_override: Path | None = None) -> Application:
     config = resolve_config(workspace_root, runtime_override)
@@ -143,6 +149,17 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
     )
     gates = GateService(repository=repository, authorization=authorization, runner=validator, clock=clock, watcher=watcher)
     transcripts = TranscriptService(repository=repository, authorization=authorization, pipe=transcript_pipe, clock=clock)
-    queries = QueryService(repository=repository, authorization=authorization, identity=identity, tmux=tmux)
-    commands = CommandService(runs=runs, gates=gates, transcripts=transcripts)
+    artifact_index = FilesystemArtifactIndex(config.runs_root, schema, config.lock_timeout_seconds)
+    evidence = EvidenceService(
+        repository=repository,
+        index=artifact_index,
+        authorization=authorization,
+        clock=clock,
+        roots=config.approved_roots,
+    )
+    queries = QueryService(
+        repository=repository, authorization=authorization, identity=identity,
+        tmux=tmux, index=artifact_index,
+    )
+    commands = CommandService(runs=runs, gates=gates, transcripts=transcripts, evidence=evidence)
     return Application(queries=queries, commands=commands, preflight=preflight, identity=identity)

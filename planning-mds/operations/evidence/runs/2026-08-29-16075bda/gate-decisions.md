@@ -33,3 +33,42 @@ and the Security Reviewer signoff is required at G3 onward regardless of this bo
 | M1 | Medium | `nebula-agents mcp install` versus documented manual host configuration | Must be answered before Step 7 (S0003). Does not block Steps 1-6 |
 | — | Medium | MCP protocol revision and conformance fixtures not yet pinned | Pin during Step 7 authoring |
 | L1 | Low | S0001's open question unreconciled against ADR-005 | Reconcile during Step 4 authoring |
+
+## Step 3 Findings — raised by implementation, not by review
+
+### S3-F1 (High) — `1.1` cannot be "no F0001 schema changes"
+
+Three approved statements are mutually exclusive:
+
+| Source | Statement |
+|--------|-----------|
+| Runtime contract §9 | `1.1` is additive: "no F0001 command, exit-code class, record, or **schema** changes" |
+| BLUEPRINT §5.3 | "Indexing, summarization, and proposal drafting [create runtime events]" |
+| `f0001-runtime-event.schema.json` | `event_type` is a **closed enum** of 24 F0001 values |
+
+F0003 cannot append `ArtifactIndexed` without changing that enum, and cannot omit the
+event without contradicting BLUEPRINT §5.3.
+
+**Resolved in code, pending Architect confirmation.** The enum gains eleven F0003 members
+and runtime-contract §9 is corrected to record it as the one F0001 schema change `1.1`
+makes. Every event written under `1.0` stays valid and no field, type, or existing member
+changed — but a **strict `1.0` reader will reject an event type it does not know**, so the
+change is backward-compatible for data and not transparent to readers.
+
+A separate `f0003-runtime-event` schema was considered and rejected: both options break a
+strict `1.0` reader identically, because the events share one `events.jsonl`, and a second
+schema over the same stream adds machinery without adding compatibility.
+
+**Owner: Architect.** Confirm at G3, or direct a different resolution. This is a published
+compatibility contract, not an implementation detail.
+
+### S3-F2 (Low) — a G1 row was wrong, and is corrected in place
+
+`g1-runtime-preflight.md` recorded that the six F0003 schemas "load through the existing
+`JsonSchemaRegistry` with **no registry change**". The registry allowlisted `f0001-` names
+only, so every F0003 name was refused; the G1 probe asserted only that *an* error was
+raised and read a refusal as a validation.
+
+Corrected in the G1 artifact with the reasoning kept, and replaced by a test that requires
+each F0003 schema to **load** and a non-allowlisted name, a traversal attempt, and a
+non-schema file to be **refused**. No blocker was missed and the G1 verdict is unchanged.

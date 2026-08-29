@@ -69,6 +69,12 @@ class AuthorizationService:
             Action.LAUNCH: "reviewer_can_launch",
             Action.ATTACH: "reviewer_can_attach",
             Action.CONFIGURE_TRANSCRIPT: "reviewer_can_configure_transcript",
+            # F0003 optional grants, off by default. DECIDE_PROPOSAL is deliberately
+            # absent: it is granted per target-document class, never as a blanket
+            # reviewer grant, so it stays denied here and is resolved against the
+            # proposal's target document instead (BLUEPRINT 5.4, ADR-009).
+            Action.INDEX_EVIDENCE: "reviewer_can_index_evidence",
+            Action.DRAFT_PROPOSAL: "reviewer_can_draft_proposal",
         }.get(action)
         if action is Action.DECIDE_GATE:
             if context.decision is DecisionKind.HOLD:

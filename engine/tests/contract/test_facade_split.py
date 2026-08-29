@@ -112,9 +112,12 @@ def test_executing_the_whole_query_surface_writes_nothing(
             application.queries.status,
             application.queries.evidence,
             application.queries.recovery_status,
+            application.queries.artifacts,
         ):
             with pytest.raises(Exception):  # unknown run: NOT_FOUND, never a write
                 call(run_id)
+    with pytest.raises(Exception):
+        application.queries.artifact("2026-08-29-deadbeef/transcript/rt-0123456789ab")
 
     assert tree_snapshot(runtime) == before
     assert not runtime.exists(), "a query created the runtime root"
@@ -134,8 +137,15 @@ def test_preflight_inspects_without_creating(
 
 
 def test_command_facade_holds_every_mutating_service() -> None:
-    assert isinstance(CommandService.__dataclass_fields__["runs"], object)
-    assert set(CommandService.__dataclass_fields__) == {"runs", "gates", "transcripts"}
+    """Grows deliberately: Steps 4 and 6 add `capabilities` and `learning`.
+
+    The equality is the point. A mutating service wired anywhere else -- straight onto
+    `Application`, or reachable from the query side -- fails here rather than passing
+    unnoticed because nothing named it.
+    """
+    assert set(CommandService.__dataclass_fields__) == {
+        "runs", "gates", "transcripts", "evidence",
+    }
 
 
 def test_query_facade_holds_no_mutating_service(application: Application) -> None:
@@ -165,6 +175,7 @@ def test_application_properties_delegate_to_the_command_facade(
     assert application.runs is application.commands.runs
     assert application.gates is application.commands.gates
     assert application.transcripts is application.commands.transcripts
+    assert application.evidence is application.commands.evidence
 
 
 def test_application_declares_the_read_and_write_sides(application: Application) -> None:

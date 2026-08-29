@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, NoReturn, TextIO
 from uuid import uuid4
 
+from nebula_agents.domain.enums import ArtifactKind
+
 from .formatters import (
     MAX_LIST_RECORDS,
     clean_text,
@@ -33,6 +35,7 @@ _FORMATS = ("table", "json")
 _PROVIDERS = ("codex", "claude")
 _ACTIONS = ("plan", "feature", "build", "review", "validate")
 _VALIDATORS = ("stories", "trackers", "templates")
+_ARTIFACT_KINDS = tuple(kind.value for kind in ArtifactKind)
 _RUN_STATUSES = (
     "PreflightPending",
     "Launching",
@@ -104,9 +107,29 @@ def build_parser() -> ContractParser:
     status.add_argument("--run-id", required=True, type=_run_id)
     _format_argument(status)
 
+    # F0001's `evidence --run-id X` is preserved exactly. F0003 adds `index`, `list`,
+    # and `show` as OPTIONAL subcommands (contract 1.1 is additive), so `--run-id` moves
+    # off `required=True` here and the bare form's usage error is raised in `_dispatch`
+    # instead -- same message, same exit 2.
     evidence = subcommands.add_parser("evidence", help="Show expected paths and artifact observations.")
-    evidence.add_argument("--run-id", required=True, type=_run_id)
+    evidence.add_argument("--run-id", type=_run_id)
     _format_argument(evidence)
+    evidence_commands = evidence.add_subparsers(dest="evidence_command", metavar="SUBCOMMAND")
+
+    evidence_index = evidence_commands.add_parser("index", help="Index run artifacts into the retrieval index.")
+    evidence_index.add_argument("--run-id", required=True, type=_run_id, dest="sub_run_id")
+    evidence_index.add_argument("--path", action="append", default=[], dest="paths")
+    evidence_index.add_argument("--kind", choices=_ARTIFACT_KINDS)
+    _sub_format_argument(evidence_index)
+
+    evidence_list = evidence_commands.add_parser("list", help="List indexed artifacts for a run.")
+    evidence_list.add_argument("--run-id", required=True, type=_run_id, dest="sub_run_id")
+    evidence_list.add_argument("--kind", choices=_ARTIFACT_KINDS)
+    _sub_format_argument(evidence_list)
+
+    evidence_show = evidence_commands.add_parser("show", help="Show one artifact by its stable id.")
+    evidence_show.add_argument("artifact_id")
+    _sub_format_argument(evidence_show)
 
     validate = subcommands.add_parser("validate", help="Run one committed allowlisted validator.")
     validate.add_argument("--run-id", required=True, type=_run_id)
@@ -140,6 +163,7 @@ def main(
         namespace = parser.parse_args(arguments)
         command = namespace.command
         output_format = getattr(namespace, "format", "table")
+        _require_evidence_run_id(namespace)
         resolved_product_root = _resolve_product_root(product_root)
         application = _build_application(resolved_product_root)
         return _dispatch(application, namespace, output_format, product_root=resolved_product_root)
@@ -272,9 +296,40 @@ def _dispatch(
         _emit_success(command, result, output_format)
         return 0
     if command == "evidence":
-        result = invoke(application.queries.evidence, run_id=namespace.run_id, actor=actor)
-        _emit_success(command, result, output_format)
-        return 0
+        subcommand = getattr(namespace, "evidence_command", None)
+        if subcommand is None:
+            # F0001's form, unchanged. `--run-id` is validated in `main` before the
+            # application is built -- see `_require_evidence_run_id`.
+            result = invoke(application.queries.evidence, run_id=namespace.run_id, actor=actor)
+            _emit_success(command, result, output_format)
+            return 0
+        if subcommand == "index":
+            result = invoke(
+                application.evidence.index_artifacts,
+                run_id=namespace.sub_run_id,
+                paths=[Path(item) for item in namespace.paths],
+                actor=actor,
+                kinds=None,
+            )
+            _emit_success("evidence index", to_data(result), output_format)
+            return 0
+        if subcommand == "list":
+            result = invoke(
+                application.queries.artifacts,
+                run_id=namespace.sub_run_id,
+                actor=actor,
+                kind=namespace.kind,
+            )
+            _emit_success("evidence list", to_data(result), output_format)
+            return 0
+        if subcommand == "show":
+            result = invoke(
+                application.queries.artifact,
+                artifact_id=namespace.artifact_id,
+                actor=actor,
+            )
+            _emit_success("evidence show", to_data(result), output_format)
+            return 0
     if command == "validate":
         validated = invoke(
             application.gates.run_validator,
@@ -324,6 +379,35 @@ def _emit_error(document: dict[str, Any], output_format: str, *, stream: TextIO 
 
 def _format_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--format", choices=_FORMATS, default="table")
+
+
+def _require_evidence_run_id(namespace: argparse.Namespace) -> None:
+    """`evidence` without a subcommand still requires `--run-id`.
+
+    The parser cannot express "required unless a subcommand is given" -- the F0003
+    subcommands carry their own `--run-id` -- so it is enforced here. Deliberately
+    before the application is built: a usage error must not depend on a workspace being
+    resolvable, which is how F0001 behaved when argparse enforced it.
+    """
+    if getattr(namespace, "command", None) != "evidence":
+        return
+    if getattr(namespace, "evidence_command", None) is not None:
+        return
+    if getattr(namespace, "run_id", None) is None:
+        raise UsageFault(
+            "the following arguments are required: --run-id",
+            "nebula-agents evidence --run-id RUN_ID [--format {table,json}]",
+        )
+
+
+def _sub_format_argument(parser: argparse.ArgumentParser) -> None:
+    """`--format` on a subparser, without clobbering the parent's value.
+
+    argparse applies a subparser's defaults *after* the parent has parsed, so a plain
+    `default="table"` here would silently override `evidence --format json list`.
+    SUPPRESS leaves the parent's value in place when the flag is absent.
+    """
+    parser.add_argument("--format", choices=_FORMATS, default=argparse.SUPPRESS)
 
 
 def _feature_id(value: str) -> str:
