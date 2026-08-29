@@ -34,12 +34,20 @@ As-built source (read to make the plan's "Existing Code" rows concrete):
 - `gate-decisions.md` — G0 row and the scope declarations
 - `artifacts/diffs/changed-files.txt` — generated
 - `commands.log`, `lifecycle-gates.log` — appended by `run-gate.py`
+- `g1-runtime-preflight.md` — created at G1
+- `evidence-manifest.json` — updated at G1: `gate_results.runtime_preflight` PASS
+- `gate-decisions.md` — G1 row appended
 
 ## Generated Evidence
 
 - `artifacts/diffs/changed-files.txt` — changed-file list for this run
 
-No coverage, test-result, scan, or screenshot artifacts exist at G0; they are produced from
+G1 executed environment probes, a tmux lifecycle smoke on a unique session name, and the
+engine suite on all three CI-matrix interpreters. Their results are recorded in
+`g1-runtime-preflight.md`; no raw output artifact is retained, because the preflight created
+no workspace state and its temporary runtime root and tmux session were both removed.
+
+No coverage, test-result, scan, or screenshot artifacts exist yet; they are produced from
 G2 onward.
 
 ## External Or Global Evidence References

@@ -40,6 +40,11 @@
       "required": true,
       "result": "PASS",
       "artifact": "g0-assembly-plan-validation.md"
+    },
+    "runtime_preflight": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "g1-runtime-preflight.md"
     }
   },
   "files": {
@@ -49,7 +54,8 @@
     "gate_decisions": "gate-decisions.md",
     "commands_log": "commands.log",
     "lifecycle_gates_log": "lifecycle-gates.log",
-    "assembly_plan_validation": "g0-assembly-plan-validation.md"
+    "assembly_plan_validation": "g0-assembly-plan-validation.md",
+    "runtime_preflight": "g1-runtime-preflight.md"
   },
   "role_results": {},
   "token_usage": {
