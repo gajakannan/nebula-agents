@@ -49,22 +49,40 @@ engine/tests/unit/test_artifact_identity.py
 engine/tests/unit/test_capability_matrix.py
 engine/tests/unit/test_f0003_domain_records.py
 engine/tests/unit/test_metrics_derivation.py
+planning-mds/BLUEPRINT.md
+planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
 planning-mds/architecture/f0003-runtime-contract.md
 planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
 planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/GETTING-STARTED.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/GETTING-STARTED.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/PRD.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/PRD.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/README.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/README.md
 planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/STATUS.md
 planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
+planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md -> planning-mds/features/archive/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
 planning-mds/features/REGISTRY.md
 planning-mds/features/ROADMAP.md
+planning-mds/features/STORY-INDEX.md
 planning-mds/kg-source/bindings/node_bindings.yaml
 planning-mds/kg-source/features/F0003.yaml
+planning-mds/knowledge-graph/canonical-nodes.yaml
 planning-mds/knowledge-graph/code-index.yaml
 planning-mds/knowledge-graph/coverage-report.yaml
 planning-mds/knowledge-graph/decisions-index.yaml
 planning-mds/knowledge-graph/feature-mappings.yaml
 planning-mds/knowledge-graph/symbol-index.yaml
+planning-mds/operations/evidence/features/F0003-local-agent-runtime-control-plane/latest-run.json
 planning-mds/operations/evidence/runs/2026-07-13-1cfbc5a0/artifacts/test-results/coverage.xml
 planning-mds/operations/evidence/runs/2026-07-14-b885d64c/artifacts/test-results/coverage.xml
+planning-mds/operations/evidence/runs/2026-08-22-5ed12b9c/evidence-manifest.json
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/README.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/action-context.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/artifact-trace.md
@@ -93,9 +111,12 @@ planning-mds/operations/evidence/runs/2026-08-29-16075bda/gate-decisions.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/gate-state.json
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/kg-reconciliation.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/lifecycle-gates.log
+planning-mds/operations/evidence/runs/2026-08-29-16075bda/pm-closeout.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/security-review-report.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/signoff-ledger.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/test-execution-report.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/test-plan.md
+planning-mds/operations/evidence/runs/2026-08-29-16075bda/token-usage.json
 planning-mds/schemas/f0001-local-policy.schema.json
 planning-mds/schemas/f0001-runtime-event.schema.json
+scripts/kg/tests/test_tracker_gen.py

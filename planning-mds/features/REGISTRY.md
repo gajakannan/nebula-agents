@@ -12,7 +12,6 @@
 <!-- generated:begin registry:active -->
 | Feature ID | Name | Status | Phase | Folder |
 |------------|------|--------|-------|--------|
-| F0003 | Local Agent Runtime Control Plane | In Progress | Platform Hardening | `F0003-local-agent-runtime-control-plane/` |
 | F0007 | Spec-Driven Orchestration and Prompt Compilation | In Progress | Framework Hardening | `F0007-spec-driven-orchestration-and-prompt-compilation/` |
 <!-- generated:end registry:active -->
 
@@ -41,6 +40,7 @@ Replaces the legacy `Abandoned Features` section. Retired features are registry 
 <!-- generated:begin registry:archived -->
 | Feature ID | Name | Archived Date | Evidence Reentry Date | Folder |
 |------------|------|---------------|-----------------------|--------|
+| F0003 | Local Agent Runtime Control Plane | 2026-08-30 | 2026-08-30 | `archive/F0003-local-agent-runtime-control-plane/` |
 | F0001 | Tmux-Native Agent Cockpit | 2026-07-15 | 2026-07-15 | `archive/F0001-tmux-native-agent-cockpit/` |
 | F0006 | Compiled Knowledge-Graph Projection and Governed Integration | 2026-07-12 | 2026-07-12 | `archive/F0006-compiled-kg-projection-and-integration/` |
 <!-- generated:end registry:archived -->

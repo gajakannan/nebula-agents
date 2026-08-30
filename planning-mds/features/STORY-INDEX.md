@@ -35,13 +35,13 @@ Auto-generated index of all user stories across feature folders.
 
 | Story ID | Title | Priority | Phase | Persona |
 |----------|-------|----------|-------|---------|
-| [F0003-S0001](./F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md) | Runtime command surface and wrap launch | Critical | Platform Hardening | product build operator |
-| [F0003-S0002](./F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md) | Provider capability matrix and launch guards | Critical | Platform Hardening | platform maintainer |
-| [F0003-S0003](./F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md) | MCP status and evidence tools | High | Platform Hardening | reviewer using an AI coding tool |
-| [F0003-S0004](./F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) | Evidence artifact store and retrieval index | High | Platform Hardening | code reviewer |
-| [F0003-S0005](./F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) | Deterministic transcript, log, and validator summaries | High | Platform Hardening | reviewer |
-| [F0003-S0006](./F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) | Runtime metrics and failure-learning review | Medium | Platform Hardening | framework maintainer |
-| [F0003-S0007](./F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) | Application query/command service split | Critical | Platform Hardening | platform maintainer |
+| [F0003-S0001](./archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md) | Runtime command surface and wrap launch | Critical | Platform Hardening | product build operator |
+| [F0003-S0002](./archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md) | Provider capability matrix and launch guards | Critical | Platform Hardening | platform maintainer |
+| [F0003-S0003](./archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md) | MCP status and evidence tools | High | Platform Hardening | reviewer using an AI coding tool |
+| [F0003-S0004](./archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) | Evidence artifact store and retrieval index | High | Platform Hardening | code reviewer |
+| [F0003-S0005](./archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) | Deterministic transcript, log, and validator summaries | High | Platform Hardening | reviewer |
+| [F0003-S0006](./archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) | Runtime metrics and failure-learning review | Medium | Platform Hardening | framework maintainer |
+| [F0003-S0007](./archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) | Application query/command service split | Critical | Platform Hardening | platform maintainer |
 
 ---
 

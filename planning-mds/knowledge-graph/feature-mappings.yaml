@@ -58,9 +58,9 @@ features:
       - schema:f0001-preflight-result
       - schema:f0001-run-record
       - schema:f0001-runtime-event
-  - status: in-progress
+  - status: archived-done
     id: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane
     affects:
       - capability:deterministic-evidence-summaries
       - capability:evidence-artifact-index
@@ -173,7 +173,7 @@ stories:
       - schema:f0001-run-record
   - id: story:F0003-S0001
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
     affects:
       - capability:runtime-command-surface
       - entity:run-record
@@ -181,7 +181,7 @@ stories:
       - adr:005-f0003-control-plane-packaging
   - id: story:F0003-S0002
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
     affects:
       - capability:provider-capability-matrix
       - entity:provider-capability-report
@@ -189,7 +189,7 @@ stories:
       - schema:f0003-capability-report
   - id: story:F0003-S0003
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
     affects:
       - capability:readonly-mcp-runtime-surface
     governed_by:
@@ -198,7 +198,7 @@ stories:
       - schema:f0003-mcp-response
   - id: story:F0003-S0004
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
     affects:
       - capability:evidence-artifact-index
       - entity:artifact-index-entry
@@ -209,7 +209,7 @@ stories:
       - schema:f0003-artifact-index
   - id: story:F0003-S0005
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
     affects:
       - capability:deterministic-evidence-summaries
       - entity:artifact-summary
@@ -219,7 +219,7 @@ stories:
       - schema:f0003-artifact-summary
   - id: story:F0003-S0006
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
     affects:
       - capability:runtime-metrics-and-learning-review
       - entity:learning-proposal
@@ -231,7 +231,7 @@ stories:
       - schema:f0003-metric-snapshot
   - id: story:F0003-S0007
     feature: feature:F0003
-    path: planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+    path: planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
     affects:
       - capability:readonly-mcp-runtime-surface
     governed_by:

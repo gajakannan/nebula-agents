@@ -18,7 +18,6 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Why Now | Validation Gate |
 |---------|--------|---------|-----------------|
 | [F0007 — Spec-Driven Orchestration and Prompt Compilation](./F0007-spec-driven-orchestration-and-prompt-compilation/README.md) | In Progress | The fixed orchestration contract is paraphrased across actions, 24 evidence prompts, skills, validators, and prose linters. F0007 makes versioned policy authoritative, compiles prompts, executes typed procedure, and preserves historical evidence semantics. | Historical policy fixtures retain baseline verdicts; typed runtime has no shell path; generated prompts pass drift plus independent semantic checks; one governed pilot reaches closeout. |
-| [F0003 — Local Agent Runtime Control Plane](./F0003-local-agent-runtime-control-plane/README.md) | In Progress | Phase B architecture approved 2026-08-29; the feature action is running. Adds concrete local commands, status tools, evidence retrieval, summaries, metrics, and reviewed learning before managed orchestration becomes default. Doubles as F0007's live governed pilot. | All 7 stories reach Done through feature G0-G8; the 514 existing engine tests pass unmodified across the S0007 facade split; summaries are byte-identical across the 3.11/3.12/3.14 matrix; no mutating service is reachable from the MCP adapter. |
 <!-- generated:end roadmap:now -->
 
 ## Next
@@ -53,6 +52,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 |---------|----------------|----------|
 | [F0006 — Compiled Knowledge-Graph Projection and Governed Integration](./archive/F0006-compiled-kg-projection-and-integration/README.md) | 2026-07-11 | All 9 stories Done; feature-review PASS; framework Phase-B PRs |
 | [F0001 — Tmux-Native Agent Cockpit](./archive/F0001-tmux-native-agent-cockpit/README.md) | 2026-07-15 | All 6 stories Done; 514 runtime tests and 186 compiled-KG toolchain tests pass; Code, Security, DevOps, QE, and Architect signoffs complete; G4 explicitly approved; G7 reconciliation and G8 archive closeout complete in run `2026-07-14-b885d64c`. |
+| [F0003 — Local Agent Runtime Control Plane](./archive/F0003-local-agent-runtime-control-plane/README.md) | 2026-08-30 | All 7 stories Done; 732 engine tests pass on Python 3.11/3.12/3.14 at 92.3% line and 82.7% branch coverage; QE, Code Reviewer, Security Reviewer, and Architect signoffs complete; G4 approved with four carried decisions confirmed; G7 bound six capabilities to as-built code (symbol index 1608 to 2034); G8 closeout in run `2026-08-29-16075bda`. Served as F0007-S0009's live governed pilot and produced nine framework findings. |
 <!-- generated:end roadmap:completed -->
 
 ## Notes

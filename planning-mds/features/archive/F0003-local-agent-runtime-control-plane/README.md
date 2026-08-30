@@ -1,6 +1,7 @@
 # F0003 - Local Agent Runtime Control Plane
 
-**Status:** Planned — Phase B architecture drafted 2026-08-19, pending operator approval
+**Status:** Archived - implementation and G8 closeout complete
+**Archived:** 2026-08-30
 **Priority:** High
 **Phase:** Platform Hardening
 

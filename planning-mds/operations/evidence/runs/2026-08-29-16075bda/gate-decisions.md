@@ -14,6 +14,7 @@
 | G5 | PASS | Product Manager | 2026-08-30T00:16:38-04:00 | All four Required=Yes roles signed with reviewer, ISO date, and evidence path; eight recommendations dispositioned | No | Single signer holds all four roles; recorded in the ledger's Independence Note |
 | G6 | PASS | Quality Engineer | 2026-08-30T08:50:53-04:00 | G0-G5 evidence present and passing; changed_paths covers all 95 changed files; four conditional booleans consistent with the section 7 path classes; omissions empty | No | No closeout artifacts written -- pm-closeout, tracker sync, and latest-run.json are G8 |
 | G7 | PASS | Architect | 2026-08-30T08:53:23-04:00 | Six F0003 capabilities bound to as-built CODE paths; node_bindings 7 -> 13; 0 orphans; --check-reproducible OK | No | coverage-report.yaml deliberately left stale -- regenerating is forbidden at G7 and deferred to G8 |
+| G8 | PASS | Product Manager | 2026-08-30T10:31:01-04:00 | Feature archived; trackers recompiled from the shard; prior manifest superseded before latest-run.json published; manifest approved; coverage report regenerated after the move | No | Four deferred follow-ups with named owners; nine framework findings routed to F0007's rollout report |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -522,3 +523,80 @@ Confirmed safe before relying on it: CI runs only `validate.py --check-reproduci
 exits 0. Leaving the report stale until G8 breaks nothing.
 
 Sixth and seventh framework findings from this pilot.
+
+## G8 — PM closeout
+
+**PASS.** Role switched to Product Manager (`agents/product-manager/SKILL.md`). F0003 is
+`Done` and archived; the manifest is `approved`.
+
+### Order of operations, which the gate is specific about
+
+1. Orphaned Story Rule applied — all seven stories terminal before the move; nothing needed
+   rehoming.
+2. Closeout Summary filled in `STATUS.md`.
+3. Feature folder moved to `features/archive/`, with the README carrying `**Archived:**`.
+4. `kg-source/features/F0003.yaml` updated — `status: archived-done`, `registry_section:
+   Archived`, `roadmap_section: Completed`, path relocated, dates added — and **compiled**.
+   Trackers are generated; none was hand-edited.
+5. `patch-prior-manifest.py` exit 0, superseding the prior approved plan-review manifest.
+6. **Then** `latest-run.json` published. The patch-then-publish order matters: publishing
+   first would leave two approved manifests for one feature.
+7. Manifest finalized — `status: approved`, `feature_state: Archived`,
+   `feature_path_at_closeout` resolved.
+8. `capture-run-telemetry.py` (advisory).
+9. **`--write-coverage-report` last**, after the move.
+
+### The deferral from G7 was correct
+
+Before regeneration `validate.py` exited **1** on the stale coverage report. After it, exit
+**0**, and all 32 F0003 paths in the report point at `features/archive/...` with **zero**
+pre-archive paths remaining. Running it at G7 would have written 32 paths the archive move
+invalidated one step later.
+
+### Path relocation caught by hand, not by a validator
+
+The archive move left stale references in four places no gate checks: the shard's seven
+`story_mappings` paths, eight BLUEPRINT links, one ADR-001 link, and BLUEPRINT's F0003
+story statuses still reading *Not Started*. BLUEPRINT uses **relative** links
+(`features/F0003-…`), so a search for the `planning-mds/`-prefixed path found none of them
+— the first sweep reported zero and was wrong.
+
+### Two PM acceptance lines were invalid and are removed
+
+`dast` is not a `manifest.waivers` key — the DAST waiver lives under
+`security_scans.dast.waiver` and is validated by the scan-completeness check instead.
+`DEP-2` was a label I invented that appears in no role report; it is the same finding as
+S3-F1, which already carries an acceptance. Both removed rather than made to fit.
+
+### Final state
+
+| Item | Value |
+|------|-------|
+| Manifest status | `approved` |
+| Feature state | `Archived` |
+| Stories | 7 / 7 Done |
+| Tests | 732 on 3.11 / 3.12 / 3.14 |
+| Coverage | 92.3% line, 82.7% branch |
+| Prior manifests | Superseded, none left approved |
+| Deferred follow-ups | 4, each with a named owner |
+| Framework findings | 9, routed to F0007's rollout report |
+
+### S13-F1 (Low) — the archive move exposed a vacuous framework test
+
+`scripts/kg/tests/test_tracker_gen.py::test_roadmap_uses_captured_order` asserted that
+F0003 appeared before F0002 across every roadmap row. That held only while both sat in
+`Next`; archiving F0003 into `Completed` broke it — a legitimate data change, not a
+regression.
+
+**My first replacement was also worthless**, and that is the part worth recording. It read
+the *generated* output and asserted the rows were sorted. `render_table` sorts, so the
+assertion could never fail: inverting a shard's `roadmap_order` from 2 to 0 left the test
+green. I only found that out by trying to break it.
+
+The version that ships injects synthetic features into `render_table` and checks both
+orderings. Verified by deleting the `sorted(...)` call from `tracker_gen.render_table` and
+watching the test fail — which neither previous version did.
+
+Third instance in this run of a test that passed for the wrong reason. Read alongside the
+G1 probe that misread a schema-allowlist refusal as a validation, and the standing finding
+that a gate's own validator is vacuous mid-flight.

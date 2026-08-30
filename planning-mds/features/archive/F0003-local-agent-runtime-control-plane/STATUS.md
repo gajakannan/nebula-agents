@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G7 PASS**; all 8 steps, all 7 stories, all signoffs, KG bound. **G8 (PM closeout) is the only gate left**
+**Overall Status:** Done — `feature` action run `2026-08-29-16075bda` complete through G8; archived 2026-08-30
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -36,7 +36,7 @@ in BLUEPRINT §5.9.
 | G5 Signoff | PM | **PASS** 2026-08-30 | `signoff-ledger.md` |
 | G6 Candidate evidence | QE | **PASS** 2026-08-30 | `feature-action-execution.md` |
 | G7 KG reconciliation | Architect | **PASS** 2026-08-30 | `kg-reconciliation.md` |
-| G8 Closeout | PM | Not started | — |
+| G8 Closeout | PM | **PASS** 2026-08-30 | `pm-closeout.md` |
 
 The assembly plan is
 [`feature-assembly-plan.md`](./feature-assembly-plan.md) — 8 build steps, all 7 stories
@@ -384,13 +384,13 @@ table.
 
 | Story | Title | Status |
 |-------|-------|--------|
-| F0003-S0001 | Runtime command surface and wrap launch | [x] **Implemented** 2026-08-29 (Steps 4+6) |
-| F0003-S0002 | Provider capability matrix and launch guards | [x] **Implemented** 2026-08-29 (Step 4) |
-| F0003-S0003 | MCP status and evidence tools | [x] **Implemented** 2026-08-29 (Step 7) |
-| F0003-S0004 | Evidence artifact store and retrieval index | [x] **Implemented** 2026-08-29 (Steps 3+5) |
-| F0003-S0005 | Deterministic transcript, log, and validator summaries | [x] **Implemented** 2026-08-29 (Step 5) |
-| F0003-S0006 | Runtime metrics and failure-learning review | [x] **Implemented** 2026-08-29 (Step 6) |
-| F0003-S0007 | Application query/command service split | [x] **Implemented** 2026-08-29 (Step 1; prerequisite for S0003) |
+| F0003-S0001 | Runtime command surface and wrap launch | [x] **Done** 2026-08-30 |
+| F0003-S0002 | Provider capability matrix and launch guards | [x] **Done** 2026-08-30 |
+| F0003-S0003 | MCP status and evidence tools | [x] **Done** 2026-08-30 |
+| F0003-S0004 | Evidence artifact store and retrieval index | [x] **Done** 2026-08-30 |
+| F0003-S0005 | Deterministic transcript, log, and validator summaries | [x] **Done** 2026-08-30 |
+| F0003-S0006 | Runtime metrics and failure-learning review | [x] **Done** 2026-08-30 |
+| F0003-S0007 | Application query/command service split | [x] **Done** 2026-08-30 |
 
 ## Runtime Progress
 
@@ -475,14 +475,18 @@ individual holds all four roles in this single-operator deployment; see the
 
 | Field | Value |
 |-------|-------|
-| Implementation completed | TBD |
-| Closeout review date | TBD |
+| Implementation completed | 2026-08-29 (8 build steps) |
+| Closeout review date | 2026-08-30 |
 | Total stories | 7 |
-| Stories completed | 0 / 7 |
-| Test count (unit + integration) | TBD |
-| Defects found during review | TBD |
-| Defects fixed before closeout | TBD |
-| Residual risks | TBD |
+| Stories completed | 7 / 7 |
+| Test count (unit + integration) | 732 engine tests, green on Python 3.11 / 3.12 / 3.14 |
+| Coverage | 92.3% line, 82.7% branch |
+| Defects found during review | 6 — SEC-1 (high), CR-1, S9-F1 (medium), CR-2, CR-3, S7-F1 (low) |
+| Defects fixed before closeout | 3 — SEC-1, S9-F1, S7-F1. CR-1 accepted by decision; CR-2/CR-3 deferred |
+| Residual risks | Contract `1.1` is not transparent to a strict `1.0` reader: two additive F0001 schema changes (`event_type` enum, `proposal_grants`), both confirmed at G4. Resolve-to-read TOCTOU window accepted as inside the local trust boundary. Projection/audit commits are non-atomic by accepted decision (CR-1) |
+| Scope delivered | All 7 stories: command surface and guarded `wrap`, capability matrix, read-only MCP surface, artifact index, deterministic summaries, metrics and learning proposals, query/command split |
+| Phase 2 deferrals | None for F0003. F0002 consumes the runtime contract; F0004 consumes the evidence store; F0008 owns any terminal UI over these services |
+
 
 ## Tracker Sync Checklist
 

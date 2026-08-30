@@ -3,28 +3,33 @@
   "feature_id": "F0003",
   "feature_slug": "local-agent-runtime-control-plane",
   "run_id": "2026-08-29-16075bda",
-  "status": "in-progress",
+  "status": "approved",
   "recorded_on": "2026-08-29",
   "contract_version": "2026-07-11",
   "contract_effective_date": "2026-07-11",
   "feature_path_at_run_start": "planning-mds/features/F0003-local-agent-runtime-control-plane",
-  "feature_path_at_closeout": null,
-  "feature_state": "In Progress",
+  "feature_path_at_closeout": "planning-mds/features/archive/F0003-local-agent-runtime-control-plane",
+  "feature_state": "Archived",
   "rerun_of": null,
   "changed_paths": [
     ".gitignore",
     "docs",
     "engine",
+    "planning-mds/BLUEPRINT.md",
     "planning-mds/architecture",
     "planning-mds/features/F0003-local-agent-runtime-control-plane",
     "planning-mds/features/REGISTRY.md",
     "planning-mds/features/ROADMAP.md",
+    "planning-mds/features/STORY-INDEX.md",
+    "planning-mds/features/archive",
     "planning-mds/kg-source",
     "planning-mds/kg-source/features/F0003.yaml",
     "planning-mds/knowledge-graph",
+    "planning-mds/operations/evidence/features",
     "planning-mds/operations/evidence/runs",
     "planning-mds/operations/evidence/runs/2026-08-29-16075bda",
-    "planning-mds/schemas"
+    "planning-mds/schemas",
+    "scripts/kg"
   ],
   "scm": {
     "base_ref": "main",
@@ -86,6 +91,16 @@
       "required": true,
       "result": "PASS",
       "artifact": "kg-reconciliation.md"
+    },
+    "pm_closeout": {
+      "required": true,
+      "result": "APPROVED",
+      "artifact": "pm-closeout.md"
+    },
+    "tracker_sync": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "lifecycle-gates.log"
     }
   },
   "files": {
@@ -106,7 +121,9 @@
     "security_review": "security-review-report.md",
     "signoff_ledger": "signoff-ledger.md",
     "feature_action_execution": "feature-action-execution.md",
-    "kg_reconciliation": "kg-reconciliation.md"
+    "kg_reconciliation": "kg-reconciliation.md",
+    "pm_closeout": "pm-closeout.md",
+    "token_usage": "token-usage.json"
   },
   "role_results": {
     "Quality Engineer": {
@@ -163,17 +180,17 @@
   },
   "token_usage": {
     "artifact": "token-usage.json",
-    "agent_tool": null,
-    "turns": null,
-    "context_tokens": null,
-    "uncached_input_tokens": null,
-    "cached_input_tokens": null,
-    "cache_creation_input_tokens": null,
-    "cache_creation_1h_input_tokens": null,
-    "cache_creation_5m_input_tokens": null,
-    "output_tokens": null,
-    "cache_hit_ratio": null,
-    "compactions": null
+    "agent_tool": "claude-code",
+    "turns": 1076,
+    "context_tokens": 422976132,
+    "uncached_input_tokens": 2148,
+    "cached_input_tokens": 415456340,
+    "cache_creation_input_tokens": 7517644,
+    "cache_creation_1h_input_tokens": 7030139,
+    "cache_creation_5m_input_tokens": 487505,
+    "output_tokens": 902821,
+    "cache_hit_ratio": 0.9822,
+    "compactions": 2
   },
   "security_scans": {
     "dependency": {

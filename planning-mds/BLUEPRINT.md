@@ -27,14 +27,14 @@ Nebula Agents should become an operator cockpit for high-quality agentic deliver
   - [F0002-S0004 - Streaming event and approval bridge](features/F0002-managed-agent-orchestration/F0002-S0004-streaming-event-and-approval-bridge.md) - Not Started
   - [F0002-S0005 - Migration from tmux to managed orchestration](features/F0002-managed-agent-orchestration/F0002-S0005-migration-from-tmux-to-managed-orchestration.md) - Not Started
 
-- [F0003 - Local Agent Runtime Control Plane](features/F0003-local-agent-runtime-control-plane/README.md) - Planned / Next (Phase B architecture drafted 2026-08-19)
-  - [F0003-S0001 - Runtime command surface and wrap launch](features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md) - Not Started
-  - [F0003-S0002 - Provider capability matrix and launch guards](features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md) - Not Started
-  - [F0003-S0003 - MCP status and evidence tools](features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md) - Not Started
-  - [F0003-S0004 - Evidence artifact store and retrieval index](features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) - Not Started
-  - [F0003-S0005 - Deterministic transcript, log, and validator summaries](features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) - Not Started
-  - [F0003-S0006 - Runtime metrics and failure-learning review](features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) - Not Started
-  - [F0003-S0007 - Application query/command service split](features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) - Not Started
+- [F0003 - Local Agent Runtime Control Plane](features/archive/F0003-local-agent-runtime-control-plane/README.md) - Done / Archived 2026-08-30 (run `2026-08-29-16075bda`)
+  - [F0003-S0001 - Runtime command surface and wrap launch](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md) - Done
+  - [F0003-S0002 - Provider capability matrix and launch guards](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md) - Done
+  - [F0003-S0003 - MCP status and evidence tools](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md) - Done
+  - [F0003-S0004 - Evidence artifact store and retrieval index](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md) - Done
+  - [F0003-S0005 - Deterministic transcript, log, and validator summaries](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md) - Done
+  - [F0003-S0006 - Runtime metrics and failure-learning review](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md) - Done
+  - [F0003-S0007 - Application query/command service split](features/archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md) - Done
 
 - [F0004 - Reflective Learning Loop and Strategy Playbook](features/F0004-reflective-learning-loop/README.md) - Planned / Later
   - [F0004-S0001 - Strategy playbook artifact and entry schema](features/F0004-reflective-learning-loop/F0004-S0001-strategy-playbook-artifact-and-schema.md) - Not Started
