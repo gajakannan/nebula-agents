@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-6 and 8 of 8 implemented, Checkpoints A-D met; **only Step 7 (S0003) remains, blocked on M1**
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; **All 8 steps implemented; all 7 stories complete; Checkpoints A-E met.** Ready for G2
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -205,10 +205,31 @@ operator lifecycle** test through the CLI, because every layer had passing tests
 `infer_kind` misfiled `validator.txt` — the defect lived in the seam between two correct
 layers, and only the whole chain exposes that class.
 
+### Step 7 — read-only MCP surface · Checkpoint E met · M1 and L1 resolved
+
+**M1 resolved: documented manual host configuration.** No `mcp install` subcommand —
+writing a host's configuration file would put Nebula inside a trust boundary it does not
+own. `docs/mcp-host-configuration.md` carries the configuration, and its troubleshooting
+command was executed verbatim to confirm it works as printed. **L1 resolved in the same
+pass** — ADR-005 already answered it and the built code is the evidence.
+
+Read-only is structural, asserted at instance *and* import level: the module cannot import
+a mutating application service, so a mutating tool cannot be added without a visible
+architectural edit.
+
+**S7-F1 (low):** `f0003-mcp-response` pins `tool_name` to the six-name enum, so an error
+envelope naming an *unknown* tool cannot be conformant — which my first implementation
+returned. The schema was right: an unknown tool is a protocol error (`-32601`), not a tool
+result. Found by validating against the committed schema in test; reading would not have
+caught it.
+
+ADR-007's premise is demonstrated, not asserted: a clean install carrying only
+`jsonschema` serves all six tools with no MCP SDK present.
+
 ### Remaining
 
-**Step 7 (S0003, the MCP adapter) is the only implementation work left**, blocked on
-**M1** — `nebula-agents mcp install` versus documented manual host configuration.
+No implementation work. **G2 (QE, self-review, deployability) is next**, where
+`security_sensitive_scope` flips true and the four scan classes run.
 
 ## Plan-Review Findings
 
@@ -222,8 +243,8 @@ First recorded readiness verdict for F0003; all five gates PR0-PR4 executed.
 | N2 | High | `security/f0001-authorization-model.md` omitted F0003's three actions | **Resolved 2026-08-21** — *F0003 Action Extensions* section added with the role matrix and the target-document rule for `DecideProposal` |
 | N3 | Low | STATUS *Runtime Progress* had no item for S0007 | **Resolved 2026-08-21** |
 | N4 | Medium | `F0003-S0004` line 15 and `F0003-S0001` line 130 still described a dashboard/TUI surface | **Resolved 2026-08-23** — reworded to the command surface; swept on the generic terms `dashboard`/`TUI`/`GUI` rather than the five screen names, which is what let this survive three runs |
-| M1 | Medium | S0003 MCP install vs manual host configuration | Open (deferred by owner) |
-| L1 | Low | S0001 open question unreconciled against ADR-005 | Open (deferred by owner) |
+| M1 | Medium | S0003 MCP install vs manual host configuration | **Resolved 2026-08-29** — documented manual host configuration; no `mcp install`. See `docs/mcp-host-configuration.md` |
+| L1 | Low | S0001 open question unreconciled against ADR-005 | **Resolved 2026-08-29** — reconciled in the story; the built code is the evidence |
 
 Superseded by run `2026-08-22-5ed12b9c`, which computed **READY** (critical = 0, high = 0,
 `requires_justification: false`) and is the verdict the Phase B approval was recorded
@@ -239,9 +260,9 @@ against.
 | H2 | High | `RuntimeMetricSnapshot` declared as a record with no schema | **Resolved 2026-08-21** — `f0003-metric-snapshot.schema.json` added with a closed metric-name set and a `derived_from` block pinning the revisions a snapshot was computed against |
 | H3 | High | Query/command split is an unscoped refactor of F0001 code that no story owns | **Resolved 2026-08-21** — F0003-S0007 authored to own it, with the 514 existing engine tests and the audit stream as its regression boundary |
 | H4 | High | `coverage-report.yaml` committed stale in PR #64 | **Resolved** — regenerated |
-| M1 | Medium | S0003 open question (MCP install vs manual host config) unanswered | Open |
+| M1 | Medium | S0003 open question (MCP install vs manual host config) unanswered | **Resolved 2026-08-29** |
 | M2 | Medium | ADR-006 deferred digest length to G0 while the schema pinned 12 hex | **Resolved 2026-08-21** — 12 fixed in the ADR; the contradictory follow-up removed |
-| L1 | Low | S0001 open question answered by ADR-005 but not reconciled in the story | Open |
+| L1 | Low | S0001 open question answered by ADR-005 but not reconciled in the story | **Resolved 2026-08-29** |
 
 No critical or high findings remain. M1 and L1 stay open by owner decision, both
 non-blocking under the `review-family` profile. The PR4 readiness gate — which never
@@ -255,7 +276,7 @@ table.
 |-------|-------|--------|
 | F0003-S0001 | Runtime command surface and wrap launch | [x] **Implemented** 2026-08-29 (Steps 4+6) |
 | F0003-S0002 | Provider capability matrix and launch guards | [x] **Implemented** 2026-08-29 (Step 4) |
-| F0003-S0003 | MCP status and evidence tools | [ ] Not Started |
+| F0003-S0003 | MCP status and evidence tools | [x] **Implemented** 2026-08-29 (Step 7) |
 | F0003-S0004 | Evidence artifact store and retrieval index | [x] **Implemented** 2026-08-29 (Steps 3+5) |
 | F0003-S0005 | Deterministic transcript, log, and validator summaries | [x] **Implemented** 2026-08-29 (Step 5) |
 | F0003-S0006 | Runtime metrics and failure-learning review | [x] **Implemented** 2026-08-29 (Step 6) |
@@ -265,9 +286,9 @@ table.
 
 - [x] Local command surface implemented
 - [x] Wrapped launch records run metadata
-- [ ] Session status reconciles against real local session state
+- [x] Session status reconciles against real local session state
 - [x] Provider capability reports and launch guards implemented
-- [ ] MCP read-only status tools implemented
+- [x] MCP read-only status tools implemented
 - [x] Evidence artifact store and retrieval index implemented
 - [x] Deterministic summarizers implemented
 - [x] Metrics command implemented (CLI-only; no dashboard — see PRD *UX / Surfaces*)

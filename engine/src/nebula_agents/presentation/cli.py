@@ -205,6 +205,14 @@ def build_parser() -> ContractParser:
     validate.add_argument("--validator", required=True, choices=_VALIDATORS)
     _format_argument(validate)
 
+    # `mcp serve` only. Host configuration is documented, not installed: see M1 in the
+    # F0003 STATUS and `docs/mcp-host-configuration.md`. There is deliberately no
+    # `mcp install` subcommand -- writing another tool's config file from here would put
+    # Nebula inside a trust boundary it does not own.
+    mcp = subcommands.add_parser("mcp", help="Serve the read-only MCP surface over stdio.")
+    mcp_commands = mcp.add_subparsers(dest="mcp_command", metavar="SUBCOMMAND", required=True)
+    mcp_commands.add_parser("serve", help="Serve MCP over stdio until the host closes it.")
+
     tui = subcommands.add_parser("tui", help="Open the keyboard-operated terminal cockpit.")
     tui.add_argument("--run-id", type=_run_id)
     return parser
@@ -392,6 +400,12 @@ def _dispatch(
         result = invoke(application.queries.status, run_id=namespace.run_id, actor=actor)
         _emit_success(command, result, output_format)
         return 0
+    if command == "mcp":
+        from .mcp_server import McpServer, serve
+
+        # Constructed with the QUERY facade only. Passing `application.commands` here is
+        # the visible architectural edit ADR-007 requires for a mutating tool to exist.
+        return serve(McpServer(application.queries, _SystemClock()))
     if command == "metrics":
         result = invoke(application.queries.metrics, run_id=namespace.run_id, actor=actor)
         _emit_success(command, to_data(result), output_format)
@@ -525,6 +539,16 @@ def _emit_error(document: dict[str, Any], output_format: str, *, stream: TextIO 
 
 def _format_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--format", choices=_FORMATS, default="table")
+
+
+class _SystemClock:
+    """The MCP envelope needs a timestamp; presentation does not own a clock."""
+
+    @staticmethod
+    def now():
+        from datetime import datetime
+
+        return datetime.now().astimezone()
 
 
 def _validate_usage(namespace: argparse.Namespace) -> None:

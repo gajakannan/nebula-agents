@@ -1,9 +1,3 @@
-engine/src/nebula_agents/domain/redaction.py                            70      0   100%
-engine/src/nebula_agents/domain/summaries.py                            52      1    98%
-engine/src/nebula_agents/domain/transitions.py                          52      0   100%
-engine/src/nebula_agents/infrastructure/__init__.py                      0      0   100%
-engine/src/nebula_agents/infrastructure/artifact_index.py               77      4    95%
-engine/src/nebula_agents/infrastructure/atomic.py                       83     13    84%
 engine/src/nebula_agents/infrastructure/capability_probe.py             83      3    96%
 engine/src/nebula_agents/infrastructure/config.py                       30      0   100%
 engine/src/nebula_agents/infrastructure/filesystem_store.py            304     31    90%
@@ -19,12 +13,13 @@ engine/src/nebula_agents/infrastructure/transcript.py                  209     4
 engine/src/nebula_agents/infrastructure/transcript_filter_entry.py      56     21    62%
 engine/src/nebula_agents/infrastructure/watcher.py                     355     47    87%
 engine/src/nebula_agents/presentation/__init__.py                        2      0   100%
-engine/src/nebula_agents/presentation/cli.py                           392      6    98%
+engine/src/nebula_agents/presentation/cli.py                           403     10    98%
 engine/src/nebula_agents/presentation/formatters.py                    302     37    88%
 engine/src/nebula_agents/presentation/interop.py                        37      0   100%
+engine/src/nebula_agents/presentation/mcp_server.py                    133      2    98%
 engine/src/nebula_agents/presentation/session_entry.py                 168      0   100%
 engine/src/nebula_agents/presentation/transcript_filter.py             103      3    97%
 engine/src/nebula_agents/presentation/tui.py                           571     55    90%
 ----------------------------------------------------------------------------------------
-TOTAL                                                                 5942    462    92%
-709 passed in 6.43s
+TOTAL                                                                 6086    468    92%
+727 passed in 6.55s
