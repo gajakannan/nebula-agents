@@ -33,7 +33,7 @@
   "runtime_bearing": true,
   "deployment_config_changed": false,
   "frontend_in_scope": false,
-  "security_sensitive_scope": false,
+  "security_sensitive_scope": true,
   "required_roles": [
     "Quality Engineer",
     "Code Reviewer",
@@ -50,6 +50,16 @@
       "required": true,
       "result": "PASS",
       "artifact": "g1-runtime-preflight.md"
+    },
+    "self_review": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "artifact": "g2-self-review.md"
+    },
+    "deployability": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "artifact": "deployability-check.md"
     }
   },
   "files": {
@@ -60,9 +70,34 @@
     "commands_log": "commands.log",
     "lifecycle_gates_log": "lifecycle-gates.log",
     "assembly_plan_validation": "g0-assembly-plan-validation.md",
-    "runtime_preflight": "g1-runtime-preflight.md"
+    "runtime_preflight": "g1-runtime-preflight.md",
+    "self_review": "g2-self-review.md",
+    "test_plan": "test-plan.md",
+    "test_execution_report": "test-execution-report.md",
+    "coverage_report": "coverage-report.md",
+    "deployability": "deployability-check.md"
   },
-  "role_results": {},
+  "role_results": {
+    "Quality Engineer": {
+      "required": true,
+      "result": "PASS",
+      "required_artifacts": [
+        "test-plan.md",
+        "test-execution-report.md",
+        "coverage-report.md"
+      ],
+      "verdict_artifact": "test-execution-report.md"
+    },
+    "DevOps": {
+      "required": false,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "required_artifacts": [
+        "g1-runtime-preflight.md",
+        "deployability-check.md"
+      ],
+      "verdict_artifact": "deployability-check.md"
+    }
+  },
   "token_usage": {
     "artifact": "token-usage.json",
     "agent_tool": null,
@@ -78,10 +113,34 @@
     "compactions": null
   },
   "security_scans": {
-    "dependency": {},
-    "secrets": {},
-    "sast": {},
-    "dast": {}
+    "dependency": {
+      "ran": true,
+      "result": "clean",
+      "artifact": "artifacts/security/dependency-audit.json",
+      "waiver": null
+    },
+    "secrets": {
+      "ran": true,
+      "result": "clean",
+      "artifact": "artifacts/security/secrets-scan.json",
+      "waiver": null
+    },
+    "sast": {
+      "ran": true,
+      "result": "findings",
+      "artifact": "artifacts/security/bandit-sast.json",
+      "waiver": null
+    },
+    "dast": {
+      "ran": false,
+      "result": "not_run",
+      "artifact": null,
+      "waiver": {
+        "reason": "F0003 opens no network listener, port, or HTTP target; the approved architecture is a local CLI plus a stdio MCP child process (BLUEPRINT 5.8, ADR-005, ADR-007). There is nothing for dynamic application security testing to exercise.",
+        "owner": "Architect",
+        "approved_on": "2026-08-29"
+      }
+    }
   },
   "omissions": [],
   "waivers": {},
@@ -89,33 +148,33 @@
   "run_scope": "feature-completion",
   "test_results": {
     "result": "PASS",
-    "tests": 727,
-    "passed": 727,
+    "tests": 730,
+    "passed": 730,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
     "xfail": 0,
     "coverage": {
-      "lines_covered": 5618,
-      "lines_valid": 6086,
-      "line_rate": 0.9231,
+      "lines_covered": 5621,
+      "lines_valid": 6093,
+      "line_rate": 0.9225,
       "minimum_rate": 0.85,
       "result": "PASS",
-      "branches_covered": 1468,
-      "branches_valid": 1774,
-      "branch_rate": 0.8275,
+      "branches_covered": 1471,
+      "branches_valid": 1778,
+      "branch_rate": 0.8273,
       "risk_module_branch_result": "PASS"
     },
     "artifacts": {
       "junit": {
         "path": "artifacts/test-results/junit.xml",
-        "bytes": 105990,
-        "sha256": "fd1a7222e9aace03472abb0c4333fff5e831913370026c080b55e634e4276836"
+        "bytes": 106399,
+        "sha256": "4de53d1ee9dc31c603da59c0dabc023b6e4ebb3e74b88f54fe2ed23dc9f77128"
       },
       "coverage": {
         "path": "artifacts/test-results/coverage.xml",
-        "bytes": 275298,
-        "sha256": "e9ebe6befae1a4161cdf129d77dd9b122285b5f1f4f7de7224e29712ef6b175e"
+        "bytes": 275664,
+        "sha256": "0d8911f0a9c0b6e121d7f95380d722cead3e254fe2549339e340c755a476ca29"
       }
     }
   }

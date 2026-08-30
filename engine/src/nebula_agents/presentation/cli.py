@@ -405,7 +405,14 @@ def _dispatch(
 
         # Constructed with the QUERY facade only. Passing `application.commands` here is
         # the visible architectural edit ADR-007 requires for a mutating tool to exist.
-        return serve(McpServer(application.queries, _SystemClock()))
+        root = Path(product_root or _resolve_product_root())
+
+        def workspace_ready() -> bool:
+            return (root / "planning-mds" / "features").is_dir() and (
+                root / "planning-mds" / "schemas"
+            ).is_dir()
+
+        return serve(McpServer(application.queries, _SystemClock(), workspace_ready))
     if command == "metrics":
         result = invoke(application.queries.metrics, run_id=namespace.run_id, actor=actor)
         _emit_success(command, to_data(result), output_format)

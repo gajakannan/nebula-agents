@@ -127,9 +127,13 @@ class McpServer:
     command facade is a type error as well as an architectural one.
     """
 
-    def __init__(self, queries: QueryService, clock) -> None:
+    def __init__(self, queries: QueryService, clock, workspace_ready=None) -> None:
         self._queries = queries
         self._clock = clock
+        # Distinguishing "no runs" from "not a workspace" is not cosmetic: a host
+        # pointed at the wrong directory otherwise returns an empty list, and a reviewer
+        # reads it as "this run has no evidence" rather than "I am in the wrong tree".
+        self._workspace_ready = workspace_ready or (lambda: True)
         self._handlers: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
             "nebula_session_list": self._session_list,
             "nebula_session_status": self._session_status,
@@ -138,7 +142,14 @@ class McpServer:
             "nebula_evidence_list": self._evidence_list,
             "nebula_evidence_show": self._evidence_show,
         }
-        assert set(self._handlers) == set(TOOL_NAMES)
+        # Not an `assert`: this guards the published tool set, and `python -O` strips
+        # asserts. A handler map that has drifted from TOOL_NAMES would then ship a
+        # surface that does not match the contract, silently.
+        if set(self._handlers) != set(TOOL_NAMES):
+            raise RuntimeError(
+                "MCP handler map does not match the published tool contract: "
+                f"{sorted(set(self._handlers) ^ set(TOOL_NAMES))}"
+            )
 
     # ---------------------------------------------------------------- #
     # Envelope
@@ -182,6 +193,14 @@ class McpServer:
         handler = self._handlers.get(tool_name)
         if handler is None:
             raise UnknownTool(tool_name)
+        if not self._workspace_ready():
+            return self._failure(tool_name, NebulaError(
+                ErrorCode.PREFLIGHT_BLOCKED,
+                "The server is not running inside a configured Nebula workspace.",
+                "preflight",
+                "Set the host's cwd to a workspace containing planning-mds/, or set "
+                "NEBULA_AGENTS_RUNTIME_DIR. See docs/mcp-host-configuration.md.",
+            ))
         try:
             return handler(arguments or {})
         except NebulaError as error:

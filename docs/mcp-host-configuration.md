@@ -87,7 +87,12 @@ You should get a JSON line listing six tools. If the command is not found, the h
 `PATH` is the problem, not the server.
 
 **Tools return `WORKSPACE_NOT_CONFIGURED`.** The `cwd` is not a Nebula workspace. It needs
-a `planning-mds/` tree; run `nebula-agents doctor` there to see what is missing.
+a `planning-mds/` tree with `features/` and `schemas/` beneath it.
+
+Note that `nebula-agents doctor` run outside a workspace reports `SCHEMA_INVALID`
+("Schema cannot be loaded") rather than a setup error — an F0001 diagnostic quirk recorded
+as finding S9-F2. Nothing is corrupt; you are in the wrong directory. Check the `cwd` in
+your host configuration first.
 
 **Tools return `NOT_FOUND` for a run you can see.** The host is reading a different
 runtime directory. Check `NEBULA_AGENTS_RUNTIME_DIR` in the host's environment block

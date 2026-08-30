@@ -308,3 +308,40 @@ def test_a_tool_call_is_wrapped_with_an_is_error_flag(served) -> None:
     assert responses[0]["result"]["isError"] is True
     body = json.loads(responses[0]["result"]["content"][0]["text"])
     assert body["error"]["code"] == "NOT_FOUND"
+
+
+# --------------------------------------------------------------------------- #
+# Workspace detection (found at G2, by deployability probing)
+# --------------------------------------------------------------------------- #
+def test_outside_a_workspace_every_tool_says_so_rather_than_returning_empty(served) -> None:
+    """Distinguishing "no runs" from "not a workspace" is not cosmetic.
+
+    Before this guard, a host pointed at the wrong directory got an empty session list
+    and a `nebula_evidence_list` with no artifacts — indistinguishable from a real run
+    with no evidence. A reviewer would read "this run has nothing" instead of "I am in
+    the wrong tree". `docs/mcp-host-configuration.md` documented the error this now
+    actually returns; the documentation was right and the code was not.
+    """
+    server = McpServer(
+        served.app.queries, SimpleNamespace(now=lambda: NOW), lambda: False
+    )
+    for name, arguments in (
+        ("nebula_session_list", {}),
+        ("nebula_evidence_list", {"run_id": served.run_id}),
+        ("nebula_session_status", {"run_id": served.run_id}),
+    ):
+        payload = server.call(name, arguments)
+        assert payload["error"]["code"] == "WORKSPACE_NOT_CONFIGURED", name
+        assert payload["error"]["category"] == "setup_required"
+
+
+def test_the_workspace_guard_response_is_schema_conformant(served, response_schema) -> None:
+    server = McpServer(served.app.queries, SimpleNamespace(now=lambda: NOW), lambda: False)
+    response_schema.validate(server.call("nebula_session_list", {}))
+
+
+def test_an_unknown_tool_is_rejected_before_the_workspace_guard(served) -> None:
+    """Ordering: an unknown tool is a protocol error regardless of where the host is."""
+    server = McpServer(served.app.queries, SimpleNamespace(now=lambda: NOW), lambda: False)
+    with pytest.raises(mcp_server.UnknownTool):
+        server.call("nebula_not_a_tool", {})
