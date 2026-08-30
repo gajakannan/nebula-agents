@@ -12,6 +12,7 @@ services — because that is the only place the seams are all present at once.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -150,11 +151,26 @@ def test_the_whole_operator_lifecycle_runs_through_the_cli(launched, capfd, tmp_
     )
     assert code == 0 and detail["data"]["source_artifact_ids"]
 
-    role = {"planning-mds/architecture/SOLUTION-PATTERNS.md": "architect",
-            "planning-mds/features/REGISTRY.md": "product-manager"}[proposal["target_document"]]
+    # Deciding requires a per-target-class grant in the committed policy. Without it the
+    # operator who owns the run is denied -- which is the point.
+    code, denied = run_cli(
+        ["learn", "decide", proposal["proposal_id"], "--run-id", run_id,
+         "--decision", "reject", "--reason", "documented behaviour is correct"],
+        workspace, capfd,
+    )
+    assert code == 5 and denied["error"]["code"] == "FORBIDDEN"
+
+    key = {"planning-mds/architecture/SOLUTION-PATTERNS.md": "can_decide_architecture",
+           "planning-mds/features/REGISTRY.md": "can_decide_planning"}[proposal["target_document"]]
+    policy = tmp_path / "runtime" / "policy.json"
+    document = json.loads(policy.read_text(encoding="utf-8"))
+    document["proposal_grants"] = {key: True}
+    policy.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    os.chmod(policy, 0o600)
+
     code, decided = run_cli(
         ["learn", "decide", proposal["proposal_id"], "--run-id", run_id,
-         "--decision", "reject", "--role", role, "--reason", "documented behaviour is correct"],
+         "--decision", "reject", "--reason", "documented behaviour is correct"],
         workspace, capfd,
     )
     assert code == 0 and decided["data"]["proposal_status"] == "Rejected"

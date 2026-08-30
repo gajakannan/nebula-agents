@@ -131,10 +131,9 @@ def test_decide_offers_exactly_the_four_contract_decisions() -> None:
     """`Draft` is a status, never a decision, so it is unreachable from the CLI."""
     for decision in ("accept", "edit", "reject", "archive"):
         parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", decision,
-               "--role", "architect", "--reason", "r"])
+               "--reason", "r"])
     with pytest.raises(Exception):
-        parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", "draft",
-               "--role", "architect"])
+        parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", "draft"])
 
 
 @pytest.mark.parametrize("decision", ["reject", "archive"])
@@ -147,8 +146,21 @@ def test_reject_and_archive_require_a_reason_as_a_usage_error(
 
     monkeypatch.setattr(cli, "_build_application", lambda _root: object())
     code = cli.main(["learn", "decide", "p-abc", "--run-id", RUN,
-                     "--decision", decision, "--role", "architect", "--format", "json"])
+                     "--decision", decision, "--format", "json"])
     assert code == 2
     document = json.loads(capfd.readouterr().err)
     assert document["error"]["code"] == "USAGE_ERROR"
     assert "--reason" in document["error"]["message"]
+
+
+def test_learn_decide_has_no_role_flag() -> None:
+    """A role the caller can name is a role the caller can claim.
+
+    `--role` was removed after review found that a LocalOperator could pass
+    `--role architect` and decide an architecture proposal: the check compared the
+    declared role to the required one and never asked whether the actor held it. The role
+    is now derived from the target document and verified against policy.json.
+    """
+    with pytest.raises(Exception):
+        parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", "accept",
+               "--role", "architect"])

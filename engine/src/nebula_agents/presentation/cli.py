@@ -195,7 +195,9 @@ def build_parser() -> ContractParser:
     learn_decide.add_argument("proposal_id")
     learn_decide.add_argument("--run-id", required=True, type=_run_id)
     learn_decide.add_argument("--decision", required=True, choices=_DECISIONS)
-    learn_decide.add_argument("--role", required=True, choices=_REVIEWER_ROLES)
+    # No --role. The reviewer role is derived from the proposal's target document and
+    # verified against policy.json; a role the caller can name is a role the caller can
+    # claim, which is precisely what this action must not allow.
     learn_decide.add_argument("--reason")
     learn_decide.add_argument("--patch-plan")
     _format_argument(learn_decide)
@@ -447,7 +449,6 @@ def _dispatch(
                 proposal_id=namespace.proposal_id,
                 decision=enum_member("ProposalDecisionKind", _DECISION_KIND[namespace.decision]),
                 actor=actor,
-                reviewer_role=enum_member("ReviewerRole", namespace.role),
                 reason=namespace.reason,
                 patch_plan=namespace.patch_plan,
             )

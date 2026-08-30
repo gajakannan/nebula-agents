@@ -27,6 +27,14 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G3": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g3"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }

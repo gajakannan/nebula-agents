@@ -7,6 +7,7 @@ keep drafting separate from deciding.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import stat
 import sys
@@ -68,6 +69,21 @@ def run_with_failures(tmp_path: Path, schema_root: Path):
                            runtime=runtime, evidence=evidence)
 
 
+def grant(ctx, *roles: str) -> None:
+    """Grant proposal-decision authority in the committed policy, as an operator would.
+
+    Written into policy.json rather than passed as an argument, because that is the whole
+    point of the fix: authority comes from the 0600 policy file, not from the caller.
+    """
+    keys = {"architect": "can_decide_architecture", "security": "can_decide_security",
+            "product-manager": "can_decide_planning"}
+    path = ctx.runtime / "policy.json"
+    document = json.loads(path.read_text(encoding="utf-8"))
+    document["proposal_grants"] = {keys[role]: True for role in roles}
+    path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    os.chmod(path, 0o600)
+
+
 def with_failing_evidence(ctx, *fixtures: tuple[str, str]):
     paths = []
     for fixture, name in fixtures:
@@ -123,35 +139,70 @@ def test_re_reviewing_is_idempotent_rather_than_accumulating(run_with_failures) 
 
 
 def test_owning_the_run_does_not_confer_the_right_to_decide(run_with_failures) -> None:
-    """The rule a Security Reviewer needs to be able to verify."""
+    """The rule a Security Reviewer needs to be able to verify.
+
+    The actor owns the run and holds no proposal grant. Deny by default.
+    """
     ctx = run_with_failures
     with_failing_evidence(ctx, ("validator-output.txt", "validator.txt"))
     proposal = ctx.app.learning.review(ctx.run_id, ctx.actor)[0]
+    grant(ctx, "architect")
 
     with pytest.raises(NebulaError) as caught:
         ctx.app.learning.decide(
-            ctx.run_id, proposal.proposal_id, ProposalDecisionKind.ACCEPTED,
-            ctx.actor, ReviewerRole.SECURITY,
+            ctx.run_id, proposal.proposal_id, ProposalDecisionKind.ACCEPTED, ctx.actor
         )
     assert caught.value.code is ErrorCode.FORBIDDEN
     assert caught.value.exit_code == 5
+
+
+def test_a_grant_for_one_target_class_does_not_carry_to_another(run_with_failures) -> None:
+    """Granted per target-document class, never blanket (BLUEPRINT §5.4).
+
+    This is the regression test for a real finding: an earlier revision took the reviewer
+    role from the CALLER, so a LocalOperator could name `architect` and decide an
+    architecture proposal. The role is now derived from the target and verified against
+    policy.json, so naming it is not possible and holding one class grants only that one.
+    """
+    ctx = run_with_failures
+    with_failing_evidence(ctx, ("validator-output.txt", "validator.txt"),
+                          ("command-log.jsonl", "commands.log"))
+    drafted = ctx.app.learning.review(ctx.run_id, ctx.actor)
+    by_target = {p.target_document: p for p in drafted}
+    architecture = by_target["planning-mds/architecture/SOLUTION-PATTERNS.md"]
+    planning = by_target["planning-mds/features/REGISTRY.md"]
+
+    grant(ctx, "architect")
+
+    decided = ctx.app.learning.decide(
+        ctx.run_id, architecture.proposal_id, ProposalDecisionKind.ACCEPTED, ctx.actor
+    )
+    assert decided.decisions[0].reviewer_role is ReviewerRole.ARCHITECT
+
+    with pytest.raises(NebulaError) as caught:
+        ctx.app.learning.decide(
+            ctx.run_id, planning.proposal_id, ProposalDecisionKind.ACCEPTED, ctx.actor
+        )
+    assert caught.value.code is ErrorCode.FORBIDDEN
+    assert "product-manager" in caught.value.remediation
 
 
 def test_reject_records_a_reason_and_is_append_only(run_with_failures) -> None:
     ctx = run_with_failures
     with_failing_evidence(ctx, ("command-log.jsonl", "commands.log"))
     proposal = ctx.app.learning.review(ctx.run_id, ctx.actor)[0]
+    grant(ctx, "architect")
 
     decided = ctx.app.learning.decide(
         ctx.run_id, proposal.proposal_id, ProposalDecisionKind.REJECTED,
-        ctx.actor, ReviewerRole.ARCHITECT, reason="documented behaviour is correct",
+        ctx.actor, reason="documented behaviour is correct",
     )
     assert decided.proposal_status is ProposalStatus.REJECTED
     assert decided.decisions[0].decision_reason == "documented behaviour is correct"
 
     followed = ctx.app.learning.decide(
         ctx.run_id, proposal.proposal_id, ProposalDecisionKind.ARCHIVED,
-        ctx.actor, ReviewerRole.ARCHITECT, reason="superseded",
+        ctx.actor, reason="superseded",
     )
     assert len(followed.decisions) == 2
     assert followed.decisions[0] == decided.decisions[0]
@@ -161,9 +212,10 @@ def test_rejection_is_sticky_until_the_source_evidence_changes(run_with_failures
     ctx = run_with_failures
     with_failing_evidence(ctx, ("command-log.jsonl", "commands.log"))
     proposal = ctx.app.learning.review(ctx.run_id, ctx.actor)[0]
+    grant(ctx, "architect")
     ctx.app.learning.decide(
         ctx.run_id, proposal.proposal_id, ProposalDecisionKind.REJECTED,
-        ctx.actor, ReviewerRole.ARCHITECT, reason="declined",
+        ctx.actor, reason="declined",
     )
 
     assert ctx.app.learning.review(ctx.run_id, ctx.actor) == ()
@@ -182,10 +234,11 @@ def test_accept_records_the_decision_without_opening_the_target(run_with_failure
     ctx = run_with_failures
     with_failing_evidence(ctx, ("command-log.jsonl", "commands.log"))
     proposal = ctx.app.learning.review(ctx.run_id, ctx.actor)[0]
+    grant(ctx, "architect")
 
     decided = ctx.app.learning.decide(
         ctx.run_id, proposal.proposal_id, ProposalDecisionKind.ACCEPTED,
-        ctx.actor, ReviewerRole.ARCHITECT, patch_plan="add a retry note to §7",
+        ctx.actor, patch_plan="add a retry note to §7",
     )
     assert decided.proposal_status is ProposalStatus.ACCEPTED
     assert decided.patch_plan == "add a retry note to §7"
@@ -208,9 +261,10 @@ def test_drafting_and_deciding_each_append_one_audit_event(run_with_failures) ->
     ctx = run_with_failures
     with_failing_evidence(ctx, ("command-log.jsonl", "commands.log"))
     proposal = ctx.app.learning.review(ctx.run_id, ctx.actor)[0]
+    grant(ctx, "architect")
     ctx.app.learning.decide(
         ctx.run_id, proposal.proposal_id, ProposalDecisionKind.EDITED,
-        ctx.actor, ReviewerRole.ARCHITECT,
+        ctx.actor,
     )
 
     events = [
@@ -230,6 +284,6 @@ def test_deciding_an_unknown_proposal_is_not_found(run_with_failures) -> None:
     with pytest.raises(NebulaError) as caught:
         ctx.app.learning.decide(
             ctx.run_id, "p-0000000000000000", ProposalDecisionKind.ACCEPTED,
-            ctx.actor, ReviewerRole.ARCHITECT,
+            ctx.actor,
         )
     assert caught.value.code is ErrorCode.PROPOSAL_NOT_FOUND

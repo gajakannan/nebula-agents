@@ -11,7 +11,11 @@
 | Python 3.12.13 | **727** | 0 | 0 | 0 |
 | Python 3.11.15 | **727** | 0 | 0 | 0 |
 
-`artifacts/test-results/junit.xml` records the 3.14 execution. Nothing is skipped —
+The 3.14 execution is recorded in
+
+- artifacts/test-results/junit.xml
+
+Nothing is skipped —
 including `test_real_tmux_lifecycle.py`, which skips silently when the package is
 installed in a way it cannot detect, and does not here.
 
