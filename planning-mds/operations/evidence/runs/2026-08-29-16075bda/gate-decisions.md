@@ -105,3 +105,76 @@ S3-F1, which is also a contract-text question rather than an implementation defe
 A diagnostic must describe an unusable environment rather than refuse to run in one, so
 `doctor` reports the blocked provider and exits 3 rather than raising. This mirrors
 F0001's `doctor`, which returns 3 on a non-ready overall status instead of erroring.
+
+## Step 8 — test and evidence closure
+
+Test and coverage evidence is produced; **no gate decision is recorded here.** G2 is the
+QE gate and has not run. What follows is the material G2 will assess.
+
+| Measure | Value |
+|---------|-------|
+| Tests | **709** — 0 failures, 0 errors, 0 skipped |
+| Of which F0003 | 192 |
+| Interpreters | 3.11.15, 3.12.13, 3.14.4 — all green |
+| Line coverage | 92.22% (5480/5942), minimum 85% |
+| Branch coverage | 82.64% (1438/1740) |
+
+Artifacts: `artifacts/test-results/junit.xml`, `artifacts/test-results/coverage.xml`,
+`artifacts/test-coverage/acceptance-criteria-map.md`.
+
+### The coverage audit states its gaps rather than implying completeness
+
+`acceptance-criteria-map.md` maps every story's acceptance criteria to the test that
+closes it, and names three things that are **not** covered:
+
+1. **S0003 is entirely unimplemented and untested** — blocked on M1. No partial
+   implementation exists to mislead a reader, and the `f0003-mcp-response` schema is
+   recorded as deliberately unexercised.
+2. The lifecycle test patches the provider and tmux seams. A real provider process is
+   exercised only by F0001's `test_real_tmux_lifecycle.py`, which runs and does not skip.
+   F0003 adds no new subprocess path.
+3. `gate_wait_seconds` approximates from the gate's `updated_at`. A dedicated
+   gate-transition timestamp would be exact.
+
+### Two checks added at Step 8 that did not exist
+
+- **Packaging contract.** ADR-005 and ADR-007 both rest on "no new required dependency",
+  which is a claim about a file that changes. `test_package_contract.py` asserts the
+  dependency set, the console entry point, and that no F0003 module imports anything
+  outside the standard library and `jsonschema`. Verified separately against a genuinely
+  clean 3.11 install carrying only `jsonschema` and its transitive deps.
+- **Full operator lifecycle through the CLI.** Every layer had passing tests when
+  `infer_kind` misfiled `validator.txt` as `status`, because the defect lived in the seam
+  between two correct layers. `test_f0003_lifecycle.py` runs the operator's real path —
+  `providers doctor → wrap → index → summarize → metrics → learn review → decide` — and
+  asserts the artifact kinds explicitly, which is where that class of defect shows up.
+
+### `security_sensitive_scope` remains false
+
+It flips at **G2**, when QE runs the four scan classes. The flag is not stage-gated, so
+setting it earlier would demand scan evidence that does not exist yet. The Security
+Reviewer signoff is required from G3 regardless, via STATUS.md. Recorded at G0 and
+unchanged.
+
+### S8-F1 (Low) — committed evidence referenced a file `.gitignore` excluded
+
+`.gitignore` carried a repo-root rule `coverage.xml`, intended for build output. It also
+matched `planning-mds/operations/evidence/runs/*/artifacts/test-results/coverage.xml`, so
+every run's coverage artifact was silently excluded from the commit while its manifest
+recorded the path, byte count, and SHA-256.
+
+**F0001's archived evidence has the same dangling reference** — runs
+`2026-07-13-1cfbc5a0` and `2026-07-14-b885d64c` both name a `coverage.xml` that was never
+committed. The local files still exist and their SHA-256 **matches the recorded hash
+exactly** in both cases, so they are the genuine artifacts rather than stale rebuilds.
+They are committed here, which makes an archived, signed-off evidence package resolvable
+for the first time.
+
+Fixed with a negation scoped to the evidence path only; build output stays ignored.
+
+Worth noting how it surfaced: not by review, and not by `validate-feature-evidence` —
+which does not verify that `test_results.artifacts` paths resolve, the way it does for
+`scm.diff_artifact` and `security_scans`. It surfaced because `git status` after staging
+showed the file missing. **That validator gap is a framework finding for F0007's pilot
+report**: a manifest can name a test artifact that is not in the repository and still
+pass every stage.

@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-6 of 8 implemented, Checkpoints A-D met; Step 7 blocked on M1
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; Steps 1-6 and 8 of 8 implemented, Checkpoints A-D met; **only Step 7 (S0003) remains, blocked on M1**
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -189,11 +189,26 @@ classified a file named `validator.txt` as `status`, which has no failure rules 
 real validator failure could never reach a learning proposal. Name hints now take
 precedence over the extension.
 
+### Step 8 — test and evidence closure
+
+**709 tests**, 0 failures, green on 3.11 / 3.12 / 3.14. Line coverage **92.22%**
+(minimum 85%), branch **82.64%**. 192 of those tests are F0003's.
+
+`artifacts/test-coverage/acceptance-criteria-map.md` maps every story's acceptance
+criteria to the test that closes it and **states its gaps** rather than implying
+completeness — chiefly that S0003 is entirely unimplemented and untested.
+
+Two checks were added that did not exist: a **packaging contract** test, because ADR-005
+and ADR-007 both rest on "no new required dependency" and that is a claim about a file
+that changes (verified separately against a genuinely clean install); and a **full
+operator lifecycle** test through the CLI, because every layer had passing tests when
+`infer_kind` misfiled `validator.txt` — the defect lived in the seam between two correct
+layers, and only the whole chain exposes that class.
+
 ### Remaining
 
-Step 7 (S0003, the MCP adapter) is the only implementation step left, and it is **blocked
-on M1** — `nebula-agents mcp install` versus documented manual host configuration. Step 8
-is test and evidence closure.
+**Step 7 (S0003, the MCP adapter) is the only implementation work left**, blocked on
+**M1** — `nebula-agents mcp install` versus documented manual host configuration.
 
 ## Plan-Review Findings
 

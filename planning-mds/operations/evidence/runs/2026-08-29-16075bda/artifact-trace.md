@@ -36,7 +36,12 @@ As-built source (read to make the plan's "Existing Code" rows concrete):
 - `commands.log`, `lifecycle-gates.log` — appended by `run-gate.py`
 - `g1-runtime-preflight.md` — created at G1
 - `evidence-manifest.json` — updated at G1: `gate_results.runtime_preflight` PASS
-- `gate-decisions.md` — G1 row appended
+- `gate-decisions.md` — G1 row appended; Step 3, 4, and 8 findings recorded
+- `artifacts/facade-split/` — Checkpoint A audit-stream evidence and its harness
+- `artifacts/test-results/{junit.xml,coverage.xml}` — created at Step 8
+- `artifacts/test-coverage/acceptance-criteria-map.md` — created at Step 8
+- `evidence-manifest.json` — `test_results` block recorded at Step 8
+- `engine/**` — F0003 implementation, Steps 1-6 and 8
 
 ## Generated Evidence
 

@@ -4,6 +4,10 @@ __pycache__/
 .pytest_cache/
 .coverage
 coverage.xml
+# ...but committed run evidence is not build output. A manifest that references
+# artifacts/test-results/coverage.xml must be able to resolve it; F0001's run
+# 2026-07-14-b885d64c references one that was never committed for exactly this reason.
+!planning-mds/operations/evidence/runs/*/artifacts/test-results/coverage.xml
 htmlcov/
 build/
 dist/

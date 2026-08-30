@@ -213,7 +213,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.07
+      hotspot_score: 0.09
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -452,8 +452,8 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
-      last_modified: '2026-08-29'
-      source_hash: 0b68e6880eb1fa43
+      last_modified: '2026-08-30'
+      source_hash: d38df1478c951cfa
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -704,7 +704,7 @@ freshness:
       - scripts/kg/tests/test_tracker_merge.py
       - scripts/kg/tests/test_workstate_digest.py
       source_count: 90
-      last_modified: '2026-08-29'
+      last_modified: '2026-08-30'
       source_hash: a5ead9c2ba7794bb
     capability:evidence-and-gate-control:
       source_paths:
@@ -802,6 +802,9 @@ freshness:
       - engine/tests/contract/__pycache__/test_layering.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_layering.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_layering.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_package_contract.cpython-311-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_package_contract.cpython-312-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_package_contract.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_summary_determinism.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_summary_determinism.cpython-311.pyc
       - engine/tests/contract/__pycache__/test_summary_determinism.cpython-312-pytest-9.1.1.pyc
@@ -818,14 +821,15 @@ freshness:
       - engine/tests/contract/test_formatters.py
       - engine/tests/contract/test_json_schemas.py
       - engine/tests/contract/test_layering.py
+      - engine/tests/contract/test_package_contract.py
       - engine/tests/contract/test_summary_determinism.py
       - engine/tests/security/test_presentation_boundary_edges.py
       - engine/tests/security/test_static_execution_boundary.py
       - engine/tests/unit/test_tui_actions.py
       - engine/tests/unit/test_tui_behavioral_coverage.py
-      source_count: 74
-      last_modified: '2026-08-29'
-      source_hash: 34d85b13916e7e15
+      source_count: 78
+      last_modified: '2026-08-30'
+      source_hash: 7d421d525f4eed13
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -852,7 +856,7 @@ freshness:
       - engine/tests/integration/test_real_tmux_lifecycle.py
       - engine/tests/unit/test_tmux_adapter.py
       source_count: 9
-      last_modified: '2026-08-29'
+      last_modified: '2026-08-30'
       source_hash: 468e714e0e7aa4f6
 symbols:
   symbol_count: 1608
