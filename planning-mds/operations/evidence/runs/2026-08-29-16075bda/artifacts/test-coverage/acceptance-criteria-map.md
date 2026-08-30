@@ -3,7 +3,7 @@
 Produced at Step 8. Maps every story's acceptance criteria to the test that closes it, and
 states plainly what is **not** covered.
 
-**192 F0003 tests** within a suite of **709**, green on Python 3.11, 3.12, and 3.14.
+**210 F0003 tests** within a suite of **727**, green on Python 3.11, 3.12, and 3.14.
 
 ## S0001 — Runtime command surface and wrap launch
 
@@ -31,14 +31,14 @@ secret-bearing version output. `test_wrap_launch.py` covers the guard in place.
 
 ## S0003 — MCP status and evidence tools
 
-**NOT COVERED — not implemented.** Step 7 is deferred pending **M1** (`nebula-agents mcp
-install` versus documented manual host configuration). No test in this suite asserts
-anything about the six MCP tools, and no partial implementation exists to mislead a
-reader.
+Covered. **M1 was resolved 2026-08-29: documented manual host configuration**, no `mcp
+install` subcommand. `test_mcp_tools.py` (18 tests) covers all six tools, the read-only
+guarantee at instance *and* import level, schema conformance of every success and error
+envelope, `evidence_show` refusing content when redaction is not `Pass`, paging, and the
+stdio loop — handshake, notification, malformed line, unknown method, unknown tool.
 
-What *is* already in place for it: the query-only facade the adapter must be constructed
-with (`test_facade_split.py`), and the `f0003-mcp-response` schema, which
-`test_f0003_record_schemas.py` explicitly records as unexercised with the reason.
+`docs/mcp-host-configuration.md` carries the host configuration, and its troubleshooting
+command was executed verbatim to confirm it works as printed.
 
 ## S0004 — Evidence artifact store and retrieval index
 
@@ -83,11 +83,14 @@ unmodified, plus the audit-stream invariance evidence in `artifacts/facade-split
 
 ## Known gaps, stated rather than implied
 
-1. **S0003 is entirely unimplemented and untested.** Blocked on M1.
-2. **The lifecycle test patches the provider and tmux seams.** A real provider process is
+1. **The lifecycle test patches the provider and tmux seams.** A real provider process is
    exercised only by F0001's `test_real_tmux_lifecycle.py`, which runs and does not skip.
    F0003 adds no new subprocess path — `wrap` calls F0001's `launch` unchanged — so this
    is a deliberate boundary, not an omission.
-3. **`metrics` `gate_wait_seconds` uses the gate's `updated_at`.** Where a gate has none,
+3. **The MCP surface is exercised in-process and as a real subprocess, but not against a
+   third-party host.** Conformance to the protocol revision `2025-06-18` is asserted
+   against the shape `scripts/kg/mcp_server.py` already serves in this repository, not
+   against a published conformance suite.
+2. **`metrics` `gate_wait_seconds` uses the gate's `updated_at`.** Where a gate has none,
    the run's is used. That is an approximation; a dedicated gate-transition timestamp
    would be exact and belongs to whoever revisits gate state.

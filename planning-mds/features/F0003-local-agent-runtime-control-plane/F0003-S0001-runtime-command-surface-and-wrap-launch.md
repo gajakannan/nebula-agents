@@ -124,7 +124,11 @@ Required checks for mutation stories:
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Should the first command entry point live under `agents/runtime/` or a root-level package wrapper?
+- [x] **Resolved 2026-08-29 — neither.** ADR-005 decided F0003 extends the existing
+  local package rather than adding a service or a second entry point: the commands live
+  in `engine/src/nebula_agents/presentation/cli.py` behind the F0001 `nebula-agents`
+  console script, which contract `1.1` extends and never replaces. Carried as plan-review
+  finding L1; the built code is the evidence.
 
 **Assumptions (to be validated):**
 - A local CLI surface is sufficient for the MCP implementation to consume, and for any later terminal-UI surface F0008 may add.

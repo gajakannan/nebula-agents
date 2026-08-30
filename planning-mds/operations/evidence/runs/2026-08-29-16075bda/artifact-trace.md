@@ -41,7 +41,8 @@ As-built source (read to make the plan's "Existing Code" rows concrete):
 - `artifacts/test-results/{junit.xml,coverage.xml}` — created at Step 8
 - `artifacts/test-coverage/acceptance-criteria-map.md` — created at Step 8
 - `evidence-manifest.json` — `test_results` block recorded at Step 8
-- `engine/**` — F0003 implementation, Steps 1-6 and 8
+- `engine/**` — F0003 implementation, all 8 steps
+- `docs/mcp-host-configuration.md` — created at Step 7; M1's resolution
 
 ## Generated Evidence
 

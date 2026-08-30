@@ -13,6 +13,7 @@
   "rerun_of": null,
   "changed_paths": [
     ".gitignore",
+    "docs",
     "engine",
     "planning-mds/architecture",
     "planning-mds/features/F0003-local-agent-runtime-control-plane",
@@ -88,33 +89,33 @@
   "run_scope": "feature-completion",
   "test_results": {
     "result": "PASS",
-    "tests": 709,
-    "passed": 709,
+    "tests": 727,
+    "passed": 727,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
     "xfail": 0,
     "coverage": {
-      "lines_covered": 5480,
-      "lines_valid": 5942,
-      "line_rate": 0.9222,
+      "lines_covered": 5618,
+      "lines_valid": 6086,
+      "line_rate": 0.9231,
       "minimum_rate": 0.85,
       "result": "PASS",
-      "branches_covered": 1438,
-      "branches_valid": 1740,
-      "branch_rate": 0.8264,
+      "branches_covered": 1468,
+      "branches_valid": 1774,
+      "branch_rate": 0.8275,
       "risk_module_branch_result": "PASS"
     },
     "artifacts": {
       "junit": {
         "path": "artifacts/test-results/junit.xml",
-        "bytes": 103742,
-        "sha256": "6598454b59ac7d23ccfb13b039b11f504effbd40ebc9c59a8d75d864e6be726f"
+        "bytes": 105990,
+        "sha256": "fd1a7222e9aace03472abb0c4333fff5e831913370026c080b55e634e4276836"
       },
       "coverage": {
         "path": "artifacts/test-results/coverage.xml",
-        "bytes": 269051,
-        "sha256": "55f6e2f5437f4714e8f343188a813f3bf96e7b4e3dd56ff54c9a3ff4b90c68de"
+        "bytes": 275298,
+        "sha256": "e9ebe6befae1a4161cdf129d77dd9b122285b5f1f4f7de7224e29712ef6b175e"
       }
     }
   }

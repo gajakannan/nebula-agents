@@ -223,8 +223,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
-      last_modified: '2026-08-29'
-      source_hash: ab5cfbb132c8b27a
+      last_modified: '2026-08-30'
+      source_hash: de037dba7584c050
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -243,8 +243,8 @@ freshness:
       - planning-mds/architecture/f0003-runtime-contract.md
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
-      last_modified: '2026-08-29'
-      source_hash: 83e2628f6e65af01
+      last_modified: '2026-08-30'
+      source_hash: c0e7da3f0a7d9f5c
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-30'
-      source_hash: d38df1478c951cfa
+      source_hash: 76c7e14972aa3b68
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -518,8 +518,8 @@ freshness:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 1
-      last_modified: '2026-08-28'
-      source_hash: d6e28370a210e697
+      last_modified: '2026-08-30'
+      source_hash: 1b070ed263151072
     story:F0003-S0002:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
@@ -530,8 +530,8 @@ freshness:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 1
-      last_modified: '2026-08-21'
-      source_hash: e2d66787671b8e28
+      last_modified: '2026-08-30'
+      source_hash: e08b795f183c464a
     story:F0003-S0004:
       source_paths:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
@@ -802,6 +802,9 @@ freshness:
       - engine/tests/contract/__pycache__/test_layering.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_layering.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_layering.cpython-314-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_mcp_tools.cpython-311-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_mcp_tools.cpython-312-pytest-9.1.1.pyc
+      - engine/tests/contract/__pycache__/test_mcp_tools.cpython-314-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_package_contract.cpython-311-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_package_contract.cpython-312-pytest-9.1.1.pyc
       - engine/tests/contract/__pycache__/test_package_contract.cpython-314-pytest-9.1.1.pyc
@@ -821,15 +824,16 @@ freshness:
       - engine/tests/contract/test_formatters.py
       - engine/tests/contract/test_json_schemas.py
       - engine/tests/contract/test_layering.py
+      - engine/tests/contract/test_mcp_tools.py
       - engine/tests/contract/test_package_contract.py
       - engine/tests/contract/test_summary_determinism.py
       - engine/tests/security/test_presentation_boundary_edges.py
       - engine/tests/security/test_static_execution_boundary.py
       - engine/tests/unit/test_tui_actions.py
       - engine/tests/unit/test_tui_behavioral_coverage.py
-      source_count: 78
+      source_count: 82
       last_modified: '2026-08-30'
-      source_hash: 7d421d525f4eed13
+      source_hash: e3d85ea0216e64f7
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py

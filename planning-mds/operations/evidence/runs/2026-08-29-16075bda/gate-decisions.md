@@ -178,3 +178,51 @@ which does not verify that `test_results.artifacts` paths resolve, the way it do
 showed the file missing. **That validator gap is a framework finding for F0007's pilot
 report**: a manifest can name a test artifact that is not in the repository and still
 pass every stage.
+
+## Step 7 — read-only MCP surface · Checkpoint E met · M1 RESOLVED
+
+### M1 resolved 2026-08-29 — documented manual host configuration
+
+There is **no `mcp install` subcommand**. Writing a host's configuration file would put
+Nebula inside a trust boundary it does not own: that file governs which processes the host
+spawns, it frequently sits alongside credentials for other servers, and its format is the
+vendor's to change. An installer would have to locate it by guesswork, merge without
+clobbering unrelated entries, and track each host's schema — and getting any of that
+subtly wrong is worse than a documented paste.
+
+Recorded in `docs/mcp-host-configuration.md` and in S0003's *Open Questions*. **L1 is
+resolved in the same pass**: ADR-005 already decided the entry point question, and the
+built code is the evidence — the commands live behind the F0001 console script, which
+contract `1.1` extends and never replaces.
+
+**Both plan-review findings carried open since 2026-08-19 are now closed.**
+
+| Checkpoint E criterion | Result |
+|------------------------|--------|
+| `McpServer` cannot reach any mutating service | PASS — asserted at instance **and** import level |
+| Every tool evaluates `ReadState` in addition to the facade guarantee | PASS — via `QueryService` |
+| All six tool names match the contract exactly | PASS — pinned literally |
+| Responses are paged and schema-conformant; errors carry no stack traces | PASS |
+
+### S7-F1 (Low) — the schema was right and my first design was wrong
+
+`f0003-mcp-response` pins `tool_name` to the six-name enum, so an error envelope naming an
+*unknown* tool cannot be schema-conformant. My first implementation returned exactly that.
+
+That is the schema being right, not restrictive: an unknown tool is not a tool *result*,
+it is a protocol error, and it belongs at the JSON-RPC layer as `-32601`. Keeping it in
+the envelope would have forced either a non-conformant response or a dishonest
+`tool_name`. Moved; every envelope is now schema-conformant by construction.
+
+Found by validating responses against the committed schema in test. Reading alone would
+not have caught it — the envelope looked correct.
+
+### ADR-007's premise, demonstrated rather than asserted
+
+A genuinely clean 3.11 install carrying only `jsonschema` and its transitive dependencies
+serves all six tools. No MCP SDK is present, which is what makes S0003's "MCP SDK
+unavailable" edge case unreachable rather than handled.
+
+The troubleshooting command printed in `docs/mcp-host-configuration.md` was executed
+verbatim, as was the alternate `python -m nebula_agents mcp serve` form. Both work as
+documented.

@@ -123,7 +123,13 @@ Required checks for mutation stories:
 ## Questions & Assumptions
 
 **Open Questions:**
-- [ ] Should MCP setup be installed by `nebula-agents mcp install` or documented for manual host configuration first?
+- [x] **Resolved 2026-08-29 — documented manual host configuration.** There is no
+  `mcp install` subcommand. Writing a host's configuration file would put Nebula inside a
+  trust boundary it does not own: that file governs which processes the host spawns, it
+  often sits alongside credentials for other servers, and its format is the vendor's to
+  change. An installer would have to locate it by guesswork, merge without clobbering
+  unrelated entries, and track each host's schema. See
+  [`docs/mcp-host-configuration.md`](../../../docs/mcp-host-configuration.md).
 
 **Assumptions (to be validated):**
 - Read-only MCP inspection is enough for the first runtime integration.
