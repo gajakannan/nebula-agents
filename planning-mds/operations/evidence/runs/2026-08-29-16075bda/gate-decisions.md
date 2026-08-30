@@ -10,6 +10,7 @@
 | G1 | PASS | DevOps | 2026-08-29T11:48:38-04:00 | Environment, tmux, providers, schemas, and the ADR-006 root rule verified; 514 engine tests pass on all three CI-matrix interpreters | No | `RuntimeConfig` lacks `evidence_root` — already an assembly-plan row, not a blocker |
 | G2 | PASS WITH RECOMMENDATIONS | Quality Engineer | 2026-08-29T23:24:14-04:00 | 730 tests green on 3.11/3.12/3.14; line 92.25%, branch 82.7%; four security scan classes run or waived; one deployability defect found and fixed | No | S9-F1 fixed; S9-F2 recorded for the F0001 owner; S3-F1/S4-F1 carried to G3 |
 | G3 | PASS WITH RECOMMENDATIONS | Code Reviewer + Security Reviewer | 2026-08-29T23:40:01-04:00 | Severity ACCEPTABLE (critical 0, high 0) via gate_policy standard profile. One HIGH security finding raised and FIXED within the cycle | No | SEC-1 fixed; CR-1 needs an architecture decision at G4; S3-F1 and SEC-1 are both additive F0001 schema changes |
+| G4 | PASS | Operator | 2026-08-29T23:45:10-04:00 | Severity ACCEPTABLE; all four carried decisions confirmed (S3-F1, SEC-1, S4-F1, CR-1) | No | CR-1's confirmation is a standing pattern decision for future F0003 stores |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -376,3 +377,40 @@ file that plainly exists.
 Fifth framework finding from this pilot. Worth pairing with the earlier one that
 `test_results.artifacts` manifest paths are **not** checked at all: prose references are
 validated strictly while structured manifest references are not validated whatsoever.
+
+## G4 — Approval
+
+**APPROVED.** Recorded 2026-08-29T23:45:10-04:00 on the operator's explicit confirmation.
+
+`gate_policy.py --profile standard` computes **ACCEPTABLE** — critical 0, high 0,
+`requires_justification: false`. No mitigation token is required, because no high finding
+remains open: SEC-1 was fixed inside the G3 review cycle with regression tests, and S3-F1
+is confirmed below rather than carried.
+
+### The four decisions, as confirmed
+
+| ID | Decision confirmed |
+|----|--------------------|
+| **S3-F1** (High) | The `event_type` enum extension **is** the one F0001 schema change contract `1.1` makes. Runtime-contract §9 records it, including that a strict `1.0` reader rejects event types it does not know. Data written under `1.0` stays valid |
+| **SEC-1** (High, fixed) | `proposal_grants` in `f0001-local-policy.schema.json` is confirmed as the second additive F0001 schema change. No smaller fix exists: `reviewer_grants` is closed and `bindings` knows only `LocalOperator|Reviewer|System` |
+| **S4-F1** (Medium) | The persisted `ProviderCapabilityReport` **is** the durable sanitized record for a blocked launch. The guard runs before any run exists, so there is nothing to append a runtime event to, and creating a run to record that none was created would defeat the property the ordering protects |
+| **CR-1** (Medium) | Projection-store commits and their audit events are **not** required to be atomic. Repairable divergence is the accepted pattern for F0003's stores: the index is a projection, re-indexing is idempotent and is the documented recovery path, and the failure is loud rather than silent |
+
+### What CR-1's confirmation settles going forward
+
+It is a standing decision, not a one-off: any future F0003 store may commit its projection
+and its audit event separately, provided the projection is rebuildable and the failure
+surfaces to the caller. A store that fails either condition does not get this treatment.
+
+### Contract consequence, accepted
+
+S3-F1 and SEC-1 together are the whole of where contract `1.1` is not transparent to a
+strict `1.0` reader. Both are additive — no existing field, type, or enum member changed —
+and both are now recorded in the documents a reader consults rather than discoverable only
+from a diff.
+
+### Low findings, accepted without action
+
+S7-F1 and S8-F1 are resolved in code. S9-F2 (`doctor` misreports outside a workspace) and
+S9-F3 / S10-F1 (framework inconsistencies) are routed to their owners and do not gate this
+feature.
