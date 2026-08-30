@@ -5,9 +5,9 @@ summary:
   stories_mapped: 22
   features_excluded: 5
   features_uncovered: 0
-  code_bindings: 7
-  symbol_count: 1608
-  bound_symbol_count: 1608
+  code_bindings: 13
+  symbol_count: 2034
+  bound_symbol_count: 2034
   decision_count: 0
   why_count: 0
 coverage:
@@ -65,31 +65,31 @@ freshness:
     entity:artifact-index-entry:
       source_paths:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: d096467aa945e439
+      source_hash: c9682de4076d2b9d
     entity:artifact-summary:
       source_paths:
       - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: 275ae625baa987be
+      source_hash: c064a1cc89d04fa4
     entity:learning-proposal:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: bc57addb552c99ad
+      source_hash: 740143e3f5add80e
     entity:provider-capability-report:
       source_paths:
       - planning-mds/architecture/f0003-runtime-contract.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: 89a7bd2a5d160811
+      source_hash: 05790bee4cbeafee
     entity:run-record:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -106,11 +106,11 @@ freshness:
       source_hash: b7c7bd47f37c992c
     workflow:evidence-indexing:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       source_count: 2
       last_modified: '2026-08-28'
-      source_hash: 8912229d714b1f74
+      source_hash: 9d96e80a36b274a8
     workflow:gate-decision:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0004-gate-and-validator-dashboard.md
@@ -120,10 +120,10 @@ freshness:
     workflow:learning-proposal-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: bc57addb552c99ad
+      source_hash: 740143e3f5add80e
     workflow:local-agent-session:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
@@ -142,7 +142,7 @@ freshness:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0008-reproducibility-ci-and-git-policy.md
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/README.md
       source_count: 3
-      last_modified: '2026-08-29'
+      last_modified: '2026-08-30'
       source_hash: 4b72a3326240a6c3
       hotspot_rank: 1
       hotspot_score: 1.0
@@ -152,10 +152,15 @@ freshness:
     capability:deterministic-evidence-summaries:
       source_paths:
       - planning-mds/architecture/decisions/ADR-008-f0003-deterministic-summaries.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: 275ae625baa987be
+      source_hash: c064a1cc89d04fa4
+      hotspot_rank: 7
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:evidence-and-gate-control:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0003-run-registry-and-evidence-watchers.md
@@ -163,7 +168,7 @@ freshness:
       source_count: 2
       last_modified: '2026-08-18'
       source_hash: 58616ae6ad36ebf2
-      hotspot_rank: 7
+      hotspot_rank: 11
       hotspot_score: 0.0
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
@@ -171,10 +176,15 @@ freshness:
     capability:evidence-artifact-index:
       source_paths:
       - planning-mds/architecture/decisions/ADR-006-f0003-artifact-identity-and-index.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: d096467aa945e439
+      source_hash: c9682de4076d2b9d
+      hotspot_rank: 9
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:local-run-registry:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -194,7 +204,7 @@ freshness:
       source_count: 2
       last_modified: '2026-08-29'
       source_hash: 152c8cf7958f1661
-      hotspot_rank: 6
+      hotspot_rank: 10
       hotspot_score: 0.01
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
@@ -202,10 +212,15 @@ freshness:
     capability:provider-capability-matrix:
       source_paths:
       - planning-mds/architecture/f0003-runtime-contract.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: 89a7bd2a5d160811
+      source_hash: 05790bee4cbeafee
+      hotspot_rank: 12
+      hotspot_score: 0.0
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:read-only-run-queries:
       source_paths:
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0006-readonly-review-and-status-commands.md
@@ -221,10 +236,15 @@ freshness:
       source_paths:
       - planning-mds/architecture/decisions/ADR-007-f0003-readonly-mcp-surface.md
       - planning-mds/architecture/f0003-runtime-contract.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 3
       last_modified: '2026-08-30'
-      source_hash: de037dba7584c050
+      source_hash: 001d544da3271fdd
+      hotspot_rank: 13
+      hotspot_score: 0.0
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:redacted-transcript-recovery:
       source_paths:
       - planning-mds/architecture/decisions/ADR-004-f0001-transcript-redaction.md
@@ -232,7 +252,7 @@ freshness:
       source_count: 2
       last_modified: '2026-08-18'
       source_hash: 8575e85ad8fb74e6
-      hotspot_rank: 5
+      hotspot_rank: 8
       hotspot_score: 0.01
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
@@ -241,24 +261,34 @@ freshness:
       source_paths:
       - planning-mds/architecture/decisions/ADR-005-f0003-control-plane-packaging.md
       - planning-mds/architecture/f0003-runtime-contract.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 3
       last_modified: '2026-08-30'
-      source_hash: c0e7da3f0a7d9f5c
+      source_hash: 80181e2c1b3efa6c
+      hotspot_rank: 5
+      hotspot_score: 0.02
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:runtime-metrics-and-learning-review:
       source_paths:
       - planning-mds/architecture/decisions/ADR-009-f0003-review-gated-learning-proposals.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 2
       last_modified: '2026-08-29'
-      source_hash: bc57addb552c99ad
+      source_hash: 740143e3f5add80e
+      hotspot_rank: 6
+      hotspot_score: 0.01
+      primary_owner: gajapathi.kannan@live.com
+      primary_owner_pct: 100
+      bus_factor_flag: true
     capability:tmux-session-lifecycle:
       source_paths:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
       - planning-mds/features/archive/F0001-tmux-native-agent-cockpit/F0001-S0002-tmux-session-launch-and-attach.md
       source_count: 2
-      last_modified: '2026-08-29'
-      source_hash: 7468b5a43ad41e36
+      last_modified: '2026-08-30'
+      source_hash: 97f51f1ed7d75c61
       hotspot_rank: 4
       hotspot_score: 0.02
       primary_owner: gajapathi.kannan@live.com
@@ -304,8 +334,8 @@ freshness:
       source_paths:
       - planning-mds/architecture/decisions/ADR-001-f0001-local-tmux-runtime.md
       source_count: 1
-      last_modified: '2026-07-14'
-      source_hash: 4a5b9550fc3e8130
+      last_modified: '2026-08-30'
+      source_hash: 29a039a143766036
     adr:002-f0001-runtime-persistence:
       source_paths:
       - planning-mds/architecture/decisions/ADR-002-f0001-runtime-persistence.md
@@ -439,21 +469,21 @@ freshness:
       source_hash: f02129de4757aff6
     feature:F0003:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/GETTING-STARTED.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/PRD.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/README.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/GETTING-STARTED.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/PRD.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/README.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/STATUS.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-30'
-      source_hash: d7c67b9aeffcfb79
+      source_hash: 654f4378e9da5e4a
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -516,46 +546,46 @@ freshness:
       source_hash: ff24b5a6e5b00d61
     story:F0003-S0001:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0001-runtime-command-surface-and-wrap-launch.md
       source_count: 1
       last_modified: '2026-08-30'
-      source_hash: 1b070ed263151072
+      source_hash: bd15232c04cc5bf7
     story:F0003-S0002:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0002-provider-capability-matrix-and-launch-guards.md
       source_count: 1
       last_modified: '2026-08-21'
-      source_hash: 91140d2e0550e38b
+      source_hash: 23cb19880c3fb19e
     story:F0003-S0003:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0003-mcp-status-and-evidence-tools.md
       source_count: 1
       last_modified: '2026-08-30'
-      source_hash: e08b795f183c464a
+      source_hash: 46821bb2897fc683
     story:F0003-S0004:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0004-evidence-artifact-store-and-retrieval-index.md
       source_count: 1
       last_modified: '2026-08-28'
-      source_hash: bfb402647dc1a2ed
+      source_hash: 8e558500410cc6d0
     story:F0003-S0005:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0005-deterministic-transcript-log-and-validator-summaries.md
       source_count: 1
       last_modified: '2026-08-21'
-      source_hash: e8f9b8ad5c5fcf68
+      source_hash: 60f6b5a7c112f8cb
     story:F0003-S0006:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0006-runtime-metrics-and-failure-learning-review.md
       source_count: 1
       last_modified: '2026-08-21'
-      source_hash: 17a1f60ea2d4e2d9
+      source_hash: d63d065488b724a0
     story:F0003-S0007:
       source_paths:
-      - planning-mds/features/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
+      - planning-mds/features/archive/F0003-local-agent-runtime-control-plane/F0003-S0007-application-query-command-split.md
       source_count: 1
       last_modified: '2026-08-21'
-      source_hash: c32ae9c6e0232d32
+      source_hash: e4768219938902f0
     story:F0006-S0001:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -705,7 +735,22 @@ freshness:
       - scripts/kg/tests/test_workstate_digest.py
       source_count: 90
       last_modified: '2026-08-30'
-      source_hash: a5ead9c2ba7794bb
+      source_hash: db68b24e042b691b
+    capability:deterministic-evidence-summaries:
+      source_paths:
+      - engine/src/nebula_agents/domain/summaries.py
+      - engine/src/nebula_agents/infrastructure/summarizers.py
+      - engine/tests/contract/test_summary_determinism.py
+      - engine/tests/fixtures/summaries/command-log.jsonl
+      - engine/tests/fixtures/summaries/manifest.json
+      - engine/tests/fixtures/summaries/secret-bearing.txt
+      - engine/tests/fixtures/summaries/transcript.txt
+      - engine/tests/fixtures/summaries/unsupported.bin
+      - engine/tests/fixtures/summaries/validator-output.txt
+      - engine/tests/integration/test_evidence_summarize.py
+      source_count: 10
+      last_modified: '2026-08-30'
+      source_hash: 65642a8d0a143468
     capability:evidence-and-gate-control:
       source_paths:
       - engine/src/nebula_agents/application/gates.py
@@ -716,6 +761,18 @@ freshness:
       source_count: 5
       last_modified: '2026-08-18'
       source_hash: 95fa499e9f72713a
+    capability:evidence-artifact-index:
+      source_paths:
+      - engine/src/nebula_agents/application/evidence.py
+      - engine/src/nebula_agents/domain/artifacts.py
+      - engine/src/nebula_agents/infrastructure/artifact_index.py
+      - engine/src/nebula_agents/infrastructure/atomic.py
+      - engine/tests/integration/test_artifact_index.py
+      - engine/tests/security/test_f0003_boundaries.py
+      - engine/tests/unit/test_artifact_identity.py
+      source_count: 7
+      last_modified: '2026-08-30'
+      source_hash: 1dc73e006ad3212e
     capability:local-run-registry:
       source_paths:
       - engine/src/nebula_agents/application/authorization.py
@@ -747,6 +804,15 @@ freshness:
       source_count: 7
       last_modified: '2026-08-29'
       source_hash: 1ea3cca25acb37ed
+    capability:provider-capability-matrix:
+      source_paths:
+      - engine/src/nebula_agents/application/capabilities.py
+      - engine/src/nebula_agents/domain/capabilities.py
+      - engine/src/nebula_agents/infrastructure/capability_probe.py
+      - engine/tests/unit/test_capability_matrix.py
+      source_count: 4
+      last_modified: '2026-08-29'
+      source_hash: 198aa5faa68f47a5
     capability:read-only-run-queries:
       source_paths:
       - engine/src/nebula_agents/application/queries.py
@@ -834,6 +900,13 @@ freshness:
       source_count: 82
       last_modified: '2026-08-30'
       source_hash: ddd7cf245e416cc6
+    capability:readonly-mcp-runtime-surface:
+      source_paths:
+      - engine/src/nebula_agents/presentation/mcp_server.py
+      - engine/tests/contract/test_mcp_tools.py
+      source_count: 2
+      last_modified: '2026-08-30'
+      source_hash: f8b53f34783bbf49
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
@@ -848,6 +921,32 @@ freshness:
       source_count: 9
       last_modified: '2026-08-18'
       source_hash: 719b0f81969f4914
+    capability:runtime-command-surface:
+      source_paths:
+      - engine/src/nebula_agents/application/commands.py
+      - engine/tests/contract/test_evidence_cli.py
+      - engine/tests/contract/test_facade_split.py
+      - engine/tests/contract/test_layering.py
+      - engine/tests/contract/test_package_contract.py
+      - engine/tests/integration/test_f0003_lifecycle.py
+      - engine/tests/integration/test_wrap_launch.py
+      source_count: 7
+      last_modified: '2026-08-30'
+      source_hash: 7b72f15e764d2e86
+    capability:runtime-metrics-and-learning-review:
+      source_paths:
+      - engine/src/nebula_agents/application/learning.py
+      - engine/src/nebula_agents/application/metrics.py
+      - engine/src/nebula_agents/domain/metrics.py
+      - engine/src/nebula_agents/domain/proposals.py
+      - engine/src/nebula_agents/infrastructure/proposal_store.py
+      - engine/tests/contract/test_f0003_record_schemas.py
+      - engine/tests/integration/test_learning_proposals.py
+      - engine/tests/unit/test_f0003_domain_records.py
+      - engine/tests/unit/test_metrics_derivation.py
+      source_count: 9
+      last_modified: '2026-08-30'
+      source_hash: 311f18ca94d4ca8e
     capability:tmux-session-lifecycle:
       source_paths:
       - engine/src/nebula_agents/application/ports.py
@@ -863,10 +962,10 @@ freshness:
       last_modified: '2026-08-30'
       source_hash: 468e714e0e7aa4f6
 symbols:
-  symbol_count: 1608
-  bound_symbol_count: 1608
+  symbol_count: 2034
+  bound_symbol_count: 2034
   by_language:
-    python: 1608
+    python: 2034
 decisions:
   decision_count: 0
   why_count: 0

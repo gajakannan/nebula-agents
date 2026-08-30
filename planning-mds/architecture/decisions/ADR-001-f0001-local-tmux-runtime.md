@@ -68,7 +68,7 @@ The MVP supports POSIX and WSL environments where tmux, Python, and the provider
 - [F0001 PRD](../../features/F0001-tmux-native-agent-cockpit/PRD.md)
 - [Codex authentication documentation](https://learn.chatgpt.com/docs/auth.md)
 - [Codex CLI command documentation](https://learn.chatgpt.com/docs/developer-commands.md?surface=cli)
-- [F0003 PRD](../../features/F0003-local-agent-runtime-control-plane/PRD.md)
+- [F0003 PRD](../../features/archive/F0003-local-agent-runtime-control-plane/PRD.md)
 
 ## Follow-up Actions
 

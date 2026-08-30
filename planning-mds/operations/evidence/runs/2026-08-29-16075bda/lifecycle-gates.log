@@ -94,3 +94,67 @@ Exit Code: 0
 Result: PASS
 Output References: -
 Skipped Gates: -
+
+### G8
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/compile.py
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --new-run-id 2026-08-29-16075bda
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py --write-coverage-report
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py --check-drift
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 agents/scripts/capture-run-telemetry.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --run-id 2026-08-29-16075bda
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --stage closeout
+Stage: G8
+Exit Code: 1
+Result: FAIL
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --stage closeout
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G8
+Command: python3 agents/product-manager/scripts/validate-trackers.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --run-id 2026-08-29-16075bda
+Stage: G8
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -

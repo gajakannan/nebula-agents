@@ -70,6 +70,44 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G8": {
+      "attestations": [
+        {
+          "actor": "",
+          "checkpoint_id": "archive-move",
+          "evidence": [
+            {
+              "path": "pm-closeout.md",
+              "sha256": "7393a2830ba847598a5abdebb83cf17b2bafaf4edeb5981178994faa649b7353"
+            },
+            {
+              "path": "signoff-ledger.md",
+              "sha256": "1c407cdb6963f59129da8b04db4d0beb6d4b9362ea7d3850dd725fca00dd1ad6"
+            },
+            {
+              "path": "kg-reconciliation.md",
+              "sha256": "f5060877481d80920c6cba8f4ec877a3ca5a961be513a6a95a9ccb680cbca94f"
+            }
+          ],
+          "note": "",
+          "role": "",
+          "timestamp": "2026-08-30T10:31:38-04:00"
+        }
+      ],
+      "completed_operations": [
+        "checkpoint:archive-move",
+        "kg-compile-closeout",
+        "patch-prior-manifest",
+        "write:latest-run.json",
+        "kg-write-coverage",
+        "kg-check-drift-closeout",
+        "capture-run-telemetry",
+        "validate-closeout",
+        "validate-trackers-closeout"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }
