@@ -103,3 +103,52 @@ def test_providers_requires_a_subcommand() -> None:
 def test_providers_doctor_parses_with_and_without_a_provider() -> None:
     assert parse(["providers", "doctor"]).providers_command == "doctor"
     assert parse(["providers", "doctor", "--provider", "claude"]).provider == "claude"
+
+
+# --------------------------------------------------------------------------- #
+# F0003 Step 6 surfaces
+# --------------------------------------------------------------------------- #
+def test_metrics_and_learn_subcommands_parse() -> None:
+    assert parse(["metrics", "--run-id", RUN]).command == "metrics"
+    assert parse(["learn", "review", "--run-id", RUN]).learn_command == "review"
+    assert parse(["learn", "list", "--run-id", RUN, "--status", "Draft"]).status == "Draft"
+    assert parse(["learn", "show", "p-abc", "--run-id", RUN]).proposal_id == "p-abc"
+
+
+def test_learn_requires_a_subcommand() -> None:
+    with pytest.raises(Exception):
+        parse(["learn"])
+
+
+def test_learn_scope_is_a_bounded_enumeration_not_free_text() -> None:
+    """Runtime contract §3: `--scope` is an enumeration."""
+    assert parse(["learn", "review", "--run-id", RUN, "--scope", "validators"]).scope == "validators"
+    with pytest.raises(Exception):
+        parse(["learn", "review", "--run-id", RUN, "--scope", "anything-goes"])
+
+
+def test_decide_offers_exactly_the_four_contract_decisions() -> None:
+    """`Draft` is a status, never a decision, so it is unreachable from the CLI."""
+    for decision in ("accept", "edit", "reject", "archive"):
+        parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", decision,
+               "--role", "architect", "--reason", "r"])
+    with pytest.raises(Exception):
+        parse(["learn", "decide", "p-abc", "--run-id", RUN, "--decision", "draft",
+               "--role", "architect"])
+
+
+@pytest.mark.parametrize("decision", ["reject", "archive"])
+def test_reject_and_archive_require_a_reason_as_a_usage_error(
+    decision: str, monkeypatch: pytest.MonkeyPatch, capfd: pytest.CaptureFixture[str]
+) -> None:
+    """Enforced in the CLI as well as the domain, so the operator gets exit 2 rather
+    than a state-io error surfacing from deeper in the stack."""
+    from nebula_agents.presentation import cli
+
+    monkeypatch.setattr(cli, "_build_application", lambda _root: object())
+    code = cli.main(["learn", "decide", "p-abc", "--run-id", RUN,
+                     "--decision", decision, "--role", "architect", "--format", "json"])
+    assert code == 2
+    document = json.loads(capfd.readouterr().err)
+    assert document["error"]["code"] == "USAGE_ERROR"
+    assert "--reason" in document["error"]["message"]

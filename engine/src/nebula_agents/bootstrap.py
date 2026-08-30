@@ -11,6 +11,7 @@ from nebula_agents.application.authorization import AuthorizationService
 from nebula_agents.application.capabilities import CapabilityService
 from nebula_agents.application.commands import CommandService
 from nebula_agents.application.evidence import EvidenceService
+from nebula_agents.application.learning import LearningService
 from nebula_agents.application.gates import GateService
 from nebula_agents.application.preflight import PreflightService
 from nebula_agents.application.queries import QueryService
@@ -30,6 +31,7 @@ from nebula_agents.infrastructure.identity import OsIdentity
 from nebula_agents.infrastructure.policy_store import LocalPolicyStore
 from nebula_agents.infrastructure.process import SubprocessRunner
 from nebula_agents.infrastructure.providers import ClaudeAdapter, CodexAdapter
+from nebula_agents.infrastructure.proposal_store import FilesystemProposalStore
 from nebula_agents.infrastructure.schema_registry import JsonSchemaRegistry
 from nebula_agents.infrastructure.summarizers import (
     FilesystemSummaryStore,
@@ -129,6 +131,10 @@ class Application:
     def capabilities(self) -> CapabilityService:
         return self.commands.capabilities
 
+    @property
+    def learning(self) -> LearningService:
+        return self.commands.learning
+
 
 def build_application(workspace_root: Path, runtime_override: Path | None = None) -> Application:
     config = resolve_config(workspace_root, runtime_override)
@@ -162,6 +168,7 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
     )
     gates = GateService(repository=repository, authorization=authorization, runner=validator, clock=clock, watcher=watcher)
     transcripts = TranscriptService(repository=repository, authorization=authorization, pipe=transcript_pipe, clock=clock)
+    summary_store = FilesystemSummaryStore(config.runs_root, schema, config.lock_timeout_seconds)
     artifact_index = FilesystemArtifactIndex(config.runs_root, schema, config.lock_timeout_seconds)
     evidence = EvidenceService(
         repository=repository,
@@ -169,13 +176,18 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
         authorization=authorization,
         clock=clock,
         roots=config.approved_roots,
-        summaries=FilesystemSummaryStore(config.runs_root, schema, config.lock_timeout_seconds),
+        summaries=summary_store,
         extractor=RuleBasedSummaryExtractor(),
         marker_limit=config.summary_marker_limit,
     )
+    proposal_store = FilesystemProposalStore(config.runs_root, schema, config.lock_timeout_seconds)
+    learning = LearningService(
+        repository=repository, index=artifact_index, summaries=summary_store,
+        store=proposal_store, authorization=authorization, clock=clock,
+    )
     queries = QueryService(
         repository=repository, authorization=authorization, identity=identity,
-        tmux=tmux, index=artifact_index,
+        tmux=tmux, index=artifact_index, proposals=proposal_store,
     )
     capabilities = CapabilityService(
         prober=ProviderCapabilityProber(providers, tmux, process, clock),
@@ -187,6 +199,6 @@ def build_application(workspace_root: Path, runtime_override: Path | None = None
     )
     commands = CommandService(
         runs=runs, gates=gates, transcripts=transcripts, evidence=evidence,
-        capabilities=capabilities,
+        capabilities=capabilities, learning=learning,
     )
     return Application(queries=queries, commands=commands, preflight=preflight, identity=identity)

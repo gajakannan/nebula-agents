@@ -23,6 +23,14 @@ from .ports import IdentityPort, RunRepository, TmuxPort
 from .runs import require_authorized
 
 
+class _EmptyIndex:
+    revision = 0
+    entries: tuple = ()
+
+
+_EMPTY_INDEX = _EmptyIndex()
+
+
 class QueryService:
     """The query facade (F0003-S0007).
 
@@ -50,9 +58,12 @@ class QueryService:
         "recovery_status",
         "artifacts",
         "artifact",
+        "metrics",
+        "proposals",
+        "proposal",
     })
 
-    def __init__(self, *, repository: RunRepository, authorization: AuthorizationService, identity: IdentityPort, tmux: TmuxPort | None = None, index: object | None = None) -> None:
+    def __init__(self, *, repository: RunRepository, authorization: AuthorizationService, identity: IdentityPort, tmux: TmuxPort | None = None, index: object | None = None, proposals: object | None = None) -> None:
         self._repository = repository
         self._authorization = authorization
         self._identity = identity
@@ -60,6 +71,7 @@ class QueryService:
         # The artifact index is optional so a composition without F0003 wiring still
         # builds. An absent index reads as an empty one, never as an error.
         self._index = index
+        self._proposals = proposals
 
     def _actor(self, actor: Actor | None) -> Actor:
         return actor or self._identity.current_actor()
@@ -164,6 +176,36 @@ class QueryService:
         raise error(
             ErrorCode.ARTIFACT_NOT_FOUND, "Artifact is not indexed.", "not-found",
             "Run evidence index for this run, then retry.", artifact_id=artifact_id,
+        )
+
+    def metrics(self, run_id: str, actor: Actor | None = None):
+        """Recompute the metric snapshot. Derived, never stored, never authoritative."""
+        from .metrics import derive
+
+        subject = self._actor(actor)
+        run = self._repository.load(run_id)
+        require_authorized(self._repository, self._authorization, run, subject, Action.READ_STATE)
+        document = self._index.load(run_id) if self._index is not None else _EMPTY_INDEX
+        return derive(self._fresh(run), document, datetime.now().astimezone())
+
+    def proposals(self, run_id: str, actor: Actor | None = None, status: str | None = None) -> tuple:
+        subject = self._actor(actor)
+        run = self._repository.load(run_id)
+        require_authorized(self._repository, self._authorization, run, subject, Action.READ_STATE)
+        if self._proposals is None:
+            return ()
+        found = self._proposals.list(run_id)
+        if status is not None:
+            found = tuple(p for p in found if p.proposal_status.value.lower() == status.lower())
+        return found
+
+    def proposal(self, run_id: str, proposal_id: str, actor: Actor | None = None):
+        for candidate in self.proposals(run_id, actor):
+            if candidate.proposal_id == proposal_id:
+                return candidate
+        raise error(
+            ErrorCode.PROPOSAL_NOT_FOUND, "Proposal is not recorded for this run.",
+            "not-found", "List proposals with `learn list`.", proposal_id=proposal_id,
         )
 
     def _recovery_projection(self, recoverable: RecoverableRun, subject: Actor) -> RecoveryProjection:

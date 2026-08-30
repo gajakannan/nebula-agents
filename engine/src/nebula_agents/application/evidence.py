@@ -311,12 +311,21 @@ def infer_kind(path: Path) -> ArtifactKind:
     """
     if path.name in _KIND_BY_NAME:
         return _KIND_BY_NAME[path.name]
-    if path.suffix == ".log":
-        return ArtifactKind.COMMAND_LOG
-    if "transcript" in path.name:
+    stem = path.name.lower()
+    # Name hints are checked before the extension: a file called `validator.txt` is
+    # validator output whatever it is suffixed with, and misfiling it as `status` costs
+    # more than the guess is worth -- `status` has no summarizer rules for failures, so
+    # a real validator failure would never reach a learning proposal.
+    if "transcript" in stem:
         return ArtifactKind.TRANSCRIPT
-    if "manifest" in path.name:
+    if "validator" in stem or "gates" in stem:
+        return ArtifactKind.VALIDATOR_OUTPUT
+    if "manifest" in stem:
         return ArtifactKind.MANIFEST
+    if "metric" in stem:
+        return ArtifactKind.METRIC
+    if path.suffix in (".log", ".jsonl"):
+        return ArtifactKind.COMMAND_LOG
     return ArtifactKind.STATUS
 
 def summary_id_for(artifact_id: str) -> str:

@@ -23,6 +23,7 @@ from nebula_agents.domain.models import Actor, LaunchRequest
 from .capabilities import CapabilityService
 from .evidence import EvidenceService
 from .gates import GateService
+from .learning import LearningService
 from .runs import RunService
 from .transcripts import TranscriptService
 
@@ -31,8 +32,8 @@ from .transcripts import TranscriptService
 class CommandService:
     """Aggregates the mutating application services.
 
-    Step 6 of the F0003 assembly plan adds `learning` here. It is absent rather than
-    stubbed, so the facade never claims a capability that does not exist yet.
+    Every mutating F0003 service is now present: evidence indexing and summarization,
+    capability probing, and learning-proposal drafting and decision.
     """
 
     runs: RunService
@@ -40,6 +41,7 @@ class CommandService:
     transcripts: TranscriptService
     evidence: EvidenceService
     capabilities: CapabilityService
+    learning: LearningService
 
     def wrap(self, request: LaunchRequest, actor: Actor):
         """Preflight + capability guard + launch + registration, as one operator step.

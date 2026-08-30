@@ -113,6 +113,8 @@ def test_executing_the_whole_query_surface_writes_nothing(
             application.queries.evidence,
             application.queries.recovery_status,
             application.queries.artifacts,
+            application.queries.metrics,
+            application.queries.proposals,
         ):
             with pytest.raises(Exception):  # unknown run: NOT_FOUND, never a write
                 call(run_id)
@@ -137,14 +139,14 @@ def test_preflight_inspects_without_creating(
 
 
 def test_command_facade_holds_every_mutating_service() -> None:
-    """Grows deliberately: Step 6 adds `learning`.
+    """Complete: every mutating F0003 service is present.
 
     The equality is the point. A mutating service wired anywhere else -- straight onto
     `Application`, or reachable from the query side -- fails here rather than passing
     unnoticed because nothing named it.
     """
     assert set(CommandService.__dataclass_fields__) == {
-        "runs", "gates", "transcripts", "evidence", "capabilities",
+        "runs", "gates", "transcripts", "evidence", "capabilities", "learning",
     }
 
 
@@ -177,6 +179,7 @@ def test_application_properties_delegate_to_the_command_facade(
     assert application.transcripts is application.commands.transcripts
     assert application.evidence is application.commands.evidence
     assert application.capabilities is application.commands.capabilities
+    assert application.learning is application.commands.learning
 
 
 def test_application_declares_the_read_and_write_sides(application: Application) -> None:
