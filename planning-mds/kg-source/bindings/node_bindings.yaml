@@ -113,3 +113,87 @@ node_bindings:
           - planning-mds/kg-source/**
         schemas:
           - planning-mds/schemas/kg-source/**
+
+  # ------------------------------------------------------------------ #
+  # F0003 as-built bindings, added at G7 (run 2026-08-29-16075bda).
+  #
+  # CODE paths only. Feature-doc paths move at the G8 archive transition;
+  # engine/** does not, so these bindings stay resolvable afterwards.
+  # ------------------------------------------------------------------ #
+  - id: capability:runtime-command-surface
+    paths:
+      runtime:
+        application:
+          - engine/src/nebula_agents/application/commands.py
+        # cli.py is deliberately NOT claimed here. It is already bound to
+        # capability:read-only-run-queries by F0001, and the compiler warns when two
+        # capabilities claim one path -- an overlap makes "which capability owns this
+        # file" ambiguous for retrieval. cli.py genuinely serves both, and the model has
+        # no way to say so, so it stays with its original owner rather than acquiring a
+        # second. The F0003 CLI tests below are what make this capability findable.
+        tests:
+          - engine/tests/integration/test_wrap_launch.py
+          - engine/tests/integration/test_f0003_lifecycle.py
+          - engine/tests/contract/test_evidence_cli.py
+          - engine/tests/contract/test_facade_split.py
+          - engine/tests/contract/test_layering.py
+          - engine/tests/contract/test_package_contract.py
+  - id: capability:provider-capability-matrix
+    paths:
+      runtime:
+        domain:
+          - engine/src/nebula_agents/domain/capabilities.py
+        application:
+          - engine/src/nebula_agents/application/capabilities.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/capability_probe.py
+        tests:
+          - engine/tests/unit/test_capability_matrix.py
+  - id: capability:readonly-mcp-runtime-surface
+    paths:
+      runtime:
+        presentation:
+          - engine/src/nebula_agents/presentation/mcp_server.py
+        tests:
+          - engine/tests/contract/test_mcp_tools.py
+  - id: capability:evidence-artifact-index
+    paths:
+      runtime:
+        domain:
+          - engine/src/nebula_agents/domain/artifacts.py
+        application:
+          - engine/src/nebula_agents/application/evidence.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/artifact_index.py
+          - engine/src/nebula_agents/infrastructure/atomic.py
+        tests:
+          - engine/tests/unit/test_artifact_identity.py
+          - engine/tests/integration/test_artifact_index.py
+          - engine/tests/security/test_f0003_boundaries.py
+  - id: capability:deterministic-evidence-summaries
+    paths:
+      runtime:
+        domain:
+          - engine/src/nebula_agents/domain/summaries.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/summarizers.py
+        tests:
+          - engine/tests/contract/test_summary_determinism.py
+          - engine/tests/integration/test_evidence_summarize.py
+          - engine/tests/fixtures/summaries/**
+  - id: capability:runtime-metrics-and-learning-review
+    paths:
+      runtime:
+        domain:
+          - engine/src/nebula_agents/domain/metrics.py
+          - engine/src/nebula_agents/domain/proposals.py
+        application:
+          - engine/src/nebula_agents/application/metrics.py
+          - engine/src/nebula_agents/application/learning.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/proposal_store.py
+        tests:
+          - engine/tests/unit/test_metrics_derivation.py
+          - engine/tests/unit/test_f0003_domain_records.py
+          - engine/tests/integration/test_learning_proposals.py
+          - engine/tests/contract/test_f0003_record_schemas.py

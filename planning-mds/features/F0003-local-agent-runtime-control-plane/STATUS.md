@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G5 PASS**; all 8 steps, all 7 stories, all four role signoffs complete. **G6 next** — candidate evidence
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G7 PASS**; all 8 steps, all 7 stories, all signoffs, KG bound. **G8 (PM closeout) is the only gate left**
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -34,8 +34,8 @@ in BLUEPRINT §5.9.
 | G3 Code + security review | Code Reviewer, Security | **PASS WITH RECOMMENDATIONS** 2026-08-29 · severity ACCEPTABLE | `code-review-report.md`, `security-review-report.md` |
 | G4 Approval | Operator | **APPROVED** 2026-08-29 | `gate-decisions.md` |
 | G5 Signoff | PM | **PASS** 2026-08-30 | `signoff-ledger.md` |
-| G6 Candidate evidence | PM | Not started | — |
-| G7 KG reconciliation | Architect | Not started | — |
+| G6 Candidate evidence | QE | **PASS** 2026-08-30 | `feature-action-execution.md` |
+| G7 KG reconciliation | Architect | **PASS** 2026-08-30 | `kg-reconciliation.md` |
 | G8 Closeout | PM | Not started | — |
 
 The assembly plan is
@@ -307,9 +307,39 @@ requirement comes independently from STATUS.md" **wrong** — the role became re
 when `security_sensitive_scope` was set true at G2. The outcome was unaffected; the
 reasoning was not. Section renamed to match F0001 and the parser.
 
+### G6 — candidate evidence · PASS 2026-08-30
+
+G0–G5 evidence present and passing; `omissions[]` empty; the one waiver (DAST) complete.
+
+The diff artifact was **regenerated from the run base** rather than the working tree — it
+had been showing 9 files where the run actually touched 95, so a boolean cross-check would
+have run against a tenth of the scope. Only `engine/**` matches a §7 path class;
+`security_sensitive_scope` is true by judgment rather than glob, which is the conservative
+direction.
+
+### G7 — knowledge-graph reconciliation · PASS 2026-08-30
+
+Six F0003 capabilities had **no** code bindings. `node_bindings` 7 → 13, authored as
+shards and compiled — never hand-edited. Symbol index **1608 → 2034**; 426 symbols became
+reachable because the capabilities now have bindings to resolve through. Orphan nodes: 0.
+
+CODE paths only, so the G8 archive move cannot break them. `cli.py` was left with its
+original F0001 owner rather than claimed twice: the compiler warns on binding overlap, and
+it is right — an overlap makes "which capability owns this file" ambiguous exactly when
+retrieval needs an answer.
+
+**`coverage-report.yaml` is deliberately stale.** Regenerating it is forbidden at G7 and
+belongs to G8, after the archive move relocates evidence paths. Verified safe: CI runs only
+`--check-reproducible`, which exits 0.
+
+Two framework findings recorded: **S12-F1** (`validate.py` prints `[PASS]` and exits 1) and
+**S12-F2** (the Architect SKILL says "confirm exit 0" while the action spec forbids the only
+command that would produce it).
+
 ### Remaining
 
-**G6 candidate evidence, G7 KG reconciliation, G8 PM closeout.**
+**G8 — PM closeout only.** Status to Done, archive move, tracker sync, `latest-run.json`,
+`pm-closeout.md`, and the deferred `--write-coverage-report`.
 
 ## Plan-Review Findings
 

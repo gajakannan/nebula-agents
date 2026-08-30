@@ -54,3 +54,43 @@ Exit Code: 0
 Result: PASS
 Output References: -
 Skipped Gates: -
+
+### G6
+Command: python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --run-id 2026-08-29-16075bda --stage G6
+Stage: G6
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G6
+Command: python3 agents/product-manager/scripts/validate-trackers.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --run-id 2026-08-29-16075bda
+Stage: G6
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G7
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/compile.py
+Stage: G7
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G7
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions
+Stage: G7
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -
+
+### G7
+Command: python3 /home/gajap/uSandbox/repos/nebula/nebula-agents/scripts/kg/validate.py --check-drift
+Stage: G7
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -

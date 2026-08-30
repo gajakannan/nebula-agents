@@ -19,6 +19,7 @@
     "planning-mds/features/F0003-local-agent-runtime-control-plane",
     "planning-mds/features/REGISTRY.md",
     "planning-mds/features/ROADMAP.md",
+    "planning-mds/kg-source",
     "planning-mds/kg-source/features/F0003.yaml",
     "planning-mds/knowledge-graph",
     "planning-mds/operations/evidence/runs",
@@ -80,6 +81,11 @@
       "required": true,
       "result": "PASS",
       "artifact": "signoff-ledger.md"
+    },
+    "kg_reconciliation": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "kg-reconciliation.md"
     }
   },
   "files": {
@@ -98,7 +104,9 @@
     "deployability": "deployability-check.md",
     "code_review": "code-review-report.md",
     "security_review": "security-review-report.md",
-    "signoff_ledger": "signoff-ledger.md"
+    "signoff_ledger": "signoff-ledger.md",
+    "feature_action_execution": "feature-action-execution.md",
+    "kg_reconciliation": "kg-reconciliation.md"
   },
   "role_results": {
     "Quality Engineer": {

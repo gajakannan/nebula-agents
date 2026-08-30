@@ -51,6 +51,25 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G6": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g6",
+        "validate-trackers-g6"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
+    },
+    "G7": {
+      "attestations": [],
+      "completed_operations": [
+        "kg-compile",
+        "kg-symbols-decisions",
+        "kg-check-drift"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }
