@@ -12,6 +12,7 @@
   "feature_state": "In Progress",
   "rerun_of": null,
   "changed_paths": [
+    ".gitignore",
     "engine",
     "planning-mds/architecture",
     "planning-mds/features/F0003-local-agent-runtime-control-plane",
@@ -19,6 +20,7 @@
     "planning-mds/features/ROADMAP.md",
     "planning-mds/kg-source/features/F0003.yaml",
     "planning-mds/knowledge-graph",
+    "planning-mds/operations/evidence/runs",
     "planning-mds/operations/evidence/runs/2026-08-29-16075bda",
     "planning-mds/schemas"
   ],
@@ -83,5 +85,37 @@
   "omissions": [],
   "waivers": {},
   "global_evidence_refs": {},
-  "run_scope": "feature-completion"
+  "run_scope": "feature-completion",
+  "test_results": {
+    "result": "PASS",
+    "tests": 709,
+    "passed": 709,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "xfail": 0,
+    "coverage": {
+      "lines_covered": 5480,
+      "lines_valid": 5942,
+      "line_rate": 0.9222,
+      "minimum_rate": 0.85,
+      "result": "PASS",
+      "branches_covered": 1438,
+      "branches_valid": 1740,
+      "branch_rate": 0.8264,
+      "risk_module_branch_result": "PASS"
+    },
+    "artifacts": {
+      "junit": {
+        "path": "artifacts/test-results/junit.xml",
+        "bytes": 103742,
+        "sha256": "6598454b59ac7d23ccfb13b039b11f504effbd40ebc9c59a8d75d864e6be726f"
+      },
+      "coverage": {
+        "path": "artifacts/test-results/coverage.xml",
+        "bytes": 269051,
+        "sha256": "55f6e2f5437f4714e8f343188a813f3bf96e7b4e3dd56ff54c9a3ff4b90c68de"
+      }
+    }
+  }
 }
