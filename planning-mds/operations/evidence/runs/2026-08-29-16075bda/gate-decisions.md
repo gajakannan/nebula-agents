@@ -12,6 +12,8 @@
 | G3 | PASS WITH RECOMMENDATIONS | Code Reviewer + Security Reviewer | 2026-08-29T23:40:01-04:00 | Severity ACCEPTABLE (critical 0, high 0) via gate_policy standard profile. One HIGH security finding raised and FIXED within the cycle | No | SEC-1 fixed; CR-1 needs an architecture decision at G4; S3-F1 and SEC-1 are both additive F0001 schema changes |
 | G4 | PASS | Operator | 2026-08-29T23:45:10-04:00 | Severity ACCEPTABLE; all four carried decisions confirmed (S3-F1, SEC-1, S4-F1, CR-1) | No | CR-1's confirmation is a standing pattern decision for future F0003 stores |
 | G5 | PASS | Product Manager | 2026-08-30T00:16:38-04:00 | All four Required=Yes roles signed with reviewer, ISO date, and evidence path; eight recommendations dispositioned | No | Single signer holds all four roles; recorded in the ledger's Independence Note |
+| G6 | PASS | Quality Engineer | 2026-08-30T08:50:53-04:00 | G0-G5 evidence present and passing; changed_paths covers all 95 changed files; four conditional booleans consistent with the section 7 path classes; omissions empty | No | No closeout artifacts written -- pm-closeout, tracker sync, and latest-run.json are G8 |
+| G7 | PASS | Architect | 2026-08-30T08:53:23-04:00 | Six F0003 capabilities bound to as-built CODE paths; node_bindings 7 -> 13; 0 orphans; --check-reproducible OK | No | coverage-report.yaml deliberately left stale -- regenerating is forbidden at G7 and deferred to G8 |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -448,3 +450,75 @@ misled about what was protecting the requirement.
 Fixed by renaming the section to `Required Role Matrix`, matching F0001's archived STATUS
 and the parser. Worth noting as a framework observation: a feature can pass G0 through G4
 with a STATUS section the validator silently cannot read, and nothing says so until G5.
+
+## G6 — Candidate evidence validation
+
+**PASS.** G0–G5 evidence is present and passing; `changed_paths[]` covers all 95 files the
+run changed; `omissions[]` is empty; the one waiver (DAST) carries reason, owner, and
+approval date.
+
+The diff artifact was **regenerated from the run base** (`ca7ac8d..HEAD` plus the working
+tree) rather than from the uncommitted delta. It had been showing 9 files — the current
+unstaged change — where the run actually touched 95. A candidate-evidence gate reading the
+narrow version would have cross-checked the conditional booleans against a tenth of the
+scope.
+
+### Boolean cross-check
+
+Only `engine/**` matches a §7 path class, forcing `runtime_bearing`. `security_sensitive_scope`
+is true **without** a glob forcing it: the globs key on directory names this repository does
+not use (`**/Security/**`, `**/Auth*/**`), and redaction, containment, authorization, and
+the MCP boundary are security-relevant wherever the files sit. Set by judgment at G2 rather
+than waiting for a glob to fire, which is the conservative direction.
+
+An error in my own first cross-check is worth recording: I matched globs with
+`path.startswith(glob.split("*")[0])`, which for `**/config/**` yields an **empty prefix**
+and therefore matches every file. That reported `deployment_config_changed` as forced and
+mismatched. Corrected to plain `fnmatch`, under which nothing but `engine/**` matches. The
+manifest was right; my probe was not.
+
+### Nothing from G7 or G8 was written
+
+No `pm-closeout.md`, no tracker sync, no `latest-run.json`, no `kg-reconciliation.md`.
+Each is a later gate's output, which is why `omissions[]` stays empty rather than listing
+them.
+
+## G7 — Architect knowledge-graph reconciliation
+
+**PASS.** Role switched to Architect (`agents/architect/SKILL.md`). Six F0003 capabilities
+had no code bindings; `node_bindings` grows 7 → 13. Authored as shards under
+`kg-source/bindings/` and compiled — `knowledge-graph/*.yaml` is generated and was not
+hand-edited. Orphan nodes: 0. `--check-reproducible` OK.
+
+**CODE paths only**, as the gate requires: feature-doc paths move at the G8 archive
+transition, `engine/**` does not, so every binding stays resolvable afterwards.
+
+### The compiler caught an ambiguity worth keeping
+
+`presentation/cli.py` is both the runtime command surface and the surface F0001 bound to
+`read-only-run-queries`. Claiming it for both raised `binding-overlap`. The warning is
+right — an overlap makes "which capability owns this file" ambiguous precisely when
+retrieval needs an answer. The file stays with its original owner; `runtime-command-surface`
+is made findable through `commands.py` and the six F0003 CLI tests. The model has no way to
+express a shared surface, and the next person extending `cli.py` will face the same choice.
+
+### S12-F1 (Medium) — `validate.py` prints `[PASS]` and exits 1
+
+Adding bindings makes `coverage-report.yaml` stale. `validate.py` then emits an `Errors:`
+block, prints `[PASS] knowledge-graph integrity checks passed.`, and exits **1**. Three
+signals, three different conclusions.
+
+### S12-F2 (Low) — the SKILL and the action spec contradict each other here
+
+`agents/architect/SKILL.md` #14 says run `validate.py` and *confirm exit 0*. `feature.yaml`
+G7 **forbids** `--write-coverage-report`, which is the only thing that makes the exit code
+0. Both cannot be followed.
+
+Resolved in favour of the action spec: it is specific to this gate, names the exact flag,
+and its reason is correct — the coverage report records evidence paths and G8's archive
+move relocates them, so a report written now would be regenerated immediately.
+
+Confirmed safe before relying on it: CI runs only `validate.py --check-reproducible`, which
+exits 0. Leaving the report stale until G8 breaks nothing.
+
+Sixth and seventh framework findings from this pilot.

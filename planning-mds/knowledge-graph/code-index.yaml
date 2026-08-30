@@ -23,6 +23,17 @@ node_bindings:
           - planning-mds/kg-source/**
         tests:
           - scripts/kg/tests/**/*.py
+  - id: capability:deterministic-evidence-summaries
+    paths:
+      runtime:
+        domain:
+          - engine/src/nebula_agents/domain/summaries.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/summarizers.py
+        tests:
+          - engine/tests/contract/test_summary_determinism.py
+          - engine/tests/fixtures/summaries/**
+          - engine/tests/integration/test_evidence_summarize.py
   - id: capability:evidence-and-gate-control
     paths:
       runtime:
@@ -34,6 +45,20 @@ node_bindings:
           - engine/tests/integration/test_story_validator_descriptor_boundary.py
           - engine/tests/unit/test_application_services.py
           - engine/tests/unit/test_watcher_validator.py
+  - id: capability:evidence-artifact-index
+    paths:
+      runtime:
+        application:
+          - engine/src/nebula_agents/application/evidence.py
+        domain:
+          - engine/src/nebula_agents/domain/artifacts.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/artifact_index.py
+          - engine/src/nebula_agents/infrastructure/atomic.py
+        tests:
+          - engine/tests/integration/test_artifact_index.py
+          - engine/tests/security/test_f0003_boundaries.py
+          - engine/tests/unit/test_artifact_identity.py
   - id: capability:local-run-registry
     paths:
       runtime:
@@ -68,6 +93,17 @@ node_bindings:
           - engine/tests/integration/test_process_and_providers.py
           - engine/tests/unit/test_preflight.py
           - engine/tests/unit/test_runtime_config_identity_policy.py
+  - id: capability:provider-capability-matrix
+    paths:
+      runtime:
+        application:
+          - engine/src/nebula_agents/application/capabilities.py
+        domain:
+          - engine/src/nebula_agents/domain/capabilities.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/capability_probe.py
+        tests:
+          - engine/tests/unit/test_capability_matrix.py
   - id: capability:read-only-run-queries
     paths:
       runtime:
@@ -84,6 +120,13 @@ node_bindings:
           - engine/tests/security/test_static_execution_boundary.py
           - engine/tests/unit/test_tui_actions.py
           - engine/tests/unit/test_tui_behavioral_coverage.py
+  - id: capability:readonly-mcp-runtime-surface
+    paths:
+      runtime:
+        presentation:
+          - engine/src/nebula_agents/presentation/mcp_server.py
+        tests:
+          - engine/tests/contract/test_mcp_tools.py
   - id: capability:redacted-transcript-recovery
     paths:
       runtime:
@@ -101,6 +144,34 @@ node_bindings:
           - engine/tests/integration/test_transcript_filter.py
           - engine/tests/security/test_redaction.py
           - engine/tests/security/test_session_entry.py
+  - id: capability:runtime-command-surface
+    paths:
+      runtime:
+        application:
+          - engine/src/nebula_agents/application/commands.py
+        tests:
+          - engine/tests/contract/test_evidence_cli.py
+          - engine/tests/contract/test_facade_split.py
+          - engine/tests/contract/test_layering.py
+          - engine/tests/contract/test_package_contract.py
+          - engine/tests/integration/test_f0003_lifecycle.py
+          - engine/tests/integration/test_wrap_launch.py
+  - id: capability:runtime-metrics-and-learning-review
+    paths:
+      runtime:
+        application:
+          - engine/src/nebula_agents/application/learning.py
+          - engine/src/nebula_agents/application/metrics.py
+        domain:
+          - engine/src/nebula_agents/domain/metrics.py
+          - engine/src/nebula_agents/domain/proposals.py
+        infrastructure:
+          - engine/src/nebula_agents/infrastructure/proposal_store.py
+        tests:
+          - engine/tests/contract/test_f0003_record_schemas.py
+          - engine/tests/integration/test_learning_proposals.py
+          - engine/tests/unit/test_f0003_domain_records.py
+          - engine/tests/unit/test_metrics_derivation.py
   - id: capability:tmux-session-lifecycle
     paths:
       runtime:
