@@ -35,6 +35,14 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G4": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g4"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }

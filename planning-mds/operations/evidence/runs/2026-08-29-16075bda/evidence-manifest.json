@@ -70,6 +70,11 @@
       "required": true,
       "result": "PASS WITH RECOMMENDATIONS",
       "artifact": "security-review-report.md"
+    },
+    "approval": {
+      "required": true,
+      "result": "APPROVED",
+      "artifact": "gate-decisions.md"
     }
   },
   "files": {

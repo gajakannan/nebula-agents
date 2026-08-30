@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G3 PASS**; all 8 steps, all 7 stories, Checkpoints A-E. **G4 next** — operator approval
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G4 PASS** (approved 2026-08-29); all 8 steps, all 7 stories. **G5 next** — role signoffs
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -32,7 +32,7 @@ in BLUEPRINT §5.9.
 | G1 Runtime preflight | DevOps | **PASS** 2026-08-29 | `g1-runtime-preflight.md` |
 | G2 Self-review + QE + deployability | QE, DevOps | **PASS WITH RECOMMENDATIONS** 2026-08-29 | `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`, `deployability-check.md` |
 | G3 Code + security review | Code Reviewer, Security | **PASS WITH RECOMMENDATIONS** 2026-08-29 · severity ACCEPTABLE | `code-review-report.md`, `security-review-report.md` |
-| G4 Approval | Operator | Not started | — |
+| G4 Approval | Operator | **APPROVED** 2026-08-29 | `gate-decisions.md` |
 | G5 Signoff | PM | Not started | — |
 | G6 Candidate evidence | PM | Not started | — |
 | G7 KG reconciliation | Architect | Not started | — |
@@ -274,19 +274,25 @@ audit event commit in separate transactions, so a failure between them advances 
 projection without the event BLUEPRINT §5.3 requires. Repairable — the index is a
 projection and re-indexing is idempotent — and loud rather than silent.
 
+### G4 — approval · APPROVED 2026-08-29
+
+Severity **ACCEPTABLE**; no mitigation token required, because no high finding remains
+open. All four carried decisions confirmed by the operator:
+
+| ID | Confirmed |
+|----|-----------|
+| S3-F1 | The `event_type` enum extension is the one F0001 schema change `1.1` makes |
+| SEC-1 | `proposal_grants` is the second additive F0001 schema change; no smaller fix exists |
+| S4-F1 | The persisted capability report is the durable record for a blocked launch |
+| CR-1 | Projection commits and audit events need **not** be atomic — repairable divergence is the accepted pattern, provided the projection is rebuildable and the failure is loud |
+
+CR-1's confirmation is a **standing decision** for future F0003 stores, not a one-off.
+
 ### Remaining
 
-**G4 — operator approval.** Four decisions are queued there:
-
-| ID | Severity | Decision |
-|----|----------|----------|
-| S3-F1 | High | Confirm the `event_type` enum extension |
-| SEC-1 | High (fixed) | Confirm `proposal_grants` as the second additive F0001 schema change |
-| S4-F1 | Medium | Confirm the capability report as the blocked-launch audit record |
-| CR-1 | Medium | Settle whether projection-store commits and their audit events must be atomic |
-
-S3-F1 and SEC-1 together are the whole of contract `1.1`'s non-transparency to a strict
-`1.0` reader.
+**G5 — role signoffs.** Four roles are Required=Yes and each needs a verdict, reviewer,
+ISO date, and an evidence path: Quality Engineer, Code Reviewer, Security Reviewer,
+Architect. Then G6 candidate evidence, G7 KG reconciliation, G8 PM closeout.
 
 ## Plan-Review Findings
 
