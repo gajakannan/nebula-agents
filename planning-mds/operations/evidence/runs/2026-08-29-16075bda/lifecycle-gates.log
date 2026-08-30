@@ -30,3 +30,11 @@ Exit Code: 0
 Result: PASS
 Output References: -
 Skipped Gates: -
+
+### G3
+Command: python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root /home/gajap/uSandbox/repos/nebula/nebula-agents --feature F0003 --run-id 2026-08-29-16075bda --stage G3
+Stage: G3
+Exit Code: 0
+Result: PASS
+Output References: -
+Skipped Gates: -

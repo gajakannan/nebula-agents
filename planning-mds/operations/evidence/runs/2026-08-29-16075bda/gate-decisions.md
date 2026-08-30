@@ -9,6 +9,7 @@
 | G0 | PASS | Architect | 2026-08-29T11:35:30-04:00 | Assembly plan authored and validated against the approved Phase B package; all 7 stories covered, no blocking plan finding | No | M1 gates Step 7 (S0003); MCP protocol revision pinned at Step 7; L1 reconciled at Step 4 |
 | G1 | PASS | DevOps | 2026-08-29T11:48:38-04:00 | Environment, tmux, providers, schemas, and the ADR-006 root rule verified; 514 engine tests pass on all three CI-matrix interpreters | No | `RuntimeConfig` lacks `evidence_root` — already an assembly-plan row, not a blocker |
 | G2 | PASS WITH RECOMMENDATIONS | Quality Engineer | 2026-08-29T23:24:14-04:00 | 730 tests green on 3.11/3.12/3.14; line 92.25%, branch 82.7%; four security scan classes run or waived; one deployability defect found and fixed | No | S9-F1 fixed; S9-F2 recorded for the F0001 owner; S3-F1/S4-F1 carried to G3 |
+| G3 | PASS WITH RECOMMENDATIONS | Code Reviewer + Security Reviewer | 2026-08-29T23:40:01-04:00 | Severity ACCEPTABLE (critical 0, high 0) via gate_policy standard profile. One HIGH security finding raised and FIXED within the cycle | No | SEC-1 fixed; CR-1 needs an architecture decision at G4; S3-F1 and SEC-1 are both additive F0001 schema changes |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -301,3 +302,77 @@ here. The spec's `artifacts` list is not what the gate enforces.
 This is the fourth framework finding this pilot has produced, after the vacuous mid-flight
 gate validation, the unverified `test_results.artifacts` references, and the `.gitignore`
 exclusion of committed evidence.
+
+## G3 — code and security review
+
+**PASS WITH RECOMMENDATIONS.** `gate_policy.py --profile standard` computes **ACCEPTABLE**
+from critical 0 / high 0 across both domains, `requires_justification: false`. Computed,
+not asserted.
+
+### SEC-1 (High) — raised and fixed inside this review cycle
+
+`learn decide` took `--role` from the command line, and the check compared that
+**declared** role to the role the target document requires — never asking whether the
+actor held it. Demonstrated: a `LocalOperator` who owned the run passed `--role architect`
+and accepted a proposal targeting `SOLUTION-PATTERNS.md`.
+
+That defeats the security model's central claim about this action — *owning the run does
+not confer the right to decide its proposals* — and reopens the escalation path ADR-009's
+`DraftProposal`/`DecideProposal` split exists to close, from the other side: the split
+stops one capability covering both, but a caller-supplied role made the second
+self-granting.
+
+**Fixed.** The role is derived from the target document and verified against
+`proposal_grants` in the `0600` policy file; `--role` is removed, because a role the
+caller can name is a role the caller can claim. Deny by default. Three tests cover it,
+including that a grant for one target class does not carry to another.
+
+This required a **second additive change to an F0001 schema** —
+`f0001-local-policy.schema.json` gains `proposal_grants`. Unavoidable: `reviewer_grants`
+is closed and `bindings` knows only `LocalOperator|Reviewer|System`, so expressing
+per-target-class decision authority needs new policy state. Same class as S3-F1, and
+carried to the Architect with it.
+
+### CR-1 (Medium) — an architecture decision, not a code fix
+
+The artifact index and the audit event commit in **separate** transactions against
+different stores. If the second fails — a stale run revision is the realistic case — the
+projection advances without an audit entry, and BLUEPRINT §5.3 requires that event.
+
+Medium rather than high: the index is a projection, re-indexing is idempotent and is the
+documented recovery path, and the failure is loud rather than silent. Not fixed here
+because the options are a two-phase commit across two stores, or folding the index into
+the run record — and the second contradicts ADR-006's decision to keep the index separate.
+
+### Two low findings
+
+CR-2: stale-evidence blocking is run-wide, so one missing artifact silences the whole run's
+learning. Matches S0006's acceptance criterion exactly; noted because it is stricter than a
+reader expects. CR-3: `gate_wait_seconds` uses a proxy timestamp.
+
+### For the Architect at G4
+
+| ID | Severity | Decision |
+|----|----------|----------|
+| S3-F1 | High | Confirm the `event_type` enum extension |
+| SEC-1 | High (fixed) | Confirm `proposal_grants` as the second additive F0001 schema change |
+| S4-F1 | Medium | Confirm the capability report as the blocked-launch audit record |
+| CR-1 | Medium | Settle whether projection-store commits and their audit events must be atomic |
+
+S3-F1 and SEC-1 together are the whole of contract `1.1`'s non-transparency to a strict
+`1.0` reader. Both are additive; neither changes an existing field, type, or member.
+
+### S10-F1 (Low) — framework finding: artifact references are parsed greedily
+
+`artifact_references()` matches `[^\s)\]]+` after the path prefix, so it stops only at
+whitespace, `)`, or `]`. A reference written the natural way in prose —
+`` `artifacts/security/bandit-sast.json`. `` — is extracted **with its closing backtick
+and full stop attached**, and then fails to resolve.
+
+Three reports had to be rewritten to bare paths on their own lines. The requirement is not
+stated in any template, and the failure mode is a confusing "artifact is missing" for a
+file that plainly exists.
+
+Fifth framework finding from this pilot. Worth pairing with the earlier one that
+`test_results.artifacts` manifest paths are **not** checked at all: prose references are
+validated strictly while structured manifest references are not validated whatsoever.

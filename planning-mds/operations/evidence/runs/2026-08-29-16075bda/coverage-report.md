@@ -10,7 +10,9 @@
 | Line | **92.30%** (5484 / 5942) | `coverage_min_pct` (`_contract.yaml`) |
 | Branch | **82.71%** (1439 / 1740) | not separately floored |
 
-Machine-readable: `artifacts/test-results/coverage.xml`.
+Machine-readable:
+
+- artifacts/test-results/coverage.xml
 
 Branch coverage is reported because the first evidence run recorded `branch-rate 0` — the
 `--cov-branch` flag was absent, not the branches. Recorded so the zero is not read as a

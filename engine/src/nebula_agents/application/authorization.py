@@ -86,6 +86,40 @@ class AuthorizationService:
         allowed = bool(grant_key and grants.get(grant_key, False))
         return AuthorizationDecision(allowed, grant_key if allowed else "reviewer_grant_missing")
 
+    #: Which policy grant carries authority over each target-document class.
+    PROPOSAL_GRANTS = {
+        "architect": "can_decide_architecture",
+        "security": "can_decide_security",
+        "product-manager": "can_decide_planning",
+    }
+
+    def decider_roles(self, subject: Actor) -> frozenset[str]:
+        """Reviewer roles this subject may record a proposal decision as.
+
+        Read from `proposal_grants` in the committed policy file -- mode 0600 inside a
+        0700 directory -- rather than taken from the caller. A role the caller merely
+        names is not a role they hold, and `DecideProposal` is the one action where that
+        distinction is the whole control: owning the run confers no authority over the
+        target document (BLUEPRINT 5.4).
+
+        Deny by default. An unbound subject, an unreadable policy, or an absent
+        `proposal_grants` block all yield the empty set.
+        """
+        try:
+            policy = self._policy.load()
+        except Exception:
+            return frozenset()
+        if policy.get("default_effect") != "deny":
+            return frozenset()
+        if subject.role is not Role.SYSTEM and not self._has_binding(policy, subject):
+            return frozenset()
+        grants = policy.get("proposal_grants")
+        if not isinstance(grants, Mapping):
+            return frozenset()
+        return frozenset(
+            role for role, key in self.PROPOSAL_GRANTS.items() if grants.get(key) is True
+        )
+
     @staticmethod
     def _has_binding(policy: Mapping[str, JsonValue], subject: Actor) -> bool:
         bindings = policy.get("bindings", [])

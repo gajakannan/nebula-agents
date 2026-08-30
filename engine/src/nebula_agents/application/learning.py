@@ -176,14 +176,20 @@ class LearningService:
         proposal_id: str,
         decision: ProposalDecisionKind,
         actor: Actor,
-        reviewer_role: ReviewerRole,
         reason: str | None = None,
         patch_plan: str | None = None,
     ) -> LearningProposal:
         """Record a decision. Never opens the target document.
 
-        Authorization is evaluated against the proposal's **target document**, not the
-        run. Owning the run does not confer the right to decide its proposals.
+        The reviewer role is **derived from the target document and verified against the
+        committed policy** — it is not an argument. An earlier revision took it from the
+        caller, which meant a `LocalOperator` could pass `--role architect` and decide an
+        architecture proposal: the check compared the *declared* role to the required one
+        and never asked whether the actor held it. That reopened the escalation path
+        ADR-009's draft/decide split exists to close, from the other side.
+
+        Authority comes from `proposal_grants` in the policy file, per target-document
+        class, deny by default. Owning the run confers nothing (BLUEPRINT §5.4).
         """
         run = self._repository.load(run_id)
         require_authorized(
@@ -196,13 +202,17 @@ class LearningService:
                 "not-found", "List proposals with `learn list`.", proposal_id=proposal_id,
             )
         required = authorized_role(proposal.target_document)
-        if reviewer_role is not required:
+        held = self._authorization.decider_roles(actor)
+        if required.value not in held:
             raise error(
                 ErrorCode.FORBIDDEN,
-                "Reviewer role does not own this proposal's target document.", "forbidden",
-                f"A decision on {proposal.target_document} requires the {required.value} role.",
+                "You do not hold the reviewer role that owns this proposal's target.",
+                "forbidden",
+                f"A decision on {proposal.target_document} requires the "
+                f"{required.value} role, granted in policy.json under proposal_grants.",
                 proposal_id=proposal_id,
             )
+        reviewer_role = required
         now = self._clock.now()
         decided = proposal.decide(
             ProposalDecision(now, decision, reviewer_role, actor.username, reason)

@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G2 PASS**; all 8 steps, all 7 stories, Checkpoints A-E. **G3 next** — code + security review
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G3 PASS**; all 8 steps, all 7 stories, Checkpoints A-E. **G4 next** — operator approval
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -31,7 +31,7 @@ in BLUEPRINT §5.9.
 | G0 Architect assembly plan | Architect | **PASS** 2026-08-29 | `g0-assembly-plan-validation.md` |
 | G1 Runtime preflight | DevOps | **PASS** 2026-08-29 | `g1-runtime-preflight.md` |
 | G2 Self-review + QE + deployability | QE, DevOps | **PASS WITH RECOMMENDATIONS** 2026-08-29 | `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`, `deployability-check.md` |
-| G3 Code + security review | Code Reviewer, Security | Not started | — |
+| G3 Code + security review | Code Reviewer, Security | **PASS WITH RECOMMENDATIONS** 2026-08-29 · severity ACCEPTABLE | `code-review-report.md`, `security-review-report.md` |
 | G4 Approval | Operator | Not started | — |
 | G5 Signoff | PM | Not started | — |
 | G6 Candidate evidence | PM | Not started | — |
@@ -252,10 +252,41 @@ exit 9. Pre-existing F0001; reclassifying it is a contract change owned elsewher
 **S9-F3 (low), framework:** `feature.yaml` declares `g2-deployability-check.md`; the
 validator requires `deployability-check.md`. The names disagree.
 
+### G3 — code and security review · PASS WITH RECOMMENDATIONS
+
+`gate_policy.py --profile standard` computes **ACCEPTABLE** (critical 0, high 0,
+`requires_justification: false`) — computed, not asserted.
+
+**SEC-1 (high) was raised and fixed inside this cycle.** `learn decide` took `--role` from
+the command line, and the check compared the *declared* role to the one the target
+document requires — never asking whether the actor held it. Demonstrated: a
+`LocalOperator` who owned the run passed `--role architect` and accepted an architecture
+proposal. That defeats the security model's central claim about this action and reopens
+ADR-009's escalation path from the other side.
+
+Fixed: the role is derived from the target and verified against a new `proposal_grants`
+block in the `0600` policy file; `--role` is **removed**, because a role the caller can
+name is a role the caller can claim. Deny by default, and a grant for one target class
+does not carry to another.
+
+**CR-1 (medium)** is an architecture question, not a code fix: the artifact index and its
+audit event commit in separate transactions, so a failure between them advances the
+projection without the event BLUEPRINT §5.3 requires. Repairable — the index is a
+projection and re-indexing is idempotent — and loud rather than silent.
+
 ### Remaining
 
-**G3 — code and security review.** Four findings await an Architect decision there: S3-F1
-(high), S4-F1 (medium), S9-F2 and S9-F3 (low).
+**G4 — operator approval.** Four decisions are queued there:
+
+| ID | Severity | Decision |
+|----|----------|----------|
+| S3-F1 | High | Confirm the `event_type` enum extension |
+| SEC-1 | High (fixed) | Confirm `proposal_grants` as the second additive F0001 schema change |
+| S4-F1 | Medium | Confirm the capability report as the blocked-launch audit record |
+| CR-1 | Medium | Settle whether projection-store commits and their audit events must be atomic |
+
+S3-F1 and SEC-1 together are the whole of contract `1.1`'s non-transparency to a strict
+`1.0` reader.
 
 ## Plan-Review Findings
 
@@ -325,7 +356,7 @@ table.
 
 - [x] Story validator passes
 - [x] Tracker validator passes
-- [~] Security scans run at G2 (dependency clean, secrets clean, SAST 0 high/0 medium, DAST waived); Security Reviewer verdict is G3
+- [x] Security review complete (G3) — one HIGH finding raised and fixed within the cycle; severity ACCEPTABLE
 - [x] Architecture review of runtime contract complete; operator approved 2026-08-29 (BLUEPRINT §5.9)
 - [x] Tests cover command surface, MCP tools, artifact retrieval, summaries, metrics, and proposal workflow — 730 tests, 92.25% line
 

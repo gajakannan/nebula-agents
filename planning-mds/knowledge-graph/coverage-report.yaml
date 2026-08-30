@@ -364,8 +364,8 @@ freshness:
       source_paths:
       - planning-mds/schemas/f0001-local-policy.schema.json
       source_count: 1
-      last_modified: '2026-07-14'
-      source_hash: a56102015e5b89eb
+      last_modified: '2026-08-30'
+      source_hash: 7f1d1e6c1e545e13
     schema:f0001-preflight-result:
       source_paths:
       - planning-mds/schemas/f0001-preflight-result.schema.json
@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-30'
-      source_hash: 76c7e14972aa3b68
+      source_hash: 2c490279cb03a376
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -733,8 +733,8 @@ freshness:
       - engine/tests/unit/test_models.py
       - engine/tests/unit/test_transitions.py
       source_count: 14
-      last_modified: '2026-08-29'
-      source_hash: 15b55030257d53bb
+      last_modified: '2026-08-30'
+      source_hash: 38a0e8e5db003bee
     capability:native-session-preflight:
       source_paths:
       - engine/src/nebula_agents/application/preflight.py
@@ -833,7 +833,7 @@ freshness:
       - engine/tests/unit/test_tui_behavioral_coverage.py
       source_count: 82
       last_modified: '2026-08-30'
-      source_hash: 457cddf927c60279
+      source_hash: 88fafd3ebb4d1293
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py

@@ -60,6 +60,16 @@
       "required": true,
       "result": "PASS WITH RECOMMENDATIONS",
       "artifact": "deployability-check.md"
+    },
+    "code_review": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "artifact": "code-review-report.md"
+    },
+    "security_review": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "artifact": "security-review-report.md"
     }
   },
   "files": {
@@ -75,7 +85,9 @@
     "test_plan": "test-plan.md",
     "test_execution_report": "test-execution-report.md",
     "coverage_report": "coverage-report.md",
-    "deployability": "deployability-check.md"
+    "deployability": "deployability-check.md",
+    "code_review": "code-review-report.md",
+    "security_review": "security-review-report.md"
   },
   "role_results": {
     "Quality Engineer": {
@@ -96,6 +108,22 @@
         "deployability-check.md"
       ],
       "verdict_artifact": "deployability-check.md"
+    },
+    "Code Reviewer": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "required_artifacts": [
+        "code-review-report.md"
+      ],
+      "verdict_artifact": "code-review-report.md"
+    },
+    "Security Reviewer": {
+      "required": true,
+      "result": "PASS WITH RECOMMENDATIONS",
+      "required_artifacts": [
+        "security-review-report.md"
+      ],
+      "verdict_artifact": "security-review-report.md"
     }
   },
   "token_usage": {
@@ -148,33 +176,33 @@
   "run_scope": "feature-completion",
   "test_results": {
     "result": "PASS",
-    "tests": 730,
-    "passed": 730,
+    "tests": 732,
+    "passed": 732,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
     "xfail": 0,
     "coverage": {
-      "lines_covered": 5621,
-      "lines_valid": 6093,
-      "line_rate": 0.9225,
+      "lines_covered": 5632,
+      "lines_valid": 6108,
+      "line_rate": 0.9221,
       "minimum_rate": 0.85,
       "result": "PASS",
-      "branches_covered": 1471,
-      "branches_valid": 1778,
-      "branch_rate": 0.8273,
+      "branches_covered": 1475,
+      "branches_valid": 1784,
+      "branch_rate": 0.8268,
       "risk_module_branch_result": "PASS"
     },
     "artifacts": {
       "junit": {
         "path": "artifacts/test-results/junit.xml",
-        "bytes": 106399,
-        "sha256": "4de53d1ee9dc31c603da59c0dabc023b6e4ebb3e74b88f54fe2ed23dc9f77128"
+        "bytes": 106657,
+        "sha256": "16c896c2c147cb525b88c64a2dad20fdfaa83b5b7c2e52a550b6b9ca6947f42e"
       },
       "coverage": {
         "path": "artifacts/test-results/coverage.xml",
-        "bytes": 275664,
-        "sha256": "0d8911f0a9c0b6e121d7f95380d722cead3e254fe2549339e340c755a476ca29"
+        "bytes": 276407,
+        "sha256": "19bcb657baa30246bcf609241d655df2a09a1039fc394be745182e27fbf325e9"
       }
     }
   }
