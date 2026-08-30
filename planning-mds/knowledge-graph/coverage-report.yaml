@@ -453,7 +453,7 @@ freshness:
       - planning-mds/features/F0003-local-agent-runtime-control-plane/feature-assembly-plan.md
       source_count: 12
       last_modified: '2026-08-30'
-      source_hash: 2f532f1612c8be69
+      source_hash: d7c67b9aeffcfb79
     feature:F0006:
       source_paths:
       - planning-mds/features/archive/F0006-compiled-kg-projection-and-integration/F0006-S0001-three-way-semantic-kg-merge.md
@@ -833,7 +833,7 @@ freshness:
       - engine/tests/unit/test_tui_behavioral_coverage.py
       source_count: 82
       last_modified: '2026-08-30'
-      source_hash: 3b5433c318810a0c
+      source_hash: ddd7cf245e416cc6
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py
