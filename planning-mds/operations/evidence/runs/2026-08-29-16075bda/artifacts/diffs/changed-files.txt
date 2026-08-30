@@ -6,3 +6,4 @@ planning-mds/operations/evidence/runs/2026-08-29-16075bda/evidence-manifest.json
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/gate-decisions.md
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/gate-state.json
 planning-mds/operations/evidence/runs/2026-08-29-16075bda/lifecycle-gates.log
+planning-mds/operations/evidence/runs/2026-08-29-16075bda/signoff-ledger.md

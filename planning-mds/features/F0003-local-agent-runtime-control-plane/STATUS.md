@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G4 PASS** (approved 2026-08-29); all 8 steps, all 7 stories. **G5 next** — role signoffs
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G5 PASS**; all 8 steps, all 7 stories, all four role signoffs complete. **G6 next** — candidate evidence
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -33,7 +33,7 @@ in BLUEPRINT §5.9.
 | G2 Self-review + QE + deployability | QE, DevOps | **PASS WITH RECOMMENDATIONS** 2026-08-29 | `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`, `deployability-check.md` |
 | G3 Code + security review | Code Reviewer, Security | **PASS WITH RECOMMENDATIONS** 2026-08-29 · severity ACCEPTABLE | `code-review-report.md`, `security-review-report.md` |
 | G4 Approval | Operator | **APPROVED** 2026-08-29 | `gate-decisions.md` |
-| G5 Signoff | PM | Not started | — |
+| G5 Signoff | PM | **PASS** 2026-08-30 | `signoff-ledger.md` |
 | G6 Candidate evidence | PM | Not started | — |
 | G7 KG reconciliation | Architect | Not started | — |
 | G8 Closeout | PM | Not started | — |
@@ -288,11 +288,28 @@ open. All four carried decisions confirmed by the operator:
 
 CR-1's confirmation is a **standing decision** for future F0003 stores, not a one-off.
 
+### G5 — signoff · PASS 2026-08-30
+
+All four Required=Yes roles signed by `gajakannan`, each with a verdict, ISO date, and an
+evidence path: 28 story × role rows across seven stories. Eight recommendations
+dispositioned; none blocking, and both high-severity items resolved before the gate.
+
+A single individual holds all four roles. Recorded plainly in the ledger's *Independence
+Note*, with the two things that partially offset it: the security review found and fixed a
+**high** finding in the implementer's own code, and every structural guard was verified by
+injecting the failure it exists to catch.
+
+**S11-F1 (medium) — a correction to my own G0 reasoning.** `parse_status_required_roles`
+reads a section named exactly `Required Role Matrix`. This STATUS.md called it *"Required
+Signoff Roles (Set in Planning)"*, so the parser found nothing and `status_required` was
+**empty for the whole run**. That makes the G0 claim that "the Security Reviewer
+requirement comes independently from STATUS.md" **wrong** — the role became required only
+when `security_sensitive_scope` was set true at G2. The outcome was unaffected; the
+reasoning was not. Section renamed to match F0001 and the parser.
+
 ### Remaining
 
-**G5 — role signoffs.** Four roles are Required=Yes and each needs a verdict, reviewer,
-ISO date, and an evidence path: Quality Engineer, Code Reviewer, Security Reviewer,
-Architect. Then G6 candidate evidence, G7 KG reconciliation, G8 PM closeout.
+**G6 candidate evidence, G7 KG reconciliation, G8 PM closeout.**
 
 ## Plan-Review Findings
 
@@ -366,7 +383,7 @@ table.
 - [x] Architecture review of runtime contract complete; operator approved 2026-08-29 (BLUEPRINT §5.9)
 - [x] Tests cover command surface, MCP tools, artifact retrieval, summaries, metrics, and proposal workflow — 730 tests, 92.25% line
 
-## Required Signoff Roles (Set in Planning)
+## Required Role Matrix
 
 | Role | Required | Why Required | Set By | Date |
 |------|----------|--------------|--------|------|
@@ -378,14 +395,40 @@ table.
 
 ## Story Signoff Provenance
 
-Complete this before moving `Overall Status` to `Done` or `Archived`.
+All four required story-level signoffs are complete for every story. A single
+individual holds all four roles in this single-operator deployment; see the
+*Independence Note* in `signoff-ledger.md`.
 
 | Story | Role | Reviewer | Verdict | Evidence | Date | Notes |
 |-------|------|----------|---------|----------|------|-------|
-| F0003-S0001 | Quality Engineer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0003-S0001 | Code Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0003-S0001 | Security Reviewer | TBD | TBD | TBD | TBD | Pending implementation |
-| F0003-S0001 | Architect | TBD | TBD | TBD | TBD | Pending implementation |
+| F0003-S0001 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Guarded `wrap` launch, command surface, and run registration validated. |
+| F0003-S0001 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Guard-before-launch ordering and F0001 `launch` reuse approved. |
+| F0003-S0001 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | No credential body persisted; blocked launch starts no session. |
+| F0003-S0001 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Command surface matches the approved runtime contract 1.1. |
+| F0003-S0002 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Capability matrix across four requirement levels and four probe results validated. |
+| F0003-S0002 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Declared requirement levels and the single guard rule approved. |
+| F0003-S0002 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | Probe output redacted before persistence; timeout blocks as failure does. |
+| F0003-S0002 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | `approval_visibility` required is consistent with the tmux-native premise (ADR-001). |
+| F0003-S0003 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Six MCP tools, paging, and error envelopes validated against the committed schema. |
+| F0003-S0003 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Read-only enforced structurally at instance and import level. |
+| F0003-S0003 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | No mutating service reachable; `evidence_show` refuses unredacted content. |
+| F0003-S0003 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Dependency-free stdio surface matches ADR-007; M1 resolved as manual host configuration. |
+| F0003-S0004 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Identity, longest-match root selection, containment, and collision behaviour validated. |
+| F0003-S0004 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Atomic index with its own lock; re-index idempotent and the recovery path. |
+| F0003-S0004 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | Symlink resolved before containment; owner-only modes verified. |
+| F0003-S0004 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Root-scoped identity matches ADR-006 including the fixed 12-hex digest. |
+| F0003-S0005 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Determinism proven across repeated calls, processes, and three interpreters. |
+| F0003-S0005 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Rule sets keep failure markers; truncation yields Partial, never Pass. |
+| F0003-S0005 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | Redaction runs on bytes before decoding; no model call reachable. |
+| F0003-S0005 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Rule-based extraction matches ADR-008; `rule_set_version` stamped. |
+| F0003-S0006 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | Metric closure, `derived_from` pinning, and proposal lifecycle validated. |
+| F0003-S0006 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Drafting and deciding separated; append-only decisions. |
+| F0003-S0006 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | DecideProposal authority derived from the target and verified against policy (SEC-1). |
+| F0003-S0006 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Inert proposals and allowlisted targets match ADR-009. |
+| F0003-S0007 | Quality Engineer | gajakannan | PASS | test-execution-report.md | 2026-08-30 | 514 F0001 tests pass unmodified; audit stream byte-identical. |
+| F0003-S0007 | Code Reviewer | gajakannan | PASS | code-review-report.md | 2026-08-30 | Facades partition the services; delegation, not duplication. |
+| F0003-S0007 | Security Reviewer | gajakannan | PASS | security-review-report.md | 2026-08-30 | Query facade holds no mutating service; reads append no events. |
+| F0003-S0007 | Architect | gajakannan | PASS | g0-assembly-plan-validation.md | 2026-08-30 | Split is the Phase B interface commitment ADR-007 depends on. |
 
 ## Deviations From the Assembly Plan
 
@@ -417,4 +460,4 @@ Complete this before moving `Overall Status` to `Done` or `Archived`.
 - [x] `planning-mds/features/ROADMAP.md` section aligned
 - [x] `planning-mds/features/STORY-INDEX.md` regenerated or updated
 - [x] `planning-mds/BLUEPRINT.md` feature/story status links aligned (F0003 was absent from the Feature Plan before 2026-08-19; added with all stories, now seven)
-- [ ] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence
+- [x] Every required signoff role has story-level `PASS` entries with reviewer, date, and evidence

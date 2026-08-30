@@ -43,6 +43,14 @@
       ],
       "pending_checkpoint": null,
       "status": "completed"
+    },
+    "G5": {
+      "attestations": [],
+      "completed_operations": [
+        "validate-g5"
+      ],
+      "pending_checkpoint": null,
+      "status": "completed"
     }
   }
 }

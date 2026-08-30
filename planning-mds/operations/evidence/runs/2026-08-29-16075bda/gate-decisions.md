@@ -11,6 +11,7 @@
 | G2 | PASS WITH RECOMMENDATIONS | Quality Engineer | 2026-08-29T23:24:14-04:00 | 730 tests green on 3.11/3.12/3.14; line 92.25%, branch 82.7%; four security scan classes run or waived; one deployability defect found and fixed | No | S9-F1 fixed; S9-F2 recorded for the F0001 owner; S3-F1/S4-F1 carried to G3 |
 | G3 | PASS WITH RECOMMENDATIONS | Code Reviewer + Security Reviewer | 2026-08-29T23:40:01-04:00 | Severity ACCEPTABLE (critical 0, high 0) via gate_policy standard profile. One HIGH security finding raised and FIXED within the cycle | No | SEC-1 fixed; CR-1 needs an architecture decision at G4; S3-F1 and SEC-1 are both additive F0001 schema changes |
 | G4 | PASS | Operator | 2026-08-29T23:45:10-04:00 | Severity ACCEPTABLE; all four carried decisions confirmed (S3-F1, SEC-1, S4-F1, CR-1) | No | CR-1's confirmation is a standing pattern decision for future F0003 stores |
+| G5 | PASS | Product Manager | 2026-08-30T00:16:38-04:00 | All four Required=Yes roles signed with reviewer, ISO date, and evidence path; eight recommendations dispositioned | No | Single signer holds all four roles; recorded in the ledger's Independence Note |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -414,3 +415,36 @@ from a diff.
 S7-F1 and S8-F1 are resolved in code. S9-F2 (`doctor` misreports outside a workspace) and
 S9-F3 / S10-F1 (framework inconsistencies) are routed to their owners and do not gate this
 feature.
+
+## G5 — Signoff
+
+**PASS.** All four Required=Yes roles signed on 2026-08-30 by `gajakannan`, each with a
+verdict, ISO date, and an evidence path under the run folder. Eight recommendations across
+the two `WITH RECOMMENDATIONS` reports are dispositioned in `signoff-ledger.md`; none is
+blocking, and both high-severity items were resolved before this gate.
+
+A single individual holds all four roles. That is recorded plainly in the ledger's
+*Independence Note* rather than obscured, together with the two things that partially
+offset it: the security review found and fixed a **high** finding in the implementer's own
+code, and every structural guard was verified by injecting the failure it exists to catch.
+
+### S11-F1 (Medium) — correcting my own G0 reasoning
+
+The gate exposed that `parse_status_required_roles` reads a STATUS.md section named
+exactly **`Required Role Matrix`**. F0003's STATUS.md called it *"Required Signoff Roles
+(Set in Planning)"*, so the parser found nothing and `status_required` was **empty for the
+whole run**.
+
+That makes a claim I recorded at G0 wrong. I wrote there that deferring
+`security_sensitive_scope` was safe because *"the Security Reviewer requirement comes
+independently from STATUS.md via `effective_required_roles`"*. It did not — the section
+name never matched. Security Reviewer became required only when the boolean was set true
+at G2.
+
+The **outcome** was unaffected: the role was required from G2, its report exists, and it is
+signed. The **reasoning** was not, and a reader relying on that G0 sentence would have been
+misled about what was protecting the requirement.
+
+Fixed by renaming the section to `Required Role Matrix`, matching F0001's archived STATUS
+and the parser. Worth noting as a framework observation: a feature can pass G0 through G4
+with a STATUS section the validator silently cannot read, and nothing says so until G5.

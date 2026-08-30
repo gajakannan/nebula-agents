@@ -75,6 +75,11 @@
       "required": true,
       "result": "APPROVED",
       "artifact": "gate-decisions.md"
+    },
+    "signoff": {
+      "required": true,
+      "result": "PASS",
+      "artifact": "signoff-ledger.md"
     }
   },
   "files": {
@@ -92,7 +97,8 @@
     "coverage_report": "coverage-report.md",
     "deployability": "deployability-check.md",
     "code_review": "code-review-report.md",
-    "security_review": "security-review-report.md"
+    "security_review": "security-review-report.md",
+    "signoff_ledger": "signoff-ledger.md"
   },
   "role_results": {
     "Quality Engineer": {
@@ -103,7 +109,9 @@
         "test-execution-report.md",
         "coverage-report.md"
       ],
-      "verdict_artifact": "test-execution-report.md"
+      "verdict_artifact": "test-execution-report.md",
+      "reviewer": "gajakannan",
+      "reviewed_on": "2026-08-30"
     },
     "DevOps": {
       "required": false,
@@ -120,7 +128,9 @@
       "required_artifacts": [
         "code-review-report.md"
       ],
-      "verdict_artifact": "code-review-report.md"
+      "verdict_artifact": "code-review-report.md",
+      "reviewer": "gajakannan",
+      "reviewed_on": "2026-08-30"
     },
     "Security Reviewer": {
       "required": true,
@@ -128,7 +138,19 @@
       "required_artifacts": [
         "security-review-report.md"
       ],
-      "verdict_artifact": "security-review-report.md"
+      "verdict_artifact": "security-review-report.md",
+      "reviewer": "gajakannan",
+      "reviewed_on": "2026-08-30"
+    },
+    "Architect": {
+      "required": true,
+      "result": "PASS",
+      "verdict_artifact": "g0-assembly-plan-validation.md",
+      "reviewer": "gajakannan",
+      "reviewed_on": "2026-08-30",
+      "required_artifacts": [
+        "g0-assembly-plan-validation.md"
+      ]
     }
   },
   "token_usage": {
