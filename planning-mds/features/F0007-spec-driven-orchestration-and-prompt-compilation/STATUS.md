@@ -1,7 +1,7 @@
 # F0007 - Spec-Driven Orchestration and Prompt Compilation - Status
 
-**Overall Status:** Implemented and merged to `main` (S0001–S0009, PRs #55–#61); rollout **HOLD** pending required role signoffs and a live governed product pilot
-**Last Updated:** 2026-08-17
+**Overall Status:** Implemented and merged to `main` (S0001–S0009, PRs #55–#61); rollout **HOLD** pending four remaining closeout items — the live governed pilot is **satisfied**
+**Last Updated:** 2026-08-30
 
 ## Story Checklist
 
@@ -81,7 +81,21 @@ One decision remains open.
 
 ## Remaining Work to Close
 
-1. **Live governed pilot** (S0009 D-gate) — one real feature run end-to-end through `run-gate.py` to closeout. `test_pilot_end_to_end.py` proves the toolchain against a fixture product root; it does not substitute for a live run. F0003 is the recommended pilot subject: it is next on the roadmap and its entry criteria are already met.
+1. ~~**Live governed pilot** (S0009 D-gate)~~ — **SATISFIED 2026-08-30.** F0003 ran end to
+   end through `run-gate.py`, G0 through G8, and was archived. Run
+   `2026-08-29-16075bda`; evidence under
+   `planning-mds/operations/evidence/runs/2026-08-29-16075bda/`.
+
+   **The pilot's substantive output is nine framework findings**, recorded in that run's
+   `gate-decisions.md` (finding sections `S3-F1`…`S13-F1`, `SEC-1`, `CR-1`…`CR-3`) and
+   summarised as a table in its `pm-closeout.md`. They were deliberately routed out of
+   F0003's closeout and to F0007, so archiving F0003 did not absorb them. **They are the
+   input `rollout-report.md` still needs.**
+
+   The one that matters most: `validate-feature-evidence.py` **silently skips** the deep
+   check for an Active non-terminal feature, so a gate's own validator exits 0 having
+   checked nothing mid-flight. Forcing it by hand caught real failures at **seven of the
+   nine gates**. That is a finding about the gate model, not a bug report.
 2. **Five role signoffs** — Architect, Quality Engineer, Code Reviewer, DevOps, Security Reviewer; every row in *Story Signoff Provenance* is still `TBD`.
 3. **Semantic-equivalence review of the generated prompts** (S0006) — the cutover shipped; role-owner acceptance that generated output preserves the accepted semantics has not been recorded.
 4. **Private-constant removal decision** (S0007/S0008) — see *Open Decisions*.
