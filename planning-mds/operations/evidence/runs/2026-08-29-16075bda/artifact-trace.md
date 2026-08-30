@@ -42,11 +42,18 @@ As-built source (read to make the plan's "Existing Code" rows concrete):
 - `artifacts/test-coverage/acceptance-criteria-map.md` — created at Step 8
 - `evidence-manifest.json` — `test_results` block recorded at Step 8
 - `engine/**` — F0003 implementation, all 8 steps
-- `docs/mcp-host-configuration.md` — created at Step 7; M1's resolution
+- `docs/mcp-host-configuration.md` — created at Step 7; M1's resolution. Corrected at G2
+- `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`,
+  `deployability-check.md` — created at G2
+- `artifacts/security/{dependency-audit,secrets-scan,bandit-sast}.json` — created at G2
 
 ## Generated Evidence
 
 - `artifacts/diffs/changed-files.txt` — changed-file list for this run
+
+G2 executed three security scan classes (`pip-audit`, `detect-secrets`, `bandit`) whose
+raw output is retained under `artifacts/security/`. The secrets scan carries its triage
+inline. DAST did not run and is waived — no listening port exists.
 
 G1 executed environment probes, a tmux lifecycle smoke on a unique session name, and the
 engine suite on all three CI-matrix interpreters. Their results are recorded in

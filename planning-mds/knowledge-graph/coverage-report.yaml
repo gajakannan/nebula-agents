@@ -213,7 +213,7 @@ freshness:
       last_modified: '2026-08-29'
       source_hash: ff24b5a6e5b00d61
       hotspot_rank: 2
-      hotspot_score: 0.09
+      hotspot_score: 0.1
       primary_owner: gajapathi.kannan@live.com
       primary_owner_pct: 100
       bus_factor_flag: true
@@ -833,7 +833,7 @@ freshness:
       - engine/tests/unit/test_tui_behavioral_coverage.py
       source_count: 82
       last_modified: '2026-08-30'
-      source_hash: e3d85ea0216e64f7
+      source_hash: 457cddf927c60279
     capability:redacted-transcript-recovery:
       source_paths:
       - engine/src/nebula_agents/application/transcripts.py

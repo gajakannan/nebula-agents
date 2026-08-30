@@ -8,6 +8,7 @@
 |------|----------|---------|-----------|-----------|----------|-----------|
 | G0 | PASS | Architect | 2026-08-29T11:35:30-04:00 | Assembly plan authored and validated against the approved Phase B package; all 7 stories covered, no blocking plan finding | No | M1 gates Step 7 (S0003); MCP protocol revision pinned at Step 7; L1 reconciled at Step 4 |
 | G1 | PASS | DevOps | 2026-08-29T11:48:38-04:00 | Environment, tmux, providers, schemas, and the ADR-006 root rule verified; 514 engine tests pass on all three CI-matrix interpreters | No | `RuntimeConfig` lacks `evidence_root` — already an assembly-plan row, not a blocker |
+| G2 | PASS WITH RECOMMENDATIONS | Quality Engineer | 2026-08-29T23:24:14-04:00 | 730 tests green on 3.11/3.12/3.14; line 92.25%, branch 82.7%; four security scan classes run or waived; one deployability defect found and fixed | No | S9-F1 fixed; S9-F2 recorded for the F0001 owner; S3-F1/S4-F1 carried to G3 |
 
 Decisions: `PASS`, `PASS WITH RECOMMENDATIONS`, `FAIL`, `SKIP`. Blocking values: `Yes` / `No`.
 
@@ -226,3 +227,77 @@ unavailable" edge case unreachable rather than handled.
 The troubleshooting command printed in `docs/mcp-host-configuration.md` was executed
 verbatim, as was the alternate `python -m nebula_agents mcp serve` form. Both work as
 documented.
+
+## G2 — self-review, QE, and deployability
+
+**PASS WITH RECOMMENDATIONS.** 730 tests green on all three interpreters; line 92.25%,
+branch 82.71%. Artifacts: `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`,
+`coverage-report.md`, `deployability-check.md`.
+
+### Scope booleans reconciled first, as the gate requires
+
+`security_sensitive_scope` **false → true**. Deferred at G0 because the check is not
+stage-gated and would have demanded scan evidence that did not exist; the scans have now
+run. The flip forces the Security Reviewer role, which STATUS.md already required, so the
+effective role set is unchanged and `security-review-report.md` becomes required at G3 —
+where it belongs.
+
+### Security scans — executed, and triaged rather than waved through
+
+| Class | Result | Detail |
+|-------|--------|--------|
+| Dependency | **clean** | `pip-audit` over the 6-package runtime closure of a clean install. 0 vulnerabilities |
+| Secrets | **clean** | `detect-secrets` over `engine/`, the run folder, and `docs/`. 7 candidates, **all triaged in the artifact** |
+| SAST | **findings** | `bandit` over `engine/src`: 0 HIGH, 0 MEDIUM, 17 LOW |
+| DAST | **waived** | No listening port or HTTP target exists. Architect-owned waiver, 2026-08-29 |
+
+Every secrets candidate was reviewed and the reasoning recorded in the scan artifact
+itself: synthetic redaction fixtures, their echoes in pytest **parametrize IDs** inside
+`junit.xml`, and the manifest's own SHA-256 digests. None was ever a live credential.
+Worth naming as a pattern: a test parametrized over a *real* value would land it in
+committed evidence exactly the same way.
+
+**One SAST LOW was mine and was real.** `bandit` B101 flagged an `assert` guarding the MCP
+handler map against the published tool contract. `python -O` strips asserts, so that
+invariant would silently vanish in an optimised run and ship a surface not matching the
+contract. Replaced with an unconditional check and verified under `-O`. The remaining 17
+are pre-existing F0001 (typed-argv subprocess, deliberate `try/except/pass` where an audit
+failure must not become access) or false positives (`B105` on enum members literally named
+`Pass`).
+
+### S9-F1 (Medium) — found and fixed at this gate
+
+Outside a configured workspace, every MCP tool returned **success with an empty result**.
+A host pointed at the wrong directory produced an empty session list and an empty evidence
+list — indistinguishable from a real run with no evidence, so a reviewer would read "this
+run has nothing" rather than "I am in the wrong tree".
+
+`docs/mcp-host-configuration.md` already documented `WORKSPACE_NOT_CONFIGURED` for this
+case. **The documentation was right and the code was not.** A workspace probe was added,
+the tools now return that error, and three tests cover it.
+
+Found by *running* the documented troubleshooting steps from outside a workspace rather
+than reading them. Documentation that has not been executed is a guess.
+
+### S9-F2 (Low) — recorded, deliberately not fixed
+
+`nebula-agents doctor` outside a workspace reports `SCHEMA_INVALID` — "Restore the
+committed schema" — and exits 9. Nothing is corrupt; the operator is in the wrong
+directory. The correct class is preflight/setup, exit 3.
+
+Pre-existing F0001 behaviour in the schema registry's load path. Reclassifying an F0001
+error is a contract change owned by whoever owns that path, and the 514-test boundary
+makes it a reviewed change rather than a drive-by. The MCP documentation no longer sends
+operators to `doctor` for this diagnosis.
+
+### S9-F3 (Low) — framework finding, for F0007's pilot report
+
+`agents/actions/spec/feature.yaml` declares the G2 artifact as
+**`g2-deployability-check.md`**; `validate-feature-evidence.py` requires
+**`deployability-check.md`**. The names disagree. The validator's name is authoritative in
+practice — it is what fails the gate — and is what F0001 used, so that is what is written
+here. The spec's `artifacts` list is not what the gate enforces.
+
+This is the fourth framework finding this pilot has produced, after the vacuous mid-flight
+gate validation, the unverified `test_results.artifacts` references, and the `.gitignore`
+exclusion of committed evidence.

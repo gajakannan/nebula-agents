@@ -1,6 +1,6 @@
 # F0003 - Local Agent Runtime Control Plane - Status
 
-**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G1 PASS**; **All 8 steps implemented; all 7 stories complete; Checkpoints A-E met.** Ready for G2
+**Overall Status:** In Progress — `feature` action run `2026-08-29-16075bda`, **G0-G2 PASS**; all 8 steps, all 7 stories, Checkpoints A-E. **G3 next** — code + security review
 **Last Updated:** 2026-08-29
 
 ## Phase B Architecture (drafted 2026-08-19)
@@ -30,7 +30,7 @@ in BLUEPRINT §5.9.
 |------|------|-------|----------|
 | G0 Architect assembly plan | Architect | **PASS** 2026-08-29 | `g0-assembly-plan-validation.md` |
 | G1 Runtime preflight | DevOps | **PASS** 2026-08-29 | `g1-runtime-preflight.md` |
-| G2 Self-review + QE + deployability | QE, DevOps | Not started | — |
+| G2 Self-review + QE + deployability | QE, DevOps | **PASS WITH RECOMMENDATIONS** 2026-08-29 | `g2-self-review.md`, `test-plan.md`, `test-execution-report.md`, `coverage-report.md`, `deployability-check.md` |
 | G3 Code + security review | Code Reviewer, Security | Not started | — |
 | G4 Approval | Operator | Not started | — |
 | G5 Signoff | PM | Not started | — |
@@ -226,10 +226,36 @@ caught it.
 ADR-007's premise is demonstrated, not asserted: a clean install carrying only
 `jsonschema` serves all six tools with no MCP SDK present.
 
+### G2 — self-review, QE, deployability · PASS WITH RECOMMENDATIONS
+
+730 tests green on 3.11/3.12/3.14; line 92.25%, branch 82.71%. `security_sensitive_scope`
+flipped **false → true** and the four scan classes ran: dependency **clean** (6-package
+runtime closure, 0 vulnerabilities), secrets **clean** (7 candidates, all triaged in the
+artifact — synthetic redaction fixtures, their echoes in pytest parametrize IDs, and the
+manifest's own digests), SAST **0 high / 0 medium / 17 low**, DAST **waived** (no port
+exists; Architect-owned).
+
+**One SAST low was mine and was real:** an `assert` guarded the MCP handler map against
+the published tool contract, and `python -O` strips asserts — the invariant would have
+vanished in an optimised run. Replaced with an unconditional check, verified under `-O`.
+
+**S9-F1 (medium), found and fixed at this gate.** Outside a configured workspace every MCP
+tool returned *success with an empty result* — indistinguishable from a real run with no
+evidence, so a reviewer would read "this run has nothing" rather than "I am in the wrong
+tree". `docs/mcp-host-configuration.md` already documented `WORKSPACE_NOT_CONFIGURED` for
+this case: the documentation was right and the code was not. Found by **running** the
+documented troubleshooting steps rather than reading them.
+
+**S9-F2 (low), recorded not fixed:** `doctor` outside a workspace reports `SCHEMA_INVALID`
+exit 9. Pre-existing F0001; reclassifying it is a contract change owned elsewhere.
+
+**S9-F3 (low), framework:** `feature.yaml` declares `g2-deployability-check.md`; the
+validator requires `deployability-check.md`. The names disagree.
+
 ### Remaining
 
-No implementation work. **G2 (QE, self-review, deployability) is next**, where
-`security_sensitive_scope` flips true and the four scan classes run.
+**G3 — code and security review.** Four findings await an Architect decision there: S3-F1
+(high), S4-F1 (medium), S9-F2 and S9-F3 (low).
 
 ## Plan-Review Findings
 
@@ -299,9 +325,9 @@ table.
 
 - [x] Story validator passes
 - [x] Tracker validator passes
-- [ ] Security review of redaction and retrieval boundaries completed
+- [~] Security scans run at G2 (dependency clean, secrets clean, SAST 0 high/0 medium, DAST waived); Security Reviewer verdict is G3
 - [x] Architecture review of runtime contract complete; operator approved 2026-08-29 (BLUEPRINT §5.9)
-- [ ] Tests cover command surface, MCP tools, artifact retrieval, summaries, metrics, and proposal workflow
+- [x] Tests cover command surface, MCP tools, artifact retrieval, summaries, metrics, and proposal workflow — 730 tests, 92.25% line
 
 ## Required Signoff Roles (Set in Planning)
 
