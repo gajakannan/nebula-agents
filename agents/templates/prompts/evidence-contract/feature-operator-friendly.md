@@ -8,9 +8,9 @@ Required inputs:
 - `FEATURE_ID` (format `F####`)
 
 Optional inputs (defaults apply when omitted):
-- `MODE` — default `clean`
-- `SLICE_ORDER_SOURCE` — default `assembly-plan`
-- `SLICE_ORDER`
+- `MODE` — one of `clean` | `drift-reconcile` — default `clean`
+- `SLICE_ORDER_SOURCE` — one of `assembly-plan` | `override` — default `assembly-plan`
+- `SLICE_ORDER` — required when SLICE_ORDER_SOURCE=override
 - `PRODUCT_ROOT` — default `sister-repo`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
@@ -31,12 +31,14 @@ Session setup (first session of the run only): create the run under `planning-md
 Retrieval tier defaults: clean: [1, 2]; drift-reconcile: [3, 4]
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action feature` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/feature.md`
-5. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID}`
-6. `{FEATURE_PATH}`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/feature.md`
+6. `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID}`
+7. `{FEATURE_PATH}`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **G0 — Architect assembly plan authoring and validation** (role: architect; artifacts: g0-assembly-plan-validation.md)

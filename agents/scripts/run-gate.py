@@ -36,6 +36,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 import validate_action_specs as vas  # noqa: E402
 import gate_runtime as gr  # noqa: E402
+import project_checks as pc  # noqa: E402
+from project_context import ProjectError
 from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
 
 JOURNAL_SCHEMA_VERSION = 1
@@ -88,7 +90,7 @@ def load_journal(run_folder: Path, *, run_id: str, action: str, contract_version
         if data.get("schema_version") != JOURNAL_SCHEMA_VERSION:
             raise GateDriverError("stale_journal_version",
                                   f"gate-state schema {data.get('schema_version')} != {JOURNAL_SCHEMA_VERSION}")
-        if data.get("run_id") != run_id:
+        if data.get("run_id") != run_id or data.get("action", action) != action:
             raise GateDriverError("wrong_run", f"journal run_id {data.get('run_id')} != {run_id}")
         return data
     return {"schema_version": JOURNAL_SCHEMA_VERSION, "run_id": run_id, "action": action,
@@ -273,19 +275,57 @@ def attest_checkpoint(*, spec_dir: Path, action: str, stage: str, product_root: 
 def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, feature_id: str,
               slug: str, run_id: str, run_folder: Path, dry_run: bool = False,
               from_op: str | None = None, force: bool = False,
-              lock_timeout: float = DEFAULT_LOCK_TIMEOUT) -> dict[str, Any]:
+              lock_timeout: float = DEFAULT_LOCK_TIMEOUT, plan_scope: str = "feature",
+              target: str | None = None) -> dict[str, Any]:
     policy, spec = _load_spec(spec_dir, action)
     contract_version = str(policy.contract.get("active_version"))
     gate = _find_gate(spec, stage)
     variables = build_variables(product_root=product_root, feature_id=feature_id, slug=slug,
                                 run_id=run_id, run_folder=run_folder, stage=stage)
     ops = gate.get("operations", []) or []
+    context, checks = pc.prepare(product_root.resolve(), action, plan_scope=plan_scope,
+                                 target=target or feature_id or "", spec_dir=spec_dir)
+    stage_checks = [c for c in checks if c["stage"] == stage]
+    if context["checks"]:
+        if plan_scope == "feature" and feature_id and target and feature_id != target:
+            raise ProjectError("conflicting_target", "--feature and --target must identify the same feature.")
+        variables.update(PLAN_SCOPE=plan_scope, TARGET=target or feature_id)
+        if plan_scope == "feature":
+            variables["FEATURE_ID"] = context["scope"]["features"][0]["id"]
+            variables["FEATURE_PATH"] = context["scope"]["features"][0]["path"]
+        elif action == "plan-review" and stage == "PR2":
+            scoped_ops = []
+            for op in ops:
+                if op.get("run", {}).get("id") == "pr2-validate-stories":
+                    for feature in context["scope"]["features"]:
+                        scoped_ops.append({"run": {**op["run"], "id": f"pr2-validate-stories-{feature['id']}",
+                                                   "argv": [x.replace("{FEATURE_PATH}", feature["path"]) for x in op["run"]["argv"]]}})
+                else:
+                    scoped_ops.append(op)
+            ops = scoped_ops
+    if dry_run:
+        return {"stage": stage, "status": "dry-run", "operations": ops,
+                "project_checks": stage_checks, "instructions": context["instructions"],
+                "completed_operations": [], "log_refs": []}
     lock = run_folder / LOCK_NAME
     acquire_lock(lock, lock_timeout)
     try:
         journal = load_journal(run_folder, run_id=run_id, action=action, contract_version=contract_version)
         stage_state = _stage_state(journal, stage)
 
+        try:
+            pc.bind_context(journal, context)
+            _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+            pc.require_prior_checks(journal, spec, stage, checks, run_folder)
+        except ProjectError:
+            stage_state["status"] = "failed"
+            _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+            raise
+        records = stage_state.setdefault("project_checks", {})
+        if stage_checks and any(not pc.passed(records.get(c["id"]), c, run_folder) for c in stage_checks):
+            stage_state.update(status="pending", completed_operations=[])
+        if force:
+            records.clear()
         if force:
             stage_state.update(status="pending", completed_operations=[], pending_checkpoint=None)
         elif stage_state["status"] == "completed":
@@ -300,6 +340,9 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
             start_index = indices[0]
             for j in range(start_index):
                 kind, body = op_kind(ops[j])
+                if stage_checks and op_id(ops[j], j) not in stage_state["completed_operations"]:
+                    raise GateDriverError("cannot_skip_required_operation",
+                                          f"--from would skip required framework operation {op_id(ops[j], j)!r}")
                 if kind == "checkpoint" and not _verify_attested(stage_state, body.get("id"), run_folder):
                     raise GateDriverError("cannot_skip_unattested_checkpoint",
                                           f"--from would skip unattested checkpoint {body.get('id')!r}")
@@ -384,6 +427,32 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
                 return {"stage": stage, "status": "paused", "pending_write": artifact,
                         "message": f"MANUAL: write {artifact}", "log_refs": log_refs}
 
+        for check in stage_checks:
+            record = records.get(check["id"])
+            if not pc.passed(record, check, run_folder):
+                record = pc.execute(check, root=product_root.resolve(), action=action,
+                                    run_folder=run_folder, run_id=run_id)
+                records[check["id"]] = record
+                _append_lifecycle_log(run_folder, stage, check["argv"], record)
+                _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+            if not record["ok"]:
+                stage_state["status"] = "failed"
+                _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+                return {"stage": stage, "status": "fail", "failed_step": f"project:{check['id']}",
+                        "exit_code": record["exit_code"], "log_refs": record["artifacts"]}
+        if checks:
+            try:
+                latest_context, latest_checks = pc.prepare(product_root.resolve(), action, plan_scope=plan_scope,
+                                                           target=target or feature_id or "", spec_dir=spec_dir)
+                pc.bind_context(journal, latest_context)
+                pc.require_prior_checks(journal, spec, stage, latest_checks, run_folder)
+                if any(not pc.passed(records.get(c["id"]), c, run_folder)
+                       for c in latest_checks if c["stage"] == stage):
+                    raise ProjectError("check_inputs_changed", "Inputs changed during the stage; rerun its required checks.")
+            except ProjectError:
+                stage_state["status"] = "failed"
+                _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+                raise
         stage_state["status"] = "completed"
         stage_state["pending_checkpoint"] = None
         if not dry_run:
@@ -447,6 +516,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stage")
     parser.add_argument("--feature")
     parser.add_argument("--feature-slug")
+    parser.add_argument("--plan-scope", choices=["feature", "feature-set", "project"], default="feature")
+    parser.add_argument("--target", help="Feature ID(s) or project for product validation scope.")
     parser.add_argument("--run-id")
     parser.add_argument("--run-folder", help="Override the resolved run folder (tests/advanced).")
     parser.add_argument("--spec-dir", type=Path, default=vas.DEFAULT_SPEC_DIR)
@@ -461,11 +532,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--note", default="")
     args = parser.parse_args(argv)
 
-    if args.list:
+    if args.list and not (args.product_root or os.environ.get("NEBULA_PRODUCT_ROOT")):
         print(json.dumps(list_runbook(args.spec_dir, args.action), indent=2, sort_keys=True))
         return 0
 
     product_root = resolve_product_root(args.product_root)
+    if (product_root / ".nebula-project.yaml").exists() and not (args.product_root or os.environ.get("NEBULA_PRODUCT_ROOT")):
+        print(json.dumps({"ok": False, "code": "product_root_required", "error": "Project extensions require an explicit product root."}))
+        return 2
+    if args.list:
+        try:
+            context, checks = pc.prepare(product_root, args.action, plan_scope=args.plan_scope,
+                                         target=args.target or args.feature or "", spec_dir=args.spec_dir)
+            print(json.dumps({**list_runbook(args.spec_dir, args.action), "context": context, "project_checks": checks}, indent=2))
+            return 0
+        except (ProjectError, gr.GateRuntimeError, OSError, ValueError) as exc:
+            print(json.dumps({"ok": False, "code": getattr(exc, "code", "project_error"), "error": str(exc)}))
+            return 2
     run_folder = _resolve_run_folder(args, product_root)
 
     try:
@@ -483,9 +566,12 @@ def main(argv: list[str] | None = None) -> int:
             product_root=product_root, feature_id=args.feature,
             slug=_resolve_feature_slug(args, run_folder),
             run_id=args.run_id, run_folder=run_folder, dry_run=args.dry_run,
-            from_op=args.from_op, force=args.force)
+            from_op=args.from_op, force=args.force, plan_scope=args.plan_scope, target=args.target)
     except GateDriverError as exc:
         print(json.dumps({"ok": False, "error": exc.message, "code": exc.code}))
+        return 3
+    except (ProjectError, gr.GateRuntimeError, OSError, ValueError) as exc:
+        print(json.dumps({"ok": False, "error": str(exc), "code": getattr(exc, "code", "project_error")}))
         return 3
 
     print(json.dumps(verdict, indent=2, sort_keys=True))

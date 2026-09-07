@@ -5,14 +5,14 @@
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
 Required inputs:
-- `MODE`
+- `MODE` — one of `feature-scoped` | `standalone`
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
-- `SCOPE`
-- `PATHS`
-- `FEATURE_ID`
-- `RUN_ID`
+- `SCOPE` — one of `feature` | `path-set` | `codebase` — required when PR_URL unset
+- `PATHS` — required when SCOPE=path-set (auto from PR_URL)
+- `FEATURE_ID` — required when MODE=feature-scoped (from PR_URL when set)
+- `RUN_ID` — required when MODE=feature-scoped — the parent feature run ID
 - `PRODUCT_ROOT` — default `sister-repo`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
@@ -28,13 +28,15 @@ Resuming an in-flight run in a new session: do NOT generate a new `REVIEW_RUN_ID
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/review.md`
-5. `feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, {OUTPUT_FOLDER}/evidence-manifest.json`
-6. `agents/code-reviewer/SKILL.md`
-7. `agents/security/SKILL.md (when SCOPE includes security review)`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/review.md`
+6. `feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, {OUTPUT_FOLDER}/evidence-manifest.json`
+7. `agents/code-reviewer/SKILL.md`
+8. `agents/security/SKILL.md (when SCOPE includes security review)`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **R0 — Review scope lock** (role: code-reviewer; artifacts: gate-decisions.md)

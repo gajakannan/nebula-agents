@@ -74,6 +74,9 @@ def _op_lines(gate: dict[str, Any]) -> list[str]:
                          f"produces: {', '.join(body.get('produces', []))})")
         elif kind == "write":
             lines.append(f"    - write `{body.get('artifact')}` after `{body.get('after')}`")
+    for event in gate.get("project_checks", []):
+        lines.append(f"    - Required product checks at `{event}`: run through `agents/scripts/run-gate.py` "
+                     "with explicit `--product-root`, `--plan-scope`, and `--target`; local checks cannot replace core operations.")
     return lines
 
 
@@ -96,6 +99,29 @@ def _common_facts(spec: dict[str, Any], shared: dict[str, Any]) -> dict[str, Any
         "context_preamble": shared.get("context_preamble", []),
         "coverage_min_pct": shared.get("coverage_min_pct"),
     }
+
+
+def _input_constraints(item: dict[str, Any], prose: bool) -> str:
+    """Render an input's declared `enum` / `required_when` constraints.
+
+    Dropping these leaves a prompt that names an input without saying which values
+    are legal, or that an optional input becomes required under some condition —
+    the reader cannot recover either from the spec they never see.
+    Square brackets, never braces: PLACEHOLDER_RE treats `{IDENT}` as a placeholder.
+    """
+    parts: list[str] = []
+    if item.get("enum"):
+        values = [str(v) for v in item["enum"]]
+        if prose:
+            parts.append("one of " + " | ".join(f"`{v}`" for v in values))
+        else:
+            parts.append("enum:[" + "|".join(values) + "]")
+    if item.get("required_when"):
+        cond = str(item["required_when"])
+        parts.append(f"required when {cond}" if prose else f"required_when:[{cond}]")
+    if not parts:
+        return ""
+    return (" — " + " — ".join(parts)) if prose else (" " + " ".join(parts))
 
 
 def _auto_resolved(spec: dict[str, Any]) -> list[tuple[str, str]]:
@@ -123,14 +149,16 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
     out.append("")
     out.append("Required inputs:")
     for item in spec.get("inputs", {}).get("required", []):
-        out.append(f"- `{item['name']}`" + (f" (format `{item['format']}`)" if item.get("format") else ""))
+        out.append(f"- `{item['name']}`"
+                   + (f" (format `{item['format']}`)" if item.get("format") else "")
+                   + _input_constraints(item, prose=True))
     optional = spec.get("inputs", {}).get("optional", [])
     if optional:
         out.append("")
         out.append("Optional inputs (defaults apply when omitted):")
         for item in optional:
             default = f" — default `{item['default']}`" if item.get("default") else ""
-            out.append(f"- `{item['name']}`{default}")
+            out.append(f"- `{item['name']}`{_input_constraints(item, prose=True)}{default}")
     auto = _auto_resolved(spec)
     if auto:
         out.append("")
@@ -162,6 +190,10 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
         out.append("Retrieval tier defaults: " + "; ".join(f"{mode}: {vals}" for mode, vals in tiers))
     out.append("")
     out.append("Load context in this order, then navigate rather than eager-load:")
+    out.append("First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py "
+               f"--product-root {{PRODUCT_ROOT}} --action {action}` and read the returned product instructions "
+               "before action work, including after resume. A context error blocks the action; "
+               "an absent project manifest preserves the existing context procedure.")
     ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
     for i, path in enumerate(ctx, 1):
         out.append(f"{i}. `{path}`")
@@ -210,10 +242,14 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
     out.append("")
     out.append("REQUIRED_INPUTS:")
     for item in spec.get("inputs", {}).get("required", []):
-        out.append(f"- {item['name']}" + (f" [{item['format']}]" if item.get("format") else ""))
+        out.append(f"- {item['name']}"
+                   + (f" [{item['format']}]" if item.get("format") else "")
+                   + _input_constraints(item, prose=False))
     out.append("OPTIONAL_INPUTS:")
     for item in spec.get("inputs", {}).get("optional", []):
-        out.append(f"- {item['name']}" + (f" =default:{item['default']}" if item.get("default") else ""))
+        out.append(f"- {item['name']}"
+                   + _input_constraints(item, prose=False)
+                   + (f" =default:{item['default']}" if item.get("default") else ""))
     auto = _auto_resolved(spec)
     if auto:
         out.append("AUTO_RESOLVED:")
@@ -229,6 +265,9 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
         out.append("RETRIEVAL_TIERS: " + "; ".join(f"{mode}={vals}" for mode, vals in tiers))
     ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
     out.append(f"CONTEXT: {' -> '.join(ctx)}")
+    out.append("PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py "
+               f"--product-root {{PRODUCT_ROOT}} --action {action}`; read returned instructions before work "
+               "and after resume; context error blocks action; absent manifest preserves existing procedure.")
     out.append("")
     out.append("GATES:")
     for gate in spec.get("gates", []):

@@ -5,11 +5,11 @@
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
-- MODE
-- TEST_SCOPE
+- MODE enum:[feature-scoped|standalone]
+- TEST_SCOPE enum:[unit|component|integration|e2e|api|accessibility|regression|all]
 OPTIONAL_INPUTS:
-- FEATURE_ID
-- RUN_ID
+- FEATURE_ID required_when:[MODE=feature-scoped]
+- RUN_ID required_when:[MODE=feature-scoped]
 - STORIES
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
@@ -23,7 +23,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=TEST_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/test.md -> agents/quality-engineer/SKILL.md -> feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, the feature's story files, {OUTPUT_FOLDER}/evidence-manifest.json
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/test.md -> agents/quality-engineer/SKILL.md -> feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, the feature's story files, {OUTPUT_FOLDER}/evidence-manifest.json
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action test`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - T0 role=quality-engineer artifacts=[test-plan.md]

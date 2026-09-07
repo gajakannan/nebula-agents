@@ -26,6 +26,7 @@ This roadmap sequences Nebula Agents work so the team can validate one delivery 
 | Feature | Status | Why Next | Entry Criteria |
 |---------|--------|----------|----------------|
 | [F0002 — Managed Agent Orchestration](./F0002-managed-agent-orchestration/README.md) | Planned | Add provider adapters and richer orchestration once tmux behavior and runtime control-plane contracts are understood and testable. | F0001 is implemented, F0003 runtime contracts are validated, and evidence shows native interactivity can be preserved or matched. |
+| [F0009 — Project-owned instructions and required checks](./F0009-project-owned-instructions-and-checks/README.md) | Planned | Keep consumer-specific instructions and scripts local while sharing generic discovery, required-check execution, and gate evidence. Candidate implementation exists in the working tree; review and coordinated consumer rollout remain pending. | Generic and product fixtures pass; PR2 and PR4 enforce fresh required checks; framework lifecycle gates pass; publish the framework revision before consumer pins advance. |
 <!-- generated:end roadmap:next -->
 
 ## Later

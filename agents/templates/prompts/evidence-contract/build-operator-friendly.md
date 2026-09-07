@@ -8,7 +8,7 @@ Required inputs:
 - `BUILD_SCOPE` (format `[F####, F####, ...] — features closed/archived in this build (may be empty for non-feature builds)`)
 
 Optional inputs (defaults apply when omitted):
-- `MODE` — default `clean`
+- `MODE` — one of `clean` | `drift-reconcile` — default `clean`
 - `PRODUCT_ROOT` — default `sister-repo`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
@@ -28,12 +28,14 @@ Resuming an in-flight run in a new session: do NOT generate a new `BUILD_RUN_ID`
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action build` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/build.md`
-5. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
-6. `per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/build.md`
+6. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
+7. `per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **B0 — Build scope lock** (role: product-manager; artifacts: action-context.md, gate-decisions.md)

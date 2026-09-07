@@ -487,7 +487,11 @@
       "Bash(.venv/bin/python -c \"from app.config import load_settings; print\\('default intent_mode:', load_settings\\(\\).intent_mode\\)\")",
       "Bash(.venv/bin/python -m pytest tests/test_evaluation_and_rollout.py -q)",
       "Bash(.venv/bin/python -m pytest tests -q --cov=app --cov-report=json:../planning-mds/operations/evidence/runs/2026-07-25-273d5672/artifacts/coverage/neuron-coverage.json)",
-      "Bash(.venv/bin/python -m pytest tests -q --cov=app --cov-report=term)"
+      "Bash(.venv/bin/python -m pytest tests -q --cov=app --cov-report=term)",
+      "Bash(echo \"--- exit: $? ---\")",
+      "Bash(command grep -v \"refs/heads/main$\")",
+      "Bash(git remote *)",
+      "Bash(command grep -n \"S0007; prerequisite\\\\|Re-run \\\\`2026-08-20\" planning-mds/features/F0003-local-agent-runtime-control-plane/STATUS.md)"
     ]
   }
 }

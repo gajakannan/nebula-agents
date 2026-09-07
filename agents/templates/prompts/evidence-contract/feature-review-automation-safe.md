@@ -7,11 +7,11 @@ CONTRACT: Feature Evidence Contract | SCOPE: read-only-audit | POLICY: 2026-07-1
 REQUIRED_INPUTS:
 OPTIONAL_INPUTS:
 - PR_URL
-- FEATURE_ID
-- MODE
-- DIFF_RANGE
-- FEATURE_RUN_ID
-- RUN_DEVOPS =default:auto
+- FEATURE_ID required_when:[PR_URL unset]
+- MODE enum:[closeout-audit|candidate-audit] required_when:[PR_URL unset]
+- DIFF_RANGE required_when:[PR_URL unset]
+- FEATURE_RUN_ID required_when:[MODE=candidate-audit or an older-run review]
+- RUN_DEVOPS enum:[auto|yes|no] =default:auto
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
 - FEATURE_INDEX_ROOT = {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
@@ -22,7 +22,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=FEATURE_REVIEW_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/feature-review.md -> agents/actions/feature.md -> {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/** -> {FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports -> role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/feature-review.md -> agents/actions/feature.md -> {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/** -> {FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports -> role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action feature-review`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - FR0 role=product-manager artifacts=[action-context.md]

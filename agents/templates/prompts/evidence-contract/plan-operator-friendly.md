@@ -6,8 +6,8 @@ This prompt encodes the **Plan (Phase A + B)** (scope `base-run-only`, policy `2
 
 Required inputs:
 - `FEATURE_ID` (format `F####`)
-- `PHASE`
-- `FEATURE_MODE`
+- `PHASE` — one of `A` | `B` | `A+B`
+- `FEATURE_MODE` — one of `new` | `existing`
 
 Optional inputs (defaults apply when omitted):
 - `PRODUCT_ROOT` — default `sister-repo`
@@ -25,16 +25,18 @@ Resuming an in-flight run in a new session: do NOT generate a new `PLAN_RUN_ID` 
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action plan` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/plan.md`
-5. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
-6. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-7. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-8. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/plan.md`
+6. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
+7. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+8. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
+10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **G1 — Clarification** (role: product-manager; artifacts: none)

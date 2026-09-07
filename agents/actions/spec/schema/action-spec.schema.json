@@ -81,6 +81,7 @@
         "artifacts": {"type": "array", "items": {"type": "string"}},
         "manifest_status_after": {"type": "string"},
         "operations": {"type": "array", "items": {"$ref": "#/$defs/operation"}},
+        "project_checks": {"type": "array", "uniqueItems": true, "items": {"enum": ["before_stage_complete"]}},
         "constraints": {
           "type": "array",
           "items": {

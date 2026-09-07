@@ -7,7 +7,7 @@ CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 REQUIRED_INPUTS:
 - BUILD_SCOPE [[F####, F####, ...] — features closed/archived in this build (may be empty for non-feature builds)]
 OPTIONAL_INPUTS:
-- MODE =default:clean
+- MODE enum:[clean|drift-reconcile] =default:clean
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
 - BUILD_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BUILD_RUN_ID}
@@ -21,7 +21,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=BUILD_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/build.md -> {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/build.md -> {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action build`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - B0 role=product-manager artifacts=[action-context.md, gate-decisions.md]

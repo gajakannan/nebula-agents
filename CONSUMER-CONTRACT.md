@@ -68,6 +68,8 @@ Any reference to an implementation-layer path inside `agents/**` uses `{PRODUCT_
 
 ## 4. Discovery convention for product-specific concretes
 
+Products may also declare `.nebula-project.yaml` (version 1) at their root for local instructions and required checks. See [Project extensions](agents/docs/PROJECT-EXTENSIONS.md) for the strict manifest/result schemas, explicit product-root requirement, PR2 enforcement, evidence, and CI commands. This optional contract is additive: products without a manifest retain their existing behavior. Product checks never replace framework validators or approvals.
+
 Framework agents do NOT hardcode:
 
 - Product namespaces (e.g. C# root namespace, Python package name)

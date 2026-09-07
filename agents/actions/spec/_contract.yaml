@@ -46,6 +46,7 @@ shared:
     - agents/ROUTER.md
     - agents/agent-map.yaml
     - agents/docs/AGENT-USE.md
+    - agents/docs/PROJECT-EXTENSIONS.md
   requirements:
     security_scans_required: true
     required_security_scan_classes: [dependency, secrets, sast, dast]

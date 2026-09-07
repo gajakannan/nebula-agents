@@ -5,7 +5,7 @@
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
-- DOC_SCOPE
+- DOC_SCOPE enum:[api|readme|runbook|developer-guide|release-notes|mixed]
 - TARGETS [[path, ...] destination doc files]
 OPTIONAL_INPUTS:
 - SOURCE_CODE
@@ -18,7 +18,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=DOC_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/document.md -> agents/technical-writer/SKILL.md -> SOURCE_CODE paths (read-only) -> for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/document.md -> agents/technical-writer/SKILL.md -> SOURCE_CODE paths (read-only) -> for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action document`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - D0 role=technical-writer artifacts=[gate-decisions.md]

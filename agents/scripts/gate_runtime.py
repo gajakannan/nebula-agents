@@ -86,7 +86,7 @@ def _kill_process_group(proc: subprocess.Popen) -> None:
 
 
 def execute_argv(argv: list[str], *, cwd: Path, timeout: float | None = None,
-                 capture: bool = True) -> ExecResult:
+                 capture: bool = True, env: dict[str, str] | None = None) -> ExecResult:
     """Run *argv* shell-free in *cwd*. Never invokes a shell.
 
     On timeout the whole process group is killed so no grandchild is orphaned.
@@ -95,6 +95,8 @@ def execute_argv(argv: list[str], *, cwd: Path, timeout: float | None = None,
     if not argv:
         raise GateRuntimeError("empty_argv", "argv must be non-empty")
     popen_kwargs: dict[str, Any] = {"cwd": str(cwd)}
+    if env is not None:
+        popen_kwargs["env"] = {**os.environ, **env}
     if capture:
         popen_kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if os.name == "posix":
@@ -184,7 +186,8 @@ def run_operation(op: dict[str, Any], *, product_root: Path, variables: dict[str
     cwd_path, cwd_label = _resolve_cwd(str(body.get("cwd", "")), product_root)
     timeout = body.get("timeout_seconds")
 
-    result = execute_argv(argv, cwd=cwd_path, timeout=timeout, capture=True)
+    result = execute_argv(argv, cwd=cwd_path, timeout=timeout, capture=True,
+                          env={"NEBULA_PRODUCT_ROOT": str(product_root)})
 
     artifacts = list(extra_artifacts or [])
     if run_folder is not None:

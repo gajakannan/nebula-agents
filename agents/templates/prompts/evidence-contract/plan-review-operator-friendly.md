@@ -5,7 +5,7 @@
 This prompt encodes the **Feature Evidence Contract** (scope `read-only-audit`, policy `2026-07-11`).
 
 Required inputs:
-- `PLAN_SCOPE`
+- `PLAN_SCOPE` — one of `feature` | `feature-set` | `project`
 - `TARGET` (format `F#### | comma-separated F#### list | project`)
 
 Optional inputs (defaults apply when omitted):
@@ -24,14 +24,16 @@ Resuming an in-flight run in a new session: do NOT generate a new `PLAN_REVIEW_R
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action plan-review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/plan-review.md`
-5. `agents/actions/plan.md`
-6. `agents/actions/feature.md`
-7. `role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/code-reviewer/SKILL.md`
-8. `feature scope: {FEATURE_PATH}/**; plus BLUEPRINT.md, REGISTRY.md, ROADMAP.md, KG + architecture/API/schema/security artifacts as needed`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/plan-review.md`
+6. `agents/actions/plan.md`
+7. `agents/actions/feature.md`
+8. `role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/code-reviewer/SKILL.md`
+9. `feature scope: {FEATURE_PATH}/**; plus BLUEPRINT.md, REGISTRY.md, ROADMAP.md, KG + architecture/API/schema/security artifacts as needed`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **PR0 — Scope lock** (role: product-manager; artifacts: action-context.md)
@@ -50,8 +52,10 @@ not repair plan artifacts during review.
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - Required product checks at `before_stage_complete`: run through `agents/scripts/run-gate.py` with explicit `--product-root`, `--plan-scope`, and `--target`; local checks cannot replace core operations.
     - judgment: validate-stories.py {FEATURE_PATH} applies in feature scope; iterate it per feature for feature-set and
-skip it (record why) for project scope. All PR2 validators are read-only. Record exit code, summary, and
+skip it (record why) for legacy project scope. With declared project checks, project scope iterates all
+active or PRD-bearing nonarchived features resolved from the product registry. All PR2 validators are read-only. Record exit code, summary, and
 artifact path for each command in lifecycle-gates.log.
 - **PR3 — Self-review gate** (role: product-manager; artifacts: none)
     - judgment: Each reviewer verifies that its findings cite exact files/sections and that any skipped item is

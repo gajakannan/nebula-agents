@@ -5,7 +5,7 @@
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
 Required inputs:
-- `DOC_SCOPE`
+- `DOC_SCOPE` — one of `api` | `readme` | `runbook` | `developer-guide` | `release-notes` | `mixed`
 - `TARGETS` (format `[path, ...] destination doc files`)
 
 Optional inputs (defaults apply when omitted):
@@ -25,13 +25,15 @@ Resuming an in-flight run in a new session: do NOT generate a new `DOC_RUN_ID` a
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action document` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/document.md`
-5. `agents/technical-writer/SKILL.md`
-6. `SOURCE_CODE paths (read-only)`
-7. `for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/document.md`
+6. `agents/technical-writer/SKILL.md`
+7. `SOURCE_CODE paths (read-only)`
+8. `for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **D0 — Scope lock** (role: technical-writer; artifacts: gate-decisions.md)

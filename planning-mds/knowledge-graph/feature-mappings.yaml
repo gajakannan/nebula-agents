@@ -23,6 +23,10 @@ coverage:
       path: planning-mds/features/F0008-agent-cockpit-landing-shell
       reason: Planned feature with no implementation to bind; canonical mappings are deferred until its
         architecture and code are activated.
+    - id: feature:F0009
+      path: planning-mds/features/F0009-project-owned-instructions-and-checks
+      reason: Reserved for lifecycle review and release coordination; working-tree implementation is not
+        an approved or delivered feature, and canonical mappings await that review.
 features:
   - status: archived-done
     id: feature:F0001
