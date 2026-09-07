@@ -48,6 +48,8 @@ Echo the resolved absolute path back as the first agent turn's output before any
 
 ### Honoring `.agentignore`
 
+For an opted-in product, load its blueprint and declared instruction text before work and after resume with `python3 agents/scripts/project_context.py --product-root <absolute-product-root> --action <action>`. Resolve the root explicitly; extension commands do not use the legacy fallback. A context error blocks the action. See [Project extensions](PROJECT-EXTENSIONS.md) for gate/CI usage and the current native-launcher limitation.
+
 After resolving `{PRODUCT_ROOT}`, check for `{PRODUCT_ROOT}/.agentignore`
 before broad product discovery. This file is a gitignore-style retrieval guard
 for agents, not a Git ignore file. Honor it for broad reads, globs, greps, and

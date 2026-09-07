@@ -8,11 +8,11 @@ Required inputs:
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
-- `FEATURE_ID`
-- `MODE`
-- `DIFF_RANGE`
-- `FEATURE_RUN_ID`
-- `RUN_DEVOPS` — default `auto`
+- `FEATURE_ID` — required when PR_URL unset
+- `MODE` — one of `closeout-audit` | `candidate-audit` — required when PR_URL unset
+- `DIFF_RANGE` — required when PR_URL unset
+- `FEATURE_RUN_ID` — required when MODE=candidate-audit or an older-run review
+- `RUN_DEVOPS` — one of `auto` | `yes` | `no` — default `auto`
 - `PRODUCT_ROOT` — default `sister-repo`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
@@ -29,14 +29,16 @@ Resuming an in-flight run in a new session: do NOT generate a new `FEATURE_REVIE
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action feature-review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/feature-review.md`
-5. `agents/actions/feature.md`
-6. `{FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/**`
-7. `{FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports`
-8. `role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/feature-review.md`
+6. `agents/actions/feature.md`
+7. `{FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/**`
+8. `{FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports`
+9. `role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **FR0 — Feature run and diff lock** (role: product-manager; artifacts: action-context.md)

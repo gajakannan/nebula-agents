@@ -5,7 +5,7 @@
 CONTRACT: Feature Evidence Contract | SCOPE: read-only-audit | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
-- PLAN_SCOPE
+- PLAN_SCOPE enum:[feature|feature-set|project]
 - TARGET [F#### | comma-separated F#### list | project]
 OPTIONAL_INPUTS:
 - DIFF_RANGE
@@ -17,7 +17,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=PLAN_REVIEW_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/plan-review.md -> agents/actions/plan.md -> agents/actions/feature.md -> role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/code-reviewer/SKILL.md -> feature scope: {FEATURE_PATH}/**; plus BLUEPRINT.md, REGISTRY.md, ROADMAP.md, KG + architecture/API/schema/security artifacts as needed
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/plan-review.md -> agents/actions/plan.md -> agents/actions/feature.md -> role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/code-reviewer/SKILL.md -> feature scope: {FEATURE_PATH}/**; plus BLUEPRINT.md, REGISTRY.md, ROADMAP.md, KG + architecture/API/schema/security artifacts as needed
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action plan-review`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - PR0 role=product-manager artifacts=[action-context.md]
@@ -28,6 +29,7 @@ GATES:
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - Required product checks at `before_stage_complete`: run through `agents/scripts/run-gate.py` with explicit `--product-root`, `--plan-scope`, and `--target`; local checks cannot replace core operations.
 - PR3 role=product-manager artifacts=[]
 - PR4 role=product-manager artifacts=[]
 

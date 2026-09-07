@@ -9,10 +9,10 @@ Required inputs:
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
-- `SOURCE`
-- `REVIEW_VERDICT_REF`
-- `WAIVER`
-- `MODE` — default `live`
+- `SOURCE` — required when PR_URL unset
+- `REVIEW_VERDICT_REF` — required when no WAIVER
+- `WAIVER` — required when no REVIEW_VERDICT_REF
+- `MODE` — one of `live` | `dry-run` — default `live`
 - `PRODUCT_ROOT` — default `sister-repo`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
@@ -26,12 +26,14 @@ Resuming an in-flight run in a new session: do NOT generate a new `RUN_ID` and d
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action integrate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/integrator/SKILL.md`
-5. `agents/actions/integrate.md`
-6. `agents/templates/integration-evidence-template.md`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/integrator/SKILL.md`
+6. `agents/actions/integrate.md`
+7. `agents/templates/integration-evidence-template.md`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **I0 — Gate 1 — feature-review verdict (maintainer)** (role: integrator; artifacts: none)

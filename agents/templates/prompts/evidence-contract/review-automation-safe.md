@@ -5,13 +5,13 @@
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
-- MODE
+- MODE enum:[feature-scoped|standalone]
 OPTIONAL_INPUTS:
 - PR_URL
-- SCOPE
-- PATHS
-- FEATURE_ID
-- RUN_ID
+- SCOPE enum:[feature|path-set|codebase] required_when:[PR_URL unset]
+- PATHS required_when:[SCOPE=path-set (auto from PR_URL)]
+- FEATURE_ID required_when:[MODE=feature-scoped (from PR_URL when set)]
+- RUN_ID required_when:[MODE=feature-scoped — the parent feature run ID]
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
 - FEATURE_PATH = {PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)
@@ -21,7 +21,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=REVIEW_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/review.md -> feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, {OUTPUT_FOLDER}/evidence-manifest.json -> agents/code-reviewer/SKILL.md -> agents/security/SKILL.md (when SCOPE includes security review)
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/review.md -> feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, {OUTPUT_FOLDER}/evidence-manifest.json -> agents/code-reviewer/SKILL.md -> agents/security/SKILL.md (when SCOPE includes security review)
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action review`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - R0 role=code-reviewer artifacts=[gate-decisions.md]

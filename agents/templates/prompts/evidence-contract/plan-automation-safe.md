@@ -6,8 +6,8 @@ CONTRACT: Plan (Phase A + B) | SCOPE: base-run-only | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
 - FEATURE_ID [F####]
-- PHASE
-- FEATURE_MODE
+- PHASE enum:[A|B|A+B]
+- FEATURE_MODE enum:[new|existing]
 OPTIONAL_INPUTS:
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
@@ -18,7 +18,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=PLAN_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/plan.md -> {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md -> {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/plan.md -> {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md -> {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml -> {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action plan`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - G1 role=product-manager artifacts=[]

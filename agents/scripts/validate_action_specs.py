@@ -561,6 +561,8 @@ def _action_model(spec: dict[str, Any]) -> dict[str, Any]:
             "constraints": sorted(json.dumps(c, sort_keys=True) for c in g.get("constraints", []) or []),
             "operations": [_op_fingerprint(o) for o in g.get("operations", []) or []],
         }
+        if "project_checks" in g:
+            gates[gid]["project_checks"] = sorted(g["project_checks"])
     return {
         "scope": contract.get("scope"),
         "severity_gate": spec.get("severity_gate"),

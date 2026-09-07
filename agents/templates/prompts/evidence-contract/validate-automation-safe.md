@@ -5,11 +5,11 @@
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
 REQUIRED_INPUTS:
-- VALIDATION_SCOPE
+- VALIDATION_SCOPE enum:[requirements|architecture|implementation|all]
 OPTIONAL_INPUTS:
 - FEATURE_ID
-- STAGE =default:closeout
-- RUN_ID
+- STAGE enum:[G0|G1|G2|G3|G5|G6|G8|closeout] =default:closeout
+- RUN_ID required_when:[STAGE in {G0,G1,G2,G3,G5}]
 - EFFECTIVE_DATE =default:2026-05-19 (framework default; earlier values rejected per §22)
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
@@ -19,7 +19,8 @@ AUTO_RESOLVED:
 
 RUN_ID: var=VALIDATE_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/validate.md -> agents/product-manager/SKILL.md (requirements validation mode) -> agents/architect/SKILL.md (architecture validation mode) -> agents/product-manager/scripts/README.md (validator commands + exit codes; only when scope includes implementation)
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/validate.md -> agents/product-manager/SKILL.md (requirements validation mode) -> agents/architect/SKILL.md (architecture validation mode) -> agents/product-manager/scripts/README.md (validator commands + exit codes; only when scope includes implementation)
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action validate`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - V0 role=product-manager artifacts=[action-context.md]

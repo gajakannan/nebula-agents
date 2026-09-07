@@ -5,12 +5,12 @@
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
 Required inputs:
-- `MODE`
-- `TEST_SCOPE`
+- `MODE` — one of `feature-scoped` | `standalone`
+- `TEST_SCOPE` — one of `unit` | `component` | `integration` | `e2e` | `api` | `accessibility` | `regression` | `all`
 
 Optional inputs (defaults apply when omitted):
-- `FEATURE_ID`
-- `RUN_ID`
+- `FEATURE_ID` — required when MODE=feature-scoped
+- `RUN_ID` — required when MODE=feature-scoped
 - `STORIES`
 - `PRODUCT_ROOT` — default `sister-repo`
 
@@ -30,12 +30,14 @@ Resuming an in-flight run in a new session: do NOT generate a new `TEST_RUN_ID` 
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action test` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/test.md`
-5. `agents/quality-engineer/SKILL.md`
-6. `feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, the feature's story files, {OUTPUT_FOLDER}/evidence-manifest.json`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/test.md`
+6. `agents/quality-engineer/SKILL.md`
+7. `feature-scoped only: {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/STATUS.md, the feature's story files, {OUTPUT_FOLDER}/evidence-manifest.json`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **T0 — Test plan** (role: quality-engineer; artifacts: test-plan.md)

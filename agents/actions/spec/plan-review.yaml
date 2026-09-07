@@ -68,6 +68,7 @@ gates:
   - id: PR2
     title: Validator pass
     role: product-manager
+    project_checks: [before_stage_complete]
     operations:
       - run:
           id: pr2-validate-stories
@@ -96,7 +97,8 @@ gates:
           timeout_seconds: 300
     judgment: |
       validate-stories.py {FEATURE_PATH} applies in feature scope; iterate it per feature for feature-set and
-      skip it (record why) for project scope. All PR2 validators are read-only. Record exit code, summary, and
+      skip it (record why) for legacy project scope. With declared project checks, project scope iterates all
+      active or PRD-bearing nonarchived features resolved from the product registry. All PR2 validators are read-only. Record exit code, summary, and
       artifact path for each command in lifecycle-gates.log.
 
   - id: PR3

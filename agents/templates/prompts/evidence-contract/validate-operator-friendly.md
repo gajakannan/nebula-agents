@@ -5,12 +5,12 @@
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
 Required inputs:
-- `VALIDATION_SCOPE`
+- `VALIDATION_SCOPE` — one of `requirements` | `architecture` | `implementation` | `all`
 
 Optional inputs (defaults apply when omitted):
 - `FEATURE_ID`
-- `STAGE` — default `closeout`
-- `RUN_ID`
+- `STAGE` — one of `G0` | `G1` | `G2` | `G3` | `G5` | `G6` | `G8` | `closeout` — default `closeout`
+- `RUN_ID` — required when STAGE in {G0,G1,G2,G3,G5}
 - `EFFECTIVE_DATE` — default `2026-05-19 (framework default; earlier values rejected per §22)`
 - `PRODUCT_ROOT` — default `sister-repo`
 
@@ -26,13 +26,15 @@ Resuming an in-flight run in a new session: do NOT generate a new `VALIDATE_RUN_
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
+First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action validate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
-4. `agents/actions/validate.md`
-5. `agents/product-manager/SKILL.md (requirements validation mode)`
-6. `agents/architect/SKILL.md (architecture validation mode)`
-7. `agents/product-manager/scripts/README.md (validator commands + exit codes; only when scope includes implementation)`
+4. `agents/docs/PROJECT-EXTENSIONS.md`
+5. `agents/actions/validate.md`
+6. `agents/product-manager/SKILL.md (requirements validation mode)`
+7. `agents/architect/SKILL.md (architecture validation mode)`
+8. `agents/product-manager/scripts/README.md (validator commands + exit codes; only when scope includes implementation)`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **V0 — Scope lock** (role: product-manager; artifacts: action-context.md)

@@ -7,9 +7,9 @@ CONTRACT: Feature Evidence Contract | SCOPE: feature-completion | POLICY: 2026-0
 REQUIRED_INPUTS:
 - FEATURE_ID [F####]
 OPTIONAL_INPUTS:
-- MODE =default:clean
-- SLICE_ORDER_SOURCE =default:assembly-plan
-- SLICE_ORDER
+- MODE enum:[clean|drift-reconcile] =default:clean
+- SLICE_ORDER_SOURCE enum:[assembly-plan|override] =default:assembly-plan
+- SLICE_ORDER required_when:[SLICE_ORDER_SOURCE=override]
 - PRODUCT_ROOT =default:sister-repo
 AUTO_RESOLVED:
 - ARCHIVE_FEATURE_PATH = {PRODUCT_ROOT}/planning-mds/features/archive/{FEATURE_ID}-{FEATURE_SLUG}
@@ -23,7 +23,8 @@ AUTO_RESOLVED:
 RUN_ID: var=RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
 SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
 RETRIEVAL_TIERS: clean=[1, 2]; drift-reconcile=[3, 4]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/actions/feature.md -> python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} -> {FEATURE_PATH}
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/feature.md -> python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID} -> {FEATURE_PATH}
+PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action feature`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - G0 role=architect artifacts=[g0-assembly-plan-validation.md]

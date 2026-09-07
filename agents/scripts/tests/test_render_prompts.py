@@ -142,3 +142,60 @@ def test_cli_check_exit_zero():
         cwd=str(REPO_ROOT), capture_output=True, text=True)
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert json.loads(proc.stdout)["ok"]
+
+
+# ---- input constraints must survive compilation (F0007-S0006 review, SE-1) --- #
+# A prompt that names an input without its declared `enum` / `required_when` tells
+# the reader neither which values are legal nor when an optional input becomes
+# required. `prompt_drift` cannot catch that class of loss: it compares committed
+# output against freshly rendered output, and a constraint the renderer never emits
+# is absent from both sides. These tests are the guard instead.
+def test_declared_enum_and_required_when_are_rendered():
+    spec = mk_spec()
+    spec["inputs"] = {
+        "required": [{"name": "FEATURE_ID", "format": "F####", "required_when": "PR_URL unset"}],
+        "optional": [{"name": "MODE", "enum": ["clean", "drift-reconcile"], "default": "clean"},
+                     {"name": "SLICE_ORDER", "required_when": "SLICE_ORDER_SOURCE=override"}],
+    }
+    out = rp.render_action(spec, SHARED, "2026-07-11")
+    for variant, text in out.items():
+        assert "clean" in text and "drift-reconcile" in text, variant
+        assert "SLICE_ORDER_SOURCE=override" in text, variant
+        assert "PR_URL unset" in text, variant
+
+
+def test_constraints_use_brackets_not_braces():
+    # `{IDENT}` is placeholder syntax; rendering a constraint with braces would trip
+    # _semantic_check's unresolved-placeholder guard.
+    spec = mk_spec()
+    spec["inputs"] = {"required": [{"name": "FEATURE_ID", "format": "F####"}],
+                      "optional": [{"name": "MODE", "enum": ["live", "dry-run"]}]}
+    out = rp.render_action(spec, SHARED, "2026-07-11")  # must not raise
+    assert "{live}" not in out["automation-safe"]
+
+
+@pytest.mark.parametrize("spec_path", sorted(REAL_SPEC_DIR.glob("*.yaml")))
+def test_every_declared_constraint_reaches_the_committed_prompts(spec_path):
+    if spec_path.name == "_contract.yaml":
+        pytest.skip("shared contract, not an action")
+    import yaml
+    spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
+    action = spec["action"]
+    texts = {}
+    for variant in rp.ALL_VARIANTS:
+        path = rp._target(action, variant)
+        if path.exists():
+            texts[variant] = path.read_text(encoding="utf-8")
+    assert texts, f"no committed prompt for {action}"
+    inputs = spec.get("inputs") or {}
+    for kind in ("required", "optional"):
+        for item in inputs.get(kind) or []:
+            for variant, text in texts.items():
+                for value in item.get("enum", []):
+                    assert str(value) in text, (
+                        f"{action}-{variant}: enum value {value!r} for input "
+                        f"{item['name']} is declared in the spec but absent from the prompt")
+                if "required_when" in item:
+                    assert str(item["required_when"]) in text, (
+                        f"{action}-{variant}: required_when for input {item['name']} "
+                        f"is declared in the spec but absent from the prompt")
