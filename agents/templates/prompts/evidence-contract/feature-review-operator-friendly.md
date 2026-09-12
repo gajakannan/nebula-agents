@@ -4,7 +4,8 @@
 
 This prompt encodes the **Feature Evidence Contract** (scope `read-only-audit`, policy `2026-07-11`).
 
-Required inputs:
+Required inputs: 
+FEATURE_ID - 'F####'
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
