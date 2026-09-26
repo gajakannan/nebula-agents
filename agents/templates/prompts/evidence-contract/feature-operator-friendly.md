@@ -26,7 +26,7 @@ Generate `RUN_ID` once per run — not per session — in the contract format `Y
 
 Resuming an in-flight run in a new session: do NOT generate a new `RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --action feature --feature {FEATURE_ID}` to perform this.
 
 Retrieval tier defaults: clean: [1, 2]; drift-reconcile: [3, 4]
 

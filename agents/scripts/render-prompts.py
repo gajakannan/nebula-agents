@@ -80,6 +80,32 @@ def _op_lines(gate: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _session_setup_line(action: str, spec: dict[str, Any], facts: dict[str, Any]) -> str:
+    """The session-setup instruction, matching what init-run.py actually creates.
+
+    Only a feature-bound action (FEATURE_ID required) gets evidence-manifest.json;
+    telling any other action to create one contradicts its own contract. An
+    integrate-scheme run id is minted by the integrator, not by init-run.py.
+    """
+    base = (f"Session setup (first session of the run only): create the run under "
+            f"`{PACKAGE_ROOT_REF}/`, ")
+    files = (f"create the base run files ({facts['base_run_files']}) and artifact subdirs "
+             f"({facts['artifacts_subdirs']})")
+    scheme = (spec.get("run_id", {}) or {}).get("scheme", "contract")
+    if scheme == "integrate":
+        return (base + files + ". This action creates no `evidence-manifest.json`; its run id "
+                "follows the integrate scheme and is not minted by `agents/scripts/init-run.py`.")
+    if vas.is_feature_bound(spec):
+        return (base + "initialize `evidence-manifest.json` (status `draft`) with the active "
+                "contract version stamped, " + files + ". Run "
+                f"`agents/scripts/init-run.py --action {action} --feature {{FEATURE_ID}}` to perform this.")
+    optional = [i.get("name") for i in (spec.get("inputs", {}) or {}).get("optional", []) or []]
+    feature_arg = " [--feature {FEATURE_ID}]" if "FEATURE_ID" in optional else ""
+    return (base + files + ". This action creates no `evidence-manifest.json` (only feature-bound "
+            "actions do). Run "
+            f"`agents/scripts/init-run.py --action {action}{feature_arg}` to perform this.")
+
+
 def _common_facts(spec: dict[str, Any], shared: dict[str, Any]) -> dict[str, Any]:
     # The shared contract defines the `contract` run-id scheme (date + token_hex). The
     # `integrate` scheme uses a UTC-timestamp id minted by the integrator, not init-run.
@@ -179,11 +205,7 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
                f"position, next gate, recorded decisions, current story, and scope in one read, so the "
                f"session does not re-derive them. `init-run.py --resume` reuses the existing run folder.")
     out.append("")
-    out.append(f"Session setup (first session of the run only): create the run under "
-               f"`{PACKAGE_ROOT_REF}/`, initialize "
-               f"`evidence-manifest.json` (status `draft`) with the active contract version stamped, "
-               f"create the base run files ({facts['base_run_files']}) and artifact subdirs "
-               f"({facts['artifacts_subdirs']}). Run `agents/scripts/init-run.py` to perform this.")
+    out.append(_session_setup_line(action, spec, facts))
     tiers = _tiers(spec)
     if tiers:
         out.append("")

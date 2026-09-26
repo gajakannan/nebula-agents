@@ -22,6 +22,14 @@ All notable changes to `nebula-agents` will be documented in this file. Format f
 - **Consumer-visible:** newly initialized evidence runs carry `contract_version` in `evidence-manifest.json` (stamped by `init-run.py`) in addition to `contract_effective_date`. Legacy manifests without a version continue to resolve by effective date; published historical policy is immutable and an active-policy update never changes a historical run's verdict (`CONSUMER-CONTRACT.md`). Version/date contradictions fail closed.
 - `validate-feature-evidence.py` is version-aware (new-field-guarded; existing rule IDs and behavior unchanged). Parity between the validator's date matrix and the versioned policy is proven by the dual-read diagnostic (`agents/product-manager/scripts/contract_compat.py --matrix`).
 
+### Fixed — base-run tooling
+
+- `run-gate.py`: checkpoint attestation hashes only file-like `requires` entries. Prose preconditions (validate V3, integrate I0, build, blog, document) are recorded as `acknowledged_preconditions` instead of being treated as missing files, so those checkpoints are no longer impossible to attest (`checkpoint_output_missing`). At least one hashed evidence file is still required; a prose-only checkpoint names its files with `--evidence`.
+- `init-run.py`: `--feature` is required only for feature-bound actions (`FEATURE_ID` required in the action spec: `feature`, `plan`), which keep their run-scoped `evidence-manifest.json`. Every other action (for example `validate`, `blog`, `document`) now initializes base run files only, with no manifest and no feature index; `--feature` is optional scope. An unknown `--action` is rejected. Shared rule: `validate_action_specs.is_feature_bound`.
+- `render-prompts.py`: the generated session-setup instruction matches what `init-run.py` creates. It no longer tells non-feature-bound actions to create `evidence-manifest.json`, names the `init-run.py` arguments, and says integrate-scheme ids are not minted by `init-run.py`. Operator prompts regenerated.
+- `exec-and-log.py` / `gate_runtime.run_operation`: the command's stdout/stderr are passed through (or, with `--json`, kept out of the JSON). The new `--stdout` / `--stderr` options persist them inside the product root before the log entry is written, and record them as the entry's artifacts.
+- `append-command-log.py`: the spec cwd labels `product` / `framework` (with optional subpath) map to `{PRODUCT_ROOT}` / `nebula-agents`, matching `gate_runtime`, instead of being recorded as `{PRODUCT_ROOT}/framework`.
+
 ### Deferred (human-gated)
 
 - Cutover of the 24 hand-written evidence-contract prompts to generated output, and the 40% action/SKILL prose thinning, require role-owner semantic-equivalence approval.

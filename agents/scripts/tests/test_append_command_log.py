@@ -101,6 +101,20 @@ class AppendCommandLogTests(unittest.TestCase):
                 "nebula-agents/agents/scripts",
             )
 
+    def test_spec_cwd_labels_map_to_stable_labels(self) -> None:
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            product_root, framework_root = product_tree(Path(raw_tmp))
+            cases = {
+                "product": "{PRODUCT_ROOT}",
+                "product/engine": "{PRODUCT_ROOT}/engine",
+                "framework": "nebula-agents",
+                "framework/agents/scripts": "nebula-agents/agents/scripts",
+            }
+            for raw, expected in cases.items():
+                self.assertEqual(acl.normalize_cwd(raw, product_root, framework_root), expected, raw)
+            with self.assertRaisesRegex(acl.CommandLogError, "traverse upward"):
+                acl.normalize_cwd("framework/../x", product_root, framework_root)
+
     def test_tmp_artifact_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as raw_tmp:
             tmp_path = Path(raw_tmp)

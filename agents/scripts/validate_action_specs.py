@@ -180,6 +180,19 @@ def _load_yaml(path: Path, result: Result) -> dict[str, Any] | None:
     return _normalize_scalars(loaded)
 
 
+def is_feature_bound(spec: dict[str, Any] | None) -> bool:
+    """True when an action cannot run without a feature: it lists FEATURE_ID as required.
+
+    A feature-bound run carries a run-scoped evidence-manifest.json, which identifies the
+    feature and lets init-run detect a concurrent run for it. Every other action (FEATURE_ID
+    optional or absent) produces base run files only; FEATURE_ID, when supplied, narrows scope.
+    """
+    if not isinstance(spec, dict):
+        return False
+    required = (spec.get("inputs", {}) or {}).get("required", []) or []
+    return any(isinstance(item, dict) and item.get("name") == "FEATURE_ID" for item in required)
+
+
 def load_policy(spec_dir: Path, result: Result) -> Policy:
     contract = None
     contract_path = spec_dir / "_contract.yaml"

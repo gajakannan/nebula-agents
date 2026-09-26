@@ -8,7 +8,14 @@ and one JSONL entry is appended to the run's commands.log through
 append-command-log.py.
 
     python3 agents/scripts/exec-and-log.py --log RUN_FOLDER/commands.log \
-        --product-root PATH --cwd product [--timeout N] [--artifact P] -- cmd arg ...
+        --product-root PATH --cwd product [--timeout N] [--artifact P] \
+        [--stdout RUN_FOLDER/artifacts/out.txt] [--stderr PATH] -- cmd arg ...
+
+The command's stdout and stderr are passed through to this process's streams.
+``--stdout`` / ``--stderr`` also persist them to files inside the product root,
+written before the log entry, and recorded as that entry's artifacts. With
+``--json`` only the result object is printed; the streams are persisted, not
+echoed, so the JSON stays parseable.
 
 Exit code mirrors the command (124 on timeout, 128+signal when signalled).
 """
@@ -38,6 +45,12 @@ def parse_args(argv: list[str] | None):
     parser.add_argument("--timeout", type=float, default=None, help="Timeout in seconds.")
     parser.add_argument("--artifact", action="append", default=[], help="Durable artifact path or URL.")
     parser.add_argument("--redaction", action="append", default=[], help="Documented redaction class.")
+    parser.add_argument("--stdout", dest="stdout_path", default=None,
+                        help="Persist the command's stdout to this file (inside the product root) and "
+                             "record it as an artifact.")
+    parser.add_argument("--stderr", dest="stderr_path", default=None,
+                        help="Persist the command's stderr to this file (inside the product root) and "
+                             "record it as an artifact.")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("command", nargs=argparse.REMAINDER,
                         help="The command argv, after `--`.")
@@ -69,13 +82,20 @@ def main(argv: list[str] | None = None) -> int:
     try:
         result = gr.run_operation(op, product_root=product_root, variables=None,
                                   log_path=log_path, extra_artifacts=args.artifact,
-                                  redactions=args.redaction)
+                                  redactions=args.redaction,
+                                  stdout_path=Path(args.stdout_path) if args.stdout_path else None,
+                                  stderr_path=Path(args.stderr_path) if args.stderr_path else None)
     except gr.GateRuntimeError as exc:
         print(json.dumps({"ok": False, "error": exc.message, "code": exc.code}))
         return 2
 
+    stdout_text = result.pop("stdout", "")
+    stderr_text = result.pop("stderr", "")
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        sys.stdout.write(stdout_text)
+        sys.stderr.write(stderr_text)
 
     if result["timed_out"]:
         return 124

@@ -25,6 +25,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shlex
 import sys
 import time
@@ -132,6 +133,18 @@ def _resolve_evidence(run_folder: Path, rel: str) -> Path:
     if ".." in Path(rel).parts or Path(rel).is_absolute():
         raise GateDriverError("evidence_escapes_run", f"evidence path escapes run folder: {rel!r}")
     return run_folder / rel
+
+
+# A checkpoint's `requires` mixes two kinds of entry: run-folder artifacts
+# (`gate-decisions.md`, `reports/x.json`) and prose preconditions
+# ("the drafted post at TARGET_PATH"). Only the former can be hashed. A prose
+# entry contains whitespace or punctuation a relative path never needs, so it
+# never matches.
+ARTIFACT_REF_RE = re.compile(r"^[A-Za-z0-9_.{}-]+(/[A-Za-z0-9_.{}-]+)*$")
+
+
+def is_artifact_ref(token: str) -> bool:
+    return bool(ARTIFACT_REF_RE.match(token))
 
 
 def _find_attestation(stage_state: dict[str, Any], checkpoint_id: str) -> dict[str, Any] | None:
@@ -243,10 +256,15 @@ def attest_checkpoint(*, spec_dir: Path, action: str, stage: str, product_root: 
         if not pending or pending.get("id") != checkpoint_id:
             raise GateDriverError("no_pending_checkpoint",
                                   f"no pending checkpoint {checkpoint_id!r} at {stage}")
-        to_hash = list(dict.fromkeys(list(pending.get("requires", []) or []) + list(evidence or [])))
+        requires = [str(r) for r in (pending.get("requires", []) or [])]
+        required_files = [r for r in requires if is_artifact_ref(r)]
+        described = [r for r in requires if not is_artifact_ref(r)]
+        to_hash = list(dict.fromkeys(required_files + list(evidence or [])))
         if not to_hash:
+            hint = (f"; its preconditions are descriptive ({'; '.join(described)}), so name the "
+                    "files that satisfy them with --evidence") if described else ""
             raise GateDriverError("missing_checkpoint_evidence",
-                                  "checkpoint attestation requires at least one evidence file")
+                                  "checkpoint attestation requires at least one evidence file" + hint)
         recorded = []
         for rel in to_hash:
             path = _resolve_evidence(run_folder, rel)
@@ -257,6 +275,8 @@ def attest_checkpoint(*, spec_dir: Path, action: str, stage: str, product_root: 
             "checkpoint_id": checkpoint_id, "actor": actor, "role": role,
             "timestamp": datetime.now().astimezone().isoformat(timespec="seconds"),
             "evidence": recorded, "note": note,
+            # Prose preconditions are affirmed by the attesting actor, not hashed.
+            "acknowledged_preconditions": described,
         }
         stage_state["attestations"].append(attestation)
         oid = f"checkpoint:{checkpoint_id}"
