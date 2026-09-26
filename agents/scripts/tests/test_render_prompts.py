@@ -237,3 +237,23 @@ def test_committed_validate_prompt_matches_its_contract():
     assert "initialize `evidence-manifest.json`" not in text
     assert "init-run.py --action validate [--feature {FEATURE_ID}]" in text
 
+
+def test_conditionally_required_inputs_render_under_required():
+    spec = mk_spec(scope="read-only-audit")
+    spec["inputs"] = {"optional": [
+        {"name": "PR_URL", "format": "GitHub PR URL"},
+        {"name": "FEATURE_ID", "format": "F####", "required_when": "PR_URL unset"},
+    ]}
+    text = rp.render_action(spec, SHARED, "2026-07-11")["operator-friendly"]
+    required_block = text.split("Required inputs:")[1].split("Optional inputs")[0]
+    assert "- `FEATURE_ID` (format `F####`) — required when PR_URL unset" in required_block
+    optional_block = text.split("Optional inputs")[1].split("Auto-resolved")[0].split("Generate")[0]
+    assert "`PR_URL`" in optional_block and "FEATURE_ID" not in optional_block
+
+
+def test_committed_feature_review_prompt_lists_feature_id_as_required():
+    text = (REPO_ROOT / "agents" / "templates" / "prompts" / "evidence-contract"
+            / "feature-review-operator-friendly.md").read_text()
+    required_block = text.split("Required inputs:")[1].split("Optional inputs")[0]
+    assert "`FEATURE_ID`" in required_block and "required when PR_URL unset" in required_block
+

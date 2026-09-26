@@ -174,11 +174,23 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
                f"(scope `{contract.get('scope')}`, policy `{policy_version}`).")
     out.append("")
     out.append("Required inputs:")
-    for item in spec.get("inputs", {}).get("required", []):
+    required = spec.get("inputs", {}).get("required", []) or []
+    optional = spec.get("inputs", {}).get("optional", []) or []
+    for item in required:
         out.append(f"- `{item['name']}`"
                    + (f" (format `{item['format']}`)" if item.get("format") else "")
                    + _input_constraints(item, prose=True))
-    optional = spec.get("inputs", {}).get("optional", [])
+    if not required:
+        # Nothing is unconditionally required, but an input that becomes required under a
+        # condition (required_when) still belongs here; an empty list reads as "no inputs".
+        conditional = [item for item in optional if item.get("required_when")]
+        if conditional:
+            out.append("- none unconditionally; each input below is required under its stated condition:")
+            for item in conditional:
+                out.append(f"- `{item['name']}`"
+                           + (f" (format `{item['format']}`)" if item.get("format") else "")
+                           + _input_constraints(item, prose=True))
+            optional = [item for item in optional if not item.get("required_when")]
     if optional:
         out.append("")
         out.append("Optional inputs (defaults apply when omitted):")

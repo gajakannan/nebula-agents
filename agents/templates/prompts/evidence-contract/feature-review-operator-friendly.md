@@ -5,13 +5,14 @@
 This prompt encodes the **Feature Evidence Contract** (scope `read-only-audit`, policy `2026-07-11`).
 
 Required inputs:
+- none unconditionally; each input below is required under its stated condition:
+- `FEATURE_ID` (format `F####`) — required when PR_URL unset
+- `MODE` — one of `closeout-audit` | `candidate-audit` — required when PR_URL unset
+- `DIFF_RANGE` (format `base..head | working-tree | ...`) — required when PR_URL unset
+- `FEATURE_RUN_ID` (format `YYYY-MM-DD-[a-z0-9]{8}`) — required when MODE=candidate-audit or an older-run review
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
-- `FEATURE_ID` — required when PR_URL unset
-- `MODE` — one of `closeout-audit` | `candidate-audit` — required when PR_URL unset
-- `DIFF_RANGE` — required when PR_URL unset
-- `FEATURE_RUN_ID` — required when MODE=candidate-audit or an older-run review
 - `RUN_DEVOPS` — one of `auto` | `yes` | `no` — default `auto`
 - `PRODUCT_ROOT` — default `sister-repo`
 
