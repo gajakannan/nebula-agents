@@ -141,3 +141,59 @@ def test_concurrent_initializers_yield_one_success(tmp_path):
     p1, p2 = launch(), launch()
     rc = sorted([p1.wait(), p2.wait()])
     assert rc[0] == 0 and rc[1] == 3, f"expected one success and one conflict, got {rc}"
+
+
+# ---- base runs without a feature (validate, blog, document, ...) -------------
+def test_validate_without_feature_creates_base_run_only(tmp_path):
+    report = do_init(tmp_path, action="validate", feature_id=None, feature_slug=None)
+    assert report["ok"] and report["feature_id"] is None and report["manifest"] is False
+    run_folder = Path(report["run_folder"])
+    for base in ("README.md", "action-context.md", "artifact-trace.md", "gate-decisions.md",
+                 "commands.log", "lifecycle-gates.log"):
+        assert (run_folder / base).exists()
+    assert not (run_folder / "evidence-manifest.json").exists()
+    assert report["feature_index_root"] is None
+    assert not (tmp_path / "planning-mds" / "operations" / "evidence" / "features").exists()
+    assert not (run_folder.parent / ".validate.init.lock").exists()
+    context = (run_folder / "action-context.md").read_text()
+    assert "validate run initialized" in context and "feature_id" not in context
+
+
+def test_action_without_feature_input_initializes(tmp_path):
+    report = do_init(tmp_path, action="blog", feature_id=None, feature_slug=None)
+    assert report["ok"] and not (Path(report["run_folder"]) / "evidence-manifest.json").exists()
+
+
+def test_optional_feature_scopes_but_writes_no_manifest(tmp_path):
+    report = do_init(tmp_path, action="validate")
+    assert report["feature_id"] == "F0007" and report["manifest"] is False
+    assert not (Path(report["run_folder"]) / "evidence-manifest.json").exists()
+
+
+def test_feature_bound_action_requires_feature(tmp_path):
+    for action in ("feature", "plan"):
+        with pytest.raises(ir.InitError) as exc:
+            do_init(tmp_path, action=action, feature_id=None, feature_slug=None)
+        assert exc.value.code == 2
+
+
+def test_feature_bound_actions_still_write_manifest(tmp_path):
+    report = do_init(tmp_path, action="plan")
+    assert report["manifest"] is True
+    assert (Path(report["run_folder"]) / "evidence-manifest.json").exists()
+
+
+def test_unknown_action_rejected(tmp_path):
+    with pytest.raises(ir.InitError) as exc:
+        do_init(tmp_path, action="no-such-action")
+    assert exc.value.code == 5
+
+
+def test_cli_validate_without_feature(tmp_path):
+    proc = subprocess.run([sys.executable, str(SCRIPTS_DIR / "init-run.py"), "--action", "validate",
+                           "--product-root", str(tmp_path), "--json"],
+                          capture_output=True, text=True)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    report = json.loads(proc.stdout[proc.stdout.index("{"):])
+    assert report["action"] == "validate" and report["manifest"] is False
+

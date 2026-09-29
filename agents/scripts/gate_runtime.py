@@ -167,11 +167,18 @@ def _resolve_cwd(label: str, product_root: Path) -> tuple[Path, str]:
 def run_operation(op: dict[str, Any], *, product_root: Path, variables: dict[str, Any] | None = None,
                   run_folder: Path | None = None, log_path: Path | None = None,
                   extra_artifacts: list[str] | None = None,
-                  redactions: list[str] | None = None) -> dict[str, Any]:
+                  redactions: list[str] | None = None,
+                  stdout_path: Path | None = None,
+                  stderr_path: Path | None = None) -> dict[str, Any]:
     """Execute one typed ``run`` operation shell-free and append telemetry.
 
     Rejects undeclared mutation classes and unknown cwd labels with named errors;
     logs exit status + durable artifacts through append-command-log.py.
+
+    ``stdout_path`` / ``stderr_path`` persist the captured streams before the log
+    entry is written, and are recorded as the entry's artifacts, so evidence that
+    cites a command's output points at that output. Both must stay inside the
+    product root. The captured text is also returned (``stdout`` / ``stderr``).
     """
     if "run" not in op or not isinstance(op["run"], dict):
         raise GateRuntimeError("not_a_run_op", "run_operation only executes typed 'run' operations")
@@ -190,6 +197,17 @@ def run_operation(op: dict[str, Any], *, product_root: Path, variables: dict[str
                           env={"NEBULA_PRODUCT_ROOT": str(product_root)})
 
     artifacts = list(extra_artifacts or [])
+    for stream_path, text in ((stdout_path, result.stdout), (stderr_path, result.stderr)):
+        if stream_path is None:
+            continue
+        target = Path(stream_path).expanduser().resolve(strict=False)
+        if product_root.resolve() not in target.parents:
+            raise GateRuntimeError("capture_escapes_root",
+                                   f"output capture path escapes product root: {stream_path}")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text or "", encoding="utf-8")
+        if str(target) not in artifacts:
+            artifacts.append(str(target))
     if run_folder is not None:
         for name in body.get("expected_artifacts", []) or []:
             candidate = run_folder / name
@@ -225,4 +243,6 @@ def run_operation(op: dict[str, Any], *, product_root: Path, variables: dict[str
         "artifacts": artifacts,
         "log_written": log_written,
         "ok": result.exit_code == 0 and not result.timed_out,
+        "stdout": result.stdout or "",
+        "stderr": result.stderr or "",
     }

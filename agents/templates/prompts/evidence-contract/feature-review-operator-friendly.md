@@ -7,13 +7,14 @@ This prompt encodes the **Feature Evidence Contract** (scope `read-only-audit`, 
 Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
 
 Required inputs:
+- none unconditionally; each input below is required under its stated condition:
+- `FEATURE_ID` (format `F####`) — required when PR_URL unset
+- `MODE` — one of `closeout-audit` | `candidate-audit` — required when PR_URL unset
+- `DIFF_RANGE` (format `base..head | working-tree | ...`) — required when PR_URL unset
+- `FEATURE_RUN_ID` (format `YYYY-MM-DD-[a-z0-9]{8}`) — required when MODE=candidate-audit or an older-run review
 
 Optional inputs (defaults apply when omitted):
 - `PR_URL`
-- `FEATURE_ID` — required when PR_URL unset
-- `MODE` — one of `closeout-audit` | `candidate-audit` — required when PR_URL unset
-- `DIFF_RANGE` — required when PR_URL unset
-- `FEATURE_RUN_ID` — required when MODE=candidate-audit or an older-run review
 - `RUN_DEVOPS` — one of `auto` | `yes` | `no` — default `auto`
 - `NEBULA_PRODUCT_ROOT` — default `environment; required if unset`
 
@@ -28,7 +29,7 @@ Generate `FEATURE_REVIEW_RUN_ID` once per run — not per session — in the con
 
 Resuming an in-flight run in a new session: do NOT generate a new `FEATURE_REVIEW_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <FEATURE_REVIEW_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT}` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). This action creates no `evidence-manifest.json` (only feature-bound actions do). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action feature-review [--feature {FEATURE_ID}]` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
 First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action feature-review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.

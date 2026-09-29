@@ -84,5 +84,25 @@ gates:
           after: r4
           mutates: [latest-run.json]
 
+  - id: G6
+    title: Checkpoint with prose and artifact preconditions
+    role: product-manager
+    operations:
+      - checkpoint:
+          id: cp-prose
+          description: Operator reviews the produced reports.
+          requires: ["the in-scope reports (pm / architect)", report.md]
+          produces: [approved]
+
+  - id: G7
+    title: Checkpoint with prose preconditions only
+    role: product-manager
+    operations:
+      - checkpoint:
+          id: cp-prose-only
+          description: Operator reviews the drafted post.
+          requires: ["the drafted post at TARGET_PATH"]
+          produces: [approved]
+
 stop_conditions:
   - "Stop if an operation fails."

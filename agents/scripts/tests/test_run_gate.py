@@ -124,6 +124,71 @@ def test_attest_missing_output_rejected(env):
     assert exc.value.code == "checkpoint_output_missing"
 
 
+@pytest.mark.parametrize("token,expected", [
+    ("gate-decisions.md", True),
+    ("artifacts/test-results/out.txt", True),
+    ("{RUN_FOLDER}/note.md", True),
+    ("the in-scope per-agent validation reports (pm / architect / implementation)", False),
+    ("REVIEW_VERDICT_REF (passing feature-review) or a maintainer WAIVER + rationale", False),
+    ("every pm-closeout.md from B4", False),
+])
+def test_is_artifact_ref_separates_files_from_prose(token, expected):
+    assert rg.is_artifact_ref(token) is expected
+
+
+def test_prose_preconditions_are_acknowledged_not_hashed(env):
+    product, rf = env
+    verdict = run(product, rf, "G6")
+    assert verdict["status"] == "paused" and verdict["pending_checkpoint"] == "cp-prose"
+    (rf / "report.md").write_text("reviewed")
+    att = rg.attest_checkpoint(spec_dir=DRIVER_SPEC, action="drive", stage="G6",
+                               product_root=product, run_id=RUN_ID, run_folder=rf,
+                               checkpoint_id="cp-prose", evidence=[], actor="pat",
+                               role="product-manager")
+    assert att["ok"] and [e["path"] for e in att["evidence"]] == ["report.md"]
+    recorded = journal(rf)["stages"]["G6"]["attestations"][0]
+    assert recorded["acknowledged_preconditions"] == ["the in-scope reports (pm / architect)"]
+    assert run(product, rf, "G6")["status"] == "pass"
+
+
+def test_prose_only_checkpoint_requires_named_evidence(env):
+    product, rf = env
+    run(product, rf, "G7")
+    with pytest.raises(rg.GateDriverError) as exc:
+        rg.attest_checkpoint(spec_dir=DRIVER_SPEC, action="drive", stage="G7", product_root=product,
+                             run_id=RUN_ID, run_folder=rf, checkpoint_id="cp-prose-only",
+                             evidence=[], actor="pat", role="product-manager")
+    assert exc.value.code == "missing_checkpoint_evidence"
+    assert "--evidence" in exc.value.message
+    (rf / "post.md").write_text("draft")
+    att = rg.attest_checkpoint(spec_dir=DRIVER_SPEC, action="drive", stage="G7", product_root=product,
+                               run_id=RUN_ID, run_folder=rf, checkpoint_id="cp-prose-only",
+                               evidence=["post.md"], actor="pat", role="product-manager")
+    assert [e["path"] for e in att["evidence"]] == ["post.md"]
+
+
+def test_validate_spec_v3_checkpoint_is_attestable(tmp_path):
+    """Regression: the real validate V3 checkpoint declares prose requires only."""
+    product = tmp_path / "product"
+    rf = product / "planning-mds" / "operations" / "evidence" / "runs" / RUN_ID
+    rf.mkdir(parents=True)
+    verdict = rg.run_stage(spec_dir=rg.vas.DEFAULT_SPEC_DIR, action="validate", stage="V3",
+                           product_root=product, feature_id="", slug="", run_id=RUN_ID, run_folder=rf)
+    assert verdict["status"] == "paused"
+    for name in ("pm-validation-report.md", "architect-validation-report.md", "gate-decisions.md"):
+        (rf / name).write_text(name)
+    att = rg.attest_checkpoint(spec_dir=rg.vas.DEFAULT_SPEC_DIR, action="validate", stage="V3",
+                               product_root=product, run_id=RUN_ID, run_folder=rf,
+                               checkpoint_id="validate-approval",
+                               evidence=["pm-validation-report.md", "architect-validation-report.md",
+                                         "gate-decisions.md"],
+                               actor="pat", role="product-manager")
+    assert att["ok"]
+    assert rg.run_stage(spec_dir=rg.vas.DEFAULT_SPEC_DIR, action="validate", stage="V3",
+                        product_root=product, feature_id="", slug="", run_id=RUN_ID,
+                        run_folder=rf)["status"] == "pass"
+
+
 def test_stale_journal_version_rejected(env):
     product, rf = env
     (rf / "gate-state.json").write_text(json.dumps({"schema_version": 999, "run_id": RUN_ID, "stages": {}}))
@@ -169,7 +234,7 @@ def test_dry_run_executes_nothing(env):
 def test_list_runbook_marks_manual_checkpoint():
     book = rg.list_runbook(DRIVER_SPEC, "drive")
     stages = {s["stage"]: s for s in book["stages"]}
-    assert set(stages) == {"G0", "G1", "G2", "G3", "G4", "G5"}
+    assert set(stages) == {"G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"}
     g2_kinds = [o["kind"] for o in stages["G2"]["operations"]]
     assert any("MANUAL" in k for k in g2_kinds)
 
