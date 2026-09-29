@@ -23,10 +23,10 @@ inputs:
     - {name: TARGET_USERS, format: "[role, role, ...]"}
     - {name: CORE_ENTITIES, format: "[entity, entity, ...]"}
   optional:
-    - {name: PRODUCT_ROOT, default: "NEBULA_PRODUCT_ROOT env var, or sister-repo ../<product-repo>"}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
-  INIT_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}"
+  INIT_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}"
 
 context_load:
   - "agents/ROUTER.md"
@@ -49,10 +49,10 @@ gates:
       (Lifecycle Stage = "Init", Scope Boundaries = "Bootstrap only").
 
   - id: I1
-    title: PRODUCT_ROOT scaffold
+    title: NEBULA_PRODUCT_ROOT scaffold
     role: product-manager
     judgment: |
-      Confirm {PRODUCT_ROOT} is empty or a new repo willing to accept scaffolded files (do not scaffold into a
+      Confirm {NEBULA_PRODUCT_ROOT} is empty or a new repo willing to accept scaffolded files (do not scaffold into a
       non-empty root without explicit operator confirmation), then create the canonical directory structure.
 
   - id: I2
@@ -60,7 +60,7 @@ gates:
     role: product-manager
     artifacts: [BLUEPRINT.md]
     judgment: |
-      Produce {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md from the template.
+      Produce {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md from the template.
 
   - id: I3
     title: Registry + roadmap
@@ -101,17 +101,17 @@ gates:
       - run:
           id: i6-validate-feature-evidence
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}"]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}"]
           cwd: framework
           timeout_seconds: 300
       - run:
           id: i6-kg-check-symbols
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-symbols]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-symbols]
           cwd: product
           timeout_seconds: 300
       - run:
           id: i6-kg-check-drift
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
       - run:
@@ -130,13 +130,13 @@ variants: [operator-friendly, automation-safe]
 
 forbidden:
   - "Generate INIT_RUN_ID with uuid4."
-  - "Scaffold into a non-empty {PRODUCT_ROOT} without explicit operator confirmation."
+  - "Scaffold into a non-empty {NEBULA_PRODUCT_ROOT} without explicit operator confirmation."
   - "Skip the evidence directory bootstrap — the product must have planning-mds/operations/evidence/ ready for the first feature run."
   - "Pre-populate REGISTRY.md with non-empty Archived or Retired tables; both start empty."
   - "Set the Evidence Contract Effective Date earlier than the framework default (must be 2026-05-19 or later for new products)."
 
 stop_conditions:
-  - "The operator refuses to confirm scaffolding into a non-empty {PRODUCT_ROOT}."
+  - "The operator refuses to confirm scaffolding into a non-empty {NEBULA_PRODUCT_ROOT}."
   - "Any validator exits non-zero at I6 (fix the root cause before init can complete)."
   - "INSUFFICIENT_CONTEXT for any required input."
 
@@ -146,13 +146,12 @@ conflict_resolution:
 
 notes:
   session_setup: |
-    Resolve {PRODUCT_ROOT} per agents/docs/AGENT-USE.md (operator input, the NEBULA_PRODUCT_ROOT env var, or the
-    default ../<product-repo>) and echo the resolved absolute path. Confirm it is empty or a new repo accepting
+    Resolve {NEBULA_PRODUCT_ROOT} per agents/docs/AGENT-USE.md (explicit operator input or the NEBULA_PRODUCT_ROOT env var; no default product) and echo the resolved absolute path. Confirm it is empty or a new repo accepting
     scaffold. Mint INIT_RUN_ID once in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
     suffix); never uuid4. Create {INIT_RUN_FOLDER} (after scaffolding lands operations/evidence/) and initialize
     the six §8 base run files.
   preconditions: |
-    nebula-agents is checked out and is the current session working directory; {PRODUCT_ROOT} is resolved and
+    nebula-agents is checked out and is the current session working directory; {NEBULA_PRODUCT_ROOT} is resolved and
     either empty or accepting scaffold; the operator has basic project context (domain, goals, target users,
     initial entities).
   evidence_readme: |

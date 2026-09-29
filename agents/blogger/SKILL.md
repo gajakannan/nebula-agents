@@ -91,7 +91,7 @@ Series planning, draft posts, and amplification artifacts belong in the private 
 ## Retrieval Guard
 
 Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
-`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+`{NEBULA_PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
 evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Phase 1 — Write
@@ -112,8 +112,8 @@ evidence README / `latest-run.json` / `evidence-manifest.json`; read only the ex
 
 Before drafting, gather:
 - `../nebula-blog/SERIES-PLAN.md`
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/decisions/` (ADRs)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/` (ADRs)
 - Relevant feature/story artifacts
 - Recent code changes and test outcomes
 - Any performance/operational metrics intended for publication
@@ -453,8 +453,8 @@ cat agents/actions/blog.md
 
 # 2) Gather planning and decision context
 cat ../nebula-blog/SERIES-PLAN.md
-cat {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
-ls -la {PRODUCT_ROOT}/planning-mds/architecture/decisions/
+cat {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+ls -la {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/
 
 # 3) Inspect candidate source material
 rg --files ../nebula-blog planning-mds agents | sort

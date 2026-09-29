@@ -8,7 +8,7 @@ Thanks for contributing to this project.
 2. Read `BOUNDARY-POLICY.md`.
 3. Confirm whether your change is:
    - framework-generic (`agents/`, docs), or
-   - solution-specific (`{PRODUCT_ROOT}/planning-mds/`).
+   - solution-specific (`{NEBULA_PRODUCT_ROOT}/planning-mds/`).
 
 ## 2) Contribution Flow
 
@@ -44,7 +44,7 @@ python3 -m py_compile $(rg --files agents scripts planning-mds | rg '\.py$')
 
 - Do not add solution-specific entities or terminology to `agents/`.
 - Use standard example entities (`customers` and `orders`) in framework examples.
-- Place project-specific requirements and examples in `{PRODUCT_ROOT}/planning-mds/`.
+- Place project-specific requirements and examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 
 ## 5) Vendor-Neutral Language Policy
 

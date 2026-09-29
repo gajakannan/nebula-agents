@@ -4,7 +4,7 @@ Scaffold a React page module with optional route metadata.
 
 Usage:
     python scaffold-page.py CustomerDetails --route /customers/:id --with-tests
-    python scaffold-page.py Orders --route /orders --routes-file {PRODUCT_ROOT}/experience/src/routes/index.tsx
+    python scaffold-page.py Orders --route /orders --routes-file {NEBULA_PRODUCT_ROOT}/experience/src/routes/index.tsx
 """
 
 from __future__ import annotations
@@ -234,7 +234,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--pages-dir",
         default=None,
-        help="Pages directory (default: {PRODUCT_ROOT}/experience/src/pages)",
+        help="Pages directory (default: {NEBULA_PRODUCT_ROOT}/experience/src/pages)",
     )
     parser.add_argument(
         "--route",

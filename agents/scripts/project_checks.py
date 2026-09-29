@@ -38,7 +38,7 @@ def prepare(root: Path, action: str, *, plan_scope: str = "feature", target: str
     if not context["checks"]:
         return context, []
     context["scope"] = resolve_scope(root, plan_scope, target)
-    variables = {"PRODUCT_ROOT": str(root), "PLAN_SCOPE": plan_scope, "TARGET": target}
+    variables = {"NEBULA_PRODUCT_ROOT": str(root), "PLAN_SCOPE": plan_scope, "TARGET": target}
     if plan_scope == "feature":
         variables["FEATURE_PATH"] = context["scope"]["features"][0]["path"]
         variables["FEATURE_ID"] = target
@@ -182,7 +182,7 @@ def execute(check: dict, *, root: Path, action: str, run_folder: Path, run_id: s
     record["evidence"] = [{"path": p.relative_to(run_folder).as_posix(), "sha256": file_hash(p)} for p in artifacts]
     record["artifacts"] = [str(p) for p in artifacts]
     log = gr._append_command_log()
-    entry = log.build_entry(cwd="{PRODUCT_ROOT}", command=shlex.join(check["argv"]),
+    entry = log.build_entry(cwd="{NEBULA_PRODUCT_ROOT}", command=shlex.join(check["argv"]),
                            exit_code=record["exit_code"], artifacts=[log.normalize_artifact(str(p), root) for p in artifacts], redactions=[])
     log.append_entry(run_folder / "commands.log", entry)
     return record

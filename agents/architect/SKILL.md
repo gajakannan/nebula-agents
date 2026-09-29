@@ -97,7 +97,7 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
 
 7) **Define validation schemas**
    - Create JSON Schemas for all request/response models
-   - Store schemas in `{PRODUCT_ROOT}/planning-mds/schemas/` for frontend/backend sharing
+   - Store schemas in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/` for frontend/backend sharing
    - Ensure schemas align with OpenAPI specs (OpenAPI uses JSON Schema)
    - Specify validation rules, formats, and error messages
 
@@ -113,8 +113,8 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
    - Confirm caching strategy exists (in-memory vs external, cache-aside vs write-through) or create an ADR
 
 10) **Orchestrate implementation kickoff (Phase C)**
-   - Create/update `{PRODUCT_ROOT}/planning-mds/architecture/application-assembly-plan.md` for the umbrella architecture summary
-   - **Create a dedicated per-feature execution plan** at `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` using the template at `agents/templates/feature-assembly-plan-template.md`. This file is colocated with the feature it describes so it archives together. It is the primary deliverable consumed by implementation agents — it must be self-contained and implementation-ready:
+   - Create/update `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/application-assembly-plan.md` for the umbrella architecture summary
+   - **Create a dedicated per-feature execution plan** at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` using the template at `agents/templates/feature-assembly-plan-template.md`. This file is colocated with the feature it describes so it archives together. It is the primary deliverable consumed by implementation agents — it must be self-contained and implementation-ready:
      - **Per-step file tables:** exact paths for new and modified files in each layer (Domain, Application, Infrastructure, Api)
      - **Code signatures:** full C# record/class definitions for entities, DTOs, validators, and service method signatures
      - **Logic flows:** numbered step-by-step service method logic with guard conditions, error codes, timestamp/audit field handling, and timeline event emission
@@ -122,9 +122,9 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
      - **Mutation traceability:** for every PM story or screen interaction that says `capture`, `edit`, `save`, `update`, `manage`, `submit`, `approve`, `assign`, or `transition`, map `Screen / entry point -> user action -> endpoint -> service method -> entity/carrier -> authorization action -> concurrency / rowVersion behavior -> validation failure -> audit/timeline evidence -> test expectation`. If any link is missing, stop and ask a clarifying question or update the plan before implementation kickoff.
      - **Migration SQL:** raw SQL for filtered/expression indexes, seed data, and schema changes that cannot be expressed via EF Core fluent API
      - **Integration checkpoints:** specific, testable criteria per build phase (not generic checklists)
-   - Reference the execution plan from the umbrella `{PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` section for the feature (cross-feature sequencing view)
+   - Reference the execution plan from the umbrella `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` section for the feature (cross-feature sequencing view)
    - Define backend/frontend/AI/QA/DevOps handoffs and sequencing
-   - For features that cross backend, frontend, and `{PRODUCT_ROOT}/neuron/`,
+   - For features that cross backend, frontend, and `{NEBULA_PRODUCT_ROOT}/neuron/`,
      define the ownership split explicitly: backend owns the source-of-truth/
      business APIs, business-data persistence, authorization, and domain
      mutations; frontend owns rendering, user interaction, and client state; the
@@ -149,7 +149,7 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
 
 12) **Separate framework and solution workstreams when both are needed**
    - If a discovered gap requires generic agent/template/action updates, track that as framework work under `agents/**`
-   - If a discovered gap requires solution lifecycle activation, feature planning, runtime wiring, or evidence changes, track that as solution work under `{PRODUCT_ROOT}/planning-mds/**`, runtime config, and app code
+   - If a discovered gap requires solution lifecycle activation, feature planning, runtime wiring, or evidence changes, track that as solution work under `{NEBULA_PRODUCT_ROOT}/planning-mds/**`, runtime config, and app code
    - Do not hide solution enforcement gaps by updating agent guidance alone
 
 13) **Post-session knowledge capture**
@@ -194,7 +194,7 @@ Your responsibility is to define **HOW** to build what the Product Manager speci
 ## Retrieval Guard
 
 Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
-`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+`{NEBULA_PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
 evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
@@ -202,16 +202,16 @@ evidence README / `latest-run.json` / `evidence-manifest.json`; read only the ex
 **Allowed Tools:** Read, Write, Edit, AskUserQuestion
 
 **Required Resources:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Sections 0-3 (Phase A outputs)
-- `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` - tracker sync contract
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` - feature state/path inventory
-- `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` - active sequencing
-- `{PRODUCT_ROOT}/planning-mds/domain/` - Solution-specific domain knowledge
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings, code-index bindings, and coverage report
-- `{PRODUCT_ROOT}/planning-mds/examples/architecture/` - Solution-specific architecture examples
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific architectural patterns
-- `{PRODUCT_ROOT}/planning-mds/architecture/api-guidelines-profile.md` - API governance profile (routing, status semantics, error media type)
-- `{PRODUCT_ROOT}/planning-mds/architecture/api-design-guide.md` - Implementation-facing API design guide
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Sections 0-3 (Phase A outputs)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` - tracker sync contract
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` - feature state/path inventory
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` - active sequencing
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` - Solution-specific domain knowledge
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings, code-index bindings, and coverage report
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/architecture/` - Solution-specific architecture examples
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific architectural patterns
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/api-guidelines-profile.md` - API governance profile (routing, status semantics, error media type)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/api-design-guide.md` - Implementation-facing API design guide
 - `agents/templates/` - Generic templates (ADR, API contract, entity model, workflow)
 - `agents/backend-developer/SKILL.md` - Understand backend tech stack and constraints
 - `agents/frontend-developer/SKILL.md` - Understand frontend tech stack and patterns
@@ -227,12 +227,12 @@ confirm binding with `lookup.py --symbol <name>`.
 
 ## References
 
-Generic references in `agents/architect/references/` only. Solution-specific examples must live in `{PRODUCT_ROOT}/planning-mds/`.
+Generic references in `agents/architect/references/` only. Solution-specific examples must live in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 
 ## Solution Patterns Integration
 
 **Reading Patterns:**
-- Always read `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` before starting Phase B
+- Always read `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` before starting Phase B
 - Understand established solution-specific architectural patterns
 - Apply patterns to new designs for consistency
 - Reference patterns when making architectural decisions
@@ -250,7 +250,7 @@ Generic references in `agents/architect/references/` only. Solution-specific exa
 
 ## Diagram Standards
 
-Two formats: **Mermaid** for all stored diagram files in `{PRODUCT_ROOT}/planning-mds/`, and **ASCII** inline
+Two formats: **Mermaid** for all stored diagram files in `{NEBULA_PRODUCT_ROOT}/planning-mds/`, and **ASCII** inline
 in ADR decision sections / quick sketches / any context where rendering is uncertain. Every formal stored
 diagram gets Mermaid; an ADR decision section that includes a diagram also gets an ASCII companion (readable
 in terminals, PR inline comments, Slack).
@@ -297,8 +297,8 @@ Your architecture specifications will be consumed by **Phase C Implementation Ag
 **1. Backend Developer**
 - **Needs from you:**
   - Data model (entities, relationships, constraints)
-  - API contracts (OpenAPI specs in `{PRODUCT_ROOT}/planning-mds/api/`)
-  - JSON Schemas (validation rules in `{PRODUCT_ROOT}/planning-mds/schemas/`)
+  - API contracts (OpenAPI specs in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/`)
+  - JSON Schemas (validation rules in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`)
   - Workflow state machines (valid transitions)
   - Authorization model (Casbin ABAC policies)
   - Audit/timeline requirements
@@ -310,11 +310,11 @@ Your architecture specifications will be consumed by **Phase C Implementation Ag
 - **Needs from you:**
   - Screen specifications (components, layouts, workflows)
   - API contracts (OpenAPI specs for endpoints they'll call)
-  - JSON Schemas (form validation rules in `{PRODUCT_ROOT}/planning-mds/schemas/`)
+  - JSON Schemas (form validation rules in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`)
   - Authorization model (what users can see/do)
   - UI/UX patterns and guidelines
   - UI quality constraints (theme token usage rules, light/dark verification scope, visual smoke test targets)
-  - Module boundary expectations (what is feature-local vs shared in `{PRODUCT_ROOT}/experience/src`)
+  - Module boundary expectations (what is feature-local vs shared in `{NEBULA_PRODUCT_ROOT}/experience/src`)
 - **What they'll build:** React components, forms, routing, API integration, state management
 - **Tech Stack:** React 18, TypeScript, Tailwind, shadcn/ui, AJV, RJSF
 - **Reference:** `agents/frontend-developer/SKILL.md`
@@ -325,7 +325,7 @@ Your architecture specifications will be consumed by **Phase C Implementation Ag
 - Require light/dark theme verification in acceptance criteria or test plan notes for visual changes.
 - Identify at least one critical page per affected feature for Playwright visual/theme smoke coverage.
 - Identify the expected fast-test layer (component/integration) for changed UI behavior and how QE will validate it.
-- Prefer vertical-slice organization for feature code in `{PRODUCT_ROOT}/experience/src/features/<feature>/` (components, hooks, api, types, tests).
+- Prefer vertical-slice organization for feature code in `{NEBULA_PRODUCT_ROOT}/experience/src/features/<feature>/` (components, hooks, api, types, tests).
 - Reserve shared/global folders for primitives, app shell, and utilities reused by multiple features.
 - Call out co-location expectations in the assembly plan when refactoring drifted frontend areas (avoid adding new feature code to global buckets by default).
 
@@ -393,10 +393,10 @@ Your architecture specifications will be consumed by **Phase C Implementation Ag
 
 ### Deliverables
 
-All outputs written to `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 4.x and supporting files under:
-- `{PRODUCT_ROOT}/planning-mds/architecture/` (ADRs, data model, architecture docs)
-- `{PRODUCT_ROOT}/planning-mds/api/` (OpenAPI contracts)
-- `{PRODUCT_ROOT}/planning-mds/schemas/` (JSON Schema validation schemas - shared with frontend/backend)
+All outputs written to `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 4.x and supporting files under:
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/` (ADRs, data model, architecture docs)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/api/` (OpenAPI contracts)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/` (JSON Schema validation schemas - shared with frontend/backend)
 
 **Key Deliverables by Consumer:**
 
@@ -425,7 +425,7 @@ Before declaring work complete, verify each deliverable:
 5. Cross-check ERD entities and relationships against data model tables — every entity in the tables must appear in the ERD
 6. Verify C4 L2 container diagram reflects all services present in docker-compose (or equivalent)
 7. Validate tracker consistency when planning trackers were touched during architecture updates (manually or by delegating `agents/product-manager/scripts/validate-trackers.py`)
-8. Verify feature assembly execution plan (`{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md`) exists and is implementation-ready: every API endpoint has a corresponding Step with file paths, code signatures, logic flow, Casbin pattern, and HTTP response table. Cross-check against OpenAPI endpoints — no endpoint should be missing from the plan.
+8. Verify feature assembly execution plan (`{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md`) exists and is implementation-ready: every API endpoint has a corresponding Step with file paths, code signatures, logic flow, Casbin pattern, and HTTP response table. Cross-check against OpenAPI endpoints — no endpoint should be missing from the plan.
 9. Verify mutation traceability for every capture/edit/save/update/manage/submit/approve/assign/transition story: no read-only rendering can satisfy a mutation story unless explicitly marked read-only, and every mutation has endpoint/service/carrier/auth/concurrency/audit/test coverage.
 10. For AI companion or agentic features, verify the assembly plan includes
    backend/frontend/AI sequencing plus explicit Neuron contracts for auth,
@@ -441,20 +441,20 @@ Before declaring work complete, verify each deliverable:
 
 - Service boundaries clear
 - Data model complete
-- Domain ERD (Mermaid) present and up to date in `{PRODUCT_ROOT}/planning-mds/architecture/data-model.md`
+- Domain ERD (Mermaid) present and up to date in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/data-model.md`
 - Feature ERD (Mermaid + ASCII) embedded in feature README if new entities introduced
-- C4 L1 + L2 diagrams (Mermaid) present in `{PRODUCT_ROOT}/planning-mds/architecture/`
+- C4 L1 + L2 diagrams (Mermaid) present in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/`
 - C4 L3 produced for features with non-obvious internal structure
 - ASCII diagram included in any ADR that justifies a structural decision
 - API contracts defined (OpenAPI specs)
 - JSON Schemas created for all request/response models
-- JSON Schemas stored in `{PRODUCT_ROOT}/planning-mds/schemas/` for sharing
+- JSON Schemas stored in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/` for sharing
 - Workflow rules specified
 - Authorization model documented
 - NFRs measurable
 - ADRs recorded for major decisions
 - Validation strategy documented (JSON Schema for both frontend and backend)
-- **Feature assembly execution plan** created at `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (colocated with feature) with implementation-level detail (per-step file paths, code signatures, logic flows, Casbin per-endpoint, HTTP response tables, migration SQL, integration checkpoints). Referenced from umbrella `{PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md`.
+- **Feature assembly execution plan** created at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (colocated with feature) with implementation-level detail (per-step file paths, code signatures, logic flows, Casbin per-endpoint, HTTP response tables, migration SQL, integration checkpoints). Referenced from umbrella `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md`.
 - Tracker-governance checks pass when planning trackers changed
 - Post-session knowledge capture completed (non-obvious decisions and gotchas saved to KG notes, ADRs, or feature docs)
 - Structural KG updates completed (rationale entries for ADRs, canonical nodes for new design elements, code-index bindings for new artifacts, `validate.py` exits 0)
@@ -465,22 +465,22 @@ Before declaring work complete, verify each deliverable:
 ### Schema Drift Between Frontend and Backend
 **Symptom:** Frontend and backend validate differently for the same entity.
 **Cause:** JSON Schemas not stored in shared location or updated independently.
-**Solution:** All schemas must live in `{PRODUCT_ROOT}/planning-mds/schemas/`. Both frontend (AJV) and backend (NJsonSchema) load from this single source. See `references/json-schema-validation-architecture.md`.
+**Solution:** All schemas must live in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`. Both frontend (AJV) and backend (NJsonSchema) load from this single source. See `references/json-schema-validation-architecture.md`.
 
 ### Missing ADR for Design Decision
 **Symptom:** Architecture decision made but not recorded, causing confusion later.
 **Cause:** Decision was made informally without documenting rationale and alternatives.
-**Solution:** Use `agents/templates/adr-template.md` for every non-trivial decision. Store in `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`.
+**Solution:** Use `agents/templates/adr-template.md` for every non-trivial decision. Store in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`.
 
 ### API Contract Doesn't Match Implementation
 **Symptom:** Backend endpoints diverge from OpenAPI spec.
 **Cause:** Spec was not updated when implementation changed, or backend invented endpoints not in spec.
-**Solution:** OpenAPI spec in `{PRODUCT_ROOT}/planning-mds/api/` is the contract. Backend must implement exactly per spec. Changes require architect approval and spec update first.
+**Solution:** OpenAPI spec in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/` is the contract. Backend must implement exactly per spec. Changes require architect approval and spec update first.
 
 ## Feature Evidence Contract (§10, §15)
 
 Architect produces `g0-assembly-plan-validation.md` at G0 for every governed completed-terminal feature, in
-the feature run folder (`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`), and is marked
+the feature run folder (`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`), and is marked
 required in the `STATUS.md` Required Role Matrix when explicit architect signoff is needed. Recommendations
 under `PASS WITH RECOMMENDATIONS` use the canonical bullet `- [severity] text — owner: X; follow-up: Y`
 (severity `low`/`medium`/`high`/`critical`; `high`/`critical` need PM mitigation per §15) — full rules in

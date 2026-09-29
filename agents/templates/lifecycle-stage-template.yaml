@@ -42,13 +42,13 @@ gates:
     description: Validate symbol-index.yaml is in sync with code-index bindings.
     command:
       - python3
-      - "{PRODUCT_ROOT}/scripts/kg/validate.py"
+      - "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"
       - --check-symbols
   inline_decisions_check:
     description: Validate inline decision markers resolve to files, nodes, symbols, and ADRs.
     command:
       - python3
-      - "{PRODUCT_ROOT}/scripts/kg/validate.py"
+      - "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"
       - --check-decisions
   kg_orphan_check:
     description: |
@@ -58,7 +58,7 @@ gates:
       authoritative.
     command:
       - python3
-      - "{PRODUCT_ROOT}/scripts/kg/validate.py"
+      - "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"
       - --check-orphans
   kg_coverage_gap_check:
     description: |
@@ -71,5 +71,5 @@ gates:
       go through --coverage-gap-exclude.
     command:
       - python3
-      - "{PRODUCT_ROOT}/scripts/kg/validate.py"
+      - "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"
       - --check-coverage-gaps

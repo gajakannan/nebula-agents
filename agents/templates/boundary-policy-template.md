@@ -7,7 +7,7 @@
 
 ## Purpose
 
-This policy defines the boundary between generic, reusable agent roles (`agents/`) and solution-specific content (`{PRODUCT_ROOT}/planning-mds/`).
+This policy defines the boundary between generic, reusable agent roles (`agents/`) and solution-specific content (`{NEBULA_PRODUCT_ROOT}/planning-mds/`).
 
 ---
 
@@ -34,18 +34,18 @@ This policy defines the boundary between generic, reusable agent roles (`agents/
 
 ---
 
-### Rule 2: {PRODUCT_ROOT}/planning-mds/ is Solution-Specific
+### Rule 2: {NEBULA_PRODUCT_ROOT}/planning-mds/ is Solution-Specific
 
-**Principle:** Everything in `{PRODUCT_ROOT}/planning-mds/` is specific to the current project and would be replaced for a new project.
+**Principle:** Everything in `{NEBULA_PRODUCT_ROOT}/planning-mds/` is specific to the current project and would be replaced for a new project.
 
-**What belongs in {PRODUCT_ROOT}/planning-mds/:**
+**What belongs in {NEBULA_PRODUCT_ROOT}/planning-mds/:**
 - Project master specification (BLUEPRINT.md)
 - Domain knowledge (glossary, competitive analysis, domain-specific patterns)
 - Project-specific examples (personas, features, stories, architecture)
 - Actual project requirements (features/, stories/, architecture/)
 - Project-specific ADRs and design decisions
 
-**What does NOT belong in {PRODUCT_ROOT}/planning-mds/:**
+**What does NOT belong in {NEBULA_PRODUCT_ROOT}/planning-mds/:**
 - Generic best practices (those go in agents/)
 - Generic examples from other domains
 - Reusable templates (those go in agents/templates/)
@@ -54,12 +54,12 @@ This policy defines the boundary between generic, reusable agent roles (`agents/
 
 ### Rule 3: Agents Must Not Invent Requirements
 
-**Principle:** Agent roles consume requirements from `{PRODUCT_ROOT}/planning-mds/`; they do not create or embed solution requirements.
+**Principle:** Agent roles consume requirements from `{NEBULA_PRODUCT_ROOT}/planning-mds/`; they do not create or embed solution requirements.
 
 **Implementation:**
-- Agents read from `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and `{PRODUCT_ROOT}/planning-mds/domain/` to understand project context
-- Agents reference `{PRODUCT_ROOT}/planning-mds/examples/` to see how generic patterns apply to this project
-- Agents generate deliverables based on templates in `agents/templates/` and requirements in `{PRODUCT_ROOT}/planning-mds/`
+- Agents read from `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` to understand project context
+- Agents reference `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` to see how generic patterns apply to this project
+- Agents generate deliverables based on templates in `agents/templates/` and requirements in `{NEBULA_PRODUCT_ROOT}/planning-mds/`
 - Agents never hard-code project-specific business logic in their role definitions
 
 ---
@@ -70,10 +70,10 @@ This policy defines the boundary between generic, reusable agent roles (`agents/
 
 **Process:**
 1. Clone `nebula-agents` and the product repo as siblings under a shared workspace root
-2. Resolve `{PRODUCT_ROOT}` via `NEBULA_PRODUCT_ROOT`, operator input at session start, or the default `../<product-repo>` relative to `nebula-agents`
-3. From a session rooted in `nebula-agents`, run the `init` action to scaffold `{PRODUCT_ROOT}/planning-mds/` structure and `{PRODUCT_ROOT}`-level lifecycle/CI files
-4. Write new domain knowledge in `{PRODUCT_ROOT}/planning-mds/domain/`
-5. Create new project-specific examples in `{PRODUCT_ROOT}/planning-mds/examples/`
+2. Resolve `{NEBULA_PRODUCT_ROOT}` via explicit `NEBULA_PRODUCT_ROOT` prompt input or the environment; normalize relative paths once at session start and pass the absolute path thereafter. No default product is selected.
+3. From a session rooted in `nebula-agents`, run the `init` action to scaffold `{NEBULA_PRODUCT_ROOT}/planning-mds/` structure and `{NEBULA_PRODUCT_ROOT}`-level lifecycle/CI files
+4. Write new domain knowledge in `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/`
+5. Create new project-specific examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`
 6. Write new BLUEPRINT.md for the new project
 7. Agents are immediately ready to use with new project context
 
@@ -133,9 +133,9 @@ When reviewing PRs that modify `agents/`:
 - [ ] No project-specific terminology in agent files
 - [ ] Examples use the standard entity set (`customers` / `orders`)
 - [ ] No hard-coded business rules or domain logic
-- [ ] All project-specific content belongs in `{PRODUCT_ROOT}/planning-mds/`
+- [ ] All project-specific content belongs in `{NEBULA_PRODUCT_ROOT}/planning-mds/`
 
-When reviewing PRs that modify `{PRODUCT_ROOT}/planning-mds/`:
+When reviewing PRs that modify `{NEBULA_PRODUCT_ROOT}/planning-mds/`:
 - [ ] Content is specific to current project
 - [ ] No generic best practices (those belong in `agents/`)
 - [ ] References to `agents/` resources are correct

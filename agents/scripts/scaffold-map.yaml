@@ -3,7 +3,7 @@
 # scaffold-product.py creates `directories` (mkdir -p, idempotent) and copies each
 # `files` template to its destination IFF the destination is missing. Existing
 # product-owned files are never overwritten. Destinations are relative to
-# {PRODUCT_ROOT}; templates are relative to the framework's agents/templates/.
+# {NEBULA_PRODUCT_ROOT}; templates are relative to the framework's agents/templates/.
 #
 # The user-interview / judgment portion of init.md (BLUEPRINT sections 0-2,
 # glossary, REGISTRY/ROADMAP content) intentionally stays out of this map.

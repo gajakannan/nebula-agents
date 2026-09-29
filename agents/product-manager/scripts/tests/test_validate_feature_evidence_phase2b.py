@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from test_validate_feature_evidence import (
     RUN_ID,
     ROLE_FILES,
@@ -266,7 +268,7 @@ def test_command_artifact_missing_fires(tmp_path: Path) -> None:
         json.dumps({
             "schema_version": 1,
             "timestamp": "2026-05-19T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "pnpm test",
             "exit_code": 0,
             "artifacts": ["planning-mds/operations/evidence/runs/2026-05-19-5ab6f922/artifacts/test-results/nonexistent.log"],
@@ -287,7 +289,7 @@ def test_kg_generated_regeneration_missing_fires(tmp_path: Path) -> None:
         [{
             "schema_version": 1,
             "timestamp": "2026-07-05T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "python3 scripts/kg/validate.py --regenerate-symbols --check-symbols",
             "exit_code": 0,
             "artifacts": [],
@@ -307,7 +309,7 @@ def test_kg_generated_regeneration_command_passes(tmp_path: Path) -> None:
         [{
             "schema_version": 1,
             "timestamp": "2026-07-05T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": (
                 "python3 scripts/kg/validate.py --regenerate-symbols --check-symbols "
                 "--regenerate-decisions --check-decisions --write-coverage-report"
@@ -335,7 +337,7 @@ def command_artifact_result(tmp_path: Path, artifact: str, *, existing_rel: str 
         json.dumps({
             "schema_version": 1,
             "timestamp": "2026-05-19T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "pnpm test",
             "exit_code": 0,
             "artifacts": [artifact],
@@ -377,9 +379,10 @@ def test_current_product_root_absolute_command_artifact_warns(tmp_path: Path) ->
     assert "absolute_artifact_under_product_root_warns" in warnings
 
 
-def test_product_root_placeholder_command_artifact_warns(tmp_path: Path) -> None:
+@pytest.mark.parametrize("label", ["NEBULA_PRODUCT_ROOT", "PRODUCT_ROOT"])
+def test_product_root_placeholder_command_artifact_warns(tmp_path: Path, label: str) -> None:
     artifact = command_artifact_rel()
-    result = command_artifact_result(tmp_path, f"{{PRODUCT_ROOT}}/{artifact}", existing_rel=artifact)
+    result = command_artifact_result(tmp_path, "{" + label + "}/" + artifact, existing_rel=artifact)
     assert result.returncode == 0, result.stdout + result.stderr
     warnings = {entry["rule_id"] for entry in json_result(result)["warnings"]}
     assert "placeholder_artifact_path_normalized_warns" in warnings

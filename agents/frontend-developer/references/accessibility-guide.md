@@ -63,16 +63,16 @@ Primary enforcement document:
 ## Verification Commands
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience lint
-pnpm --dir {PRODUCT_ROOT}/experience lint:theme
-pnpm --dir {PRODUCT_ROOT}/experience test
-pnpm --dir {PRODUCT_ROOT}/experience build
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience build
 ```
 
 When theme or styling changes:
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme
 ```
 
 ---

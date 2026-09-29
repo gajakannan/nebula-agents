@@ -9,7 +9,7 @@ product glossary during migration/adaptation work.
 Usage:
     python3 agents/scripts/validate-genericness.py [--glossary <path>] [--agents-dir <path>]
     python3 agents/scripts/validate-genericness.py
-    python3 agents/scripts/validate-genericness.py --glossary {PRODUCT_ROOT}/planning-mds/domain/glossary.md
+    python3 agents/scripts/validate-genericness.py --glossary {NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md
 """
 
 import sys
@@ -20,7 +20,7 @@ from pathlib import Path
 
 # Static denylist used by default for standalone framework validation.
 # Keep this list aligned with the 'Genericness-Blocked Terms' section in
-# {PRODUCT_ROOT}/planning-mds/domain/glossary.md for the reference
+# {NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md for the reference
 # insurance-CRM product. Adapters for other domains should supply --glossary.
 FALLBACK_BLOCKED_TERMS = [
     "Broker",
@@ -249,7 +249,7 @@ def main():
     print(f"Validating genericness of {args.agents_dir}/")
     print("-" * 60)
     print(f"[Scope]  Scanning only:       {args.agents_dir}/")
-    print("[Scope]  Not scanned:          {PRODUCT_ROOT}/planning-mds/ (solution-specific content is allowed)\n")
+    print("[Scope]  Not scanned:          {NEBULA_PRODUCT_ROOT}/planning-mds/ (solution-specific content is allowed)\n")
 
     # Use the embedded denylist by default so nebula-agents validates
     # standalone. A product glossary is only consulted when explicitly passed.

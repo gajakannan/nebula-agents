@@ -18,7 +18,7 @@ Use this checklist before tagging an initial public preview of the framework.
 ## 3) Manual Orchestration Reproducibility
 
 - [ ] `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md` exists and is linked from `README.md`.
-- [ ] At least one representative manual/orchestrated run evidence package exists under `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/` (the base run profile defined in `agents/docs/AGENT-OPS.md`).
+- [ ] At least one representative manual/orchestrated run evidence package exists under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/` (the base run profile defined in `agents/docs/AGENT-OPS.md`).
 - [ ] Base run evidence package contains all required files:
   - [ ] `README.md`
   - [ ] `action-context.md`

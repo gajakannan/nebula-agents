@@ -58,7 +58,7 @@ When AI features are in scope, architects must define:
 
 ### Step 3: Document Decision
 
-Create ADR in `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`:
+Create ADR in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`:
 
 **Example ADR:**
 ```markdown
@@ -77,13 +77,13 @@ Requirements:
 - No need for real-time streaming
 
 ## Decision
-Use **AI-Embedded (Pattern 2)** with {PRODUCT_ROOT}/neuron/ layer accessed via backend proxy.
+Use **AI-Embedded (Pattern 2)** with {NEBULA_PRODUCT_ROOT}/neuron/ layer accessed via backend proxy.
 
 ## Consequences
-✅ Clear separation of business logic ({PRODUCT_ROOT}/engine/) and AI logic ({PRODUCT_ROOT}/neuron/)
+✅ Clear separation of business logic ({NEBULA_PRODUCT_ROOT}/engine/) and AI logic ({NEBULA_PRODUCT_ROOT}/neuron/)
 ✅ AI logic testable independently
 ✅ Backend controls authorization and rate limiting
-✅ Can scale {PRODUCT_ROOT}/neuron/ independently
+✅ Can scale {NEBULA_PRODUCT_ROOT}/neuron/ independently
 ❌ Added deployment complexity (2 services → 3 services)
 ❌ Extra latency from proxy hop (~50-100ms)
 ```
@@ -94,7 +94,7 @@ Use **AI-Embedded (Pattern 2)** with {PRODUCT_ROOT}/neuron/ layer accessed via b
 
 ### 3.1 Request/Response Contract Template
 
-All {PRODUCT_ROOT}/neuron/ API endpoints should follow this structure:
+All {NEBULA_PRODUCT_ROOT}/neuron/ API endpoints should follow this structure:
 
 **Request:**
 ```json
@@ -153,7 +153,7 @@ All {PRODUCT_ROOT}/neuron/ API endpoints should follow this structure:
 
 ### 3.2 OpenAPI Specification
 
-Document all {PRODUCT_ROOT}/neuron/ endpoints in `{PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`:
+Document all {NEBULA_PRODUCT_ROOT}/neuron/ endpoints in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`:
 
 ```yaml
 openapi: 3.0.0
@@ -231,7 +231,7 @@ components:
 
 ### 3.3 Backend Proxy Service Pattern
 
-**File:** `{PRODUCT_ROOT}/engine/Services/AiProxyService.cs`
+**File:** `{NEBULA_PRODUCT_ROOT}/engine/Services/AiProxyService.cs`
 
 **Responsibilities:**
 1. Authorization enforcement
@@ -268,7 +268,7 @@ public class AiProxyService
             throw new RateLimitExceededException("Too many AI requests");
         }
 
-        // 3. Call {PRODUCT_ROOT}/neuron/ with timeout
+        // 3. Call {NEBULA_PRODUCT_ROOT}/neuron/ with timeout
         try
         {
             var request = new RiskAssessmentRequest
@@ -328,7 +328,7 @@ public class AiProxyService
 
 **Flow:**
 ```
-AI Agent ({PRODUCT_ROOT}/neuron/) → HTTP call → Backend Internal API ({PRODUCT_ROOT}/engine/) → Database
+AI Agent ({NEBULA_PRODUCT_ROOT}/neuron/) → HTTP call → Backend Internal API ({NEBULA_PRODUCT_ROOT}/engine/) → Database
 ```
 
 **Advantages:**
@@ -339,7 +339,7 @@ AI Agent ({PRODUCT_ROOT}/neuron/) → HTTP call → Backend Internal API ({PRODU
 
 **Implementation:**
 
-**Backend Internal API** (`{PRODUCT_ROOT}/engine/Controllers/InternalController.cs`):
+**Backend Internal API** (`{NEBULA_PRODUCT_ROOT}/engine/Controllers/InternalController.cs`):
 ```csharp
 [ApiController]
 [Route("api/internal")]
@@ -369,7 +369,7 @@ public class InternalController : ControllerBase
 }
 ```
 
-**AI Agent** (`{PRODUCT_ROOT}/neuron/domain_agents/data_fetcher.py`):
+**AI Agent** (`{NEBULA_PRODUCT_ROOT}/neuron/domain_agents/data_fetcher.py`):
 ```python
 import httpx
 
@@ -407,7 +407,7 @@ class DataFetcher:
 
 **Flow:**
 ```
-AI Agent ({PRODUCT_ROOT}/neuron/) → MCP Tool Call → MCP Server ({PRODUCT_ROOT}/neuron/mcp/) → Backend API ({PRODUCT_ROOT}/engine/)
+AI Agent ({NEBULA_PRODUCT_ROOT}/neuron/) → MCP Tool Call → MCP Server ({NEBULA_PRODUCT_ROOT}/neuron/mcp/) → Backend API ({NEBULA_PRODUCT_ROOT}/engine/)
 ```
 
 **Use When:**
@@ -418,7 +418,7 @@ AI Agent ({PRODUCT_ROOT}/neuron/) → MCP Tool Call → MCP Server ({PRODUCT_ROO
 
 **MCP Server Specification:**
 
-File: `{PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
+File: `{NEBULA_PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
 
 ```yaml
 mcp_server:
@@ -477,7 +477,7 @@ rate_limiting:
 ### 5.1 Service-to-Service Authentication
 
 **Requirements:**
-- Neuron/ must authenticate when calling {PRODUCT_ROOT}/engine/ internal APIs
+- Neuron/ must authenticate when calling {NEBULA_PRODUCT_ROOT}/engine/ internal APIs
 - Token-based authentication (JWT)
 - Short-lived tokens (1 hour expiry)
 - Scoped permissions (crm.read, crm.write, etc.)
@@ -489,12 +489,12 @@ rate_limiting:
 # Generate service token at deployment time
 export NEURON_SERVICE_TOKEN="eyJhbGciOiJSUzI1NiIs..."
 
-# {PRODUCT_ROOT}/neuron/ uses this token for all backend calls
+# {NEBULA_PRODUCT_ROOT}/neuron/ uses this token for all backend calls
 ```
 
 **Option 2: Token Exchange (Preferred)**
 ```csharp
-// {PRODUCT_ROOT}/engine/Services/ServiceAuthService.cs
+// {NEBULA_PRODUCT_ROOT}/engine/Services/ServiceAuthService.cs
 public class ServiceAuthService
 {
     public async Task<string> GenerateServiceTokenAsync(string serviceName, string[] scopes)
@@ -843,7 +843,7 @@ public async Task<RiskAssessment> GetRiskAsync(Guid customerId)
 When designing AI features, architects must deliver:
 
 - [ ] **ADR documenting pattern selection** (AI-Optional, Embedded, or Centric)
-- [ ] **OpenAPI spec for {PRODUCT_ROOT}/neuron/ API** (`{PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`)
+- [ ] **OpenAPI spec for {NEBULA_PRODUCT_ROOT}/neuron/ API** (`{NEBULA_PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`)
 - [ ] **Data access pattern definition** (Backend proxy or MCP server)
 - [ ] **Authentication design** (Service-to-service auth, user permissions)
 - [ ] **Error handling strategy** (Fallbacks, timeouts, retries)
@@ -873,7 +873,7 @@ When designing AI features, architects must deliver:
 **Framework Documentation:**
 - `agents/architect/references/ai-integration-patterns.md` - Choose AI pattern first
 - `agents/ai-engineer/SKILL.md` - AI Engineer responsibilities
-- `{PRODUCT_ROOT}/planning-mds/examples/stories/ai-story-example.md` - Example AI story
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/stories/ai-story-example.md` - Example AI story
 
 **External Resources:**
 - [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.io/)

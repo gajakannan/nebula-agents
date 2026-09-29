@@ -8,7 +8,7 @@ Usage:
     python3 validate-infrastructure.py [root-path] [--strict]
     python3 validate-infrastructure.py --product-root ../my-product
 
-If no root path is supplied, the script checks {PRODUCT_ROOT}.
+If no root path is supplied, the script checks {NEBULA_PRODUCT_ROOT}.
 """
 
 import argparse
@@ -36,7 +36,7 @@ def exists_any_dir(root: Path, names: Iterable[str]) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate infrastructure artifacts.")
     add_product_root_arg(parser)
-    parser.add_argument("root", nargs="?", default=None, help="Root path to check (default: {PRODUCT_ROOT})")
+    parser.add_argument("root", nargs="?", default=None, help="Root path to check (default: {NEBULA_PRODUCT_ROOT})")
     parser.add_argument("--strict", action="store_true", help="Fail if any item is missing")
     args = parser.parse_args()
 

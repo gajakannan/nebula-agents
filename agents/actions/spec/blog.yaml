@@ -24,12 +24,12 @@ inputs:
   optional:
     - {name: AMPLIFICATION, enum: [none, phase-2], default: none}
     - {name: FEATURE_REF, format: "F#### — optional context ref; does NOT make this a feature-scoped run"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
-  BLOG_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}"
+  BLOG_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}"
   FEATURE_REF_SLUG: "kebab-case slug for {FEATURE_REF} from REGISTRY.md (only when FEATURE_REF is set)"
-  FEATURE_REF_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)"
+  FEATURE_REF_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)"
 
 context_load:
   - "agents/ROUTER.md"
@@ -116,7 +116,7 @@ conflict_resolution:
 
 notes:
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Mint BLOG_RUN_ID once in contract format (an
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} on the first turn. Mint BLOG_RUN_ID once in contract format (an
     ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Create {BLOG_RUN_FOLDER} and
     initialize the six §8 base run files.
   evidence_outputs: |

@@ -61,4 +61,4 @@ Use this checklist to validate that acceptance criteria are clear, testable, and
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/` for project-specific acceptance criteria examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` for project-specific acceptance criteria examples.

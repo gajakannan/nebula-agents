@@ -1,6 +1,6 @@
 # PM Validation Report — run {run-id}
 
-> Produced by `agents/actions/validate.md`. Lives under the non-feature/manual run folder at `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/`, **not** inside a feature evidence package (§14).
+> Produced by `agents/actions/validate.md`. Lives under the non-feature/manual run folder at `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/`, **not** inside a feature evidence package (§14).
 
 ## Run Identity
 

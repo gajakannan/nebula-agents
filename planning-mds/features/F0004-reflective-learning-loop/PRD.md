@@ -48,7 +48,7 @@
 ## Acceptance Criteria Overview
 
 - [ ] A `LEARNINGS.md` entry schema exists and is enforced by `validate-learnings.py` (required fields, unique IDs, legal status/scope values).
-- [ ] Framework-scope strategies live in `agents/<role>/LEARNINGS.md`; product-scope strategies live under `{PRODUCT_ROOT}/planning-mds/learnings/`; neither file may hold the other scope.
+- [ ] Framework-scope strategies live in `agents/<role>/LEARNINGS.md`; product-scope strategies live under `{NEBULA_PRODUCT_ROOT}/planning-mds/learnings/`; neither file may hold the other scope.
 - [ ] The `reflector` role produces a candidate-strategy set from existing evidence without mutating the playbook.
 - [ ] The `reflect` action presents proposed `ADD`/`UPDATE`/`REMOVE`/`MERGE` operations at an approval gate; only operator-approved operations are applied.
 - [ ] Applied entries carry provenance (run-id + action + gate outcome) and maintained `used_count` / `success_count`.
@@ -108,7 +108,7 @@ This feature has no graphical UI. Its only human surface is the operator-facing 
  +-------------------------------------------------------------------------+
  |  STRATEGY PLAYBOOK  (LEARNINGS.md - mutable, scoped)                     |
  |   FRAMEWORK scope -> agents/<role>/LEARNINGS.md    (denylist-clean)      |
- |   PRODUCT  scope -> {PRODUCT_ROOT}/planning-mds/learnings/               |
+ |   PRODUCT  scope -> {NEBULA_PRODUCT_ROOT}/planning-mds/learnings/               |
  |   entry: { id . scope . role . trigger . strategy . provenance .        |
  |            status . supersedes . used_count . success_count }            |
  +----------------------------------+--------------------------------------+
@@ -208,7 +208,7 @@ This feature has no graphical UI. Its only human surface is the operator-facing 
 ## Risks & Assumptions
 
 - Risk: Playbook bloat inflates the cached prefix. Mitigation: counters + decay + budget delta shown at the gate; selection is task-matched, not whole-file.
-- Risk: A learned strategy encodes a domain-specific lesson into a generic agent. Mitigation: genericness gate on framework scope; product lessons forced to `{PRODUCT_ROOT}`.
+- Risk: A learned strategy encodes a domain-specific lesson into a generic agent. Mitigation: genericness gate on framework scope; product lessons forced to `{NEBULA_PRODUCT_ROOT}`.
 - Risk: Non-determinism from evolving guidance. Mitigation: human approval gate, provenance, and supersession audit — no silent mutation.
 - Risk: Reflection overfits to a single noisy run. Mitigation: recurrence threshold across runs before a candidate is proposed for promotion.
 - Assumption: Existing evidence/telemetry (`latest-run.json`, `eval.py`, gate outcomes) is sufficient input for useful reflection.

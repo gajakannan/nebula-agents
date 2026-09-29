@@ -2,14 +2,14 @@
 
 Thanks for contributing to this framework.
 
-`nebula-agents` is the framework repo. Product planning and application code live in a sibling product repo resolved as `{PRODUCT_ROOT}` at session start — see `CONSUMER-CONTRACT.md` and `agents/docs/AGENT-USE.md`. Contributions here must stay framework-generic; product-specific changes belong in the product repo, not here.
+`nebula-agents` is the framework repo. Product planning and application code live in a sibling product repo resolved as `{NEBULA_PRODUCT_ROOT}` at session start — see `CONSUMER-CONTRACT.md` and `agents/docs/AGENT-USE.md`. Contributions here must stay framework-generic; product-specific changes belong in the product repo, not here.
 
 ## 1) Before You Start
 
 1. Read `README.md`.
 2. Read `BOUNDARY-POLICY.md`.
 3. Read `CONSUMER-CONTRACT.md` so you understand what the framework exposes to downstream products.
-4. Confirm your change is framework-generic (`agents/**`, framework root docs). If it is product/solution-specific, route it to the product repo under `{PRODUCT_ROOT}/planning-mds/` instead.
+4. Confirm your change is framework-generic (`agents/**`, framework root docs). If it is product/solution-specific, route it to the product repo under `{NEBULA_PRODUCT_ROOT}/planning-mds/` instead.
 
 ## 2) Contribution Flow
 
@@ -41,13 +41,13 @@ If your change touches scripts:
 python3 -m py_compile $(rg --files agents | rg '\.py$')
 ```
 
-Framework Python scripts live under `agents/` only. Product-owned scripts (for example `{PRODUCT_ROOT}/scripts/kg/`) are validated in the product repo, not here.
+Framework Python scripts live under `agents/` only. Product-owned scripts (for example `{NEBULA_PRODUCT_ROOT}/scripts/kg/`) are validated in the product repo, not here.
 
 ## 4) Boundary Rules
 
 - Do not add solution-specific entities or terminology to `agents/`.
 - Use standard example entities (`customers` and `orders`) in framework examples.
-- Place project-specific requirements and examples in `{PRODUCT_ROOT}/planning-mds/`.
+- Place project-specific requirements and examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 
 ## 5) Vendor-Neutral Language Policy
 

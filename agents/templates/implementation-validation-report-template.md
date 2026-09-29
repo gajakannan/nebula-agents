@@ -1,6 +1,6 @@
 # Implementation Validation Report — run {run-id}
 
-> Produced by `agents/actions/validate.md`. Script-driven validator output. Lives under `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/` (§14). Not inside any feature evidence package.
+> Produced by `agents/actions/validate.md`. Script-driven validator output. Lives under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/` (§14). Not inside any feature evidence package.
 
 ## Run Identity
 

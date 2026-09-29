@@ -2,14 +2,14 @@
 
 ## User Intent
 
-Bootstrap a new product with the proper directory structure, blueprint template, and initial planning artifacts under `{PRODUCT_ROOT}` (the sibling product repo). Runs before any feature exists, and writes only to `{PRODUCT_ROOT}` — never to the framework repo (`nebula-agents`).
+Bootstrap a new product with the proper directory structure, blueprint template, and initial planning artifacts under `{NEBULA_PRODUCT_ROOT}` (the sibling product repo). Runs before any feature exists, and writes only to `{NEBULA_PRODUCT_ROOT}` — never to the framework repo (`nebula-agents`).
 
 ## Agent Flow
 
 ```
 I0  Project inputs captured
   ↓
-I1  PRODUCT_ROOT scaffold      (canonical directory structure)
+I1  NEBULA_PRODUCT_ROOT scaffold      (canonical directory structure)
   ↓
 I2  BLUEPRINT template
   ↓
@@ -38,11 +38,11 @@ Regenerate with `python3 agents/scripts/render-prompts.py`; the `prompt_drift` l
 committed prompts drift from the spec. **Edit the spec, not this doc or the generated prompts.**
 
 - **Scope** — `base-run-only`: init runs before any feature exists, so it produces no feature evidence
-  package; it still writes a base run package under `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}/`
+  package; it still writes a base run package under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}/`
   so the bootstrap is auditable.
 - **Key invariants** — REGISTRY.md starts with **empty** Active/Planned/Archived/Retired sections;
   ROADMAP.md with empty Now/Next/Later/Completed; the Evidence Contract Effective Date is the framework
-  default (`2026-05-19`) or later, never earlier; do not scaffold into a non-empty `{PRODUCT_ROOT}` without
+  default (`2026-05-19`) or later, never earlier; do not scaffold into a non-empty `{NEBULA_PRODUCT_ROOT}` without
   explicit operator confirmation.
 
 Drive the gates with `python3 agents/scripts/run-gate.py --action init --stage <I0..I6> ...` (`--list` prints
@@ -51,12 +51,12 @@ product (existing files are skipped; structure is validated).
 
 ---
 
-## Scaffolded outputs (all under `{PRODUCT_ROOT}`)
+## Scaffolded outputs (all under `{NEBULA_PRODUCT_ROOT}`)
 
 ### Product-level framework files
 
 ```
-{PRODUCT_ROOT}/
+{NEBULA_PRODUCT_ROOT}/
   lifecycle-stage.yaml              # from agents/templates/lifecycle-stage-template.yaml (current_stage: framework-bootstrap)
   CONTRIBUTING.md                   # from agents/templates/contributing-template.md
   .github/workflows/ci-gates.yml    # from agents/templates/ci-gates-template.yml
@@ -67,7 +67,7 @@ Boundary policy is framework-owned in `nebula-agents/BOUNDARY-POLICY.md` and app
 ### Planning directory structure
 
 ```
-{PRODUCT_ROOT}/planning-mds/
+{NEBULA_PRODUCT_ROOT}/planning-mds/
 ├── BLUEPRINT.md              # master spec — Sections 0–2 filled from inputs, 3–6 as TODO
 ├── README.md                 # planning directory overview
 ├── domain/glossary.md        # domain terminology skeleton
@@ -92,14 +92,14 @@ If the product's top-level layout differs from the framework defaults (`engine/`
 ## Prerequisites
 
 - [ ] `nebula-agents` is checked out and is the session working directory.
-- [ ] `{PRODUCT_ROOT}` is resolved via `NEBULA_PRODUCT_ROOT`, operator input, or the default `../<product-repo>`.
-- [ ] `{PRODUCT_ROOT}` is empty or a new repository willing to accept scaffolded files.
+- [ ] `{NEBULA_PRODUCT_ROOT}` is resolved via explicit `NEBULA_PRODUCT_ROOT` prompt input or environment; no default product.
+- [ ] `{NEBULA_PRODUCT_ROOT}` is empty or a new repository willing to accept scaffolded files.
 - [ ] The operator has basic project context (domain, goals, target users, initial entities).
 
 ## Post-Initialization Next Steps
 
-1. Review `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 0–2.
-2. Refine the domain glossary in `{PRODUCT_ROOT}/planning-mds/domain/glossary.md`.
+1. Review `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 0–2.
+2. Refine the domain glossary in `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md`.
 3. Run the **[plan action](./plan.md)** for Phase A + B.
 
 ## Related Actions
@@ -110,4 +110,4 @@ If the product's top-level layout differs from the framework defaults (`engine/`
 ## Notes
 
 - Idempotent — safe to run on an existing product (skips existing files, validates structure only).
-- Writes only to `{PRODUCT_ROOT}`; never modifies `nebula-agents` content.
+- Writes only to `{NEBULA_PRODUCT_ROOT}`; never modifies `nebula-agents` content.

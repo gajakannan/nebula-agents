@@ -40,7 +40,7 @@ The cutover made the prompts **stronger** on most measured axes. Presence counts
 | `evidence-manifest.json` | 10 | 17 |
 | Run-ID method (`secrets.token_hex`) | 23 | 23 |
 | `commands.log` telemetry | 24 | 24 |
-| Echo resolved `PRODUCT_ROOT` | 24 | 24 |
+| Echo resolved `NEBULA_PRODUCT_ROOT` | 24 | 24 |
 | `AGENT-USE.md` pointer | 24 | 24 |
 | **`CONSUMER-CONTRACT.md` pointer** | **23** | **0** |
 
@@ -151,7 +151,7 @@ generated prompt references it.**
 
 The document is not obsolete: it is 320 lines, still referenced by `README.md`,
 `CONTRIBUTING.md`, `Dockerfile`, two role SKILLs, and two action docs, and it defines the
-`{PRODUCT_ROOT}` path-indirection convention that every prompt depends on.
+`{NEBULA_PRODUCT_ROOT}` path-indirection convention that every prompt depends on.
 
 The specs do preserve the reference — but **only inside YAML comments** (`# … see
 agents/actions/<action>.md and CONSUMER-CONTRACT.md`), which the parser discards and the
@@ -180,7 +180,7 @@ rerun.
 
 ### SE-5 · Low · Dropped retrieval targets
 
-`{PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md` appeared in 4 baseline
+`{NEBULA_PRODUCT_ROOT}/planning-mds/security/authorization-matrix.md` appeared in 4 baseline
 prompts (`plan-*`, `feature-*`) as an on-demand retrieval target and appears in none of the
 generated prompts or specs. It is a product-owned path, absent from this repo, so the loss
 is a retrieval hint rather than a broken reference.
@@ -396,10 +396,10 @@ and the second one has an unexercised gap behind it.
 references to a sister product repo. The framework acted as its own product root for the
 entire G0–G8 run.
 
-So `{PRODUCT_ROOT}` path-indirection — the convention `CONSUMER-CONTRACT.md` §1 exists to
+So `{NEBULA_PRODUCT_ROOT}` path-indirection — the convention `CONSUMER-CONTRACT.md` §1 exists to
 define, and the reason the framework is a separate repo at all — has never been exercised in
 a governed run. `rollout-report.md` §2 asked for precisely this: "the LIVE governed pilot on
-a real product feature (real `feature.yaml` operations + `{PRODUCT_ROOT}/scripts/kg/*` …)".
+a real product feature (real `feature.yaml` operations + `{NEBULA_PRODUCT_ROOT}/scripts/kg/*` …)".
 F0003 satisfied the "governed run reaches closeout" half of that sentence. It did not
 satisfy the cross-repo half.
 

@@ -96,14 +96,14 @@ opposite things, validation should warn and an architect should reconcile them.
 
 During feature close:
 
-1. Run `python3 {PRODUCT_ROOT}/scripts/kg/decisions.py`.
-2. Review new entries in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml`.
+1. Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/decisions.py`.
+2. Review new entries in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml`.
 3. Promote reasoning into `canonical-nodes.yaml.rationale` when it describes
    shared semantics for an entity, workflow, capability, role, or policy.
 4. Keep reasoning inline when it only explains a local implementation detail.
 5. Create or update an ADR when the rationale changes architecture, data
    contracts, security posture, or cross-feature behavior.
-6. Validate with `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-decisions`.
+6. Validate with `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-decisions`.
 
 Examples:
 
@@ -144,5 +144,5 @@ should remain uncommented.
 When markers changed, reviewers should require:
 
 ```bash
-python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions
 ```

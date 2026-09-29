@@ -65,7 +65,7 @@ history, independent conformance fixtures, and explicit behavioral diffs.
 
 ### Out of Scope
 
-- Product-specific KG implementations or vendoring `{PRODUCT_ROOT}/scripts/kg/**` into the framework.
+- Product-specific KG implementations or vendoring `{NEBULA_PRODUCT_ROOT}/scripts/kg/**` into the framework.
 - Automatic migration or mutation of in-flight product evidence runs.
 - Replacing human severity classification or architectural/review judgment with scripts.
 - A hosted orchestration service, database-backed workflow engine, or provider SDK migration.

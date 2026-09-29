@@ -8,7 +8,7 @@ A tool-agnostic, orchestrator-agnostic agent-driven development framework. Plain
 
 `nebula-agents` is the framework layer extracted from the original `nebula-crm` mono-repo. It provides role definitions, action protocols, prompt templates, genericness enforcement, and a builder runtime for agent-driven software development — with no dependency on any specific AI tool, orchestrator, or problem domain.
 
-Downstream products consume it as a **sibling repo**. Agents open a session inside `nebula-agents/` and implement into a sibling product repo resolved as `{PRODUCT_ROOT}`.
+Downstream products consume it as a **sibling repo**. Agents open a session inside `nebula-agents/` and implement into a sibling product repo resolved as `{NEBULA_PRODUCT_ROOT}`.
 
 ## What it owns
 
@@ -30,12 +30,12 @@ See [CONSUMER-CONTRACT.md](CONSUMER-CONTRACT.md) for the full ownership split.
 
 ## How downstream products consume it
 
-Open a session in `nebula-agents/`. Keep the product repo as a sibling directory. All references from `agents/**` to product-owned paths use the `{PRODUCT_ROOT}` placeholder, resolved once at session start.
+Open a session in `nebula-agents/`. Keep the product repo as a sibling directory. All references from `agents/**` to product-owned paths use the `{NEBULA_PRODUCT_ROOT}` placeholder, resolved once at session start.
 
 ```
 WORKSPACE_ROOT/
   nebula-agents/        # session working directory (this repo)
-  <product-repo>/       # {PRODUCT_ROOT} — e.g. nebula-insurance-crm
+  <product-repo>/       # {NEBULA_PRODUCT_ROOT} — e.g. nebula-insurance-crm
 ```
 
 The framework makes no assumption about which AI tool or orchestrator drives the session — the contract is plain markdown plus a short set of Python validators.
@@ -46,10 +46,11 @@ The framework makes no assumption about which AI tool or orchestrator drives the
    ```
    git clone https://github.com/gajakannan/nebula-agents.git
    ```
-2. Resolve `{PRODUCT_ROOT}` via one of:
+2. Resolve `{NEBULA_PRODUCT_ROOT}` via one of:
    - CLI flag `--product-root <path>` on framework scripts
    - Environment variable `NEBULA_PRODUCT_ROOT=<path>`
-   - Default fallback: `../<product-repo>` relative to `nebula-agents/`
+   - Pasted prompt input `NEBULA_PRODUCT_ROOT="../<product-repo>"` (no shell export required)
+   - No default product. Resolve relative paths once at session start, then pass the absolute path to all commands and handoffs.
 3. Read [CONSUMER-CONTRACT.md](CONSUMER-CONTRACT.md) to understand the ownership split and required planning structure.
 4. Follow [agents/docs/AGENT-USE.md](agents/docs/AGENT-USE.md) for session setup and prompt anatomy, or [agents/docs/FORK-AND-BUILD-APP.md](agents/docs/FORK-AND-BUILD-APP.md) to scaffold a new product.
 
@@ -114,7 +115,7 @@ The framework has two views: a **composition model** (how actions compose agents
                         Agents read from & write to
                                         ↓
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PRODUCT PLANNING ARTIFACTS  ({PRODUCT_ROOT}/planning-mds/)                 │
+│  PRODUCT PLANNING ARTIFACTS  ({NEBULA_PRODUCT_ROOT}/planning-mds/)                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  Single Source of Truth                                                     │
@@ -157,10 +158,10 @@ The framework has two views: a **composition model** (how actions compose agents
 │   Dockerfile                 → builder runtime │
 └───────────────────┬────────────────────────────┘
                     │ sibling-repo contract
-                    │ (plain markdown + {PRODUCT_ROOT})
+                    │ (plain markdown + {NEBULA_PRODUCT_ROOT})
                     ▼
 ┌────────────────────────────────────────────────┐
-│          {PRODUCT_ROOT} (product repo)         │
+│          {NEBULA_PRODUCT_ROOT} (product repo)         │
 │                                                │
 │   planning-mds/    → domain + KG + features    │
 │   <backend>/       → backend source            │

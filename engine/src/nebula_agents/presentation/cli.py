@@ -514,13 +514,12 @@ def _dispatch(
 
 def _resolve_product_root(explicit: str | Path | None = None) -> Path:
     """Resolve composition root precedence without mutating process state."""
+    from nebula_agents.product_root import ProductRootError, resolve_product_root
 
-    if explicit is not None:
-        candidate = Path(explicit)
-    else:
-        configured = os.environ.get("NEBULA_AGENTS_PRODUCT_ROOT")
-        candidate = Path(configured) if configured and configured.strip() else Path.cwd()
-    return candidate.expanduser().resolve()
+    try:
+        return resolve_product_root(explicit)
+    except ProductRootError as exc:
+        raise UsageFault(str(exc), "Set NEBULA_PRODUCT_ROOT to the product path.") from exc
 
 
 def _build_application(product_root: str | Path | None = None) -> object:

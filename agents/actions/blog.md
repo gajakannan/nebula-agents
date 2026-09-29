@@ -37,7 +37,7 @@ committed prompts drift from the spec. **Edit the spec, not this doc or the gene
 - **Scope** — `base-run-only`, and **outside the feature evidence contract**: editorial content is never
   evidence for a completed feature. `POST_TYPE ∈ {devlog | technical-article | release-post | retrospective |
   other}`; the run writes a base run package under
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}/` and the post at `TARGET_PATH`.
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}/` and the post at `TARGET_PATH`.
 - **Gates** — B1 and B4 are user checkpoints: never draft before B1, never publish/amplify before B4. No
   validators are required. Never misrepresent feature status/dates/decisions — cross-check `REGISTRY.md` and
   the feature's `pm-closeout.md` when `FEATURE_REF` is set.

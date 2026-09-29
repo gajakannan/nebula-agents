@@ -259,20 +259,20 @@ jobs:
       - name: Run Backend Tests
         if: matrix.component == 'backend'
         run: |
-          cd {PRODUCT_ROOT}/engine
+          cd {NEBULA_PRODUCT_ROOT}/engine
           dotnet test --collect:"XPlat Code Coverage"
 
       - name: Run Frontend Tests
         if: matrix.component == 'frontend'
         run: |
-          cd {PRODUCT_ROOT}/experience
+          cd {NEBULA_PRODUCT_ROOT}/experience
           npm ci
           npm test
 
       - name: Run AI/Neuron Tests
         if: matrix.component == 'neuron'
         run: |
-          cd {PRODUCT_ROOT}/neuron
+          cd {NEBULA_PRODUCT_ROOT}/neuron
           pip install -r requirements.txt
           pytest --cov=neuron
 

@@ -7,16 +7,16 @@ checks close that loop:
 
 - **Ontology orphans** — canonical nodes that nothing else references and that
   have no code-index binding. Surfaced by
-  `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-orphans`.
+  `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-orphans`.
 - **Code dead-code candidates** — bound symbols not reachable from any
   declared entry point. Surfaced by
-  `python3 {PRODUCT_ROOT}/scripts/kg/dead-code.py`.
+  `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/dead-code.py`.
 - **Code-index coverage gaps** — invocations from files outside
   `code-index.yaml` bindings that target bound symbols. The sidecar
   `planning-mds/knowledge-graph/unbound-but-referenced.yaml` is the
-  substrate; surfaced by `python3 {PRODUCT_ROOT}/scripts/kg/validate.py
+  substrate; surfaced by `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py
   --check-coverage-gaps` and the ad-hoc projection
-  `python3 {PRODUCT_ROOT}/scripts/kg/coverage-gaps.py`.
+  `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/coverage-gaps.py`.
 
 The three checks attack the same underlying drift from different sides:
 orphans see *unbound canonical nodes*, dead-code sees *unreached bound
@@ -189,7 +189,7 @@ For each candidate, ask in order:
    `BuildContainer`). If yes, extend `FRAMEWORK_ENTRY_NAME_SUFFIXES` or
    `FRAMEWORK_ENTRY_FILE_PATTERNS` in `scripts/kg/symbols.py` and re-run.
 2. **Does the coverage-gaps sidecar know about this symbol?** Run
-   `python3 {PRODUCT_ROOT}/scripts/kg/coverage-gaps.py --by-target` and
+   `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/coverage-gaps.py --by-target` and
    look for the candidate symbol id in the output. If it appears, the
    sidecar already located one or more unbound caller files — bind
    them in `code-index.yaml` and regenerate. The sidecar is the
@@ -209,7 +209,7 @@ For each candidate, ask in order:
    in a per-product ignore list referenced from a product ADR.
 5. **Is the symbol genuinely unused?** Confirm `coverage-gaps.py
    --by-target` shows zero entries for it, then delete. Re-run
-   `python3 {PRODUCT_ROOT}/scripts/kg/symbols.py` + `dead-code.py` to
+   `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py` + `dead-code.py` to
    confirm the report shrinks.
 
 ---

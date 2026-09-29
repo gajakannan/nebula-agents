@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- [ ] At least one completed `build`, `feature`, or `review` run with evidence under `{PRODUCT_ROOT}/planning-mds/operations/evidence/` (the reflection input surface).
+- [ ] At least one completed `build`, `feature`, or `review` run with evidence under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/` (the reflection input surface).
 - [ ] `eval.py` telemetry available for the runs being reflected (token estimates and run-ids stamped per `AGENT-OPS.md`).
 - [ ] `validate-genericness.py` and the `lifecycle-stage.yaml` gate runner working locally (existing framework gates).
 - [ ] Decision on initial scope policy: which roles start with selection load-back enabled.
@@ -63,7 +63,7 @@ Use real completed-run evidence as input, not synthetic fixtures, so distilled s
 | Framework (planned) | `agents/scripts/playbook.py` | Curator: reflect/curate/apply/select |
 | Framework (planned) | `agents/scripts/validate-learnings.py` | Playbook schema and scope validator |
 | Framework (planned) | `agents/<role>/LEARNINGS.md` | Framework-scope strategy playbook |
-| Product (planned) | `{PRODUCT_ROOT}/planning-mds/learnings/` | Product-scope strategy playbook |
+| Product (planned) | `{NEBULA_PRODUCT_ROOT}/planning-mds/learnings/` | Product-scope strategy playbook |
 | Reused | `agents/docs/CONTEXT-ENGINEERING.md` | The four-move model this loop extends |
 | Reused | `lifecycle-stage.yaml` | Where the `learnings_governance` gate is wired |
 

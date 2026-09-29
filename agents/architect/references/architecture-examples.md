@@ -266,7 +266,7 @@ p, Admin, Order, *, allow
 
 ## For Project-Specific Architecture
 
-See your project's `{PRODUCT_ROOT}/planning-mds/examples/architecture/` directory for architecture examples specific to your solution.
+See your project's `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/architecture/` directory for architecture examples specific to your solution.
 
 ---
 

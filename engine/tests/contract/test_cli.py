@@ -11,6 +11,12 @@ from nebula_agents.domain.models import Actor
 from nebula_agents.presentation import cli
 
 
+@pytest.fixture(autouse=True)
+def selected_product(monkeypatch, tmp_path):
+    """CLI dispatch tests start with an explicit product selection."""
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", str(tmp_path))
+
+
 ACTOR = Actor(1000, "operator", Role.LOCAL_OPERATOR)
 
 

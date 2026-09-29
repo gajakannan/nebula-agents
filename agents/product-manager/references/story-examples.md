@@ -159,7 +159,7 @@ Customers browse products and want to save items for purchase. Cart persists acr
 
 ## For Project-Specific Stories
 
-See your project's `{PRODUCT_ROOT}/planning-mds/examples/stories/` directory for user story examples specific to your solution.
+See your project's `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/stories/` directory for user story examples specific to your solution.
 
 ---
 

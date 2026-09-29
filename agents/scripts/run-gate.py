@@ -38,7 +38,7 @@ import validate_action_specs as vas  # noqa: E402
 import gate_runtime as gr  # noqa: E402
 import project_checks as pc  # noqa: E402
 from project_context import ProjectError
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 
 JOURNAL_SCHEMA_VERSION = 1
 JOURNAL_NAME = "gate-state.json"
@@ -163,7 +163,7 @@ def _verify_attested(stage_state: dict[str, Any], checkpoint_id: str, run_folder
 def build_variables(*, product_root: Path, feature_id: str, slug: str, run_id: str,
                     run_folder: Path, stage: str) -> dict[str, str]:
     variables = {
-        "PRODUCT_ROOT": str(product_root),
+        "NEBULA_PRODUCT_ROOT": str(product_root),
         "FEATURE_ID": feature_id,
         "RUN_ID": run_id,
         "RUN_FOLDER": str(run_folder),
@@ -536,9 +536,10 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(list_runbook(args.spec_dir, args.action), indent=2, sort_keys=True))
         return 0
 
-    product_root = resolve_product_root(args.product_root)
-    if (product_root / ".nebula-project.yaml").exists() and not (args.product_root or os.environ.get("NEBULA_PRODUCT_ROOT")):
-        print(json.dumps({"ok": False, "code": "product_root_required", "error": "Project extensions require an explicit product root."}))
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        print(json.dumps({"ok": False, "code": "product_root_required", "error": str(exc)}))
         return 2
     if args.list:
         try:

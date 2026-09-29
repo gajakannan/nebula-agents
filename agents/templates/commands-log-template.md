@@ -7,7 +7,7 @@
 Each non-empty line is one JSON object:
 
 ```json
-{"schema_version":1,"timestamp":"2026-05-19T14:20:00-04:00","cwd":"{PRODUCT_ROOT}","command":"pnpm test","exit_code":0,"artifacts":["planning-mds/operations/evidence/runs/{run-id}/artifacts/test-results/pnpm-test.log"],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-05-19T14:20:00-04:00","cwd":"{NEBULA_PRODUCT_ROOT}","command":"pnpm test","exit_code":0,"artifacts":["planning-mds/operations/evidence/runs/{run-id}/artifacts/test-results/pnpm-test.log"],"redactions":[]}
 ```
 
 Field rules:
@@ -16,7 +16,7 @@ Field rules:
 |-------|------|------|
 | `schema_version` | integer | currently `1` |
 | `timestamp` | ISO 8601 with timezone or `Z` | parseable |
-| `cwd` | string | stable label: `{PRODUCT_ROOT}`, `{PRODUCT_ROOT}/relative/path`, `nebula-agents`, or `nebula-agents/relative/path` |
+| `cwd` | string | stable label: `{NEBULA_PRODUCT_ROOT}`, `{NEBULA_PRODUCT_ROOT}/relative/path`, `nebula-agents`, or `nebula-agents/relative/path` |
 | `command` | string | non-empty, sanitized |
 | `exit_code` | integer | required |
 | `artifacts` | array of strings | durable repo-relative product paths that resolve where committed; external URLs OK |
@@ -28,13 +28,13 @@ Use the framework helper instead of hand-writing command entries:
 
 ```bash
 python3 agents/scripts/append-command-log.py \
-  --log {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/commands.log \
-  --product-root {PRODUCT_ROOT} \
+  --log {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/commands.log \
+  --product-root {NEBULA_PRODUCT_ROOT} \
   --framework-root {FRAMEWORK_ROOT} \
   --cwd "$PWD" \
   --command "python3 ..." \
   --exit-code 0 \
-  --artifact {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/artifacts/test-results/output.log
+  --artifact {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/artifacts/test-results/output.log
 ```
 
 The helper normalizes product-root artifacts to repo-relative paths, normalizes product/framework working directories to stable labels, creates the log parent directory when needed, and rejects artifacts outside the product repo. Artifact paths must be durable and committed under the product repo, usually under the run's `artifacts/` folder. Scratch paths such as `/tmp/...`, `/var/tmp/...`, or temporary command output locations are not durable evidence artifacts.

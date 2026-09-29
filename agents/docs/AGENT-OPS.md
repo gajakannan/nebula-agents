@@ -39,8 +39,8 @@ PRDs, ADRs, `STATUS.md`, trackers) remain authoritative on conflict.
 
 ## Retrieval Policy
 
-Evidence under `{PRODUCT_ROOT}/planning-mds/operations/**` is cold archive.
-Agents must honor `{PRODUCT_ROOT}/.agentignore` before broad product discovery
+Evidence under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` is cold archive.
+Agents must honor `{NEBULA_PRODUCT_ROOT}/.agentignore` before broad product discovery
 and must not bulk-read or broad-search operations evidence by default.
 
 The supported retrieval path is index-first: read `operations/evidence/README.md`,
@@ -54,7 +54,7 @@ The full policy lives in `agents/docs/AGENTIGNORE.md`.
 ## Mental Model
 
 ```
-{PRODUCT_ROOT}/planning-mds/operations/evidence/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/
 │
 ├── runs/
 │  └── {run-id}/                    ← CANONICAL RUN PACKAGE
@@ -150,7 +150,7 @@ into the **base run** path — never into a feature package.
 
 ## Package Anatomy
 
-All paths are relative to `{PRODUCT_ROOT}`. Templates for every file below
+All paths are relative to `{NEBULA_PRODUCT_ROOT}`. Templates for every file below
 live at `agents/templates/` (e.g. `feature-evidence-readme-template.md`,
 `evidence-manifest-template.json`, `pm-closeout-template.md`,
 `commands-log-template.md`).
@@ -264,14 +264,14 @@ run, no complete waiver). Runs on earlier contract dates are exempt.
 append-only across the whole run:
 
 ```json
-{"schema_version":1,"timestamp":"2026-05-19T14:20:00-04:00","cwd":"{PRODUCT_ROOT}","command":"pnpm test","exit_code":0,"artifacts":["…/artifacts/test-results/pnpm-test.log"],"redactions":[]}
+{"schema_version":1,"timestamp":"2026-05-19T14:20:00-04:00","cwd":"{NEBULA_PRODUCT_ROOT}","command":"pnpm test","exit_code":0,"artifacts":["…/artifacts/test-results/pnpm-test.log"],"redactions":[]}
 ```
 
 | Field | Notes |
 |-------|-------|
 | `schema_version` | supported integer |
 | `timestamp` | ISO 8601 with timezone or `Z` |
-| `cwd` | repo-relative or `{PRODUCT_ROOT}` preferred; absolute paths warn unless justified in `artifact-trace.md` → `Run Environment` |
+| `cwd` | repo-relative or `{NEBULA_PRODUCT_ROOT}` preferred; absolute paths warn unless justified in `artifact-trace.md` → `Run Environment` |
 | `command` | non-empty, sanitized |
 | `exit_code` | integer |
 | `artifacts` | paths produced; resolve where committed |
@@ -326,11 +326,11 @@ The validator is stage-aware so gaps surface during the run:
 ```bash
 # in-progress / candidate (latest-run.json does not exist yet)
 python3 agents/product-manager/scripts/validate-feature-evidence.py \
-  --product-root {PRODUCT_ROOT} --feature F#### --run-id YYYY-MM-DD-xxxxxxxx --stage G2
+  --product-root {NEBULA_PRODUCT_ROOT} --feature F#### --run-id YYYY-MM-DD-xxxxxxxx --stage G2
 
 # final closeout (requires latest-run.json)
 python3 agents/product-manager/scripts/validate-feature-evidence.py \
-  --product-root {PRODUCT_ROOT} --feature F#### --stage closeout
+  --product-root {NEBULA_PRODUCT_ROOT} --feature F#### --stage closeout
 ```
 
 | Stage | Newly required at this stage |
@@ -460,5 +460,5 @@ Stages table and the fixture closure map.
   `validate-trackers.py`, and `secret_patterns.json` support it.
 - `agents/scripts/run-lifecycle-gates.py` — produces `lifecycle-gates.log`.
 - `agents/templates/` — templates for every artifact named above.
-- `{PRODUCT_ROOT}/planning-mds/operations/evidence/` — the live evidence
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/` — the live evidence
   for a given product (data only; no docs).

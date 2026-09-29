@@ -893,7 +893,7 @@ Use **JSON Schema + AJV + RJSF** when:
 
 If you currently validate only at one layer (frontend or backend), migrate in this order:
 
-1. Define canonical JSON Schemas under `{PRODUCT_ROOT}/planning-mds/schemas/` or `{PRODUCT_ROOT}/experience/src/schemas/`
+1. Define canonical JSON Schemas under `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/` or `{NEBULA_PRODUCT_ROOT}/experience/src/schemas/`
 2. Wire frontend forms to `ajvResolver` (manual forms) or RJSF validator (dynamic forms)
 3. Wire backend request validation to the same schemas
 4. Remove duplicated per-layer validation rules once parity tests pass

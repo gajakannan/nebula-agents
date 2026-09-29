@@ -184,16 +184,16 @@ inputs:
     - {name: MODE, enum: [clean, drift-reconcile], default: clean}
     - {name: SLICE_ORDER_SOURCE, enum: [assembly-plan, override], default: assembly-plan}
     - {name: SLICE_ORDER, required_when: "SLICE_ORDER_SOURCE=override"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 auto_resolved:                        # emitted by init-run.py; templates for docs only
   FEATURE_SLUG:  "kebab slug from REGISTRY.md"
-  FEATURE_PATH:  "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
-  RUN_FOLDER:    "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}"
+  FEATURE_PATH:  "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  RUN_FOLDER:    "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}"
   # ...
 retrieval:
   tier_defaults: {clean: [1, 2], drift-reconcile: [3, 4]}   # retuned by eval.py
 context_load:                         # beyond the shared 4-item preamble in _common.yaml
-  - "python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} ..."
+  - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} ..."
   - "{FEATURE_PATH}/**"
 ownership:
   product-manager: [pm-closeout.md, signoff-ledger.md, latest-run.json, "kg-source/features/*.yaml#path,status"]
@@ -207,7 +207,7 @@ gates:
     artifacts: [g0-assembly-plan-validation.md]
     manifest_status_after: in-progress
     validate:
-      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G0"
+      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G0"
     judgment: |                       # rendered as prose; NOT executed
       Author or reconcile the assembly plan; validate scope split, dependencies,
       checkpoints, ownership; initialize the Required Signoff Roles matrix.
@@ -218,9 +218,9 @@ gates:
     role_switch: agents/architect/SKILL.md
     artifacts: [kg-reconciliation.md]
     validate:
-      - "python3 {PRODUCT_ROOT}/scripts/kg/compile.py"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
     constraints:
       - {forbid: "--write-coverage-report", reason: "path-sensitive; deferred to G8 after archive move"}
   - id: G8
@@ -229,13 +229,13 @@ gates:
     role_switch: agents/product-manager/SKILL.md
     sequence:                         # strictly ordered; run-gate.py enforces
       - trackers-and-archive-move    # judgment step, prompt prose describes it
-      - "python3 {PRODUCT_ROOT}/scripts/kg/compile.py"
-      - "python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py"
+      - "python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}"
       - write: latest-run.json        # only after prior step exits 0
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report"
-      - "python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
-      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout"
-      - "python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report"
+      - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift"
+      - "python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout"
+      - "python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}"
 severity_gate: standard               # -> gate_policy.py profile
 forbidden:                            # merged with _common.yaml shared list
   - "Authoring kg-source shards during PM closeout (G7 owns shaping; G8 verifies)"
@@ -289,7 +289,7 @@ python3 agents/scripts/init-run.py --action feature --feature F0038 \
 
 Does everything the SESSION_SETUP prose currently asks the LLM to do:
 
-1. Resolve `PRODUCT_ROOT` (reuse `_product_root.py`), `FEATURE_SLUG` from `REGISTRY.md`,
+1. Resolve `NEBULA_PRODUCT_ROOT` (reuse `_product_root.py`), `FEATURE_SLUG` from `REGISTRY.md`,
    and all derived paths.
 2. Mint `RUN_ID` in contract format (or the integrate scheme when the spec says so).
 3. Create `FEATURE_INDEX_ROOT`, `RUN_FOLDER`, and `artifacts/{...}` subdirs.
@@ -351,7 +351,7 @@ python3 agents/scripts/scaffold-product.py --product-root PATH [--dry-run] [--ch
 - `mkdir -p` the planning-mds tree; copy each template to its target **iff missing**
   (table of `(template, destination)` pairs lives in `spec/init.yaml`).
 - `--check` mode runs the existence-check validation criteria and reports.
-- Never writes outside `PRODUCT_ROOT` (assert, don't trust).
+- Never writes outside `NEBULA_PRODUCT_ROOT` (assert, don't trust).
 - `init.md` keeps only: the user interview for BLUEPRINT sections 0–2, and judgment
   guidance for tailoring the blueprint.
 

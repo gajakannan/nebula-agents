@@ -4,6 +4,8 @@
 
 CONTRACT: Feature Evidence Contract | SCOPE: read-only-audit | POLICY: 2026-07-11
 
+NEBULA_PRODUCT_ROOT_BINDING: Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 REQUIRED_INPUTS:
 OPTIONAL_INPUTS:
 - PR_URL
@@ -12,27 +14,27 @@ OPTIONAL_INPUTS:
 - DIFF_RANGE required_when:[PR_URL unset]
 - FEATURE_RUN_ID required_when:[MODE=candidate-audit or an older-run review]
 - RUN_DEVOPS enum:[auto|yes|no] =default:auto
-- PRODUCT_ROOT =default:sister-repo
+- NEBULA_PRODUCT_ROOT =default:environment; required if unset
 AUTO_RESOLVED:
-- FEATURE_INDEX_ROOT = {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
+- FEATURE_INDEX_ROOT = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
 - FEATURE_PATH = current or archived feature path for {FEATURE_ID}
-- FEATURE_REVIEW_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_REVIEW_RUN_ID}
-- FEATURE_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_RUN_ID} (closeout: FEATURE_RUN_ID defaults to latest-run.json run_id)
+- FEATURE_REVIEW_RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_REVIEW_RUN_ID}
+- FEATURE_RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_RUN_ID} (closeout: FEATURE_RUN_ID defaults to latest-run.json run_id)
 - FEATURE_SLUG = kebab-case slug for {FEATURE_ID} from REGISTRY.md
 
 RUN_ID: var=FEATURE_REVIEW_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
-SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
+SESSION_SETUP: init-run.py --product-root {NEBULA_PRODUCT_ROOT} -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
 CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/feature-review.md -> agents/actions/feature.md -> {FEATURE_PATH}/feature-assembly-plan.md, {FEATURE_PATH}/** -> {FEATURE_INDEX_ROOT}/latest-run.json (when present), {FEATURE_RUN_FOLDER}/evidence-manifest.json + manifest-cited role reports -> role SKILLs: agents/product-manager/SKILL.md, agents/architect/SKILL.md, agents/quality-engineer/SKILL.md, agents/code-reviewer/SKILL.md, agents/security/SKILL.md; agents/devops/SKILL.md when RUN_DEVOPS resolves to yes
-PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action feature-review`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
+PRODUCT_CONTEXT: resolve NEBULA_PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action feature-review`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - FR0 role=product-manager artifacts=[action-context.md]
 - FR1 role=product-manager artifacts=[feature-review-report.md]
 - FR2 role=product-manager artifacts=[]
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
 - FR3 role=product-manager artifacts=[]
 - FR4 role=product-manager artifacts=[]
@@ -77,7 +79,7 @@ review — a NOT DONE / CONDITIONALLY DONE verdict routes the fix back to the ow
 NOTE[report_sections]: feature-review-report.md required sections: Decision; Findings By Severity; Completion Checks; Validation
 Evidence; Artifact Trace. README.md summarizes the done state and open follow-ups; gate-decisions.md records
 FR0 through FR4.
-NOTE[session_setup]: Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Generate FEATURE_REVIEW_RUN_ID once in contract
+NOTE[session_setup]: Echo the resolved absolute {NEBULA_PRODUCT_ROOT} on the first turn. Generate FEATURE_REVIEW_RUN_ID once in contract
 format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Resolve FEATURE_SLUG/PATH/
 INDEX_ROOT/RUN_ID/RUN_FOLDER, then create FEATURE_REVIEW_RUN_FOLDER and its artifacts/ and initialize the six
 §8 base run files.

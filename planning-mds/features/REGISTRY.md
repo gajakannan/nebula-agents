@@ -3,9 +3,9 @@
 **Next Available Feature Number:** F0010
 
 **Planning Views:**
-- Roadmap sequencing (`Now / Next / Later`): `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-- Story rollup index: `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`
-- Governance contract: `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`
+- Roadmap sequencing (`Now / Next / Later`): `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+- Story rollup index: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`
+- Governance contract: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`
 
 ## Active Features
 

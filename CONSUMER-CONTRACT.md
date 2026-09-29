@@ -4,21 +4,29 @@ This document is the formal interface between `nebula-agents` (framework) and an
 
 ---
 
-## 1. `{PRODUCT_ROOT}` path-indirection convention
+## 1. `{NEBULA_PRODUCT_ROOT}` path-indirection convention
 
-Every reference from `agents/**` to a product-owned path uses the `{PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees:
+Every reference from `agents/**` to a product-owned path uses the `{NEBULA_PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees:
 
-- `{PRODUCT_ROOT}/scripts/kg/...`
-- `{PRODUCT_ROOT}/planning-mds/...`
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/...`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/...`
 - Product implementation layer roots (backend, frontend, AI runtime) — named per the product's own conventions
 
 ### Resolution order
 
-At session start (or when a framework script runs), `{PRODUCT_ROOT}` resolves in this order:
+At session start (or when a framework script runs), `{NEBULA_PRODUCT_ROOT}` resolves in this order:
 
-1. **Explicit CLI flag** `--product-root <path>` on any framework script
+1. **Explicit operator selection**: `NEBULA_PRODUCT_ROOT` in the prompt, or `--product-root <path>` on a framework script
 2. **Environment variable** `NEBULA_PRODUCT_ROOT`, if set
-3. **Default fallback**: `../<product-repo>` relative to the framework working directory
+3. **Missing selection is an error**; never select a sibling or CWD by default.
+
+`NEBULA_PRODUCT_ROOT` is the only environment variable for product selection.
+`{NEBULA_PRODUCT_ROOT}` is its resolved absolute-path placeholder. A pasted prompt value
+does not need to exist in the shell environment: pass it explicitly to the resolver.
+Resolve relative paths once against the session starting directory, then pass the
+absolute path to every script and handoff, including resume. Conflicting explicit
+inputs require clarification. Use this name for prompt input, environment, action
+placeholders, and new command-log labels; no alternate root variable is supported.
 
 The resolved absolute path must be echoed on the first line of framework-script output so it is visible in CI logs and session transcripts. See `agents/docs/AGENT-USE.md` → Session Setup.
 
@@ -37,32 +45,32 @@ Framework-owned paths (inside this repo) stay framework-relative:
 
 ## 2. Required planning structure
 
-The framework assumes these files exist under `{PRODUCT_ROOT}`:
+The framework assumes these files exist under `{NEBULA_PRODUCT_ROOT}`:
 
 | Path | Purpose |
 |---|---|
-| `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` | Tech stack, layer boundaries, API spec filename, canonical directory names |
-| `{PRODUCT_ROOT}/planning-mds/domain/glossary.md` | Domain vocabulary, plus the `Genericness-Blocked Terms` section used by `validate-genericness.py --glossary` |
-| `{PRODUCT_ROOT}/planning-mds/api/<api>.yaml` | OpenAPI spec — filename declared in BLUEPRINT.md, not hardcoded here |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` | Canonical entity → file binding |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` | Implementation-file index per entity |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` | Role ownership per layer; consumed by `validate_templates.py` |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` | Symbol-level layer (methods, classes, functions) extracted from declared code paths. Required once product implementation has begun; omit during framework-bootstrap stage. |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml` | Inline decision marker layer (`// WHY:`, `// DECISION:`, `// TRADEOFF:`, `// SUPERSEDES:`) harvested from declared code paths. Optional — present once inline decision markers exist in product code. |
-| `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` | KG coverage roll-up produced by `validate.py --write-coverage-report`. May include additive Phase 3 freshness fields per canonical node — `hotspot_rank`, `hotspot_score`, `primary_owner`, `primary_owner_pct`, `bus_factor_flag`, `last_modified` — when `scripts/kg/hotspots.py` is wired in. Consumers may omit any of these; reviewers/architect/security only act on fields that are present. |
-| `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` | Authoritative feature registry |
-| `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` | Active/planned feature sequencing |
-| `{PRODUCT_ROOT}/lifecycle-stage.yaml` | Product-local lifecycle gates (distinct from the framework-local file in this repo) |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` | Tech stack, layer boundaries, API spec filename, canonical directory names |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md` | Domain vocabulary, plus the `Genericness-Blocked Terms` section used by `validate-genericness.py --glossary` |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/api/<api>.yaml` | OpenAPI spec — filename declared in BLUEPRINT.md, not hardcoded here |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` | Canonical entity → file binding |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` | Implementation-file index per entity |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` | Role ownership per layer; consumed by `validate_templates.py` |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` | Symbol-level layer (methods, classes, functions) extracted from declared code paths. Required once product implementation has begun; omit during framework-bootstrap stage. |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/decisions-index.yaml` | Inline decision marker layer (`// WHY:`, `// DECISION:`, `// TRADEOFF:`, `// SUPERSEDES:`) harvested from declared code paths. Optional — present once inline decision markers exist in product code. |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` | KG coverage roll-up produced by `validate.py --write-coverage-report`. May include additive Phase 3 freshness fields per canonical node — `hotspot_rank`, `hotspot_score`, `primary_owner`, `primary_owner_pct`, `bus_factor_flag`, `last_modified` — when `scripts/kg/hotspots.py` is wired in. Consumers may omit any of these; reviewers/architect/security only act on fields that are present. |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` | Authoritative feature registry |
+| `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` | Active/planned feature sequencing |
+| `{NEBULA_PRODUCT_ROOT}/lifecycle-stage.yaml` | Product-local lifecycle gates (distinct from the framework-local file in this repo) |
 
-`{PRODUCT_ROOT}/scripts/kg/` holds the product's KG tooling (`lookup.py`, `validate.py`, `hint.py`, `workstate.py`, `blast.py`, etc.). It is product-owned runtime state because it reads `{PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml`.
+`{NEBULA_PRODUCT_ROOT}/scripts/kg/` holds the product's KG tooling (`lookup.py`, `validate.py`, `hint.py`, `workstate.py`, `blast.py`, etc.). It is product-owned runtime state because it reads `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/*.yaml`.
 
 ---
 
 ## 3. Implementation layer path convention
 
-Backend, frontend, and AI-runtime paths are always referenced as product-owned paths under `{PRODUCT_ROOT}`. The framework does not assume specific directory names — actual names (e.g. `engine/`, `experience/`, `neuron/`) are declared in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and bound in `code-index.yaml`.
+Backend, frontend, and AI-runtime paths are always referenced as product-owned paths under `{NEBULA_PRODUCT_ROOT}`. The framework does not assume specific directory names — actual names (e.g. `engine/`, `experience/`, `neuron/`) are declared in `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and bound in `code-index.yaml`.
 
-Any reference to an implementation-layer path inside `agents/**` uses `{PRODUCT_ROOT}/<layer-name>/...`, never a framework-root-relative path.
+Any reference to an implementation-layer path inside `agents/**` uses `{NEBULA_PRODUCT_ROOT}/<layer-name>/...`, never a framework-root-relative path.
 
 ---
 
@@ -79,9 +87,9 @@ Framework agents do NOT hardcode:
 
 They discover these at session time from:
 
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` → tech stack and filename conventions
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` + `canonical-nodes.yaml` → real file bindings
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` → role ownership
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` → tech stack and filename conventions
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` + `canonical-nodes.yaml` → real file bindings
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` → role ownership
 
 Templates in `agents/templates/prompts/` are **shape-only skeletons**. Concrete values flow from the product's knowledge graph into each prompt at runtime.
 
@@ -93,12 +101,12 @@ Each framework action produces artifacts in well-known locations:
 
 | Action | Primary artifact |
 |---|---|
-| `plan` | `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` |
-| `feature` | `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` (stories, ADRs, test-plan, evidence) |
-| `build` | Implementation under `{PRODUCT_ROOT}/<layer>/**`; evidence under `{PRODUCT_ROOT}/planning-mds/operations/evidence/**` |
-| `review` | Code-review report in `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/review/` |
+| `plan` | `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` |
+| `feature` | `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**` (stories, ADRs, test-plan, evidence) |
+| `build` | Implementation under `{NEBULA_PRODUCT_ROOT}/<layer>/**`; evidence under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/**` |
+| `review` | Code-review report in `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/review/` |
 | `blog` | Blog post under `../nebula-blog/posts/YYYY-MM-DD-slug.md`; channel derivatives under `../nebula-blog/amplification/` |
-| `init` | Scaffolds new product into `{PRODUCT_ROOT}` (not into the framework repo) |
+| `init` | Scaffolds new product into `{NEBULA_PRODUCT_ROOT}` (not into the framework repo) |
 
 See individual `agents/actions/*.md` files for each action's deliverables contract.
 
@@ -109,7 +117,7 @@ See individual `agents/actions/*.md` files for each action's deliverables contra
 Two distinct `lifecycle-stage.yaml` files exist:
 
 - **Framework-local** (`./lifecycle-stage.yaml` in this repo) declares framework-only gates: `boundary_genericness`, `skill_regression`. It governs validation of this repo itself.
-- **Product-local** (`{PRODUCT_ROOT}/lifecycle-stage.yaml` in the downstream product repo) declares product gates and points to product-local validator scripts.
+- **Product-local** (`{NEBULA_PRODUCT_ROOT}/lifecycle-stage.yaml` in the downstream product repo) declares product gates and points to product-local validator scripts.
 
 Valid `current_stage` values: `framework-bootstrap`, `planning`, `implementation`, `release-readiness`. See `agents/templates/lifecycle-stage-template.yaml` for the canonical shape.
 
@@ -119,7 +127,7 @@ A product's lifecycle file must declare each gate with an explicit `command:` li
 
 ## 7. Validation ownership model
 
-**Framework-owned validations** live in this repo and run against the resolved `{PRODUCT_ROOT}` when product context is needed:
+**Framework-owned validations** live in this repo and run against the resolved `{NEBULA_PRODUCT_ROOT}` when product context is needed:
 
 - `agents/scripts/validate-genericness.py` — embedded domain-term denylist, overridable via `--glossary`
 - `agents/scripts/validate_templates.py` — action ↔ template alignment
@@ -129,12 +137,12 @@ A product's lifecycle file must declare each gate with an explicit `command:` li
 
 **Product-local validations** live in the product repo and must be runnable with no `agents/**` directory present:
 
-- `{PRODUCT_ROOT}/scripts/kg/validate.py` (knowledge-graph sync; `--check-symbols` validates the symbol layer, `--check-decisions` validates the inline decision marker layer)
-- `{PRODUCT_ROOT}/scripts/kg/symbols.py` (symbol-index generator; invoked directly or via `validate.py --regenerate-symbols`)
-- `{PRODUCT_ROOT}/scripts/kg/decisions.py` (inline decision marker harvester; invoked directly or via `validate.py --regenerate-decisions`)
-- `{PRODUCT_ROOT}/scripts/kg/risk.py` (Phase 4 risk-score aggregator; combines blast/hotspot/cochange/ownership/test-gap into a 0–10 score per canonical node, file, or symbol — pre-flight gate, not authoritative)
-- `{PRODUCT_ROOT}/planning-mds/testing/validate-nebula-api-contract.py` (solution contract)
-- `{PRODUCT_ROOT}/planning-mds/testing/validate-frontend-quality-gate.py` (frontend quality)
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (knowledge-graph sync; `--check-symbols` validates the symbol layer, `--check-decisions` validates the inline decision marker layer)
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py` (symbol-index generator; invoked directly or via `validate.py --regenerate-symbols`)
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/decisions.py` (inline decision marker harvester; invoked directly or via `validate.py --regenerate-decisions`)
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py` (Phase 4 risk-score aggregator; combines blast/hotspot/cochange/ownership/test-gap into a 0–10 score per canonical node, file, or symbol — pre-flight gate, not authoritative)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/testing/validate-nebula-api-contract.py` (solution contract)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/testing/validate-frontend-quality-gate.py` (frontend quality)
 - Additional product-local equivalents for `api_contract`, `infra_strict`, `security_planning_strict` as each product matures
 
 ---
@@ -157,16 +165,16 @@ CI runs the domain-term validator automatically (`lifecycle-stage.yaml` → `bou
 ```
 WORKSPACE_ROOT/
   nebula-agents/        # framework (this repo)
-  <product-repo>/       # {PRODUCT_ROOT}
+  <product-repo>/       # {NEBULA_PRODUCT_ROOT}
 ```
 
-`WORKSPACE_ROOT` must be outside any backup copy of the original `nebula-crm` repo. Resolving `{PRODUCT_ROOT}` to a path inside a backup tree is undefined behavior and will be rejected by framework scripts where possible.
+`WORKSPACE_ROOT` must be outside any backup copy of the original `nebula-crm` repo. Resolving `{NEBULA_PRODUCT_ROOT}` to a path inside a backup tree is undefined behavior and will be rejected by framework scripts where possible.
 
 ---
 
 ## 10. API reference path convention
 
-Product repos own their OpenAPI spec. Framework agents never hardcode an API filename. The filename is declared in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and — when needed — passed explicitly to framework scripts (e.g. `python3 agents/architect/scripts/validate-api-contract.py {PRODUCT_ROOT}/planning-mds/api/<api>.yaml`).
+Product repos own their OpenAPI spec. Framework agents never hardcode an API filename. The filename is declared in `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and — when needed — passed explicitly to framework scripts (e.g. `python3 agents/architect/scripts/validate-api-contract.py {NEBULA_PRODUCT_ROOT}/planning-mds/api/<api>.yaml`).
 
 ---
 
@@ -240,7 +248,7 @@ The feature evidence profile applies to governed completed-terminal feature runs
 Every orchestrated run produces a base evidence package. Non-feature/manual runs (e.g. `agents/actions/validate.md`) use the base path:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
   README.md
   action-context.md
   artifact-trace.md
@@ -254,7 +262,7 @@ Every orchestrated run produces a base evidence package. Non-feature/manual runs
 Feature completion runs (`agents/actions/feature.md` and `agents/actions/build.md` when archiving a delivered feature) write to the feature profile path with the full artifact matrix:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
   <base files above>
   evidence-manifest.json
   feature-action-execution.md
@@ -271,7 +279,7 @@ Feature completion runs (`agents/actions/feature.md` and `agents/actions/build.m
   pm-closeout.md
   artifacts/{coverage,diffs,test-results,security,screenshots}/
 
-{PRODUCT_ROOT}/planning-mds/operations/evidence/features/F####-{slug}/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/F####-{slug}/
   latest-run.json                 # pointer to approved run + manifest
 ```
 
@@ -301,14 +309,14 @@ Validators must not create or consume `current-run.json`, and must not infer the
 - `G7` records architect knowledge-graph reconciliation for the as-built source.
 - `G8`/`closeout` validation requires `latest-run.json`, `kg-reconciliation.md` when applicable, `pm-closeout.md`, and tracker/story-index/KG/template validator results recorded in `lifecycle-gates.log` and summarized in `pm-closeout.md`.
 
-When publishing a newly approved run, closeout must first run `agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark prior approved manifests for the feature as `superseded`. Only after that helper exits 0 may closeout write the feature's new `latest-run.json`. If the helper fails, do not publish the new pointer; follow the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`.
+When publishing a newly approved run, closeout must first run `agents/product-manager/scripts/patch-prior-manifest.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark prior approved manifests for the feature as `superseded`. Only after that helper exits 0 may closeout write the feature's new `latest-run.json`. If the helper fails, do not publish the new pointer; follow the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`.
 
 ### Validation Modes
 
-- Plan runs perform tracker/base-run validation only: `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`. Plan operators must not call `validate-feature-evidence.py` for the current plan run. Plan closeout also records a dependency impact evidence audit for direct or impacted feature dependencies; automated dependency discovery/validation may be added by a later framework step.
-- Feature gates `G0` through `G6` run scoped evidence validation for the current feature/run: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage <GATE>`.
-- Feature closeout runs scoped current feature/run validation: closeout evidence via `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`, and tracker sync via `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`.
-- Repo health/audit validation is explicit only: `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --all-feature-evidence` performs repo-wide feature-evidence validation after tracker validation. This mode is not an implicit blocker for every plan or feature closeout.
+- Plan runs perform tracker/base-run validation only: `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence`. Plan operators must not call `validate-feature-evidence.py` for the current plan run. Plan closeout also records a dependency impact evidence audit for direct or impacted feature dependencies; automated dependency discovery/validation may be added by a later framework step.
+- Feature gates `G0` through `G6` run scoped evidence validation for the current feature/run: `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage <GATE>`.
+- Feature closeout runs scoped current feature/run validation: closeout evidence via `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`, and tracker sync via `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`.
+- Repo health/audit validation is explicit only: `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --all-feature-evidence` performs repo-wide feature-evidence validation after tracker validation. This mode is not an implicit blocker for every plan or feature closeout.
 
 ### Global Frontend Lanes
 

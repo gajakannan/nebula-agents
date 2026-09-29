@@ -1,6 +1,6 @@
 # Project instructions and required checks (v1)
 
-A product can own local instructions and Python validation scripts without adding product rules to the framework. The optional `{PRODUCT_ROOT}/.nebula-project.yaml` declares them. This is a framework invocation convention, not a native hook API supplied by an agent host.
+A product can own local instructions and Python validation scripts without adding product rules to the framework. The optional `{NEBULA_PRODUCT_ROOT}/.nebula-project.yaml` declares them. This is a framework invocation convention, not a native hook API supplied by an agent host.
 
 ## Ownership and discovery
 
@@ -14,7 +14,12 @@ python3 agents/scripts/project_context.py --product-root /absolute/product --act
 
 Read the returned text, not only the listed filenames. The loader reads the product blueprint first and then applicable instruction files in declaration order. Explicit instruction loads are targeted reads even when `.agentignore` excludes those paths from broad discovery. It prints source paths and content hashes. `--json` returns the same context as structured data.
 
-Both new commands require `--product-root` or `NEBULA_PRODUCT_ROOT`; the flag wins and there is no default product. Paths resolve against that root regardless of launch CWD. No manifest preserves the legacy action context procedure; `checks: []` enables instructions alone. A malformed manifest, missing instruction, unsupported version, or unsupported check point is an error. For `init`, a not-yet-created blueprint is allowed.
+Both new commands require `--product-root` or `NEBULA_PRODUCT_ROOT`; the flag wins and there is no default product. Relative root inputs resolve against the invocation CWD; normalize once at session start and pass the absolute root thereafter. Product instruction/check paths resolve against that root. No manifest preserves the legacy action context procedure; `checks: []` enables instructions alone. A malformed manifest, missing instruction, unsupported version, or unsupported check point is an error. For `init`, a not-yet-created blueprint is allowed.
+
+When upgrading existing products, update root placeholders in `.nebula-project.yaml`
+checks and reusable prompts to `{NEBULA_PRODUCT_ROOT}`. Alternate root variable
+names are rejected in executable configuration. Historical evidence remains readable
+and does not need to be rewritten.
 
 ## Manifest
 
@@ -31,9 +36,9 @@ checks:
     event: before_stage_complete
     argv:
       - python3
-      - "{PRODUCT_ROOT}/scripts/validation/check_plan.py"
+      - "{NEBULA_PRODUCT_ROOT}/scripts/validation/check_plan.py"
       - --product-root
-      - "{PRODUCT_ROOT}"
+      - "{NEBULA_PRODUCT_ROOT}"
       - --plan-scope
       - "{PLAN_SCOPE}"
       - --target
@@ -49,7 +54,7 @@ The schema is `agents/scripts/schemas/project.schema.json`. Fields are strict; c
 
 `argv` is an argument array, never shell text. V1 accepts `python` or `python3` followed by a product-local `.py` script and uses the runner's Python interpreter. No inline `-c`, `-m`, shell executable, path traversal, or symlink escape is accepted. Timeouts are 1–300 seconds. Inputs are nonempty glob patterns; every pattern must match files. Declare all local dependencies and governing sources read by the check. Do not include its generated evidence directory in its inputs.
 
-Supported placeholders are `{PRODUCT_ROOT}`, `{PLAN_SCOPE}`, and `{TARGET}`; feature scope also supplies `{FEATURE_ID}` and `{FEATURE_PATH}`. Unknown placeholders block execution. Features are resolved from `planning-mds/features/REGISTRY.md`, not arbitrary supplied directories. Feature-set targets are comma-separated IDs. Project scope requires target `project` and selects active or PRD-bearing, nonarchived registry entries; reserved IDs without plans are excluded. An active feature with a missing PRD is not silently excluded.
+Supported placeholders are `{NEBULA_PRODUCT_ROOT}`, `{PLAN_SCOPE}`, and `{TARGET}`; feature scope also supplies `{FEATURE_ID}` and `{FEATURE_PATH}`. Unknown placeholders block execution. Features are resolved from `planning-mds/features/REGISTRY.md`, not arbitrary supplied directories. Feature-set targets are comma-separated IDs. Project scope requires target `project` and selects active or PRD-bearing, nonarchived registry entries; reserved IDs without plans are excluded. An active feature with a missing PRD is not silently excluded.
 
 ## Gate usage
 
@@ -93,6 +98,6 @@ This writes `project-check-state.json` plus the same check evidence and logs; it
 
 Shell-capable hosts can invoke these same commands; no platform-specific hook translation is required. Generated operator and automation prompts both require explicit context loading on start/resume. This is not automatic enforcement of every command issued by a model.
 
-Native host adapters have not been integration-tested for this extension. The current native cockpit's prompt binder does not select a separate product root, and its provider environment allowlist does not carry `NEBULA_PRODUCT_ROOT`. Do not assume a parent-shell export reaches it. Until that adapter supports explicit product selection, use the documented framework-root shell session with explicit root arguments. No native launcher configuration was changed by this work.
+The native launcher now reads `NEBULA_PRODUCT_ROOT` and binds its absolute workspace path into both the provider prompt and child environment, overriding stale tmux environment values. It still uses a single workspace for product and framework assets; separate sibling framework discovery is not supported by that adapter. For sibling consumption, use the documented framework-root shell session with explicit root arguments. Native host adapters have not been integration-tested for project extensions.
 
 Local checks are trusted repository code, not sandboxed programs. Host permissions still govern execution. Structural validation checks artifacts and declared rules; semantic adequacy, security approval, and regulatory determinations remain human/reviewer responsibilities.

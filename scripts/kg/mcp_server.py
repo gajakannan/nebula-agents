@@ -229,7 +229,7 @@ def build_validate(args: dict[str, Any], bundle: dict[str, Any]) -> dict[str, An
     return payload
 
 
-# kg_workstate write boundary: only ever under {PRODUCT_ROOT}/.kg-state/workstate/.
+# kg_workstate write boundary: only ever under {NEBULA_PRODUCT_ROOT}/.kg-state/workstate/.
 _WORKSTATE_DIR = (kg_common.REPO_ROOT / ".kg-state" / "workstate").resolve()
 _KG_GRAPH_DIR = (kg_common.REPO_ROOT / "planning-mds" / "knowledge-graph").resolve()
 _SESSION_ID_RE = re.compile(r"^[A-Za-z0-9._-]+$")

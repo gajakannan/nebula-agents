@@ -43,7 +43,7 @@ a scaffolded fixture product root:
 - An in-flight run cannot change its contract version between gates.
 
 **Not yet done (human-gated):** the LIVE governed pilot on a real product feature
-(real `feature.yaml` operations + `{PRODUCT_ROOT}/scripts/kg/*` + independent feature
+(real `feature.yaml` operations + `{NEBULA_PRODUCT_ROOT}/scripts/kg/*` + independent feature
 review with all required roles) and its closeout signoffs. The rehearsal proves the
 toolchain; it does not substitute for the role-owner review the PRD requires.
 

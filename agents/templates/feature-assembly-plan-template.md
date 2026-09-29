@@ -8,7 +8,7 @@
 >
 > **Depth expectation:** Placeholders like `{field count}` and `{summary}` must be replaced with actual values. "Existing Code" should state real field counts, method names, and precise change descriptions. "Step N" sections must include complete C# record/class definitions with all fields and types — not abbreviated signatures. If a developer agent would need to ask a clarifying question, the plan lacks sufficient detail.
 
-**Placement:** `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` — colocated with the feature folder so it archives together with PRD, stories, and STATUS. The umbrella cross-feature sequencing plan at `{PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` references this file.
+**Placement:** `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` — colocated with the feature folder so it archives together with PRD, stories, and STATUS. The umbrella cross-feature sequencing plan at `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` references this file.
 
 Use this template for solution feature planning. If generic framework work under `agents/**` is also required, track it separately rather than mixing it into the solution feature plan.
 
@@ -27,9 +27,9 @@ Use this template for solution feature planning. If generic framework work under
 
 ## Existing Code (Must Be Modified)
 
-> Resolve real paths from `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
+> Resolve real paths from `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml`
 > and `canonical-nodes.yaml`. The rows below are shape-only — replace placeholders
-> with the concrete paths returned by `{PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>`.
+> with the concrete paths returned by `{NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>`.
 
 | File | Current State | F{NNNN} Change |
 |------|---------------|----------------|
@@ -133,9 +133,9 @@ Mutation traceability rules:
 
 | Layer | Required Work | Owner | Status |
 |------|----------------|-------|--------|
-| Backend (`{PRODUCT_ROOT}/engine/`) | | | |
-| Frontend (`{PRODUCT_ROOT}/experience/`) | | | |
-| AI (`{PRODUCT_ROOT}/neuron/`, if needed) | | | |
+| Backend (`{NEBULA_PRODUCT_ROOT}/engine/`) | | | |
+| Frontend (`{NEBULA_PRODUCT_ROOT}/experience/`) | | | |
+| AI (`{NEBULA_PRODUCT_ROOT}/neuron/`, if needed) | | | |
 | Quality | | | |
 | DevOps/Runtime | | | |
 

@@ -4,6 +4,8 @@
 
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
+Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 Required inputs:
 - `VALIDATION_SCOPE` — one of `requirements` | `architecture` | `implementation` | `all`
 
@@ -12,21 +14,21 @@ Optional inputs (defaults apply when omitted):
 - `STAGE` — one of `G0` | `G1` | `G2` | `G3` | `G5` | `G6` | `G8` | `closeout` — default `closeout`
 - `RUN_ID` — required when STAGE in {G0,G1,G2,G3,G5}
 - `EFFECTIVE_DATE` — default `2026-05-19 (framework default; earlier values rejected per §22)`
-- `PRODUCT_ROOT` — default `sister-repo`
+- `NEBULA_PRODUCT_ROOT` — default `environment; required if unset`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
-- `FEATURE_INDEX_ROOT` — {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG} (only when FEATURE_ID is set)
+- `FEATURE_INDEX_ROOT` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG} (only when FEATURE_ID is set)
 - `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md (only when FEATURE_ID is set)
-- `VALIDATE_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{VALIDATE_RUN_ID}
+- `VALIDATE_RUN_FOLDER` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{VALIDATE_RUN_ID}
 
 Generate `VALIDATE_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Resuming an in-flight run in a new session: do NOT generate a new `VALIDATE_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <VALIDATE_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+Resuming an in-flight run in a new session: do NOT generate a new `VALIDATE_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <VALIDATE_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT}` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
-First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action validate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
+First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action validate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
@@ -43,10 +45,10 @@ in parallel at V1 (see notes.scope_conditionality): PM when scope in {requiremen
 when scope in {architecture, all}, implementation validators when scope in {implementation, all}.
 - **V1 — Parallel validation (PM requirements + Architect architecture + implementation validators)** (role: product-manager; artifacts: pm-validation-report.md, architect-validation-report.md, implementation-validation-report.md)
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --json` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --json` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
     - judgment: Run the three lanes in parallel per scope; each agent's report authoring is analysis, not scripted.
 PM (scope requirements/all) writes pm-validation-report.md; Architect (scope architecture/all) writes
@@ -106,9 +108,9 @@ cross-referenced to §22 rule IDs, Result); artifacts/feature-evidence-validatio
 implementation lane ran. This run does NOT write into any feature evidence package.
 
 Note (implementation_feature_variant): When FEATURE_ID is set the implementation lane runs the per-feature commands instead of the registry-wide
-ops: (i) validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} [--run-id {RUN_ID}]
+ops: (i) validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} [--run-id {RUN_ID}]
 --stage {STAGE} --json -> artifacts/feature-evidence-validation.json; (ii) validate-trackers.py --feature
-{FEATURE_ID} [--run-id {RUN_ID}]; (iii) {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift;
+{FEATURE_ID} [--run-id {RUN_ID}]; (iii) {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift;
 (iv) agents/scripts/validate_templates.py.
 
 Note (scope_conditionality): V1 lanes are conditional on VALIDATION_SCOPE. requirements/all -> PM requirements validation
@@ -118,7 +120,7 @@ implementation/all -> the validator run ops (precondition: at least one complete
 REGISTRY.md OR FEATURE_ID set). When implementation targets an in-progress feature with STAGE in
 {G0..G5}, --run-id is mandatory; at STAGE G8/closeout, {FEATURE_INDEX_ROOT}/latest-run.json must exist.
 
-Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate
+Note (session_setup): Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Generate
 VALIDATE_RUN_ID once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a
 secrets.token_hex(4) suffix); never uuid4. When resuming an in-flight run in a new session, reuse the
 existing VALIDATE_RUN_ID and skip the setup below; start with resume-brief.py --run-id.

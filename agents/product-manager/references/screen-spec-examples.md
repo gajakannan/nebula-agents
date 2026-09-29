@@ -338,7 +338,7 @@ Display product details, images, pricing, and "Add to Cart" functionality.
 
 ## For Project-Specific Screens
 
-See your project's `{PRODUCT_ROOT}/planning-mds/examples/screens/` directory for screen specifications specific to your solution.
+See your project's `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/screens/` directory for screen specifications specific to your solution.
 
 ---
 

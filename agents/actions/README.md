@@ -19,7 +19,7 @@ An action is a **composition recipe** that:
 1. **User Intent Over Implementation** - Actions express what the user wants ("plan the project") not implementation details
 2. **Agent Composition** - Actions compose existing agents; they don't duplicate agent logic
 3. **Phase Alignment** - Actions align with the three-phase workflow (A: Product, B: Architecture, C: Implementation)
-4. **Boundary Respect** - Actions are generic; solution-specific usage lives in `{PRODUCT_ROOT}/planning-mds/`
+4. **Boundary Respect** - Actions are generic; solution-specific usage lives in `{NEBULA_PRODUCT_ROOT}/planning-mds/`
 5. **Flow Clarity** - Each action clearly shows the flow: sequential (→) or parallel (+)
 
 ## Action Index
@@ -73,7 +73,7 @@ Which agents are invoked and in what sequence/parallel pattern
 What must exist before running this action
 
 ## Inputs
-What the action needs from the user or {PRODUCT_ROOT}/planning-mds/
+What the action needs from the user or {NEBULA_PRODUCT_ROOT}/planning-mds/
 
 ## Outputs
 What artifacts are created or updated
@@ -103,7 +103,7 @@ Architect agent (Phase B)
   ↓
 Validation checks Definition of Done
   ↓
-Output: {PRODUCT_ROOT}/planning-mds/ populated with requirements + architecture
+Output: {NEBULA_PRODUCT_ROOT}/planning-mds/ populated with requirements + architecture
 ```
 
 ## Action vs Agent vs Phase
@@ -164,7 +164,7 @@ Architect → (Backend Developer + Frontend Developer) → Code Reviewer
 Actions can be extended by:
 1. Adding new action definitions in this directory
 2. Composing existing agents in new ways
-3. Defining project-specific action shortcuts in `{PRODUCT_ROOT}/planning-mds/workflows/` (if needed)
+3. Defining project-specific action shortcuts in `{NEBULA_PRODUCT_ROOT}/planning-mds/workflows/` (if needed)
 
 ## Getting Started
 

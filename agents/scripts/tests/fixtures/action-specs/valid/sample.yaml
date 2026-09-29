@@ -22,7 +22,7 @@ gates:
     operations:
       - run:
           id: validate-g0
-          argv: [python3, agents/scripts/foo.py, --product-root, "{PRODUCT_ROOT}",
+          argv: [python3, agents/scripts/foo.py, --product-root, "{NEBULA_PRODUCT_ROOT}",
                  --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 120

@@ -6,9 +6,9 @@ applies_to: product-manager
 
 # User Story Template
 
-Use this template for all user stories to ensure consistency and completeness. Keep it domain-neutral; project-specific examples live in `{PRODUCT_ROOT}/planning-mds/examples/`.
+Use this template for all user stories to ensure consistency and completeness. Keep it domain-neutral; project-specific examples live in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`.
 
-One story per file. Story files are colocated in their feature folder at `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`.
+One story per file. Story files are colocated in their feature folder at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`.
 
 Filename convention: `F{NNNN}-S{NNNN}-{slug}.md` (e.g., `F0001-S0001-create-record.md`).
 Non-story docs in feature folders must not start with `F{NNNN}-S{NNNN}` to avoid story-index drift (for example: use `ASSEMBLY-PLAN-F0001-S0001.md`).
@@ -155,4 +155,4 @@ Not all stories follow the typical entity → service → endpoint pattern. Infr
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/stories/` for project-specific story examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/stories/` for project-specific story examples.

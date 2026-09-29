@@ -10,4 +10,4 @@ Generic guidance for mapping requirements to tests.
 
 ---
 
-See `{PRODUCT_ROOT}/planning-mds/examples/` for project-specific mappings.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` for project-specific mappings.

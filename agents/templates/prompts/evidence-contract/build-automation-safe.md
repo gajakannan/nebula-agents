@@ -4,49 +4,51 @@
 
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
+NEBULA_PRODUCT_ROOT_BINDING: Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 REQUIRED_INPUTS:
 - BUILD_SCOPE [[F####, F####, ...] — features closed/archived in this build (may be empty for non-feature builds)]
 OPTIONAL_INPUTS:
 - MODE enum:[clean|drift-reconcile] =default:clean
-- PRODUCT_ROOT =default:sister-repo
+- NEBULA_PRODUCT_ROOT =default:environment; required if unset
 AUTO_RESOLVED:
-- BUILD_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BUILD_RUN_ID}
-- FEATURE_INDEX_ROOT = {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
-- FEATURE_PATH = {PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}
+- BUILD_RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BUILD_RUN_ID}
+- FEATURE_INDEX_ROOT = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
+- FEATURE_PATH = {NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}
 - FEATURE_SLUG = per FEATURE_ID in BUILD_SCOPE: kebab-case slug from REGISTRY.md
 - RERUN_OF = null, or {RUN_ID_PRIOR} for an evidence-only rerun with empty changed_paths[]
-- RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}
+- RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}
 - RUN_ID = per-feature run id minted when a new feature package is produced (contract format YYYY-MM-DD-token_hex(4))
 - RUN_ID_PRIOR = prior approved run_id from {FEATURE_INDEX_ROOT}/latest-run.json (null if absent)
 
 RUN_ID: var=BUILD_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
-SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
-CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/build.md -> {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)
-PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action build`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
+SESSION_SETUP: init-run.py --product-root {NEBULA_PRODUCT_ROOT} -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
+CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/build.md -> {NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md -> per FEATURE_ID in BUILD_SCOPE: {FEATURE_PATH}/STATUS.md and {FEATURE_INDEX_ROOT}/latest-run.json (if present; absence is normal for a first-time close)
+PRODUCT_CONTEXT: resolve NEBULA_PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action build`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - B0 role=product-manager artifacts=[action-context.md, gate-decisions.md]
 - B1 role=product-manager artifacts=[]
 - B2 role=product-manager artifacts=[]
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6` (cwd: framework, timeout: 300s)
 - B3 role=product-manager artifacts=[]
-    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
 - B4 role=product-manager artifacts=[pm-closeout.md]
-    - run `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` (cwd: framework, timeout: 120s)
+    - run `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` (cwd: framework, timeout: 120s)
     - write `latest-run.json` after `b4-patch-prior-manifest`
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
 - B4.5 role=product-manager artifacts=[]
     - MANUAL checkpoint `build-approval`: User reviews the aggregated per-feature closeouts (every pm-closeout.md from B4) plus the B3 lifecycle validator results. On refusal: HALT — do not proceed to B5; any further changes restart at B1 for the affected features. (requires: every pm-closeout.md from B4, B3 lifecycle validator results in lifecycle-gates.log; produces: build-approved (recorded as the B4.5 row in gate-decisions.md))
 - B5 role=product-manager artifacts=[README.md, action-context.md, artifact-trace.md, gate-decisions.md]
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
@@ -84,8 +86,8 @@ base files) per §8. It does NOT produce a feature evidence package and does NOT
 validate-feature-evidence.py (no feature scope). Tracker validation still runs as a sanity check.
 NOTE[preconditions]: {BUILD_RUN_FOLDER} created with base run files present; every feature in BUILD_SCOPE has either an
 existing approved package referenced by {FEATURE_INDEX_ROOT}/latest-run.json or a planned package to be
-produced during this build; `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start.
-NOTE[session_setup]: Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate BUILD_RUN_ID
+produced during this build; `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start.
+NOTE[session_setup]: Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Generate BUILD_RUN_ID
 once per run — not per session — in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
 suffix); never uuid4, never regenerate it after start. When resuming an in-flight run in a new session,
 reuse the existing BUILD_RUN_ID and skip the setup below; start with resume-brief.py --run-id.

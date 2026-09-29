@@ -14,7 +14,7 @@ Use this document with:
 ## Scope
 
 - Current mode: human operator runs actions, roles, and gates.
-- Session working directory: `nebula-agents`. Implementation target: `{PRODUCT_ROOT}` (sibling product repo), resolved per `agents/docs/AGENT-USE.md` → Session Setup.
+- Session working directory: `nebula-agents`. Implementation target: `{NEBULA_PRODUCT_ROOT}` (sibling product repo), resolved per `agents/docs/AGENT-USE.md` → Session Setup.
 - No built-in automated orchestrator is required for this release.
 - Evidence capture is mandatory for reproducibility and auditability.
 
@@ -23,9 +23,9 @@ Use this document with:
 Before creating a `RUN_ID`, confirm:
 
 - [ ] Session is rooted in `nebula-agents`.
-- [ ] `{PRODUCT_ROOT}` is resolved (environment, operator input, or default `../<product-repo>`) and echoed back as an absolute path.
-- [ ] `{PRODUCT_ROOT}` exists and is writable.
-- [ ] `{PRODUCT_ROOT}/lifecycle-stage.yaml` exists (or the action being run is `init`, which will scaffold it).
+- [ ] `{NEBULA_PRODUCT_ROOT}` is resolved (explicit `NEBULA_PRODUCT_ROOT` prompt input or environment; no default product) and echoed back as an absolute path.
+- [ ] `{NEBULA_PRODUCT_ROOT}` exists and is writable.
+- [ ] `{NEBULA_PRODUCT_ROOT}/lifecycle-stage.yaml` exists (or the action being run is `init`, which will scaffold it).
 
 ## Run ID And Evidence Location
 
@@ -33,11 +33,11 @@ For every action execution, create a run ID and evidence folder:
 
 ```bash
 RUN_ID=<action>-$(date -u +%Y%m%d-%H%M%S)
-mkdir -p {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/$RUN_ID
+mkdir -p {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/$RUN_ID
 ```
 
 Store all run evidence under:
-- `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/<RUN_ID>/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/<RUN_ID>/`
 
 ## Required Evidence Files
 
@@ -165,16 +165,16 @@ The operator-relevant points:
 
 - Manual / operator-initiated runs (`agents/actions/validate.md`, ad-hoc
   preflight, release rehearsals) use the **base run** profile at
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/` — the six base
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/` — the six base
   files, no `evidence-manifest.json`. The three validate-action reports
   (`pm-validation-report.md`, `architect-validation-report.md`,
   `implementation-validation-report.md`) live here, not in a feature package.
 - Feature completion closeouts (`agents/actions/feature.md`, and
   `agents/actions/build.md` when it archives a delivered feature) produce the
   full **feature package** at
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`; the
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`; the
   feature index pointer is
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/features/F####-{slug}/latest-run.json`.
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/F####-{slug}/latest-run.json`.
 - At closeout, the supersession order is mandatory: run
   `patch-prior-manifest.py` **first**, then write `latest-run.json` — never
   the reverse (see AGENT-OPS.md → The Gate Timeline).

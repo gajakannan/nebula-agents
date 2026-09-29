@@ -87,10 +87,10 @@ You run **in parallel with the Security agent** during the review action. Securi
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
+Before broad reads or searches in `{NEBULA_PRODUCT_ROOT}`, load
+`{NEBULA_PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
 patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
 evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
 read only exact evidence files required for audit, validation, closeout, failure
 triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
@@ -261,36 +261,36 @@ Flag when you see:
 - Conversely: logic duplicated 3+ times that should be extracted
 
 ### 10. Tracker Governance (when planning docs are touched)
-- If the diff includes `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`, `ROADMAP.md`, `STORY-INDEX.md`, `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, or feature `STATUS.md`, validate tracker coherence.
-- Verify archived feature links point to `{PRODUCT_ROOT}/planning-mds/features/archive/...`.
+- If the diff includes `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`, `ROADMAP.md`, `STORY-INDEX.md`, `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, or feature `STATUS.md`, validate tracker coherence.
+- Verify archived feature links point to `{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/...`.
 - Verify `STORY-INDEX.md` reflects strict story files only (no non-story documents counted).
 - Missing tracker sync or stale links are at least **High** severity findings.
 
 ### 11. Knowledge-Graph & Symbol-Index Sync
-- When the diff adds, renames, or removes a class, function, method, or property in a bound file, the symbol layer must be regenerated and re-validated (`python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols`).
-- If `{PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` is missing or stale relative to the diff, flag as **High** severity; reviewers should be able to look up new public methods via `lookup.py --symbol`.
+- When the diff adds, renames, or removes a class, function, method, or property in a bound file, the symbol layer must be regenerated and re-validated (`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols`).
+- If `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` is missing or stale relative to the diff, flag as **High** severity; reviewers should be able to look up new public methods via `lookup.py --symbol`.
 - Flag missing or dangling caller/callee references (existing symbols pointing at IDs that no longer resolve) — these signal partial regeneration.
 - Symbol-layer mismatches indicate the change skipped the routing-aid update; raw source still wins, but downstream agents lose the shortcut.
-- Per PR, run `python3 {PRODUCT_ROOT}/scripts/kg/diff-impact.py <pr-range>` and attach the `affected_nodes` list to the review notes. Surface canonical nodes the PR description didn't anticipate as a discussion point — not an auto-fail. New internal helpers legitimately have zero callers until the calling code lands; treat zero-caller findings as a reviewer flag, never a gate.
-- For symbol *names* the diff introduces or moves, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` to detect duplicate or near-duplicate surface elsewhere in the codebase. Surface duplicates as a discussion item.
+- Per PR, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/diff-impact.py <pr-range>` and attach the `affected_nodes` list to the review notes. Surface canonical nodes the PR description didn't anticipate as a discussion point — not an auto-fail. New internal helpers legitimately have zero callers until the calling code lands; treat zero-caller findings as a reviewer flag, never a gate.
+- For symbol *names* the diff introduces or moves, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` to detect duplicate or near-duplicate surface elsewhere in the codebase. Surface duplicates as a discussion item.
 - When the diff changes the signature, contract, or visibility of an interface member or a base-class method, run `lookup.py --implementers <symbol-id>` (or `--overrides <method-id>`) and confirm every concrete site is updated in the same PR. Missing implementers/overrides are at least **High** severity.
 
 ### 12. Inline Decision Markers
 - Non-obvious change without `// WHY:` (or language equivalent such as `# WHY:` / `* @why`) is a blocker.
 - Do not require markers for self-explanatory code; comments must explain rationale, not restate mechanics.
-- If markers changed, verify `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions` passes.
+- If markers changed, verify `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions` passes.
 
 ### 13. Hotspot, Ownership, and Bus-Factor Gating
-- When `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` carries Phase 3 freshness signals, consult them for each canonical node the PR touches before approval.
+- When `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` carries Phase 3 freshness signals, consult them for each canonical node the PR touches before approval.
 - If a touched node has `hotspot_rank` ≤ 5 (or `hotspot_score` ≥ 0.80), require explicit second-reviewer evidence on the PR. Approving without it is a **High** severity finding.
 - If a touched node has `bus_factor_flag: true`, require acknowledgement from `primary_owner` on the PR. Missing acknowledgement is a **High** severity finding.
 - Thresholds and customers/orders examples live in `agents/architect/references/hotspot-review-guide.md`.
 - Hotspot signals are decision aids, not authority — they never override raw artifact or design judgment.
 
 ### 14. Risk Score Gating
-- For each canonical node the PR touches, run `python3 {PRODUCT_ROOT}/scripts/kg/risk.py <node-id>` (or `--file <changed-path>` / `--symbol <name>` for narrower scope) and record the score in the review notes.
+- For each canonical node the PR touches, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py <node-id>` (or `--file <changed-path>` / `--symbol <name>` for narrower scope) and record the score in the review notes.
 - If the score lands in the **high** band (`kg.risk` ≥ 7), require an additional reviewer beyond the PR author. Approving without that second reviewer is a **High** severity finding.
-- If the score lands in the **critical** band (`kg.risk` ≥ 9), require an explicit `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py decision --topic risk-acknowledgement` entry referenced from the PR description before merge. Missing acknowledgement is a **High** severity finding.
+- If the score lands in the **critical** band (`kg.risk` ≥ 9), require an explicit `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/workstate.py decision --topic risk-acknowledgement` entry referenced from the PR description before merge. Missing acknowledgement is a **High** severity finding.
 - Apply each `reviewer_recommendations[]` entry from `risk.py` as a checklist item — Phase 4 is a roll-up over the Phase 1–3 gates, not a replacement for them.
 - Weights, bands, and customers/orders examples live in `agents/architect/references/risk-scoring-guide.md`. Per `solution-ontology.yaml.authority.precedence`, the score never overrides raw artifact judgment.
 
@@ -299,11 +299,11 @@ Flag when you see:
 ### Step 1: Gather Context
 Read in this order before touching the code:
 1. The user story and acceptance criteria
-2. `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` — the patterns this project follows
-3. If ontology coverage exists, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` or `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --file <changed-path>` to scope the review
+2. `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` — the patterns this project follows
+3. If ontology coverage exists, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` or `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --file <changed-path>` to scope the review
 4. The code changes
 5. The test files
-6. If planning docs changed: `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` plus tracker files touched in the diff
+6. If planning docs changed: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` plus tracker files touched in the diff
 
 ### Step 2: Run Available Scripts (Feedback Loop)
 ```bash
@@ -374,7 +374,7 @@ The review action presents your report alongside the Security agent's report. Th
 
 ### Required Context
 - User story with acceptance criteria
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
 - Source code under review
 - Test code (to assess coverage and quality)
 
@@ -409,7 +409,7 @@ The review action presents your report alongside the Security agent's report. Th
 ### Cannot Determine Acceptance Criteria Coverage
 **Symptom:** Unable to map code changes to acceptance criteria.
 **Cause:** User story or AC document is missing or vague.
-**Solution:** Check the relevant feature folder under `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` for the story file (`F{NNNN}-S{NNNN}-{slug}.md`). If ACs are missing, flag it as a Critical finding — code cannot be approved without verifiable acceptance criteria.
+**Solution:** Check the relevant feature folder under `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` for the story file (`F{NNNN}-S{NNNN}-{slug}.md`). If ACs are missing, flag it as a Critical finding — code cannot be approved without verifiable acceptance criteria.
 
 ### Contradictory Pattern Guidance
 **Symptom:** Code follows one convention but `SOLUTION-PATTERNS.md` prescribes another.
@@ -435,15 +435,15 @@ Actions:
 - `agents/actions/review.md` — review workflow, report format, approval gate
 
 Solution-specific:
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` — project patterns and conventions
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` — requirements and architecture decisions
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` — project patterns and conventions
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` — requirements and architecture decisions
 
 ## Feature Evidence Contract (§14, §15, §22)
 
 Code Reviewer produces `code-review-report.md` at G3 inside the feature evidence package:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/code-review-report.md
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/code-review-report.md
 ```
 
 Template: `agents/templates/code-review-report-template.md`. Result values: `APPROVED`, `APPROVED WITH RECOMMENDATIONS`, `REQUEST CHANGES`, `REJECTED`.

@@ -8,7 +8,7 @@ and at least one dated security review output.
 
 Usage:
     python3 security-audit.py [path-to-planning-security-dir]
-    python3 security-audit.py {PRODUCT_ROOT}/planning-mds/security --strict
+    python3 security-audit.py {NEBULA_PRODUCT_ROOT}/planning-mds/security --strict
 """
 
 import argparse
@@ -96,7 +96,7 @@ def main() -> int:
         "base",
         nargs="?",
         default=None,
-        help="Path to security planning directory (default: {PRODUCT_ROOT}/planning-mds/security)",
+        help="Path to security planning directory (default: {NEBULA_PRODUCT_ROOT}/planning-mds/security)",
     )
     parser.add_argument(
         "--strict",

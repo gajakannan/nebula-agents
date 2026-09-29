@@ -498,7 +498,10 @@ def test_launch_accepts_committed_story_and_persists_private_descriptor(
     assert str(workspace) not in requested_payload["command_template"]
     assert "# Safe feature test prompt" not in requested_payload["command_template"]
     assert [item[2].event_type for item in repository.commits] == ["RunLaunched"]
-    assert provider.calls[0][1] == "# Safe feature test prompt\n"
+    assert provider.calls[0][1] == (
+        f"NEBULA_PRODUCT_ROOT={json.dumps(str(workspace.resolve()))}\n\n"
+        "# Safe feature test prompt\n"
+    )
     descriptor = tmux.created[0][1]
     assert descriptor.stat().st_mode & 0o777 == 0o600
     assert schema.calls[0][0] == "f0001-launch-descriptor.schema.json"

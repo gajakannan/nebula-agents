@@ -36,7 +36,7 @@ and compiled into the operator/automation prompt pair at
   lanes run (see the spec's `notes.scope_conditionality`). `FEATURE_ID` narrows the implementation lane to
   one feature; `STAGE` (default `closeout`) and `RUN_ID` apply then (`--run-id` mandatory for `G0..G5`).
 - **Output location (§8/§14)** — reports live under the base run at
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{VALIDATE_RUN_ID}/`, governed by the six base run
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{VALIDATE_RUN_ID}/`, governed by the six base run
   files; **no** `evidence-manifest.json` (that profile is `feature.md`/`build.md` only). This action reads
   any targeted feature run **read-only** and emits findings into its own run folder.
 - **Ownership** — `product-manager` owns `pm-validation-report.md` and `implementation-validation-report.md`
@@ -82,7 +82,7 @@ agents' judgment — keep them aligned with `agents/product-manager/SKILL.md` an
 - **Requirements alignment:** architecture satisfies Phase A requirements; every story has an API endpoint or UI path; data model supports all features; authorization supports all personas.
 - **Pattern compliance (when SOLUTION-PATTERNS.md exists):** authorization pattern (e.g. Casbin ABAC), audit fields on mutable entities, endpoint naming, ProblemDetails errors, clean-architecture layers, append-only workflow transitions, timeline events on mutations.
 - **Implementation alignment (when code exists):** schema matches data model, endpoints match contracts, entities match architecture, no drift.
-- **Ontology hygiene (release-readiness):** `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-orphans` reports zero unresolved orphans; `python3 {PRODUCT_ROOT}/scripts/kg/dead-code.py --safe-only` candidates triaged (removed / wired up / justified false positive); new orphans since the last release explained (reference `agents/architect/references/dead-code-review-guide.md`).
+- **Ontology hygiene (release-readiness):** `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-orphans` reports zero unresolved orphans; `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/dead-code.py --safe-only` candidates triaged (removed / wired up / justified false positive); new orphans since the last release explained (reference `agents/architect/references/dead-code-review-guide.md`).
 
 ## Validation Severity Levels
 
@@ -96,7 +96,7 @@ agents' judgment — keep them aligned with `agents/product-manager/SKILL.md` an
 ## Prerequisites
 
 Before running the validate action:
-- [ ] `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists with planning content
+- [ ] `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists with planning content
 - [ ] Architecture artifacts exist (for architecture validation)
 - [ ] Optional: implementation code exists (for implementation alignment) or `FEATURE_ID` is set
 - [ ] User has specified `VALIDATION_SCOPE`

@@ -125,7 +125,7 @@ This document provides generic persona examples across different domains. Use th
 
 ## For Project-Specific Personas
 
-See your project's `{PRODUCT_ROOT}/planning-mds/examples/personas/` directory for personas specific to your solution.
+See your project's `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/` directory for personas specific to your solution.
 
 ---
 

@@ -77,6 +77,7 @@ def test_execute_descriptor_passes_metacharacters_as_single_argv_value(
     monkeypatch.setattr(os, "chdir", fake_chdir)
     monkeypatch.setattr(os, "execvpe", fake_execvpe)
     monkeypatch.setenv("UNAPPROVED_SECRET_NAME", "must-not-cross-boundary")
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", "../wrong-product")
 
     with pytest.raises(AssertionError, match="returned unexpectedly"):
         execute_descriptor(descriptor)
@@ -86,6 +87,7 @@ def test_execute_descriptor_passes_metacharacters_as_single_argv_value(
     assert seen["argv"] == tuple(document["argv"])
     assert seen["argv"][1] == "prompt $(touch /tmp/not-created); && 'quoted'"
     assert "UNAPPROVED_SECRET_NAME" not in seen["environment"]
+    assert seen["environment"]["NEBULA_PRODUCT_ROOT"] == str(workspace.resolve())
     assert not descriptor.exists(), "validated descriptors must be retired before exec"
 
 

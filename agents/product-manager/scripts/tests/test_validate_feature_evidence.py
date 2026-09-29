@@ -310,7 +310,7 @@ def write_artifacts(run_folder: Path, manifest: dict[str, Any], stage: str = "G0
         log_line = json.dumps({
             "schema_version": 1,
             "timestamp": "2026-05-19T12:00:00-04:00",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "echo ok",
             "exit_code": 0,
             "artifacts": [],
