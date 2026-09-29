@@ -7,6 +7,11 @@ active contract version/date, base files, empty logs, artifact subdirs, and a
 seeded action-context — then emits every resolved variable as JSON for the caller.
 A competing active run for the same feature is rejected.
 
+Feature-bound actions (FEATURE_ID required in the action spec, e.g. feature, plan)
+require --feature and get the run-scoped manifest. Every other action gets the base
+run files and artifact subdirs only — no manifest, no feature index — and --feature
+is optional scope; without it the lock is per action.
+
 Concurrency: a per-feature lock (identity = feature id + resolved product root)
 serializes the scan-and-create critical section via an atomic O_EXCL lock file
 that fails closed; the durable "one active draft/in-progress run per feature"
@@ -16,6 +21,7 @@ the run folder is created, the partial folder is rolled back — no partial skel
     python3 agents/scripts/init-run.py --action feature --feature F0007 \
         --product-root PATH [--feature-slug SLUG] [--mode clean] \
         [--rerun-of RUN_ID] [--run-id RUN_ID --resume] [--force-unlock] [--json]
+    python3 agents/scripts/init-run.py --action validate --product-root PATH [--json]
 
 Exit codes: 0 ok · 2 usage · 3 active-run/lock conflict · 4 run folder exists
 (no --resume) · 5 invalid input / path escape.
@@ -196,13 +202,15 @@ def _atomic_write(path: Path, content: str) -> None:
 
 
 def _action_context_seed(variables: dict[str, Any]) -> str:
+    identity = {k: v for k, v in variables.items() if v is not None}
     return (
         "# Action Context\n\n"
-        "> Seeded by init-run.py. Fill the judgment sections before G0.\n\n"
+        "> Seeded by init-run.py. Fill the judgment sections before the first gate.\n\n"
         "## Run Identity\n\n"
-        + "".join(f"- **{k}:** {v}\n" for k, v in sorted(variables.items()))
+        + "".join(f"- **{k}:** {v}\n" for k, v in sorted(identity.items()))
         + "\n## Inputs\n\n- TODO\n\n## Assumptions\n\n- TODO\n\n"
-        "## Scope Boundaries\n\n- TODO\n\n## Lifecycle Stage\n\n- feature run initialized\n"
+        "## Scope Boundaries\n\n- TODO\n\n## Lifecycle Stage\n\n"
+        f"- {variables.get('action', 'action')} run initialized\n"
     )
 
 
@@ -241,10 +249,10 @@ def create_skeleton(run_folder: Path, *, base_run_files: list[str], artifacts_su
 # --------------------------------------------------------------------------- #
 # Orchestration
 # --------------------------------------------------------------------------- #
-def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
+def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: str,
              feature_slug: str | None, run_id: str | None, rerun_of: str | None,
              resume: bool, force_unlock: bool, spec_dir: Path) -> dict[str, Any]:
-    if not FEATURE_ID_RE.match(feature_id):
+    if feature_id is not None and not FEATURE_ID_RE.match(feature_id):
         raise InitError(5, f"malformed feature id {feature_id!r} (expected F####)")
 
     result = vas.Result()
@@ -260,13 +268,22 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     action_contract = action_spec.get("contract", {}) if isinstance(action_spec, dict) else {}
     action_scope = action_contract.get("scope") if isinstance(action_contract, dict) else None
     base_run_only = action_scope == "base-run-only"
+    if not action_spec:
+        raise InitError(5, f"unknown action {action!r}")
+    # A feature-bound action (FEATURE_ID required) gets a run-scoped manifest; any other
+    # action gets base run files only, and FEATURE_ID is optional scope for it.
+    feature_bound = vas.is_feature_bound(action_spec)
+    if feature_bound and feature_id is None:
+        raise InitError(2, f"action {action!r} requires --feature (F####)")
+    writes_manifest = feature_bound
 
-    slug = resolve_feature_slug(product_root, feature_id, feature_slug)
+    slug = resolve_feature_slug(product_root, feature_id, feature_slug) if feature_id else None
     # Real evidence layout: the run folder lives in the shared runs/ tree; the per-feature index
     # (features/{FID}-{slug}) holds latest-run.json and the per-feature init lock.
     evidence_root = product_root / "planning-mds" / "operations" / "evidence"
     runs_root = _contained(product_root, evidence_root / "runs")
-    index_root = _contained(product_root, evidence_root / "features" / f"{feature_id}-{slug}")
+    index_root = (_contained(product_root, evidence_root / "features" / f"{feature_id}-{slug}")
+                  if feature_id else None)
 
     run_id = run_id or mint_run_id()
     if not RUN_ID_RE.match(run_id):
@@ -274,11 +291,11 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
     run_folder = _contained(product_root, runs_root / run_id)
 
     runs_root.mkdir(parents=True, exist_ok=True)
-    prior = index_root / "latest-run.json"
     run_id_prior = None
-    if not base_run_only:
+    prior = index_root / "latest-run.json" if index_root is not None else None
+    if not base_run_only and index_root is not None:
         index_root.mkdir(parents=True, exist_ok=True)
-    if not base_run_only and prior.is_file():
+    if not base_run_only and prior is not None and prior.is_file():
         try:
             run_id_prior = json.loads(prior.read_text(encoding="utf-8")).get("run_id")
         except (OSError, json.JSONDecodeError):
@@ -286,13 +303,19 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
 
     # Base-run-only actions must not create a feature evidence package. Keep their
     # transient per-feature lock in the shared runs tree instead of index_root.
-    lock_path = ((runs_root / f".{feature_id}.init.lock") if base_run_only
-                 else (index_root / ".init.lock"))
+    if feature_id is None:
+        lock_path = runs_root / f".{action}.init.lock"
+    elif base_run_only:
+        lock_path = runs_root / f".{feature_id}.init.lock"
+    else:
+        lock_path = index_root / ".init.lock"
     acquire_lock(lock_path, force=force_unlock)
     created_run_folder = not run_folder.exists()
     try:
-        conflicts = scan_active_runs(runs_root, feature_id, exclude_run_id=run_id,
-                                     scope=action_scope or "feature-completion")
+        # Concurrent-run detection reads manifests, so it applies to manifest-bearing runs only.
+        conflicts = (scan_active_runs(runs_root, feature_id, exclude_run_id=run_id,
+                                      scope=action_scope or "feature-completion")
+                     if writes_manifest else [])
         if conflicts:
             raise InitError(3, f"active {action_scope or 'feature-completion'} run(s) already "
                                f"exist for {feature_id}: {conflicts}")
@@ -305,14 +328,17 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
             "mode": mode, "run_id": run_id, "run_id_prior": run_id_prior,
             "contract_version": contract_version, "contract_effective_date": effective_date,
             "NEBULA_PRODUCT_ROOT": str(product_root),
-            "feature_index_root": str(index_root),
+            "product_root": str(product_root),
+            "feature_index_root": str(index_root) if index_root is not None else None,
             "run_folder": str(run_folder),
         }
         created, preserved = create_skeleton(
             run_folder, base_run_files=base_run_files, artifacts_subdirs=artifacts_subdirs,
             variables=variables, resume=resume)
         manifest_path = run_folder / "evidence-manifest.json"
-        if manifest_path.exists():
+        if not writes_manifest:
+            pass  # base run files only: this action is not feature-bound
+        elif manifest_path.exists():
             preserved.append("evidence-manifest.json")  # version fixed at creation; never restamp
         else:
             _write_manifest(run_folder, feature_id=feature_id, slug=slug, run_id=run_id,
@@ -338,8 +364,9 @@ def init_run(*, product_root: Path, feature_id: str, action: str, mode: str,
         "contract_version": contract_version,
         "contract_effective_date": effective_date,
         "product_root": str(product_root),
-        "feature_index_root": str(index_root),
+        "feature_index_root": str(index_root) if index_root is not None else None,
         "run_folder": str(run_folder),
+        "manifest": writes_manifest,
         "created": sorted(created),
         "preserved": sorted(preserved),
     }
@@ -349,7 +376,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     add_product_root_arg(parser)
     parser.add_argument("--action", default="feature")
-    parser.add_argument("--feature", required=True, help="Feature id (F####).")
+    parser.add_argument("--feature", default=None,
+                        help="Feature id (F####). Required for feature-bound actions (FEATURE_ID "
+                             "required in the action spec); optional scope for any other action.")
     parser.add_argument("--feature-slug", default=None)
     parser.add_argument("--mode", default="clean", choices=["clean", "drift-reconcile"])
     parser.add_argument("--run-id", default=None, help="Reuse a specific run id (with --resume).")
@@ -380,7 +409,7 @@ def main(argv: list[str] | None = None) -> int:
         return exc.code
 
     print(json.dumps(report, indent=2, sort_keys=True) if args.json
-          else f"initialized run {report['run_id']} for {report['feature_id']} "
+          else f"initialized {report['action']} run {report['run_id']} for {report['feature_id'] or 'no feature'} "
                f"(contract {report['contract_version']})\n  run_folder: {report['run_folder']}\n"
                f"  created: {report['created']}")
     return 0

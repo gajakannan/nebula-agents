@@ -52,6 +52,50 @@ def test_exec_and_log_timeout_returns_124(tmp_path):
     assert proc.returncode == 124
 
 
+def test_exec_and_log_passes_output_through(tmp_path):
+    root, log = _product_root(tmp_path)
+    proc = subprocess.run(
+        [sys.executable, str(EXEC_AND_LOG), "--log", str(log), "--product-root", str(root),
+         "--cwd", "product", "--", sys.executable, "-c",
+         "import sys; print('to-out'); print('to-err', file=sys.stderr)"],
+        capture_output=True, text=True)
+    assert proc.returncode == 0
+    assert "to-out" in proc.stdout and "to-err" in proc.stderr
+
+
+def test_exec_and_log_persists_streams_and_records_artifacts(tmp_path):
+    root, log = _product_root(tmp_path)
+    out = root / "planning-mds" / "artifacts" / "out.txt"
+    err = root / "planning-mds" / "artifacts" / "err.txt"
+    proc = subprocess.run(
+        [sys.executable, str(EXEC_AND_LOG), "--log", str(log), "--product-root", str(root),
+         "--cwd", "product", "--stdout", str(out), "--stderr", str(err), "--json", "--",
+         sys.executable, "-c",
+         "import sys, json; print(json.dumps({'ok': True})); print('warn', file=sys.stderr); sys.exit(1)"],
+        capture_output=True, text=True)
+    assert proc.returncode == 1
+    assert json.loads(out.read_text()) == {"ok": True}
+    assert err.read_text().strip() == "warn"
+    result = json.loads(proc.stdout)                       # --json output stays parseable
+    assert "stdout" not in result and "stderr" not in result
+    entry = json.loads(log.read_text(encoding="utf-8").strip())
+    assert entry["artifacts"] == ["planning-mds/artifacts/out.txt", "planning-mds/artifacts/err.txt"]
+    assert entry["exit_code"] == 1
+
+
+def test_exec_and_log_rejects_capture_outside_product_root(tmp_path):
+    (tmp_path / "p").mkdir()
+    root, log = _product_root(tmp_path / "p")
+    proc = subprocess.run(
+        [sys.executable, str(EXEC_AND_LOG), "--log", str(log), "--product-root", str(root),
+         "--cwd", "product", "--stdout", str(tmp_path / "outside.txt"), "--",
+         sys.executable, "-c", "print('x')"],
+        capture_output=True, text=True)
+    assert proc.returncode == 2
+    assert "capture_escapes_root" in proc.stdout
+    assert not (tmp_path / "outside.txt").exists()
+
+
 def test_lifecycle_list_regression():
     proc = subprocess.run([sys.executable, str(LIFECYCLE), "--list"],
                           cwd=str(REPO_ROOT), capture_output=True, text=True)

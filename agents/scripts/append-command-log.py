@@ -11,6 +11,11 @@ from pathlib import Path, PurePosixPath
 SCHEMA_VERSION = 1
 PRODUCT_LABEL = "{NEBULA_PRODUCT_ROOT}"
 FRAMEWORK_LABEL = "nebula-agents"
+# Spec cwd labels (gate_runtime._resolve_cwd, exec-and-log --cwd) map to the same telemetry
+# labels here, so every entry point records one spelling for one directory. A relative
+# path under the product root that begins with a directory literally named "product" or
+# "framework" must be passed as an absolute path.
+SPEC_CWD_LABELS = {"product": PRODUCT_LABEL, "framework": FRAMEWORK_LABEL}
 SCRATCH_ROOTS = (Path("/tmp"), Path("/var/tmp"), Path("/private/tmp"), Path("/dev/shm"))
 DEFAULT_FRAMEWORK_ROOT = Path(__file__).resolve().parents[2]
 
@@ -79,6 +84,10 @@ def normalize_cwd(raw: str, product_root: Path, framework_root: Path) -> str:
         return FRAMEWORK_LABEL
     if value.startswith(f"{FRAMEWORK_LABEL}/"):
         return _label_path(FRAMEWORK_LABEL, value[len(FRAMEWORK_LABEL) + 1 :])
+
+    spec_base, _, spec_sub = value.partition("/")
+    if spec_base in SPEC_CWD_LABELS:
+        return _label_path(SPEC_CWD_LABELS[spec_base], spec_sub)
 
     path = Path(value).expanduser()
     if path.is_absolute():
@@ -188,7 +197,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=str(DEFAULT_FRAMEWORK_ROOT),
         help="Resolved framework repository root. Defaults to this script's nebula-agents root.",
     )
-    parser.add_argument("--cwd", required=True, help="Command working directory path or stable label.")
+    parser.add_argument("--cwd", required=True,
+                        help="Command working directory: an absolute path, a stable label "
+                             "({NEBULA_PRODUCT_ROOT}, nebula-agents), or a spec label (product, framework), "
+                             "each optionally with a contained subpath.")
     parser.add_argument("--command", required=True, help="Sanitized command string to record.")
     parser.add_argument("--exit-code", required=True, type=int, help="Command exit code.")
     parser.add_argument(

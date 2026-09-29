@@ -208,3 +208,61 @@ def test_every_declared_constraint_reaches_the_committed_prompts(spec_path):
                     assert str(item["required_when"]) in text, (
                         f"{action}-{variant}: required_when for input {item['name']} "
                         f"is declared in the spec but absent from the prompt")
+
+
+# ---- session setup matches what init-run.py creates --------------------------
+def _session_line(spec):
+    text = rp.render_action(spec, SHARED, "2026-07-11")["operator-friendly"]
+    return next(line for line in text.splitlines() if line.startswith("Session setup"))
+
+
+def test_feature_bound_session_setup_initializes_manifest():
+    line = _session_line(mk_spec())
+    assert "initialize `evidence-manifest.json`" in line
+    assert "init-run.py --action t --feature {FEATURE_ID}" in line
+
+
+def test_base_run_session_setup_creates_no_manifest():
+    spec = mk_spec(scope="base-run-only")
+    spec["inputs"] = {"required": [{"name": "SCOPE"}], "optional": [{"name": "FEATURE_ID", "format": "F####"}]}
+    line = _session_line(spec)
+    assert "creates no `evidence-manifest.json`" in line
+    assert "initialize `evidence-manifest.json`" not in line
+    assert "init-run.py --action t [--feature {FEATURE_ID}]" in line
+
+
+def test_integrate_scheme_session_setup_does_not_use_init_run():
+    spec = mk_spec(scope="merge")
+    spec["inputs"] = {"required": [{"name": "BRANCH"}]}
+    spec["run_id"] = {"scheme": "integrate", "var": "RUN_ID"}
+    spec["gates"][0]["operations"][0]["run"]["argv"] = ["python3", "x.py"]
+    line = _session_line(spec)
+    assert "not minted by `agents/scripts/init-run.py`" in line
+
+
+def test_committed_validate_prompt_matches_its_contract():
+    text = (REPO_ROOT / "agents" / "templates" / "prompts" / "evidence-contract"
+            / "validate-operator-friendly.md").read_text()
+    assert "initialize `evidence-manifest.json`" not in text
+    assert "init-run.py --action validate [--feature {FEATURE_ID}]" in text
+
+
+def test_conditionally_required_inputs_render_under_required():
+    spec = mk_spec(scope="read-only-audit")
+    spec["inputs"] = {"optional": [
+        {"name": "PR_URL", "format": "GitHub PR URL"},
+        {"name": "FEATURE_ID", "format": "F####", "required_when": "PR_URL unset"},
+    ]}
+    text = rp.render_action(spec, SHARED, "2026-07-11")["operator-friendly"]
+    required_block = text.split("Required inputs:")[1].split("Optional inputs")[0]
+    assert "- `FEATURE_ID` (format `F####`) — required when PR_URL unset" in required_block
+    optional_block = text.split("Optional inputs")[1].split("Auto-resolved")[0].split("Generate")[0]
+    assert "`PR_URL`" in optional_block and "FEATURE_ID" not in optional_block
+
+
+def test_committed_feature_review_prompt_lists_feature_id_as_required():
+    text = (REPO_ROOT / "agents" / "templates" / "prompts" / "evidence-contract"
+            / "feature-review-operator-friendly.md").read_text()
+    required_block = text.split("Required inputs:")[1].split("Optional inputs")[0]
+    assert "`FEATURE_ID`" in required_block and "required when PR_URL unset" in required_block
+
