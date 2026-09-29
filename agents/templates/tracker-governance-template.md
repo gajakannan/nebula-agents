@@ -15,11 +15,11 @@ This document defines how planning trackers stay current and trustworthy.
 
 ## Authoritative Tracker Roles
 
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`: authoritative feature inventory, status, and folder paths. (In a compiled-projection repo, the feature **tables** are generated fenced regions from the feature shards via `tracker_gen.py`; the surrounding prose stays authored.)
-- `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`: authoritative sequencing view (`Now / Next / Later / Completed`).
-- `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`: auto-generated story rollup from strict story filenames.
-- `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md`: authoritative feature execution state and deferred follow-ups.
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`: baseline strategy snapshot; must not contradict tracker state.
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`: authoritative feature inventory, status, and folder paths. (In a compiled-projection repo, the feature **tables** are generated fenced regions from the feature shards via `tracker_gen.py`; the surrounding prose stays authored.)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`: authoritative sequencing view (`Now / Next / Later / Completed`).
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`: auto-generated story rollup from strict story filenames.
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md`: authoritative feature execution state and deferred follow-ups.
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`: baseline strategy snapshot; must not contradict tracker state.
 
 ## Ownership
 
@@ -54,8 +54,8 @@ This document defines how planning trackers stay current and trustworthy.
 - Signoff provenance is solution execution evidence and must live outside `agents/`.
 - `agents/**` may define process/templates/checklists, but is never accepted as completion evidence.
 - Provenance `Evidence` should point to project outputs such as:
-  - `{PRODUCT_ROOT}/planning-mds/**` (reviews, test plans, security evidence, tracker updates)
-  - implementation/test artifacts in `{PRODUCT_ROOT}/engine/**`, `{PRODUCT_ROOT}/experience/**`, `{PRODUCT_ROOT}/neuron/**`, `docs/**`, or CI outputs
+  - `{NEBULA_PRODUCT_ROOT}/planning-mds/**` (reviews, test plans, security evidence, tracker updates)
+  - implementation/test artifacts in `{NEBULA_PRODUCT_ROOT}/engine/**`, `{NEBULA_PRODUCT_ROOT}/experience/**`, `{NEBULA_PRODUCT_ROOT}/neuron/**`, `docs/**`, or CI outputs
 
 ## Lifecycle Rules
 
@@ -63,7 +63,7 @@ This document defines how planning trackers stay current and trustworthy.
 - `Done` means implementation complete and signoff evidence captured in `STATUS.md`.
 - `Done` may include a `Deferred Non-Blocking Follow-ups` section in `STATUS.md`; deferments must not change overall completion state.
 - Archived features must:
-  - live under `{PRODUCT_ROOT}/planning-mds/features/archive/`
+  - live under `{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/`
   - be listed under `Archived Features` in `REGISTRY.md`
   - appear in `ROADMAP.md` under `Completed`, not `Now/Next/Later`.
 
@@ -97,8 +97,8 @@ Update trackers immediately when any of the following occurs:
 Run these before declaring planning or feature execution complete:
 
 ```bash
-python3 agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/
-python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/
+python3 agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/
+python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 python3 agents/product-manager/scripts/validate-trackers.py
 ```
 
@@ -117,7 +117,7 @@ All conditions must pass:
 
 Done / Archived governed features must cite canonical feature evidence package files, not broad solution artifacts:
 
-- Story signoff `Evidence` paths must resolve under `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/...`.
+- Story signoff `Evidence` paths must resolve under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/...`.
 - The feature index root must carry an approved `latest-run.json`.
 - `validate-trackers.py` calls `validate-feature-evidence.py --stage G6` after tracker validation; final `G8`/`closeout` validation runs by the closeout action after tracker results are logged. This non-circular sequence is mandatory.
 - Retired features (`Terminal Status = Abandoned` or `Superseded`) are registry-only and never satisfy completion-evidence requirements.

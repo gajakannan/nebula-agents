@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 
 
 SCHEMA_VERSION = 1
-PRODUCT_LABEL = "{PRODUCT_ROOT}"
+PRODUCT_LABEL = "{NEBULA_PRODUCT_ROOT}"
 FRAMEWORK_LABEL = "nebula-agents"
 # Spec cwd labels (gate_runtime._resolve_cwd, exec-and-log --cwd) map to the same telemetry
 # labels here, so every entry point records one spelling for one directory. A relative
@@ -119,7 +119,7 @@ def normalize_artifact(raw: str, product_root: Path) -> str:
         return value
 
     if value == PRODUCT_LABEL:
-        raise CommandLogError("artifact must point inside the product root, not at {PRODUCT_ROOT}")
+        raise CommandLogError("artifact must point inside the product root, not at {NEBULA_PRODUCT_ROOT}")
     if value.startswith(f"{PRODUCT_LABEL}/"):
         suffix = value[len(PRODUCT_LABEL) + 1 :]
         return _relative_artifact_from_candidate(product_root / suffix, product_root, raw)
@@ -145,7 +145,7 @@ def resolve_log_path(raw: str, product_root: Path) -> Path:
     if not value:
         raise CommandLogError("--log must be non-empty")
     if value == PRODUCT_LABEL:
-        raise CommandLogError("--log must point to a commands.log file, not {PRODUCT_ROOT}")
+        raise CommandLogError("--log must point to a commands.log file, not {NEBULA_PRODUCT_ROOT}")
     if value.startswith(f"{PRODUCT_LABEL}/"):
         candidate = product_root / value[len(PRODUCT_LABEL) + 1 :]
     else:
@@ -190,7 +190,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Append one normalized JSONL command entry to a framework evidence commands.log."
     )
-    parser.add_argument("--log", required=True, help="Path to the commands.log file under {PRODUCT_ROOT}.")
+    parser.add_argument("--log", required=True, help="Path to the commands.log file under {NEBULA_PRODUCT_ROOT}.")
     parser.add_argument("--product-root", required=True, help="Resolved product repository root.")
     parser.add_argument(
         "--framework-root",
@@ -199,7 +199,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--cwd", required=True,
                         help="Command working directory: an absolute path, a stable label "
-                             "({PRODUCT_ROOT}, nebula-agents), or a spec label (product, framework), "
+                             "({NEBULA_PRODUCT_ROOT}, nebula-agents), or a spec label (product, framework), "
                              "each optionally with a contained subpath.")
     parser.add_argument("--command", required=True, help="Sanitized command string to record.")
     parser.add_argument("--exit-code", required=True, type=int, help="Command exit code.")

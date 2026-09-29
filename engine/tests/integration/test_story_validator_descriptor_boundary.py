@@ -98,6 +98,10 @@ def _workspace(tmp_path: Path, story_content: str) -> tuple[Path, Path, Path]:
     helper = workspace / "agents" / "scripts" / "_product_root.py"
     helper.parent.mkdir(parents=True)
     shutil.copy2(repository / "agents" / "scripts" / "_product_root.py", helper)
+    shared = Path("engine/src/nebula_agents")
+    (workspace / shared).mkdir(parents=True)
+    for name in ("__init__.py", "product_root.py"):
+        shutil.copy2(repository / shared / name, workspace / shared / name)
     return workspace, feature, story
 
 

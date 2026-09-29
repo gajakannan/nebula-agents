@@ -20,7 +20,7 @@ in the framework serves at least one of them.
 | **Select** | Load only what is relevant | KG query layer, ROUTER, `.agentignore` |
 | **Compress** | Fewest tokens per unit of context | tiered lookup, field projection, symbol granularity |
 | **Write** | Persist context outside the window | `workstate.py`, KG-DECISION markers, STATUS.md |
-| **Isolate** | Partition context by responsibility | per-role scopes, `{PRODUCT_ROOT}` split, sub-agents |
+| **Isolate** | Partition context by responsibility | per-role scopes, `{NEBULA_PRODUCT_ROOT}` split, sub-agents |
 
 ## Select — retrieve only what is relevant
 
@@ -32,7 +32,7 @@ The core discipline: **query an index, do not read the repo.**
 | Materialize a feature/file slice | `lookup.py` / `blast.py` — joins at query time; **raw yamls never enter context** | KNOWLEDGE-GRAPH.md |
 | Follow the load order | `retrieval_contract` in `solution-ontology.yaml`: ontology → canonical-nodes → only the matching feature entry → one hop → raw files only when linked/changed/needed | KNOWLEDGE-GRAPH.md |
 | Load only task-matched references | consult `ROUTER.md` before opening any `agents/<role>/references/` file | ROUTER.md |
-| Skip cold archives | honor `{PRODUCT_ROOT}/.agentignore`; treat `planning-mds/operations/**` as cold — start from the evidence README + `latest-run.json` | AGENTIGNORE.md |
+| Skip cold archives | honor `{NEBULA_PRODUCT_ROOT}/.agentignore`; treat `planning-mds/operations/**` as cold — start from the evidence README + `latest-run.json` | AGENTIGNORE.md |
 
 ## Compress — fewest tokens per unit of context
 
@@ -86,8 +86,8 @@ after compaction instead of re-deriving it.
 | Practice | Tool / contract | Reference |
 |----------|-----------------|-----------|
 | Scope each role's reads/writes | per-role read/write surfaces (backend → `engine/**`, frontend → `experience/**`, …) | AGENT-USE.md |
-| Separate framework from product | `{PRODUCT_ROOT}` placeholder keeps `agents/**` context out of product context | AGENT-USE.md |
-| Exclude outright | `{PRODUCT_ROOT}/.agentignore` removes paths from agent attention | AGENTIGNORE.md |
+| Separate framework from product | `{NEBULA_PRODUCT_ROOT}` placeholder keeps `agents/**` context out of product context | AGENT-USE.md |
+| Exclude outright | `{NEBULA_PRODUCT_ROOT}/.agentignore` removes paths from agent attention | AGENTIGNORE.md |
 | Delegate to bounded sub-tasks | action orchestration runs agents within their declared scope | actions/README.md |
 | Partition a long run across sessions | bound each session to one story or gate; resume from evidence with `resume-brief.py --run-id` instead of re-deriving | SESSION-SEGMENTATION.md |
 

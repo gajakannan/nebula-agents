@@ -47,11 +47,11 @@ the `prompt_drift` lifecycle gate fails if the committed prompts drift from the 
 
 Run the mechanics through the scripts (do not hand-transcribe them here):
 
-- Session setup + evidence skeleton — `python3 agents/scripts/init-run.py --action feature --feature {FEATURE_ID} --product-root {PRODUCT_ROOT}`
+- Session setup + evidence skeleton — `python3 agents/scripts/init-run.py --action feature --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`
 - Gate execution (ordered ops, durable checkpoints, telemetry) — `python3 agents/scripts/run-gate.py --action feature --stage <G0..G8> ...` (`--list` prints the ordered runbook)
 - Severity arithmetic at the approval gate — `python3 agents/scripts/gate_policy.py --profile standard ...`
 
-Evidence lives under `{PRODUCT_ROOT}/planning-mds/operations/evidence/` per the Feature
+Evidence lives under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/` per the Feature
 Evidence Contract in `CONSUMER-CONTRACT.md`; per-gate acceptance is
 `validate-feature-evidence.py --stage <Gn>` (invoked by `run-gate.py`).
 
@@ -107,20 +107,20 @@ If a validation command fails with runtime symptoms (for example connection refu
 
 1. **Activate Architect agent** by reading `agents/architect/SKILL.md`
 2. **Read context:**
-   - Feature stories in `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` scope and constraints
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
-   - `{PRODUCT_ROOT}/planning-mds/api/` contracts for this feature
+   - Feature stories in `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` scope and constraints
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/api/` contracts for this feature
 3. **Produce feature assembly plan:**
    - Required backend/frontend/AI changes for this feature only
    - Integration checkpoints and dependency order
    - Test and release checklist for the vertical slice
    - **Knowledge-Graph Binding Plan** — the *intended* semantic-graph delta: which capabilities/canonical nodes this feature is expected to add or extend, and the anticipated binding glob(s) (`kg-source/bindings/**`). This is a prediction, not a contract; it is the baseline the `G7` reconciliation diffs the as-built source against. "No new nodes; reuses existing semantics" is a valid declaration.
 4. **Output artifacts:**
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (canonical per-feature execution plan; use `agents/templates/feature-assembly-plan-template.md`)
-   - Update `{PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` to reference the feature-local plan from the umbrella cross-feature sequencing view
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md` (canonical per-feature execution plan; use `agents/templates/feature-assembly-plan-template.md`)
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md` to reference the feature-local plan from the umbrella cross-feature sequencing view
 5. **Initialize signoff requirements in feature status:**
-   - Update `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` section `Required Signoff Roles`
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` section `Required Signoff Roles`
    - Mark baseline required roles as `Yes`: `Quality Engineer`, `Code Reviewer`
    - Add risk-based required roles (`Security Reviewer`, `DevOps`, `Architect`) when scope warrants
 
@@ -152,7 +152,7 @@ Validator:
 
 **Execution Instructions:**
 
-Execute these agents **in parallel** for the specific feature. Run AI Engineer when the feature touches `{PRODUCT_ROOT}/neuron/`, LLM workflows, prompts, or MCP.
+Execute these agents **in parallel** for the specific feature. Run AI Engineer when the feature touches `{NEBULA_PRODUCT_ROOT}/neuron/`, LLM workflows, prompts, or MCP.
 All stack-specific execution (compile/tests/scans) must run in application runtime containers produced for this project.
 
 Mandatory preflight before implementation validation runs:
@@ -162,14 +162,14 @@ Mandatory preflight before implementation validation runs:
 - [ ] Story mentions LLM, AI, or machine learning behavior
 - [ ] Story requires MCP server/tool/resource work
 - [ ] Story involves prompts, agent behavior, or tool orchestration
-- [ ] Story changes files under `{PRODUCT_ROOT}/neuron/`
+- [ ] Story changes files under `{NEBULA_PRODUCT_ROOT}/neuron/`
 - [ ] Story requires model selection, cost controls, or guardrails
 
 #### 1a. Backend Developer (Feature Scope)
 1. **Activate Backend Developer agent** by reading `agents/backend-developer/SKILL.md`
 2. **Read context:**
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (architecture for this feature)
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (architecture for this feature)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
    - User stories for THIS FEATURE ONLY
 3. **Execute responsibilities (feature-scoped):**
    - Implement domain entities for this feature
@@ -192,14 +192,14 @@ Mandatory preflight before implementation validation runs:
    - Application services
    - Unit tests
    - Integration tests
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (Backend Progress section, validation evidence)
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (key files, seed data, verification steps)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (Backend Progress section, validation evidence)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (key files, seed data, verification steps)
 
 #### 1b. Frontend Developer (Feature Scope)
 1. **Activate Frontend Developer agent** by reading `agents/frontend-developer/SKILL.md`
 2. **Read context:**
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (screens for this feature)
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (screens for this feature)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
    - API contracts for THIS FEATURE ONLY
    - `agents/frontend-developer/references/ux-audit-ruleset.md`
 3. **Execute responsibilities (feature-scoped):**
@@ -223,15 +223,15 @@ Mandatory preflight before implementation validation runs:
    - Routing updates
    - Component tests
    - UX audit evidence for this feature (command output + dark/light verification notes)
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (Frontend Progress section, validation evidence)
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (key files, verification steps)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (Frontend Progress section, validation evidence)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (key files, verification steps)
 
 #### 1c. AI Engineer (Feature Scope, if AI scope)
 1. **Activate AI Engineer agent** by reading `agents/ai-engineer/SKILL.md`
 2. **Read context:**
    - AI-related user stories for THIS FEATURE
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
-   - Existing `{PRODUCT_ROOT}/neuron/` code and interfaces
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - Existing `{NEBULA_PRODUCT_ROOT}/neuron/` code and interfaces
 3. **Execute responsibilities (feature-scoped):**
    - Implement AI workflow/prompt/tool logic for this feature
    - Add/modify MCP resources/tools if the feature requires them
@@ -242,18 +242,18 @@ Mandatory preflight before implementation validation runs:
    - Explicit integration contracts with backend/frontend
    - Observable AI behavior (logs/metrics)
 5. **Outputs (feature-specific):**
-   - `{PRODUCT_ROOT}/neuron/` feature implementation
+   - `{NEBULA_PRODUCT_ROOT}/neuron/` feature implementation
    - AI tests
    - Prompt/config updates
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (AI Progress section, validation evidence)
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (AI runtime / setup notes)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (AI Progress section, validation evidence)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/GETTING-STARTED.md` updates (AI runtime / setup notes)
 
 #### 1d. Quality Engineer (Feature Scope)
 1. **Activate Quality Engineer agent** by reading `agents/quality-engineer/SKILL.md`
 2. **Read context:**
    - User stories for THIS FEATURE with acceptance criteria
    - Workflows for THIS FEATURE
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
 3. **Execute responsibilities (feature-scoped):**
    - Create test plan for this feature
    - Write E2E test for feature happy path
@@ -271,13 +271,13 @@ Mandatory preflight before implementation validation runs:
    - E2E tests (happy path + errors)
    - Feature test coverage report
    - When `security_sensitive_scope = true`: `artifacts/security/` raw scan outputs + populated `security_scans{}` manifest block (handed to Security for the verdict)
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (QE feature-level signoff entry, validation evidence paths)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (QE feature-level signoff entry, validation evidence paths)
 
 #### 1e. DevOps (Feature Deployability Check)
 1. **Activate DevOps agent** by reading `agents/devops/SKILL.md`
 2. **Read context:**
-   - Feature assembly plan (`{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md`)
-   - Umbrella sequencing/reference plan (`{PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md`) when cross-feature dependency context is needed
+   - Feature assembly plan (`{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md`)
+   - Umbrella sequencing/reference plan (`{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/feature-assembly-plan.md`) when cross-feature dependency context is needed
    - Existing deployment artifacts (`docker-compose*.yml`, Dockerfiles, runtime configs)
    - Feature-specific runtime requirements from backend/frontend/AI outputs
 3. **Execute responsibilities (feature-scoped):**
@@ -289,7 +289,7 @@ Mandatory preflight before implementation validation runs:
    - Deployment/runtime config updates (if required)
    - Feature deployability check summary with executed command evidence
    - Updated env var documentation for new feature requirements
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (deployability evidence, Cross-Cutting checklist items)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` updates (deployability evidence, Cross-Cutting checklist items)
 
 **Completion Criteria for Step 1:**
 - [ ] All required agents completed feature implementation (Backend, Frontend, Quality, DevOps, and AI Engineer if AI scope)
@@ -325,8 +325,8 @@ Before self-review checks:
    - [ ] Component tests passing
    - [ ] SOLUTION-PATTERNS.md followed
    - [ ] UX rule-set checks passed for this feature (`agents/frontend-developer/references/ux-audit-ruleset.md`)
-   - [ ] `pnpm --dir {PRODUCT_ROOT}/experience lint`, `lint:theme`, `build`, and `test` passed
-   - [ ] `pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme` passed when style/theme changed
+   - [ ] `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint`, `lint:theme`, `build`, and `test` passed
+   - [ ] `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme` passed when style/theme changed
    - [ ] Feature acceptance criteria met
 
 3. **AI Engineer self-review (if AI scope):**
@@ -374,8 +374,8 @@ Run these review agents in parallel:
 2. **Read context:**
    - Feature code produced in Step 1
    - Application runtime validation outputs (test, lint, SAST, dependency scan reports)
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature requirements)
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature requirements)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
    - Feature user stories with acceptance criteria
 
 3. **Execute code review (feature-focused):**
@@ -438,10 +438,10 @@ Run these review agents in parallel:
 2. **Read context:**
    - Feature code produced in Step 1
    - Application runtime validation outputs (test, lint, SAST, dependency scan reports)
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature requirements)
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature requirements)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
    - Feature user stories with acceptance criteria
-   - Existing `{PRODUCT_ROOT}/planning-mds/security/` artifacts (if present)
+   - Existing `{NEBULA_PRODUCT_ROOT}/planning-mds/security/` artifacts (if present)
    - QE's `security_scans{}` manifest block and raw outputs under `{RUN_ID}/artifacts/security/`
 
 3. **Execute security review (feature-focused):**
@@ -599,7 +599,7 @@ Run these review agents in parallel:
      - Re-present current state and allowed options
 
 5. After an approving decision is recorded in `gate-decisions.md`, run scoped G4 validation before signoff:
-   - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G4`
+   - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G4`
 
 **Gate Criteria:**
 - [ ] Code + security critical issues = 0 before approval is enabled
@@ -616,7 +616,7 @@ Run these review agents in parallel:
 
 Before setting feature status to `Done` or moving to archive, verify role signoffs:
 
-1. Read `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md`:
+1. Read `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md`:
    - `Required Signoff Roles` matrix (planning baseline)
    - `Story Signoff Provenance` (execution evidence)
 2. For every role marked `Required = Yes`, confirm ledger has:
@@ -624,7 +624,7 @@ Before setting feature status to `Done` or moving to archive, verify role signof
    - `PASS` (or `APPROVED`) verdict
    - reviewer identity
    - review date
-   - concrete evidence path(s) to solution artifacts under `{PRODUCT_ROOT}/planning-mds/operations/evidence/**`
+   - concrete evidence path(s) to solution artifacts under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/**`
 3. If any required role is missing or non-pass:
    - Block feature closeout
    - Route back to the owning reviewer role
@@ -648,9 +648,9 @@ Before setting feature status to `Done` or moving to archive, verify role signof
 2. Write `feature-action-execution.md` with a gate-by-gate timeline of the run.
 3. Confirm the manifest is a pre-closeout candidate: `status: in-progress`, `gate_results` through `signoff` present, and `pm_closeout` / `tracker_sync` absent or `required: false` (no `latest-run.json` yet).
 4. Run candidate stage validation:
-   - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6`
+   - `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G6`
 5. Run tracker validation (it internally calls feature-evidence at `--stage G6`) and append the result to `lifecycle-gates.log`:
-   - `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`
+   - `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`
 
 **Gate Criteria:**
 - [ ] All `G0`–`G5` evidence present with passing verdicts
@@ -669,10 +669,10 @@ Before setting feature status to `Done` or moving to archive, verify role signof
 
 1. **Activate Architect agent** by reading `agents/architect/SKILL.md`.
 2. Diff the as-built source against the graph's G0 declaration (the `feature-assembly-plan.md` "Knowledge-Graph Binding Plan", if present) to find the binding delta — capabilities, modules, or shared semantics that emerged during implementation.
-3. For every new source surface that represents a capability or shared semantic, add or update its **binding shard** in `{PRODUCT_ROOT}/planning-mds/kg-source/bindings/**`. Bind by **directory glob** where a cohesive folder represents one capability (e.g. `experience/src/features/forms/**`), not file-by-file. Existing globs that already cover new files need no change — confirm coverage rather than duplicating.
-4. If the feature introduced new canonical nodes or rationale (`WHY`) entries, add **node shards** to `{PRODUCT_ROOT}/planning-mds/kg-source/nodes/**` (logical `F####/` doc refs only). If it introduced none, state that explicitly. Then run `compile.py` — it regenerates `code-index.yaml`/`canonical-nodes.yaml` (never hand-edit them).
-5. Regenerate and validate all code-path-derived generated layers: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions`. This refreshes `symbol-index.yaml`, `unbound-but-referenced.yaml`, and `decisions-index.yaml`; it is mandatory even when the authored KG files appear unchanged. (Editing a bound method body without first consulting `lookup.py --symbol` / `hint.py --symbol` is forbidden — the symbol layer keeps edits narrow.)
-6. Run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` and resolve any errors. Do **not** run `--write-coverage-report` here — coverage binds feature-doc paths that the PM closeout archive move will relocate; regenerating it now re-stales it on the move. Coverage regeneration is a `G8` step, after the move.
+3. For every new source surface that represents a capability or shared semantic, add or update its **binding shard** in `{NEBULA_PRODUCT_ROOT}/planning-mds/kg-source/bindings/**`. Bind by **directory glob** where a cohesive folder represents one capability (e.g. `experience/src/features/forms/**`), not file-by-file. Existing globs that already cover new files need no change — confirm coverage rather than duplicating.
+4. If the feature introduced new canonical nodes or rationale (`WHY`) entries, add **node shards** to `{NEBULA_PRODUCT_ROOT}/planning-mds/kg-source/nodes/**` (logical `F####/` doc refs only). If it introduced none, state that explicitly. Then run `compile.py` — it regenerates `code-index.yaml`/`canonical-nodes.yaml` (never hand-edit them).
+5. Regenerate and validate all code-path-derived generated layers: `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions --check-decisions`. This refreshes `symbol-index.yaml`, `unbound-but-referenced.yaml`, and `decisions-index.yaml`; it is mandatory even when the authored KG files appear unchanged. (Editing a bound method body without first consulting `lookup.py --symbol` / `hint.py --symbol` is forbidden — the symbol layer keeps edits narrow.)
+6. Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` and resolve any errors. Do **not** run `--write-coverage-report` here — coverage binds feature-doc paths that the PM closeout archive move will relocate; regenerating it now re-stales it on the move. Coverage regeneration is a `G8` step, after the move.
 7. Record the outcome in `kg-reconciliation.md` (template: `agents/templates/kg-reconciliation-template.md`): the binding delta applied, new/affirmed canonical nodes, and the green generated-layer + drift validator results.
 
 **Completion Criteria:**
@@ -692,24 +692,24 @@ Before setting feature status to `Done` or moving to archive, verify role signof
 
 1. **Activate Product Manager agent** by reading `agents/product-manager/SKILL.md`
 2. Reconcile feature closure artifacts:
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` (final status, deferred follow-ups, mitigation notes)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/STATUS.md` (final status, deferred follow-ups, mitigation notes)
    - `STATUS.md` required signoff matrix + story signoff provenance entries
-   - `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (status/path transitions, including archive moves)
-   - `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (Now/Next/Later/Completed placement)
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature/story status labels and links, if changed)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (status/path transitions, including archive moves)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (Now/Next/Later/Completed placement)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (feature/story status labels and links, if changed)
 3. For completed features (`Overall Status: Done`), move the feature folder to archive when appropriate:
-   - From `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`
-   - To `{PRODUCT_ROOT}/planning-mds/features/archive/F{NNNN}-{slug}/`
+   - From `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`
+   - To `{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/F{NNNN}-{slug}/`
    - Then update impacted feature-local links and registry paths
 4. If ontology-backed planning exists for the feature, update feature/path/status references in:
-   - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
 5. Record any orphaned stories, deferred follow-ups, or explicit mitigation carry-overs before final validation
 6. **Knowledge-graph: verify, then regenerate the path-sensitive layer (do not author bindings here):**
    - The **semantic** graph shards (`kg-source/bindings/**`, `kg-source/nodes/**`, compiled to `code-index.yaml`/`canonical-nodes.yaml`) were authored by the Architect at `G7` and `kg-reconciliation.md` records it. Closeout **verifies** the compiled graph is green — it does not author shards. If a binding gap is discovered now (a capability surface the `G7` pass missed), route back to the Architect for a `G7` delta pass (author shards + recompile) rather than editing the graph in closeout.
-   - After the archive folder move (step 3) and the feature-shard `path:`/`status:` edit + `compile.py` (step 4), regenerate the **path-sensitive** coverage layer: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`. (Because logical `F####/` refs resolve through the shard `path:`, the archive move needs no doc-ref repoint anywhere — the F0005 payoff.)
-   - Run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` to confirm the post-move graph is green.
+   - After the archive folder move (step 3) and the feature-shard `path:`/`status:` edit + `compile.py` (step 4), regenerate the **path-sensitive** coverage layer: `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`. (Because logical `F####/` refs resolve through the shard `path:`, the archive move needs no doc-ref repoint anywhere — the F0005 payoff.)
+   - Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` to confirm the post-move graph is green.
 7. **Publish the approved run** in the supersession-and-publish order (see "Closeout Supersession-And-Publish Sequence"): run `patch-prior-manifest.py` to mark prior approved manifests `superseded`, then write `latest-run.json` pointing at this run, then finalize the manifest to `status: approved`.
-8. **Tracker sync:** regenerate the story rollup when story files moved/changed (`python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`), then run final closeout validation (`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`) and scoped tracker validation (`python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`). Treat any tracker drift as blocking and re-run after repair.
+8. **Tracker sync:** regenerate the story rollup when story files moved/changed (`python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`), then run final closeout validation (`python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout`) and scoped tracker validation (`python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}`). Treat any tracker drift as blocking and re-run after repair.
 
 **Completion Criteria:**
 - [ ] Product Manager closeout executed after signoff and `G7` architect KG reconciliation passed
@@ -832,7 +832,7 @@ Before running feature action:
 - [ ] Feature has clear user stories with acceptance criteria
 - [ ] Feature scope is small (2-5 days of work)
 - [ ] SOLUTION-PATTERNS.md exists
-- [ ] Tracker governance contract available (`{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`, seeded from `agents/templates/tracker-governance-template.md` when missing)
+- [ ] Tracker governance contract available (`{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`, seeded from `agents/templates/tracker-governance-template.md` when missing)
 - [ ] AI scope is explicit (if feature includes AI behavior)
 - [ ] User is available for approval
 

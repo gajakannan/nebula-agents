@@ -5,7 +5,7 @@ Frontend UX Evidence Validator
 Fails CI when frontend UI files change without an accompanying UX evidence artifact.
 
 Evidence artifacts must live in:
-  {PRODUCT_ROOT}/planning-mds/operations/evidence/frontend-ux/
+  {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/frontend-ux/
 
 Usage:
   python3 agents/frontend-developer/scripts/validate-frontend-ux-evidence.py
@@ -40,11 +40,11 @@ REQUIRED_HEADINGS = (
 )
 
 REQUIRED_COMMAND_CHECKBOXES = (
-    "pnpm --dir {PRODUCT_ROOT}/experience lint",
-    "pnpm --dir {PRODUCT_ROOT}/experience lint:theme",
-    "pnpm --dir {PRODUCT_ROOT}/experience build",
-    "pnpm --dir {PRODUCT_ROOT}/experience test",
-    "pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme",
+    "pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint",
+    "pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint:theme",
+    "pnpm --dir {NEBULA_PRODUCT_ROOT}/experience build",
+    "pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test",
+    "pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme",
 )
 
 REQUIRED_CHECKLIST_CHECKBOXES = (

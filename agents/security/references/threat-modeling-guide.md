@@ -29,4 +29,4 @@
 
 ## Output
 - One threat model per major feature
-- Stored in {PRODUCT_ROOT}/planning-mds/security/
+- Stored in {NEBULA_PRODUCT_ROOT}/planning-mds/security/

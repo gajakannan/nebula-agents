@@ -15,6 +15,12 @@ from nebula_agents.presentation import cli, session_entry, transcript_filter, tu
 from nebula_agents.presentation.interop import IntegrationError
 
 
+@pytest.fixture(autouse=True)
+def selected_product(monkeypatch, tmp_path):
+    """CLI dispatch tests start with an explicit product selection."""
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", str(tmp_path))
+
+
 RUN_ID = "2026-07-13-deadbeef"
 ACTOR = Actor(1000, "operator", Role.LOCAL_OPERATOR)
 
@@ -166,7 +172,7 @@ def test_cli_helpers_cover_format_command_exit_and_validator_shapes() -> None:
     assert "[ERROR] BAD" in error_stream.getvalue()
 
 
-def test_product_root_precedence_is_explicit_then_environment_then_cwd(
+def test_product_root_precedence_is_explicit_then_environment_then_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     working = tmp_path / "working"
@@ -175,13 +181,14 @@ def test_product_root_precedence_is_explicit_then_environment_then_cwd(
     for path in (working, configured, explicit):
         path.mkdir()
     monkeypatch.chdir(working)
-    monkeypatch.setenv("NEBULA_AGENTS_PRODUCT_ROOT", str(configured))
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", str(configured))
 
     assert cli._resolve_product_root() == configured.resolve()
     assert cli._resolve_product_root(explicit) == explicit.resolve()
 
-    monkeypatch.delenv("NEBULA_AGENTS_PRODUCT_ROOT")
-    assert cli._resolve_product_root() == working.resolve()
+    monkeypatch.delenv("NEBULA_PRODUCT_ROOT")
+    with pytest.raises(cli.UsageFault, match="no product is selected"):
+        cli._resolve_product_root()
 
 
 def test_nonrepository_cwd_doctor_uses_configured_product_root(
@@ -209,7 +216,7 @@ def test_nonrepository_cwd_doctor_uses_configured_product_root(
         current_actor=lambda: ACTOR,
     )
     monkeypatch.chdir(non_repository)
-    monkeypatch.setenv("NEBULA_AGENTS_PRODUCT_ROOT", str(product_root))
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", str(product_root))
     built: list[Path] = []
 
     def build(root: Path) -> object:
@@ -290,7 +297,7 @@ def test_nonrepository_cwd_status_and_launch_use_environment_product_root(
         return application
 
     monkeypatch.chdir(elsewhere)
-    monkeypatch.setenv("NEBULA_AGENTS_PRODUCT_ROOT", str(product_root))
+    monkeypatch.setenv("NEBULA_PRODUCT_ROOT", str(product_root))
     monkeypatch.setattr(cli, "_build_application", build)
 
     assert cli.main(arguments) == 0

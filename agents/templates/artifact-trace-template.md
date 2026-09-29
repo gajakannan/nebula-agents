@@ -35,5 +35,5 @@ Mirror the manifest `omissions[]` and `waivers` entries for human review. Per §
 Required only when `commands.log` carries an absolute `cwd`. One bullet per justified absolute path:
 
 ```text
-- Absolute cwd: /workspace/some/path — sandboxed CI runner; PRODUCT_ROOT not stable
+- Absolute cwd: /workspace/some/path — sandboxed CI runner; NEBULA_PRODUCT_ROOT not stable
 ```

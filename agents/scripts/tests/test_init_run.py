@@ -53,6 +53,7 @@ def test_happy_path_creates_stamped_skeleton(tmp_path):
         assert (run_folder / base).exists()
     assert (run_folder / "artifacts" / "coverage").is_dir()
     assert "evidence-manifest.json" in report["created"]
+    assert f"**NEBULA_PRODUCT_ROOT:** {tmp_path}" in (run_folder / "action-context.md").read_text()
 
 
 def test_plan_base_run_does_not_create_feature_index(tmp_path):

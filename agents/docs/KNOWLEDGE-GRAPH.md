@@ -141,8 +141,8 @@ on conflict.
 
 ## File Inventory
 
-All KG yaml files live at `{PRODUCT_ROOT}/planning-mds/knowledge-graph/`.
-Scripts and AST extractors live at `{PRODUCT_ROOT}/scripts/kg/`.
+All KG yaml files live at `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/`.
+Scripts and AST extractors live at `{NEBULA_PRODUCT_ROOT}/scripts/kg/`.
 
 | File | Owner | Source | What it holds |
 |------|-------|--------|---------------|
@@ -162,7 +162,7 @@ canonical semantics — drift goes back to Architect or PM.
 
 ## How Symbol Extraction Works
 
-`symbols.py` (`{PRODUCT_ROOT}/scripts/kg/symbols.py`) is the only writer of
+`symbols.py` (`{NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py`) is the only writer of
 `symbol-index.yaml`. It is the *only* part of the KG that touches real
 source code. Its scope is bounded by `code-index.yaml.node_bindings` — it
 does not scan the repo broadly.
@@ -202,7 +202,7 @@ grepping.
 ## Querying the KG
 
 Agents never read the yaml files directly. They go through the CLIs,
-which all live at `{PRODUCT_ROOT}/scripts/kg/` and are agent-agnostic
+which all live at `{NEBULA_PRODUCT_ROOT}/scripts/kg/` and are agent-agnostic
 (work from any terminal).
 
 ### `lookup.py` — feature/story/file scope materialization
@@ -225,8 +225,8 @@ which all live at `{PRODUCT_ROOT}/scripts/kg/` and are agent-agnostic
 ### `hint.py` — compact pre-search routing
 
 ```
-python3 {PRODUCT_ROOT}/scripts/kg/hint.py <repo-relative-path>
-python3 {PRODUCT_ROOT}/scripts/kg/hint.py --json <repo-relative-path>
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <repo-relative-path>
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py --json <repo-relative-path>
 ```
 
 Emits a single short block: matched nodes, features, stories, Casbin
@@ -260,7 +260,7 @@ know what else moves with you.
 ### MCP server (same retrieval, structured transport)
 
 For harnesses that speak MCP, the same retrieval is exposed as local stdio tools by
-`{PRODUCT_ROOT}/scripts/kg/mcp_server.py` (committed `{PRODUCT_ROOT}/.mcp.json` launches
+`{NEBULA_PRODUCT_ROOT}/scripts/kg/mcp_server.py` (committed `{NEBULA_PRODUCT_ROOT}/.mcp.json` launches
 it). It is a thin adapter over the **same** CLI builders — identical semantics, minified
 JSON payloads, telemetry tagged `source="mcp"`. The CLIs above remain the implementation
 and the fallback for non-MCP harnesses.
@@ -271,11 +271,11 @@ and the fallback for non-MCP harnesses.
 | `kg_hint` | `hint.py` | pre-search routing; returns a structured (possibly empty) payload |
 | `kg_blast` | `blast.py` | impact radius; `compact` for summary only |
 | `kg_validate` | `validate.py` (read-only modes) | `check-drift\|check-symbols\|check-orphans\|check-coverage-gaps` → `{ok, errors, warnings}`; never mutates |
-| `kg_workstate` | `workstate.py` | the only writer; actions init/decision/escalate/dump/digest; writes **only** under `{PRODUCT_ROOT}/.kg-state/workstate/<session>.yaml` (traversal/KG-dir writes rejected) |
+| `kg_workstate` | `workstate.py` | the only writer; actions init/decision/escalate/dump/digest; writes **only** under `{NEBULA_PRODUCT_ROOT}/.kg-state/workstate/<session>.yaml` (traversal/KG-dir writes rejected) |
 
 **Launch config — two cases:**
 
-- Session launched **from `{PRODUCT_ROOT}`** → the committed `{PRODUCT_ROOT}/.mcp.json`:
+- Session launched **from `{NEBULA_PRODUCT_ROOT}`** → the committed `{NEBULA_PRODUCT_ROOT}/.mcp.json`:
   ```json
   { "mcpServers": { "kg": { "command": "python3", "args": ["scripts/kg/mcp_server.py"] } } }
   ```
@@ -287,7 +287,7 @@ and the fallback for non-MCP harnesses.
       "args": ["${NEBULA_PRODUCT_ROOT}/scripts/kg/mcp_server.py"] } } }
   ```
 
-The server self-locates the KG from its own file path, so no `PRODUCT_ROOT` env is needed
+The server self-locates the KG from its own file path, so no `NEBULA_PRODUCT_ROOT` env is needed
 at runtime — only the launch path must resolve. MCP-capable harnesses should prefer the
 `kg_*` tools; the CLIs above are the fallback for harnesses without MCP.
 
@@ -332,7 +332,7 @@ the **artifact**.
 
 ## Health Checks
 
-All run from `{PRODUCT_ROOT}/scripts/kg/`. Use them defensively — they
+All run from `{NEBULA_PRODUCT_ROOT}/scripts/kg/`. Use them defensively — they
 catch drift before it propagates.
 
 | Command | What it catches |
@@ -443,7 +443,7 @@ Adding a new validator mode:
   seeds, provenance annotations).
 - `agents/actions/plan.md`, `agents/actions/feature.md` — action-level
   retrieval contracts, gates, and validation order.
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` — the live KG data for a
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` — the live KG data for a
   given product (yamls only; no docs).
-- `{PRODUCT_ROOT}/scripts/kg/` — CLIs, AST extractors, and `kg_common.py`
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/` — CLIs, AST extractors, and `kg_common.py`
   (`resolve_node` is where joins happen).

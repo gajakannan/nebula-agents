@@ -9,10 +9,10 @@ This document is the operations-facing deployment guide for generated applicatio
 
 ## Required Inputs
 
-- Deployment topology from `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
+- Deployment topology from `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
 - Runtime service definitions (`docker-compose*.yml`, Kubernetes manifests, or equivalent)
 - Environment variable contract (`.env.example` and secret manager mappings)
-- Validation evidence from lifecycle gates for the current stage (recorded under `{PRODUCT_ROOT}/planning-mds/operations/evidence/`; see `agents/docs/AGENT-OPS.md`)
+- Validation evidence from lifecycle gates for the current stage (recorded under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/`; see `agents/docs/AGENT-OPS.md`)
 
 ## Minimum Sections
 

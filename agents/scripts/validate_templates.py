@@ -82,7 +82,7 @@ def gate_name_matches(expected: str, actual: str) -> bool:
 
 
 def _strip_product_root(value: str) -> str:
-    return value[len("{PRODUCT_ROOT}/") :] if value.startswith("{PRODUCT_ROOT}/") else value
+    return value[len("{NEBULA_PRODUCT_ROOT}/") :] if value.startswith("{NEBULA_PRODUCT_ROOT}/") else value
 
 
 def path_covered(path: str, template_text: str, template_paths: set[str]) -> bool:
@@ -90,21 +90,21 @@ def path_covered(path: str, template_text: str, template_paths: set[str]) -> boo
         return True
 
     bare = _strip_product_root(path)
-    prefixed = "{PRODUCT_ROOT}/" + bare
+    prefixed = "{NEBULA_PRODUCT_ROOT}/" + bare
 
-    if prefixed.startswith("{PRODUCT_ROOT}/planning-mds/knowledge-graph/"):
+    if prefixed.startswith("{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/"):
         stem = Path(bare).stem.replace(".schema", "")
         return (
-            "{PRODUCT_ROOT}/planning-mds/knowledge-graph/" in template_text and stem in template_text
-        ) or "{PRODUCT_ROOT}/scripts/kg/lookup.py" in template_text
+            "{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/" in template_text and stem in template_text
+        ) or "{NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py" in template_text
 
-    if prefixed == "{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**":
-        return "{FEATURE_PATH}/**" in template_text or "{PRODUCT_ROOT}/planning-mds/features/{F####-slug}" in template_text
+    if prefixed == "{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/**":
+        return "{FEATURE_PATH}/**" in template_text or "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{F####-slug}" in template_text
 
-    if prefixed == "{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md":
+    if prefixed == "{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/feature-assembly-plan.md":
         return "{FEATURE_PATH}/feature-assembly-plan.md" in template_text
 
-    if prefixed == "{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md":
+    if prefixed == "{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md":
         return "BLUEPRINT" in template_text
 
     if bare.endswith("/REGISTRY.md"):

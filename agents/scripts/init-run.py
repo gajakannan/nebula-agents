@@ -47,7 +47,7 @@ TEMPLATES_DIR = FRAMEWORK_ROOT / "agents" / "templates"
 MANIFEST_TEMPLATE = TEMPLATES_DIR / "evidence-manifest-template.json"
 
 sys.path.insert(0, str(SCRIPT_DIR))
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 import validate_action_specs as vas  # noqa: E402
 
 FEATURE_ID_RE = re.compile(r"^F\d{4}$")
@@ -327,6 +327,7 @@ def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: s
             "action": action, "feature_id": feature_id, "feature_slug": slug,
             "mode": mode, "run_id": run_id, "run_id_prior": run_id_prior,
             "contract_version": contract_version, "contract_effective_date": effective_date,
+            "NEBULA_PRODUCT_ROOT": str(product_root),
             "product_root": str(product_root),
             "feature_index_root": str(index_root) if index_root is not None else None,
             "run_folder": str(run_folder),
@@ -388,7 +389,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    product_root = resolve_product_root(args.product_root)
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        return 2
     if not product_root.is_dir():
         sys.stderr.write(f"product root does not exist: {product_root}\n")
         return 2

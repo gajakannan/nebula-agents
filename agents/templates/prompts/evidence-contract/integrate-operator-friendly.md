@@ -4,6 +4,8 @@
 
 This prompt encodes the **Feature Evidence Contract** (scope `merge`, policy `2026-07-11`).
 
+Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 Required inputs:
 - `INTEGRATION_BRANCH` (format `target integration branch — never main; a maintainer-designated train or integrator-created integrate/<date>-train`)
 
@@ -13,20 +15,20 @@ Optional inputs (defaults apply when omitted):
 - `REVIEW_VERDICT_REF` — required when no WAIVER
 - `WAIVER` — required when no REVIEW_VERDICT_REF
 - `MODE` — one of `live` | `dry-run` — default `live`
-- `PRODUCT_ROOT` — default `sister-repo`
+- `NEBULA_PRODUCT_ROOT` — default `environment; required if unset`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
 - `MERGE_BASE` — git merge-base {INTEGRATION_BRANCH} {SOURCE}
-- `RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}
+- `RUN_FOLDER` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}
 
 Generate `RUN_ID` once per run — not per session — in the contract format `integrate-YYYYMMDD-HHMMSS (UTC)` using `date -u +%Y%m%d-%H%M%S`. Do not use: uuid4.
 
-Resuming an in-flight run in a new session: do NOT generate a new `RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+Resuming an in-flight run in a new session: do NOT generate a new `RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
 Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). This action creates no `evidence-manifest.json`; its run id follows the integrate scheme and is not minted by `agents/scripts/init-run.py`.
 
 Load context in this order, then navigate rather than eager-load:
-First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action integrate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
+First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action integrate` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
@@ -49,20 +51,20 @@ The integrator never fixes contributor branches.
     - judgment: In the worktree: `git merge --no-commit {SOURCE}` (code merges via git; code conflicts halt here as
 ordinary git work — the integrator never resolves them). Then for each curated KG file changed on BOTH
 sides since {MERGE_BASE}, and for REGISTRY.md and ROADMAP.md:
-`python3 {PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base {MERGE_BASE} --ours {INTEGRATION_BRANCH}
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base {MERGE_BASE} --ours {INTEGRATION_BRANCH}
 --theirs {SOURCE} --json {RUN_FOLDER}/artifacts/merge3-<name>.json`. Any typed conflict -> halt; the
 conflict report (text + JSON) names the owning role per record kind (architect: nodes/bindings; PM:
 features/trackers; co-sign: exclusions). Nothing is committed; the owner resolves on the contributor
 branch and the maintainer re-invokes as a NEW run.
 - **I3 — Unconditional regeneration** (role: integrator; artifacts: none)
     - judgment: Even (especially) when git reported a clean merge of generated files, regenerate from source:
-`python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols --regenerate-decisions
 --check-decisions`, then `--write-coverage-report`, then
-`python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`.
+`python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`.
 Never trust a textually clean git merge of a generated file.
 - **I4 — Full validation** (role: integrator; artifacts: none)
-    - judgment: All must exit 0: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py`; `... --check-drift`; and
-`python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT}
+    - judgment: All must exit 0: `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py`; `... --check-drift`; and
+`python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT}
 --skip-feature-evidence`. Story-index regeneration must be zero-diff on re-run. A failure after a clean
 semantic merge -> halt with ConstraintViolation routed to the owning role.
 - **I5 — Evidence + prepared merge** (role: integrator; artifacts: integration-report.json)
@@ -108,7 +110,7 @@ agents/templates/integration-evidence-template.md), and the per-file merge3/trac
 artifacts/. On success: a prepared merge commit on the integration-branch worktree awaiting I6 + maintainer
 push. On bounce/halt: the bounce or conflict report addressed to the contributor or owning role; nothing merged.
 
-Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Mint RUN_ID as integrate-<UTC-timestamp>
+Note (session_setup): Echo the resolved absolute {NEBULA_PRODUCT_ROOT} on the first turn. Mint RUN_ID as integrate-<UTC-timestamp>
 (`integrate-$(date -u +%Y%m%d-%H%M%S)`); never uuid4. RUN_FOLDER is under planning-mds/operations/evidence/runs/.
 Work in a dedicated worktree (`git worktree add <tmp> {INTEGRATION_BRANCH}`); never operate on the operator's
 checkout; never push; never merge to main. MODE=dry-run prepares nothing for push and labels simulated inputs.

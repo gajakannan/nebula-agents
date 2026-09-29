@@ -29,7 +29,7 @@ All notable changes to `nebula-agents` will be documented in this file. Format f
 - `render-prompts.py`: the generated session-setup instruction matches what `init-run.py` creates. It no longer tells non-feature-bound actions to create `evidence-manifest.json`, names the `init-run.py` arguments, and says integrate-scheme ids are not minted by `init-run.py`. Operator prompts regenerated.
 - `exec-and-log.py` / `gate_runtime.run_operation`: the command's stdout/stderr are passed through (or, with `--json`, kept out of the JSON). The new `--stdout` / `--stderr` options persist them inside the product root before the log entry is written, and record them as the entry's artifacts.
 - `render-prompts.py`: when an action has no unconditionally required inputs, its conditionally required inputs (`required_when`) render under "Required inputs" with their conditions. This regenerates the intent of the hand edit in #92 (`FEATURE_ID` shown as required for `feature-review` unless `PR_URL` is given), so the `prompt_drift` gate passes again.
-- `append-command-log.py`: the spec cwd labels `product` / `framework` (with optional subpath) map to `{PRODUCT_ROOT}` / `nebula-agents`, matching `gate_runtime`, instead of being recorded as `{PRODUCT_ROOT}/framework`.
+- `append-command-log.py`: the spec cwd labels `product` / `framework` (with optional subpath) map to `{NEBULA_PRODUCT_ROOT}` / `nebula-agents`, matching `gate_runtime`, instead of being recorded as `{NEBULA_PRODUCT_ROOT}/framework`.
 
 ### Deferred (human-gated)
 

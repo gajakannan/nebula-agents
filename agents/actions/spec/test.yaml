@@ -27,16 +27,16 @@ inputs:
     - {name: FEATURE_ID, format: "F####", required_when: "MODE=feature-scoped"}
     - {name: RUN_ID, format: "YYYY-MM-DD-[a-z0-9]{8} — the parent feature run", required_when: "MODE=feature-scoped"}
     - {name: STORIES, format: "[F####-S####, ...] — stories covered (feature-scoped); default: all in the feature breakdown"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
   FEATURE_SLUG: "kebab-case slug for {FEATURE_ID} from REGISTRY.md (feature-scoped only)"
-  FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)"
-  OUTPUT_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist)"
+  FEATURE_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)"
+  OUTPUT_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist)"
   ARTIFACTS_FOLDER: "{OUTPUT_FOLDER}/artifacts/test-results (feature-scoped; raw test output)"
   COVERAGE_FOLDER: "{OUTPUT_FOLDER}/artifacts/coverage (feature-scoped; raw coverage output)"
   SCREENSHOTS_FOLDER: "{OUTPUT_FOLDER}/artifacts/screenshots (feature-scoped; visual-regression snapshots when applicable)"
-  TEST_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{TEST_RUN_ID} (standalone only)"
+  TEST_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{TEST_RUN_ID} (standalone only)"
 
 context_load:
   - "agents/ROUTER.md"
@@ -102,7 +102,7 @@ gates:
       - run:
           id: t5-validate-g2
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G2]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G2]
           cwd: framework
           timeout_seconds: 600
     judgment: |
@@ -144,7 +144,7 @@ notes:
     package and does NOT satisfy the per-feature QE requirement — the corresponding feature.md run must still
     produce its own G2 evidence.
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate TEST_RUN_ID once in
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Generate TEST_RUN_ID once in
     contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. feature-scoped: no
     run-folder creation; ensure the artifacts/test-results, artifacts/coverage, and artifacts/screenshots
     subfolders exist under OUTPUT_FOLDER. standalone: mkdir TEST_RUN_FOLDER/artifacts/{test-results,coverage} and

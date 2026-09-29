@@ -19,7 +19,7 @@ from pathlib import Path
 
 import yaml
 
-# {PRODUCT_ROOT}/... placeholders read as YAML flow-mappings, so strip the braces from
+# {NEBULA_PRODUCT_ROOT}/... placeholders read as YAML flow-mappings, so strip the braces from
 # single-token {PLACEHOLDER}s before parsing. Real flow mappings (execution: {a: b, ...})
 # contain ':'/spaces and are left untouched.
 _PLACEHOLDER_RE = re.compile(r"\{([A-Za-z0-9_]+)\}")

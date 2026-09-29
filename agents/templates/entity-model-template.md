@@ -6,7 +6,7 @@ applies_to: architect
 
 # Entity Model Template
 
-Use this template to define entities in a domain-neutral way. Project-specific entities and examples should live in `{PRODUCT_ROOT}/planning-mds/examples/`.
+Use this template to define entities in a domain-neutral way. Project-specific entities and examples should live in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`.
 
 ## 1) Entity Overview
 
@@ -70,4 +70,4 @@ Use this template to define entities in a domain-neutral way. Project-specific e
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/` for project-specific entity examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` for project-specific entity examples.

@@ -1,6 +1,6 @@
 # Feature Evidence README — F####-{slug} run {run-id}
 
-> Template for `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/README.md`
+> Template for `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{run-id}/README.md`
 > per §8 of the Feature Evidence Package Standardization contract.
 
 ## Run Summary

@@ -32,6 +32,22 @@ RENDERER_VERSION = 1
 KNOWN_SCOPES = frozenset({"feature-completion", "base-run-only", "read-only-audit", "merge"})
 PACKAGE_ROOT_REF = "planning-mds/operations/evidence"
 ALL_VARIANTS = ("operator-friendly", "automation-safe")
+ROOT_BINDING = (
+    "Before setup, discovery, or resume, bind the product root once. "
+    "NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. "
+    "An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. "
+    "Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid "
+    "even when the shell environment is empty; pass it explicitly to the resolver. "
+    "Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, "
+    "before changing directories: run `python3 agents/scripts/_product_root.py --product-root \"<supplied path>\"` "
+    "from that directory, or omit the flag to read the environment. "
+    "Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. "
+    "Pass that same absolute path as --product-root to every product-aware script, including init-run.py "
+    "and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting "
+    "between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. "
+    "If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings "
+    "to choose a product, or default to a particular repository."
+)
 # Only identifier-form placeholders; ignores {8} in a format or {a,b} lists.
 PLACEHOLDER_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
@@ -98,12 +114,12 @@ def _session_setup_line(action: str, spec: dict[str, Any], facts: dict[str, Any]
     if vas.is_feature_bound(spec):
         return (base + "initialize `evidence-manifest.json` (status `draft`) with the active "
                 "contract version stamped, " + files + ". Run "
-                f"`agents/scripts/init-run.py --action {action} --feature {{FEATURE_ID}}` to perform this.")
+                f"`agents/scripts/init-run.py --product-root {{NEBULA_PRODUCT_ROOT}} --action {action} --feature {{FEATURE_ID}}` to perform this.")
     optional = [i.get("name") for i in (spec.get("inputs", {}) or {}).get("optional", []) or []]
     feature_arg = " [--feature {FEATURE_ID}]" if "FEATURE_ID" in optional else ""
     return (base + files + ". This action creates no `evidence-manifest.json` (only feature-bound "
             "actions do). Run "
-            f"`agents/scripts/init-run.py --action {action}{feature_arg}` to perform this.")
+            f"`agents/scripts/init-run.py --product-root {{NEBULA_PRODUCT_ROOT}} --action {action}{feature_arg}` to perform this.")
 
 
 def _common_facts(spec: dict[str, Any], shared: dict[str, Any]) -> dict[str, Any]:
@@ -173,6 +189,8 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
     out.append(f"This prompt encodes the **{contract.get('name')}** "
                f"(scope `{contract.get('scope')}`, policy `{policy_version}`).")
     out.append("")
+    out.append(ROOT_BINDING)
+    out.append("")
     out.append("Required inputs:")
     required = spec.get("inputs", {}).get("required", []) or []
     optional = spec.get("inputs", {}).get("optional", []) or []
@@ -213,7 +231,7 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
     # would fragment the evidence package across run folders.
     out.append(f"Resuming an in-flight run in a new session: do NOT generate a new `{run_id_var}` "
                f"and do NOT re-create the run. Run "
-               f"`python3 agents/scripts/resume-brief.py --run-id <{run_id_var}>` first — it reports "
+               f"`python3 agents/scripts/resume-brief.py --product-root {{NEBULA_PRODUCT_ROOT}} --run-id <{run_id_var}>` first — it reports "
                f"position, next gate, recorded decisions, current story, and scope in one read, so the "
                f"session does not re-derive them. `init-run.py --resume` reuses the existing run folder.")
     out.append("")
@@ -224,8 +242,8 @@ def render_operator(spec: dict[str, Any], shared: dict[str, Any], policy_version
         out.append("Retrieval tier defaults: " + "; ".join(f"{mode}: {vals}" for mode, vals in tiers))
     out.append("")
     out.append("Load context in this order, then navigate rather than eager-load:")
-    out.append("First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py "
-               f"--product-root {{PRODUCT_ROOT}} --action {action}` and read the returned product instructions "
+    out.append("First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py "
+               f"--product-root {{NEBULA_PRODUCT_ROOT}} --action {action}` and read the returned product instructions "
                "before action work, including after resume. A context error blocks the action; "
                "an absent project manifest preserves the existing context procedure.")
     ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
@@ -274,6 +292,8 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
     out = [_header(action, policy_version), ""]
     out.append(f"CONTRACT: {contract.get('name')} | SCOPE: {contract.get('scope')} | POLICY: {policy_version}")
     out.append("")
+    out.append("NEBULA_PRODUCT_ROOT_BINDING: " + ROOT_BINDING)
+    out.append("")
     out.append("REQUIRED_INPUTS:")
     for item in spec.get("inputs", {}).get("required", []):
         out.append(f"- {item['name']}"
@@ -291,7 +311,7 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
     out.append("")
     out.append(f"RUN_ID: var={spec['run_id']['var']} format={facts['run_id_format']} "
                f"method={facts['run_id_method']} forbidden={','.join(facts['run_id_forbidden']) or 'none'}")
-    out.append(f"SESSION_SETUP: init-run.py -> {PACKAGE_ROOT_REF}/... "
+    out.append(f"SESSION_SETUP: init-run.py --product-root {{NEBULA_PRODUCT_ROOT}} -> {PACKAGE_ROOT_REF}/... "
                f"manifest=draft base_files=[{facts['base_run_files']}] "
                f"artifacts=[{facts['artifacts_subdirs']}]")
     tiers = _tiers(spec)
@@ -299,8 +319,8 @@ def render_automation(spec: dict[str, Any], shared: dict[str, Any], policy_versi
         out.append("RETRIEVAL_TIERS: " + "; ".join(f"{mode}={vals}" for mode, vals in tiers))
     ctx = list(facts["context_preamble"]) + [c for c in spec.get("context_load", []) if c not in facts["context_preamble"]]
     out.append(f"CONTEXT: {' -> '.join(ctx)}")
-    out.append("PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py "
-               f"--product-root {{PRODUCT_ROOT}} --action {action}`; read returned instructions before work "
+    out.append("PRODUCT_CONTEXT: resolve NEBULA_PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py "
+               f"--product-root {{NEBULA_PRODUCT_ROOT}} --action {action}`; read returned instructions before work "
                "and after resume; context error blocks action; absent manifest preserves existing procedure.")
     out.append("")
     out.append("GATES:")

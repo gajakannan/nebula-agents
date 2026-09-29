@@ -96,21 +96,21 @@ Phase 3: Implementation (Generate Configs)
 **Objective:** Scan the codebase to understand what needs to be deployed.
 
 **Actions:**
-1. **Inspect `{PRODUCT_ROOT}/engine/` (Backend):**
+1. **Inspect `{NEBULA_PRODUCT_ROOT}/engine/` (Backend):**
    - Detect language and framework (.NET, Java, Python, Node.js)
    - Identify database connections (PostgreSQL, MySQL, MongoDB)
    - Find authentication configuration (authentik, Auth0, JWT)
    - Detect port configuration
    - Extract environment variable requirements
 
-2. **Inspect `{PRODUCT_ROOT}/experience/` (Frontend):**
+2. **Inspect `{NEBULA_PRODUCT_ROOT}/experience/` (Frontend):**
    - Detect frontend framework (React, Vue, Angular)
    - Identify build tool (Vite, Webpack, Angular CLI)
    - Find API endpoint configuration
    - Determine runtime (static files need Nginx)
    - Extract environment variables
 
-3. **Inspect `{PRODUCT_ROOT}/neuron/` (AI Layer - if exists):**
+3. **Inspect `{NEBULA_PRODUCT_ROOT}/neuron/` (AI Layer - if exists):**
    - Detect Python version and framework (FastAPI)
    - Identify LLM provider dependencies
    - Find MCP server implementations
@@ -145,8 +145,8 @@ Phase 3: Implementation (Generate Configs)
    - Microservices (multiple services)
 
 2. **Consult Architect:**
-   - Read `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
-   - Read `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (NFRs)
+   - Read `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+   - Read `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (NFRs)
    - Review architectural decisions and constraints
    - Optional: Ask Architect agent for clarification on deployment requirements
 
@@ -162,11 +162,11 @@ Phase 3: Implementation (Generate Configs)
    - Production configuration and requirements
 
 5. **Create Deployment Architecture Template:**
-   - File: `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
+   - File: `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
    - Use template: `agents/templates/deployment-architecture-template.md`
    - Fill in all sections based on code inspection and architectural decisions
 
-**Output:** `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md` - Complete deployment architecture document
+**Output:** `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md` - Complete deployment architecture document
 
 **Approval Gate (Optional):** Present deployment architecture to user for review before generating configs
 
@@ -187,9 +187,9 @@ Phase 3: Implementation (Generate Configs)
    - Include environment variable placeholders
 
 2. **Generate Dockerfiles:**
-   - `{PRODUCT_ROOT}/engine/Dockerfile` - Backend API (multi-stage build)
-   - `{PRODUCT_ROOT}/experience/Dockerfile` - Frontend SPA (node build + nginx runtime)
-   - `{PRODUCT_ROOT}/neuron/Dockerfile` - AI layer (Python with dependencies)
+   - `{NEBULA_PRODUCT_ROOT}/engine/Dockerfile` - Backend API (multi-stage build)
+   - `{NEBULA_PRODUCT_ROOT}/experience/Dockerfile` - Frontend SPA (node build + nginx runtime)
+   - `{NEBULA_PRODUCT_ROOT}/neuron/Dockerfile` - AI layer (Python with dependencies)
    - Optimize each Dockerfile for the detected framework
 
 3. **Generate Environment Configuration:**
@@ -294,7 +294,7 @@ Phase 3: Implementation (Generate Configs)
 ## Retrieval Guard
 
 Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
-`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+`{NEBULA_PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
 evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
@@ -302,15 +302,15 @@ evidence README / `latest-run.json` / `evidence-manifest.json`; read only the ex
 **Allowed Tools:** Read, Write, Edit, Bash (for Docker, deployment commands)
 
 **Required Resources:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Tech stack, deployment requirements
-- `{PRODUCT_ROOT}/planning-mds/architecture/` - Architecture, NFRs
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings and code-index bindings for scoped retrieval
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Tech stack, deployment requirements
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/` - Architecture, NFRs
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings and code-index bindings for scoped retrieval
 - Source code (to containerize and deploy)
 
 When ontology coverage exists for the target feature or story, run
-`python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` before broad repo reads.
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` before broad repo reads.
 Use `--file <repo-path>` to reverse-map an existing code file back into the ontology.
-Pre-deploy, run `python3 {PRODUCT_ROOT}/scripts/kg/diff-impact.py <release-range>` and attach `affected_nodes` + `blast_symbols` to the change-management note so reviewers see which surfaces moved.
+Pre-deploy, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/diff-impact.py <release-range>` and attach `affected_nodes` + `blast_symbols` to the change-management note so reviewers see which surfaces moved.
 
 **Runtime Stack Baseline:**
 - Keep deployments open-source by default (Docker, Compose, GitHub Actions/GitLab CI, PostgreSQL, Prometheus/Grafana/Loki).
@@ -325,7 +325,7 @@ Pre-deploy, run `python3 {PRODUCT_ROOT}/scripts/kg/diff-impact.py <release-range
 - **Architect** (infrastructure requirements, NFRs)
 - **Backend Developer** (application code to deploy)
 - **Frontend Developer** (UI code to deploy)
-- **AI Engineer** ({PRODUCT_ROOT}/neuron/ code to deploy)
+- **AI Engineer** ({NEBULA_PRODUCT_ROOT}/neuron/ code to deploy)
 - **Quality Engineer** (tests to run in CI/CD)
 
 ### Required Context
@@ -450,9 +450,9 @@ Templates:
 - `agents/templates/deployment-architecture-template.md` - **Template for Phase 2 deployment architecture**
 
 Solution-specific references:
-- `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md` - **Created by DevOps in Phase 2**
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - DevOps patterns
-- `{PRODUCT_ROOT}/planning-mds/operations/` - Runbooks and operational docs
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md` - **Created by DevOps in Phase 2**
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - DevOps patterns
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/` - Runbooks and operational docs
 - `agents/docs/operations/deployment-guide.md`
 
 ---
@@ -463,7 +463,7 @@ Solution-specific references:
 
 DevOps owns `deployability-check.md` (required for every completed-terminal feature) and
 `g1-runtime-preflight.md` (required when `runtime_bearing = true`), in the feature run folder
-(`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`; templates under `agents/templates/`).
+(`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`; templates under `agents/templates/`).
 DevOps is a **forced** required role when `deployment_config_changed = true` (Docker/compose/CI/env
 contracts/migrations/startup/topology) — the manifest `required_roles[]` must list `DevOps` or
 `manifest_required_roles_mismatch_fails` fires. `deployability-check.md` enumerates the changed config,

@@ -7,7 +7,7 @@ JSON Schema serves as the **single source of truth** for validation rules, share
 ## Architecture Pattern
 
 ```
-{PRODUCT_ROOT}/planning-mds/schemas/
+{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/
 ├── customer.schema.json          # Shared validation schema
 ├── account.schema.json
 └── order.schema.json
@@ -24,7 +24,7 @@ or RJSF          Validator
 ## Design Decisions
 
 **1. Schema Location:**
-- Store all JSON Schemas in `{PRODUCT_ROOT}/planning-mds/schemas/`
+- Store all JSON Schemas in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`
 - Frontend loads schemas from this location
 - Backend loads schemas from this location
 - Version control ensures frontend/backend stay in sync
@@ -84,7 +84,7 @@ or RJSF          Validator
 ## Integration with OpenAPI
 
 ```yaml
-# {PRODUCT_ROOT}/planning-mds/api/customers.yaml
+# {NEBULA_PRODUCT_ROOT}/planning-mds/api/customers.yaml
 openapi: 3.0.0
 info:
   title: Customer API
@@ -150,7 +150,7 @@ var code = generator.GenerateFile("Customer");
 
 ## Architectural Decision Record (ADR)
 
-Document this decision in `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`:
+Document this decision in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`:
 
 **ADR: Use JSON Schema for Cross-Tier Validation**
 - **Status:** Accepted

@@ -38,7 +38,7 @@ operator/automation prompt pair at
 **Edit the spec, not this doc or the generated prompts.**
 
 - **Scope** — `read-only-audit`: writes a base run package with `feature-review-report.md` under
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_REVIEW_RUN_ID}/`, and reads — but never
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{FEATURE_REVIEW_RUN_ID}/`, and reads — but never
   writes — the canonical feature evidence package (owned by `feature.md`/`build.md`).
 - **Modes** — `closeout-audit` audits the approved run (`FEATURE_RUN_ID` defaults to `latest-run.json`;
   validate `--stage closeout`); `candidate-audit` audits an in-progress run (`FEATURE_RUN_ID` set; validate

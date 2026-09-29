@@ -6,7 +6,7 @@ applies_to: architect
 
 # Architecture Decision Record (ADR)
 
-Use this template for architectural decisions. Project-specific ADRs live in `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`.
+Use this template for architectural decisions. Project-specific ADRs live in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`.
 
 ## Status
 
@@ -69,4 +69,4 @@ State the decision clearly.
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/architecture/adrs/` for project-specific ADR examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/architecture/adrs/` for project-specific ADR examples.

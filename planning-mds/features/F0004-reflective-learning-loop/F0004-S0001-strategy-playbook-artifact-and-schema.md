@@ -84,7 +84,7 @@ The loop needs a destination before it needs a writer. This story defines the `L
 ## Business Rules
 
 1. Playbook is not a skill: `LEARNINGS.md` never replaces or edits `SKILL.md`.
-2. Scope is physical: framework strategies live in `agents/**`; product strategies live under `{PRODUCT_ROOT}/planning-mds/learnings/`.
+2. Scope is physical: framework strategies live in `agents/**`; product strategies live under `{NEBULA_PRODUCT_ROOT}/planning-mds/learnings/`.
 3. Stable identity: a `strategy_id` is permanent and is retired, never reused.
 
 ## Out of Scope

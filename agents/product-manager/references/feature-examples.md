@@ -112,7 +112,7 @@ As a medical office administrator, I want to schedule patient appointments and s
 
 ## For Project-Specific Features
 
-See your project's `{PRODUCT_ROOT}/planning-mds/examples/features/` directory for feature examples specific to your solution.
+See your project's `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/features/` directory for feature examples specific to your solution.
 
 ---
 

@@ -30,7 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 
 
 SCHEMA_VERSION = 1
@@ -550,7 +550,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             if not args.no_patch_manifest and not patched:
                 print("[WARN] no evidence-manifest.json to patch", file=sys.stderr)
-    except TelemetryError as exc:
+    except (TelemetryError, ProductRootError) as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
     return 0

@@ -4,11 +4,11 @@ Detailed code examples and patterns for test implementation across all tiers.
 
 ## Testing by Layer
 
-### Frontend Testing ({PRODUCT_ROOT}/experience/)
+### Frontend Testing ({NEBULA_PRODUCT_ROOT}/experience/)
 
 **Test Structure:**
 ```
-{PRODUCT_ROOT}/experience/
+{NEBULA_PRODUCT_ROOT}/experience/
 ├── src/
 │   ├── components/
 │   │   └── CustomerCard.tsx
@@ -87,11 +87,11 @@ test('customer form has no accessibility violations', async ({ page }) => {
 });
 ```
 
-### Backend Testing ({PRODUCT_ROOT}/engine/)
+### Backend Testing ({NEBULA_PRODUCT_ROOT}/engine/)
 
 **Test Structure:**
 ```
-{PRODUCT_ROOT}/engine/
+{NEBULA_PRODUCT_ROOT}/engine/
 ├── src/
 │   └── MyApp.Domain/
 │       └── Entities/
@@ -233,11 +233,11 @@ export default function () {
 }
 ```
 
-### AI/Neuron Testing ({PRODUCT_ROOT}/neuron/)
+### AI/Neuron Testing ({NEBULA_PRODUCT_ROOT}/neuron/)
 
 **Test Structure:**
 ```
-{PRODUCT_ROOT}/neuron/
+{NEBULA_PRODUCT_ROOT}/neuron/
 ├── domain_agents/
 │   └── processor.py
 └── tests/
@@ -349,7 +349,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
       - run: pip install -r requirements.txt
-      - run: pytest {PRODUCT_ROOT}/neuron/tests/ --cov={PRODUCT_ROOT}/neuron --cov-report=xml
+      - run: pytest {NEBULA_PRODUCT_ROOT}/neuron/tests/ --cov={NEBULA_PRODUCT_ROOT}/neuron --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v3
 

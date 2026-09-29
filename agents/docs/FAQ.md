@@ -10,9 +10,9 @@ Yes. The framework is domain-agnostic. See `blueprint-setup/examples/` for non-i
 
 ## How do I start a new project?
 
-You do **not** copy `agents/`. The framework is consumed in place: clone `nebula-agents` and your product repo as siblings under a shared workspace root, open a session rooted in `nebula-agents`, and resolve `{PRODUCT_ROOT}` to your product repo (see `agents/docs/AGENT-USE.md` → Session Setup).
+You do **not** copy `agents/`. The framework is consumed in place: clone `nebula-agents` and your product repo as siblings under a shared workspace root, open a session rooted in `nebula-agents`, and resolve `{NEBULA_PRODUCT_ROOT}` to your product repo (see `agents/docs/AGENT-USE.md` → Session Setup).
 
-Run the `init` action from that session. It scaffolds product-side files into `{PRODUCT_ROOT}` — `lifecycle-stage.yaml`, `CONTRIBUTING.md`, a starter CI workflow (`.github/workflows/ci-gates.yml`), and the `planning-mds/` tree — from templates bundled in `agents/`. Boundary policy stays framework-owned in `nebula-agents/BOUNDARY-POLICY.md`; `init` does not scaffold a per-product copy.
+Run the `init` action from that session. It scaffolds product-side files into `{NEBULA_PRODUCT_ROOT}` — `lifecycle-stage.yaml`, `CONTRIBUTING.md`, a starter CI workflow (`.github/workflows/ci-gates.yml`), and the `planning-mds/` tree — from templates bundled in `agents/`. Boundary policy stays framework-owned in `nebula-agents/BOUNDARY-POLICY.md`; `init` does not scaffold a per-product copy.
 
 See `agents/docs/FORK-AND-BUILD-APP.md` for the full walkthrough.
 
@@ -20,17 +20,17 @@ See `agents/docs/FORK-AND-BUILD-APP.md` for the full walkthrough.
 
 See `agents/docs/ONBOARDING.md`.
 
-## How do I know if something belongs in agents/ vs {PRODUCT_ROOT}/planning-mds/?
+## How do I know if something belongs in agents/ vs {NEBULA_PRODUCT_ROOT}/planning-mds/?
 
 Use the boundary rules in `BOUNDARY-POLICY.md`.
 
 ## Can I modify agent roles?
 
-Yes, but keep them generic. Put project-specific notes and requirements in `{PRODUCT_ROOT}/planning-mds/`.
+Yes, but keep them generic. Put project-specific notes and requirements in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 
 ## What if my agents need different workflows?
 
-Adapt the `SKILL.md` files, but keep them reusable across similar projects. Use `{PRODUCT_ROOT}/planning-mds/` for project-specific variations.
+Adapt the `SKILL.md` files, but keep them reusable across similar projects. Use `{NEBULA_PRODUCT_ROOT}/planning-mds/` for project-specific variations.
 
 ## Does this repo include an automated orchestrator right now?
 

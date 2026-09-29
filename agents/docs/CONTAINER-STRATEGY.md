@@ -17,7 +17,7 @@ Contains:
 - framework documentation
 
 Does not contain:
-- generated application source code in `{PRODUCT_ROOT}/engine/`, `{PRODUCT_ROOT}/experience/`, or `{PRODUCT_ROOT}/neuron/`
+- generated application source code in `{NEBULA_PRODUCT_ROOT}/engine/`, `{NEBULA_PRODUCT_ROOT}/experience/`, or `{NEBULA_PRODUCT_ROOT}/neuron/`
 - project databases
 - production secrets
 - long-lived application runtime state
@@ -70,4 +70,4 @@ Application Containers
 - The builder and application runtimes are intentionally separate concerns.
 - The builder runtime should not be treated as a production app deployment container.
 - Stack-specific SDK/tooling belongs with the application runtime containers, not the builder base image.
-- Application container strategy is project-specific and evolves with architecture decisions in `{PRODUCT_ROOT}/planning-mds/`.
+- Application container strategy is project-specific and evolves with architecture decisions in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.

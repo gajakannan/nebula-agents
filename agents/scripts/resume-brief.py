@@ -26,7 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 
 try:
     import yaml
@@ -230,6 +230,7 @@ def build_brief(
     out.append("## Where you are")
     out.append("")
     out.append(f"- **action:** {action}")
+    out.append(f"- **NEBULA_PRODUCT_ROOT:** {product_root}")
     if manifest.get("feature_id"):
         out.append(f"- **feature:** {manifest['feature_id']} — {manifest.get('feature_slug', '')}")
     out.append(f"- **manifest status:** {manifest.get('status', 'unknown')}")
@@ -392,7 +393,7 @@ def main(argv: list[str] | None = None) -> int:
             feature_rel=feature_rel,
         )
         print(brief)
-    except BriefError as exc:
+    except (BriefError, ProductRootError) as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
     return 0

@@ -69,7 +69,7 @@ with `agents/quality-engineer/SKILL.md`.
 
 ### Test-coverage discovery
 
-- For each touched canonical node, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --untested <node-id>`; each finding names a bound symbol with no caller in a `*.tests` bucket.
+- For each touched canonical node, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --untested <node-id>`; each finding names a bound symbol with no caller in a `*.tests` bucket.
 - Add each finding to the story-to-test mapping as a candidate case, or record an explicit exemption (`--untested-exempt-node <node-id>`) with rationale in the plan. Use `validate.py --check-untested` for whole-repo release-readiness checks.
 
 ### Test quality self-review (T3)
@@ -92,7 +92,7 @@ with `agents/quality-engineer/SKILL.md`.
 
 Before running the test action:
 - [ ] Implementation code exists (backend and/or frontend)
-- [ ] User stories with acceptance criteria available in `{PRODUCT_ROOT}/planning-mds/features/`
+- [ ] User stories with acceptance criteria available in `{NEBULA_PRODUCT_ROOT}/planning-mds/features/`
 - [ ] Test framework and tools configured in the project
 - [ ] Application runtime containers can build and run
 - [ ] For feature-scoped mode: the feature run folder exists and `feature.md` G1 has passed

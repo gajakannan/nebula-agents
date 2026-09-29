@@ -51,7 +51,7 @@ Python validators" identity with zero new runtime dependencies.
                               +-----------------------------------------------+
                               |  LEARNINGS.md  (scoped strategy playbook)     |
                               |  framework: agents/<role>/LEARNINGS.md        |
-                              |  product:   {PRODUCT_ROOT}/planning-mds/      |
+                              |  product:   {NEBULA_PRODUCT_ROOT}/planning-mds/      |
                               |             learnings/                        |
                               +-----------------------+-----------------------+
                                                       ^
@@ -89,7 +89,7 @@ Python validators" identity with zero new runtime dependencies.
 | `agents/agent-map.yaml` | Register `reflector` role + `reflect` action with model-tier/execution | S0002/S0003 |
 | `agents/actions/README.md` | Catalogue `reflect` in the action index | S0003 |
 | `agents/docs/CONTEXT-ENGINEERING.md` | Add the learn sub-loop under the Write/Select moves; remove the matching "Known gap" | S0005 |
-| `{PRODUCT_ROOT}/.agentignore` (product-side, optional) | Keep `learnings/` warm (not cold-archived) | S0005 |
+| `{NEBULA_PRODUCT_ROOT}/.agentignore` (product-side, optional) | Keep `learnings/` warm (not cold-archived) | S0005 |
 
 ## 4. Script Signatures (`playbook.py`)
 
@@ -160,7 +160,7 @@ Rendered directly into prompts during selection (Compress: a slice, not the file
 1. `validate-learnings.py` on all playbook files (schema/scope/status). Fail closed.
 2. `validate-genericness.py` on framework-scope strategy text only.
 3. Scope-placement check: no product entry in `agents/**`; no framework entry referencing
-   a product path or `{PRODUCT_ROOT}` literal.
+   a product path or `{NEBULA_PRODUCT_ROOT}` literal.
 4. Exit non-zero on any violation, naming entry + reason.
 
 ## 7. Mutation Traceability
@@ -236,7 +236,7 @@ and stateless — wrong subject, target, and lifetime for cross-session strategy
 
 - **Framework (`agents/**`, `lifecycle-stage.yaml`):** role, action, scripts, gate, templates,
   framework-scope `LEARNINGS.md`. Subject to genericness.
-- **Product (`{PRODUCT_ROOT}/planning-mds/learnings/`):** product-scope playbook content and
+- **Product (`{NEBULA_PRODUCT_ROOT}/planning-mds/learnings/`):** product-scope playbook content and
   any product-side `.agentignore` warm-listing. Domain terms allowed here only.
 - Do not close a discovered framework gap by editing product docs or vice versa
   (Architect responsibility #12).

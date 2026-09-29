@@ -14,7 +14,7 @@ when the full reference corpus is explicitly requested.
 2. Find the task row(s) that match what you are doing.
 3. Load only those reference files.
 4. If no row matches, load nothing — the SKILL.md and solution-specific
-   artifacts in `{PRODUCT_ROOT}/planning-mds/` are usually sufficient.
+   artifacts in `{NEBULA_PRODUCT_ROOT}/planning-mds/` are usually sufficient.
 
 ---
 
@@ -149,12 +149,12 @@ triggers, and failure modes live in `agents/docs/KNOWLEDGE-GRAPH.md`.
 
 | When | Command |
 |------|---------|
-| Before searching code | `python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path>` |
-| Before editing shared entities/workflows | `python3 {PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>` |
-| Starting feature work | `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` (see KNOWLEDGE-GRAPH.md for `--tier`, `--fields`, `--allow-missing`) |
-| After ontology changes | `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` |
-| Merging KG YAML across branches (never by hand/git) | `python3 {PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base <ref> --ours <ref> --theirs <ref>` (also REGISTRY.md/ROADMAP.md; see `scripts/kg/README.md`) |
-| Long session start / decisions / escalations / post-compaction | `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py …` (see KNOWLEDGE-GRAPH.md for subcommands) |
+| Before searching code | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path>` |
+| Before editing shared entities/workflows | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>` |
+| Starting feature work | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` (see KNOWLEDGE-GRAPH.md for `--tier`, `--fields`, `--allow-missing`) |
+| After ontology changes | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` |
+| Merging KG YAML across branches (never by hand/git) | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/merge3.py <file> --base <ref> --ours <ref> --theirs <ref>` (also REGISTRY.md/ROADMAP.md; see `scripts/kg/README.md`) |
+| Long session start / decisions / escalations / post-compaction | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/workstate.py …` (see KNOWLEDGE-GRAPH.md for subcommands) |
 | Resuming an in-flight run in a fresh session (read this FIRST, before exploring) | `python3 agents/scripts/resume-brief.py --run-id <run-id>` — emits position, next gate, recorded decisions, current story, and scope in one read |
 | Hub / risk / undeclared-edge analysis | `pagerank.py`, `risk.py`, `cochange.py --coverage-gaps` (see KNOWLEDGE-GRAPH.md) |
 
@@ -166,8 +166,8 @@ Task-to-tool routing only. The full contract — package shape, gate timeline
 of who writes what when, manifest, `commands.log` telemetry, verdicts,
 eligibility, and waivers — lives in `agents/docs/AGENT-OPS.md`.
 
-Honor `{PRODUCT_ROOT}/.agentignore` before broad product discovery. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from
+Honor `{NEBULA_PRODUCT_ROOT}/.agentignore` before broad product discovery. Treat
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from
 `operations/evidence/README.md`, feature `latest-run.json`, and the selected
 run's `evidence-manifest.json`; read raw reports, logs, screenshots, and
 `artifacts/**` only when the current audit, validation, or failure-triage task
@@ -176,8 +176,8 @@ requires those exact files. Full retrieval semantics live in
 
 | When | Command |
 |------|---------|
-| Validate evidence mid-run (G0–G5) | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F#### --run-id <run-id> --stage <Gn>` |
-| Final closeout validation | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature F#### --stage closeout` (see AGENT-OPS.md for the stage matrix) |
-| Closeout supersession (before writing `latest-run.json`) | `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature F#### --new-run-id <run-id>` |
+| Validate evidence mid-run (G0–G5) | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature F#### --run-id <run-id> --stage <Gn>` |
+| Final closeout validation | `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature F#### --stage closeout` (see AGENT-OPS.md for the stage matrix) |
+| Closeout supersession (before writing `latest-run.json`) | `python3 agents/product-manager/scripts/patch-prior-manifest.py --product-root {NEBULA_PRODUCT_ROOT} --feature F#### --new-run-id <run-id>` |
 | Run lifecycle gates (writes `lifecycle-gates.log`) | `python3 agents/scripts/run-lifecycle-gates.py` |
 | New run artifact / report | copy the matching skeleton from `agents/templates/` (see AGENT-OPS.md → Package Anatomy) |

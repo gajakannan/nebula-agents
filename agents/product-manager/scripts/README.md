@@ -10,14 +10,14 @@ Story convention:
 Validate one or more story files:
 
 ```bash
-python agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-view-kpis.md
-python agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-view-kpis.md {PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0002-view-pipeline.md
+python agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-view-kpis.md
+python agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-view-kpis.md {NEBULA_PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0002-view-pipeline.md
 ```
 
 Validate a directory of stories:
 
 ```bash
-python agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/
+python agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 ```
 
 ## generate-story-index.py
@@ -25,10 +25,10 @@ python agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/plannin
 Generate a story index for a directory:
 
 ```bash
-python agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/
+python agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 ```
 
-Outputs `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`.
+Outputs `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`.
 
 ## validate-trackers.py
 
@@ -43,5 +43,5 @@ Also validates `STATUS.md` closeout signoff governance for features marked `Done
 
 ```bash
 python3 agents/product-manager/scripts/validate-trackers.py
-python3 agents/product-manager/scripts/validate-trackers.py --features-dir {PRODUCT_ROOT}/planning-mds/features --blueprint {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+python3 agents/product-manager/scripts/validate-trackers.py --features-dir {NEBULA_PRODUCT_ROOT}/planning-mds/features --blueprint {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
 ```

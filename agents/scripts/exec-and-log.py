@@ -31,7 +31,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
 import gate_runtime as gr  # noqa: E402
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 
 _acl = gr._load_hyphenated("append_command_log", "append-command-log.py")
 
@@ -66,7 +66,11 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write("no command supplied after `--`\n")
         return 2
 
-    product_root = resolve_product_root(args.product_root)
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        return 2
     if not product_root.is_dir():
         sys.stderr.write(f"product root does not exist: {product_root}\n")
         return 2

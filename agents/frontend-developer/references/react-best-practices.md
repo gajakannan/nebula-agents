@@ -8,7 +8,7 @@
 
 ## Scope
 
-This guide defines practical React implementation defaults for `{PRODUCT_ROOT}/experience/`.
+This guide defines practical React implementation defaults for `{NEBULA_PRODUCT_ROOT}/experience/`.
 
 For UX release gates and accessibility enforcement, also apply:
 
@@ -19,7 +19,7 @@ For UX release gates and accessibility enforcement, also apply:
 
 ## Component Architecture
 
-- Prefer feature-local components under `{PRODUCT_ROOT}/experience/src/features/<feature>/components`.
+- Prefer feature-local components under `{NEBULA_PRODUCT_ROOT}/experience/src/features/<feature>/components`.
 - Keep global `components/ui` for reusable primitives only.
 - Keep components focused: one clear responsibility per component.
 - Prefer composition over inheritance and deep prop drilling.
@@ -69,14 +69,14 @@ For UX release gates and accessibility enforcement, also apply:
 ## Required Command Set for PR Validation
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience lint
-pnpm --dir {PRODUCT_ROOT}/experience lint:theme
-pnpm --dir {PRODUCT_ROOT}/experience build
-pnpm --dir {PRODUCT_ROOT}/experience test
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience build
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test
 ```
 
 If styles/theme changed:
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme
 ```

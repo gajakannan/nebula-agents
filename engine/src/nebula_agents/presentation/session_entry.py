@@ -123,6 +123,9 @@ def execute_descriptor(path: Path) -> NoReturn:
         for name in descriptor["inherited_env_names"]
         if name in os.environ
     }
+    # The validated launch CWD is the selected workspace. Pin its absolute root
+    # rather than inheriting a relative or stale value from the tmux server.
+    environment["NEBULA_PRODUCT_ROOT"] = cwd
     os.chdir(cwd)
     # Validation is the helper acknowledgement.  Minimize the lifetime of argv.
     try:

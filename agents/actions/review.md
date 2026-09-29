@@ -72,17 +72,17 @@ aligned with `agents/code-reviewer/SKILL.md` and `agents/security/SKILL.md`.
   over/under-engineering; SOLUTION-PATTERNS.md compliance; frontend UX rule-set compliance when UI changed.
 - Test coverage and quality; require a fast-layer proof for changed behavior or a justified skip.
 - Acceptance-criteria mapping; treat a non-obvious change without a `// WHY:` (or language equivalent) marker as a blocker.
-- If inline decision markers changed, require `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions` evidence.
+- If inline decision markers changed, require `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-decisions --check-decisions` evidence.
 - When `coverage-report.yaml` carries Phase 3 freshness signals, apply hotspot/ownership gates per touched node:
   `hotspot_rank` ≤ 5 (or `hotspot_score` ≥ 0.80) → require explicit second-reviewer evidence;
   `bus_factor_flag: true` → require `primary_owner` acknowledgement on the PR
   (thresholds: `agents/architect/references/hotspot-review-guide.md`).
-- Run `python3 {PRODUCT_ROOT}/scripts/kg/risk.py <node-id|--file|--symbol>` per touched canonical node:
+- Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py <node-id|--file|--symbol>` per touched canonical node:
   `kg.risk` ≥ 7 (high) → require an additional reviewer beyond the PR author;
   `kg.risk` ≥ 9 (critical) → require a `workstate.py decision --topic risk-acknowledgement` entry referenced from the PR before merge
   (weights/bands: `agents/architect/references/risk-scoring-guide.md`).
-- Run `python3 {PRODUCT_ROOT}/scripts/kg/diff-impact.py <pr-range>` and attach `affected_nodes` to the review notes; surface unanticipated canonical nodes as a discussion item (not an auto-fail).
-- For symbol names the diff introduces or moves, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` to detect duplicate/near-duplicate surface elsewhere.
+- Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/diff-impact.py <pr-range>` and attach `affected_nodes` to the review notes; surface unanticipated canonical nodes as a discussion item (not an auto-fail).
+- For symbol names the diff introduces or moves, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` to detect duplicate/near-duplicate surface elsewhere.
 
 ### Security review checklist
 

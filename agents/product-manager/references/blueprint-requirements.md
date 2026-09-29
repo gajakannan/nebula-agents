@@ -10,7 +10,7 @@ This document defines the completion criteria for Phase A work. Use this as a ch
 
 ## Phase A Deliverables
 
-Phase A work is documented in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 3.1 through 3.5.
+Phase A work is documented in `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` sections 3.1 through 3.5.
 
 ### Section 3.1: Vision & Non-Goals
 
@@ -82,7 +82,7 @@ For each persona, define:
 
 **Required: All Core Epics Defined**
 
-Features use 4-digit IDs (F0001, F0002, ...) and live in self-contained folders under `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`. Each feature folder contains a PRD, README, STATUS, GETTING-STARTED, and colocated story files.
+Features use 4-digit IDs (F0001, F0002, ...) and live in self-contained folders under `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`. Each feature folder contains a PRD, README, STATUS, GETTING-STARTED, and colocated story files.
 
 For each epic:
 
@@ -117,7 +117,7 @@ For each epic:
 
 **Required: One Complete Vertical Slice (Minimum)**
 
-Stories are colocated inside their feature folder: `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`. There is no separate top-level stories directory.
+Stories are colocated inside their feature folder: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`. There is no separate top-level stories directory.
 
 For MVP, define at least one complete vertical slice with all CRUD operations.
 
@@ -293,11 +293,11 @@ Before handing off to Architect (Phase B), verify:
 ### Handoff Artifacts
 
 Provide Architect with:
-- ✅ `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (sections 3.1-3.5 complete)
-- ✅ `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature index)
-- ✅ Feature folders with PRDs and stories (`{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`)
+- ✅ `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (sections 3.1-3.5 complete)
+- ✅ `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature index)
+- ✅ Feature folders with PRDs and stories (`{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`)
 - ✅ Link to all templates used (story, persona, epic, screen)
-- ✅ Domain glossary (`{PRODUCT_ROOT}/planning-mds/domain/<domain>-glossary.md`)
+- ✅ Domain glossary (`{NEBULA_PRODUCT_ROOT}/planning-mds/domain/<domain>-glossary.md`)
 - ✅ Contact info for follow-up questions
 
 ---
@@ -328,10 +328,10 @@ Provide Architect with:
 Run validation before handoff:
 ```bash
 # Validate all stories across feature folders
-python agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/
+python agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 
 # Generate index
-python agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/
+python agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 ```
 
 ---

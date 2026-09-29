@@ -88,14 +88,14 @@ an empty `BUILD_SCOPE` still produces that base run package; it produces no feat
 When this build action archives a delivered feature at closeout, it produces the canonical feature evidence package defined by the Feature Evidence Contract in `CONSUMER-CONTRACT.md` at:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
 ```
 
-The per-feature pointer/index lives at `{PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}/latest-run.json`. For each `FEATURE_ID` in `BUILD_SCOPE`, `FEATURE_SLUG` and the per-feature `RUN_ID` are resolved by the build orchestrator per `evidence-contract/build-automation-safe.md`.
+The per-feature pointer/index lives at `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}/latest-run.json`. For each `FEATURE_ID` in `BUILD_SCOPE`, `FEATURE_SLUG` and the per-feature `RUN_ID` are resolved by the build orchestrator per `evidence-contract/build-automation-safe.md`.
 
 The package contents match those produced by [`agents/actions/feature.md`](./feature.md) (see its "Canonical Evidence Package" section). The same supersession-and-publish sequence applies at closeout (B4):
 
-1. Invoke `agents/product-manager/scripts/patch-prior-manifest.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark every prior approved manifest as `superseded`.
+1. Invoke `agents/product-manager/scripts/patch-prior-manifest.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --new-run-id {RUN_ID}` to mark every prior approved manifest as `superseded`.
 2. Only after step 1 succeeds, write the new `latest-run.json` for this feature.
 
 If step 1 fails, do not proceed to step 2; surface the failure with the partial-closeout recovery guidance in `agents/docs/MANUAL-ORCHESTRATION-RUNBOOK.md`. Build-action runs that do not archive a delivered feature use the base run evidence shape only.
@@ -120,9 +120,9 @@ is safe because the feature's state is durable in its evidence package, `STATUS.
 Before running the build action:
 - [ ] Plan action completed (requirements + architecture defined) for every feature in scope
 - [ ] SOLUTION-PATTERNS.md exists and is up-to-date
-- [ ] Tracker governance contract available (`{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`, seeded from `agents/templates/tracker-governance-template.md` when missing)
+- [ ] Tracker governance contract available (`{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`, seeded from `agents/templates/tracker-governance-template.md` when missing)
 - [ ] User stories have clear acceptance criteria
-- [ ] `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start
+- [ ] `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 at start
 - [ ] User is available for the B4.5 build-level approval gate
 
 ---

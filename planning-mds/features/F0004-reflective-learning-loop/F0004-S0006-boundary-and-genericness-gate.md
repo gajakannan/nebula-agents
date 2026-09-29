@@ -28,7 +28,7 @@ An adaptive loop is only safe inside this framework if it cannot erode the bound
 **Alternative Flows / Edge Cases:**
 - A framework-scope entry contains a denylisted domain term -> genericness check fails, gate exits non-zero (rejected), naming the entry and term.
 - A product-scope entry is found in an `agents/**` file -> scope-placement check fails (forbidden) and exits non-zero.
-- A framework strategy references a product path or `{PRODUCT_ROOT}` literal -> flagged as a boundary violation.
+- A framework strategy references a product path or `{NEBULA_PRODUCT_ROOT}` literal -> flagged as a boundary violation.
 - `validate-learnings.py` itself fails (bad schema) -> the governance gate fails without running downstream checks.
 - A product playbook absent in a framework-only run -> gate skips product-scope checks cleanly (not an error).
 
@@ -84,7 +84,7 @@ An adaptive loop is only safe inside this framework if it cannot erode the bound
 
 - Reflection, curation, and selection mechanics (other stories).
 - Changing the existing `boundary_genericness` gate behavior for non-playbook files.
-- Product-side lifecycle gates under `{PRODUCT_ROOT}` (product-owned).
+- Product-side lifecycle gates under `{NEBULA_PRODUCT_ROOT}` (product-owned).
 
 ## UI/UX Notes
 

@@ -67,6 +67,16 @@ def test_fixture_policy_validates(tmp_path):
     assert result.ok, [f.as_dict() for f in result.sorted_findings()]
 
 
+@pytest.mark.parametrize("name", ["PRODUCT_ROOT", "NEBULA_AGENTS_PRODUCT_ROOT"])
+def test_legacy_root_cannot_be_reintroduced_as_an_input(tmp_path, name):
+    dst = make_policy(tmp_path)
+    spec = load(dst, "sample.yaml")
+    spec["inputs"].setdefault("optional", []).append({"name": name})
+    spec["gates"][0]["operations"][0]["run"]["argv"].append("{" + name + "}")
+    dump(dst, "sample.yaml", spec)
+    assert {"legacy_product_root", "unknown_placeholder"} <= rules(validate(dst))
+
+
 def test_validation_is_deterministic(tmp_path):
     dst = make_policy(tmp_path)
     r1, p1 = vas.validate_policy(dst)
@@ -114,7 +124,7 @@ def test_unknown_placeholder_rejected(tmp_path):
 def test_path_escape_rejected(tmp_path):
     dst = make_policy(tmp_path)
     spec = load(dst, "sample.yaml")
-    spec["gates"][0]["operations"][0]["run"]["argv"].append("{PRODUCT_ROOT}/../secrets")
+    spec["gates"][0]["operations"][0]["run"]["argv"].append("{NEBULA_PRODUCT_ROOT}/../secrets")
     dump(dst, "sample.yaml", spec)
     assert "path_escapes_root" in rules(validate(dst))
 

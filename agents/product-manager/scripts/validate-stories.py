@@ -5,13 +5,13 @@ Story Validation Script
 Validates user stories for completeness and quality.
 Checks that stories follow the template and have all required sections.
 
-Stories are colocated in feature folders: {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md
+Stories are colocated in feature folders: {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md
 
 Usage:
     python3 validate-stories.py <file-or-dir> [<file-or-dir> ...]
-    python3 validate-stories.py {PRODUCT_ROOT}/planning-mds/features/
-    python3 validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-nudge-cards.md
-    python3 validate-stories.py --strict-warnings {PRODUCT_ROOT}/planning-mds/features/
+    python3 validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/
+    python3 validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F0001-dashboard/F0001-S0001-nudge-cards.md
+    python3 validate-stories.py --strict-warnings {NEBULA_PRODUCT_ROOT}/planning-mds/features/
 """
 
 import sys
@@ -502,7 +502,7 @@ def main():
         nargs="*",
         help=(
             "Story files or directories to validate. "
-            "Defaults to {PRODUCT_ROOT}/planning-mds/features."
+            "Defaults to {NEBULA_PRODUCT_ROOT}/planning-mds/features."
         ),
     )
     args = parser.parse_args()

@@ -4,20 +4,22 @@
 
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
+NEBULA_PRODUCT_ROOT_BINDING: Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 REQUIRED_INPUTS:
 - PROJECT_NAME [string]
 - DOMAIN_DESCRIPTION [1-2 sentence summary]
 - TARGET_USERS [[role, role, ...]]
 - CORE_ENTITIES [[entity, entity, ...]]
 OPTIONAL_INPUTS:
-- PRODUCT_ROOT =default:NEBULA_PRODUCT_ROOT env var, or sister-repo ../<product-repo>
+- NEBULA_PRODUCT_ROOT =default:environment; required if unset
 AUTO_RESOLVED:
-- INIT_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}
+- INIT_RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{INIT_RUN_ID}
 
 RUN_ID: var=INIT_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
-SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
+SESSION_SETUP: init-run.py --product-root {NEBULA_PRODUCT_ROOT} -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
 CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/init.md -> agents/product-manager/SKILL.md (initialization mode) -> agents/templates/** (templates for the scaffolded files)
-PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action init`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
+PRODUCT_CONTEXT: resolve NEBULA_PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action init`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - I0 role=product-manager artifacts=[action-context.md]
@@ -28,9 +30,9 @@ GATES:
 - I5 role=product-manager artifacts=[]
 - I6 role=product-manager artifacts=[]
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
@@ -38,12 +40,12 @@ OWNERSHIP:
 - product-manager: every scaffolded file (initialization mode)
 FORBIDDEN:
 - Generate INIT_RUN_ID with uuid4.
-- Scaffold into a non-empty {PRODUCT_ROOT} without explicit operator confirmation.
+- Scaffold into a non-empty {NEBULA_PRODUCT_ROOT} without explicit operator confirmation.
 - Skip the evidence directory bootstrap — the product must have planning-mds/operations/evidence/ ready for the first feature run.
 - Pre-populate REGISTRY.md with non-empty Archived or Retired tables; both start empty.
 - Set the Evidence Contract Effective Date earlier than the framework default (must be 2026-05-19 or later for new products).
 STOP_CONDITIONS:
-- The operator refuses to confirm scaffolding into a non-empty {PRODUCT_ROOT}.
+- The operator refuses to confirm scaffolding into a non-empty {NEBULA_PRODUCT_ROOT}.
 - Any validator exits non-zero at I6 (fix the root cause before init can complete).
 - INSUFFICIENT_CONTEXT for any required input.
 CONFLICT_RESOLUTION:
@@ -52,11 +54,10 @@ CONFLICT_RESOLUTION:
 NOTE[evidence_readme]: The product's planning-mds/operations/evidence/README.md gets the sections Base Run Profile (§8), Feature
 Evidence Profile (§9), and Global Lanes (§20), plus a Path Class Extensions section (§7) that starts empty —
 the operator fills product-specific globs there after I4 for non-default layouts.
-NOTE[preconditions]: nebula-agents is checked out and is the current session working directory; {PRODUCT_ROOT} is resolved and
+NOTE[preconditions]: nebula-agents is checked out and is the current session working directory; {NEBULA_PRODUCT_ROOT} is resolved and
 either empty or accepting scaffold; the operator has basic project context (domain, goals, target users,
 initial entities).
-NOTE[session_setup]: Resolve {PRODUCT_ROOT} per agents/docs/AGENT-USE.md (operator input, the NEBULA_PRODUCT_ROOT env var, or the
-default ../<product-repo>) and echo the resolved absolute path. Confirm it is empty or a new repo accepting
+NOTE[session_setup]: Resolve {NEBULA_PRODUCT_ROOT} per agents/docs/AGENT-USE.md (explicit operator input or the NEBULA_PRODUCT_ROOT env var; no default product) and echo the resolved absolute path. Confirm it is empty or a new repo accepting
 scaffold. Mint INIT_RUN_ID once in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
 suffix); never uuid4. Create {INIT_RUN_FOLDER} (after scaffolding lands operations/evidence/) and initialize
 the six §8 base run files.

@@ -51,7 +51,7 @@ contract date/token id) and the evidence run is a `merge`-scope base run package
 
 ## Prerequisites
 
-- `{PRODUCT_ROOT}/scripts/kg/merge3.py` and `tracker_merge.py` present (F0006 S0001/S0002)
+- `{NEBULA_PRODUCT_ROOT}/scripts/kg/merge3.py` and `tracker_merge.py` present (F0006 S0001/S0002)
 - The source branch/PR is fetchable; the integration branch is designated (see Branch Strategy below)
 - A `feature-review` verdict for the source branch's feature, or the maintainer's explicit waiver with rationale
 
@@ -79,7 +79,7 @@ the definition of a semantic collision; route it to the owner.
 
 ## Outputs
 
-- Integration evidence run at `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`
+- Integration evidence run at `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`
   (base-run files + `integration-report.json` + merge3/tracker JSON reports)
 - On success: a prepared merge commit on the integration-branch worktree, awaiting gate I6 + maintainer push
 - On bounce/halt: the bounce or conflict report, addressed to the contributor or owning role; nothing merged

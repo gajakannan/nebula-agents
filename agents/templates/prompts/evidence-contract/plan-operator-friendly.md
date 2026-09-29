@@ -4,39 +4,41 @@
 
 This prompt encodes the **Plan (Phase A + B)** (scope `base-run-only`, policy `2026-07-11`).
 
+Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 Required inputs:
 - `FEATURE_ID` (format `F####`)
 - `PHASE` — one of `A` | `B` | `A+B`
 - `FEATURE_MODE` — one of `new` | `existing`
 
 Optional inputs (defaults apply when omitted):
-- `PRODUCT_ROOT` — default `sister-repo`
+- `NEBULA_PRODUCT_ROOT` — default `environment; required if unset`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
-- `FEATURE_INDEX_ROOT` — {PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
-- `FEATURE_PATH` — {PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}
+- `FEATURE_INDEX_ROOT` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}
+- `FEATURE_PATH` — {NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}
 - `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md
-- `PLAN_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}
+- `PLAN_RUN_FOLDER` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}
 
 Generate `PLAN_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Resuming an in-flight run in a new session: do NOT generate a new `PLAN_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <PLAN_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+Resuming an in-flight run in a new session: do NOT generate a new `PLAN_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <PLAN_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --action plan --feature {FEATURE_ID}` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action plan --feature {FEATURE_ID}` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
-First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action plan` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
+First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action plan` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
 4. `agents/docs/PROJECT-EXTENSIONS.md`
 5. `agents/actions/plan.md`
-6. `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
-7. `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-8. `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-9. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
-10. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
-11. `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+6. `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
+7. `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+8. `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+9. `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`
+10. `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+11. `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
 
 Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 - **G1 — Clarification** (role: product-manager; artifacts: none)
@@ -49,8 +51,8 @@ STORY-INDEX.md) before Phase A approval.
     - judgment: Step 2 Phase A review. No gate may be passed without an explicit approval token recorded in
 gate-decisions.md.
 - **G4 — Ontology sync (Phase B)** (role: architect; artifacts: none)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - judgment: Step 3.5: align the ontology with the assembly plan by editing the kg-source shards — the feature
 shard (planning-mds/kg-source/features/{FEATURE_ID}.yaml: status/name/rationale + affects/depends_on/
 governed_by/uses_* + story_mappings) and the node shards (kg-source/nodes/**: capabilities one-file-per-node,
@@ -60,11 +62,11 @@ tracker regions (the product CI's kg-reproducibility gate rejects hand-edits). k
 must exit 0. Only the Architect edits the kg-source shards feeding canonical-nodes/solution-ontology.
 - **G5 — Phase B approval and exit validation** (role: architect; artifacts: gate-decisions.md)
     - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
-    - run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 120s)
-    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
-    - run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/` (cwd: framework, timeout: 120s)
+    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
     - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. (requires: gate-decisions.md; produces: phase-b-approved)
     - judgment: Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
@@ -131,8 +133,8 @@ append-only. PHASE=B,new -> REJECT (run architecture only after requirements exi
 PHASE=B,existing -> update feature-assembly-plan.md + ontology bindings.
 PHASE=A+B -> Phase A then Phase B.
 
-Note (session_setup): Resolve {PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
-`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {PRODUCT_ROOT}`.
+Note (session_setup): Resolve {NEBULA_PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
+`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`.
 It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
 creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
 variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run

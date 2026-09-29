@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This policy defines the boundary between generic, reusable agent roles (`agents/`) and solution-specific content (`{PRODUCT_ROOT}/planning-mds/`).
+This policy defines the boundary between generic, reusable agent roles (`agents/`) and solution-specific content (`{NEBULA_PRODUCT_ROOT}/planning-mds/`).
 
 ---
 
@@ -34,18 +34,18 @@ This policy defines the boundary between generic, reusable agent roles (`agents/
 
 ---
 
-### Rule 2: {PRODUCT_ROOT}/planning-mds/ is Solution-Specific
+### Rule 2: {NEBULA_PRODUCT_ROOT}/planning-mds/ is Solution-Specific
 
-**Principle:** Everything in `{PRODUCT_ROOT}/planning-mds/` is specific to the current project and would be replaced for a new project.
+**Principle:** Everything in `{NEBULA_PRODUCT_ROOT}/planning-mds/` is specific to the current project and would be replaced for a new project.
 
-**What belongs in {PRODUCT_ROOT}/planning-mds/:**
+**What belongs in {NEBULA_PRODUCT_ROOT}/planning-mds/:**
 - ✅ Project master specification (BLUEPRINT.md)
 - ✅ Domain knowledge (glossary, competitive analysis, domain-specific patterns)
 - ✅ Project-specific examples (personas, features, stories, architecture)
 - ✅ Actual project requirements (features/, stories/, architecture/)
 - ✅ Project-specific ADRs and design decisions
 
-**What does NOT belong in {PRODUCT_ROOT}/planning-mds/:**
+**What does NOT belong in {NEBULA_PRODUCT_ROOT}/planning-mds/:**
 - ❌ Generic best practices (those go in agents/)
 - ❌ Generic examples from other domains
 - ❌ Reusable templates (those go in agents/templates/)
@@ -54,27 +54,27 @@ This policy defines the boundary between generic, reusable agent roles (`agents/
 
 ### Rule 3: Agents Must Not Invent Requirements
 
-**Principle:** Agent roles consume requirements from `{PRODUCT_ROOT}/planning-mds/`; they do not create or embed solution requirements.
+**Principle:** Agent roles consume requirements from `{NEBULA_PRODUCT_ROOT}/planning-mds/`; they do not create or embed solution requirements.
 
 **Implementation:**
-- Agents read from `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and `{PRODUCT_ROOT}/planning-mds/domain/` to understand project context
-- Agents reference `{PRODUCT_ROOT}/planning-mds/examples/` to see how generic patterns apply to this project
-- Agents generate deliverables based on templates in `agents/templates/` and requirements in `{PRODUCT_ROOT}/planning-mds/`
+- Agents read from `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` to understand project context
+- Agents reference `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` to see how generic patterns apply to this project
+- Agents generate deliverables based on templates in `agents/templates/` and requirements in `{NEBULA_PRODUCT_ROOT}/planning-mds/`
 - Agents never hard-code project-specific business logic in their role definitions
 
 ---
 
 ### Rule 4: Starting a New Project
 
-**Principle:** Reusing the framework for a new product should be as simple as placing the product repo next to `nebula-agents` and resolving `{PRODUCT_ROOT}` to that product repo. The framework is not copied into the product — the two repos operate as siblings.
+**Principle:** Reusing the framework for a new product should be as simple as placing the product repo next to `nebula-agents` and resolving `{NEBULA_PRODUCT_ROOT}` to that product repo. The framework is not copied into the product — the two repos operate as siblings.
 
 **Process:**
 1. Clone `nebula-agents` and the product repo as siblings under a shared workspace root
-2. Resolve `{PRODUCT_ROOT}` via `NEBULA_PRODUCT_ROOT`, operator input at session start, or the default `../<product-repo>` relative to `nebula-agents`
-3. From a session rooted in `nebula-agents`, run the `init` action to scaffold `{PRODUCT_ROOT}/planning-mds/` structure (or write it by hand)
-4. Write domain knowledge in `{PRODUCT_ROOT}/planning-mds/domain/`
-5. Create project-specific examples in `{PRODUCT_ROOT}/planning-mds/examples/`
-6. Write `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` for the new project
+2. Resolve `{NEBULA_PRODUCT_ROOT}` via explicit operator `NEBULA_PRODUCT_ROOT` input or the environment variable; resolve relative paths once at session start and pass the absolute path thereafter. No default product is selected
+3. From a session rooted in `nebula-agents`, run the `init` action to scaffold `{NEBULA_PRODUCT_ROOT}/planning-mds/` structure (or write it by hand)
+4. Write domain knowledge in `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/`
+5. Create project-specific examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`
+6. Write `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` for the new project
 7. Agents are immediately ready to use with new project context
 
 ---
@@ -159,9 +159,9 @@ When reviewing PRs that modify `agents/`:
 - [ ] No project-specific terminology in agent files
 - [ ] Examples use the standard entity set (`customers` / `orders`) — see "Standard Example Entities" above
 - [ ] No hard-coded business rules or domain logic
-- [ ] All project-specific content belongs in `{PRODUCT_ROOT}/planning-mds/`
+- [ ] All project-specific content belongs in `{NEBULA_PRODUCT_ROOT}/planning-mds/`
 
-When reviewing PRs that modify `{PRODUCT_ROOT}/planning-mds/`:
+When reviewing PRs that modify `{NEBULA_PRODUCT_ROOT}/planning-mds/`:
 - [ ] Content is specific to current project
 - [ ] No generic best practices (those belong in `agents/`)
 - [ ] References to `agents/` resources are correct
@@ -198,13 +198,13 @@ When reviewing PRs that modify `{PRODUCT_ROOT}/planning-mds/`:
 **Goals:** Manage subscription plans, track billing cycles, reconcile payments
 ```
 
-**Why bad:** References a specific product's domain (subscription billing), a specific persona (Priya Shah), and product-specific entities (plans, billing cycles, payments). This belongs in `{PRODUCT_ROOT}/planning-mds/examples/personas/`, not in the framework.
+**Why bad:** References a specific product's domain (subscription billing), a specific persona (Priya Shah), and product-specific entities (plans, billing cycles, payments). This belongs in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/`, not in the framework.
 
 ---
 
-### ✅ GOOD: Solution-Specific in {PRODUCT_ROOT}/planning-mds/
+### ✅ GOOD: Solution-Specific in {NEBULA_PRODUCT_ROOT}/planning-mds/
 
-**File:** `{PRODUCT_ROOT}/planning-mds/examples/personas/plan-manager.md`
+**File:** `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/plan-manager.md`
 
 ```markdown
 ## Persona: Plan Manager
@@ -214,7 +214,7 @@ When reviewing PRs that modify `{PRODUCT_ROOT}/planning-mds/`:
 **Goals:** Manage subscription plans, track billing cycles, reconcile payments
 ```
 
-**Why good:** Project-specific persona lives in the correct product-owned location (`{PRODUCT_ROOT}/planning-mds/`), not inside the framework.
+**Why good:** Project-specific persona lives in the correct product-owned location (`{NEBULA_PRODUCT_ROOT}/planning-mds/`), not inside the framework.
 
 ---
 

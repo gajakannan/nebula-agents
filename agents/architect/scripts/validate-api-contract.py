@@ -6,10 +6,10 @@ Validates OpenAPI specifications for completeness and consistency.
 
 Usage:
     python3 validate-api-contract.py [--product-root PATH] <path-to-openapi-yaml>
-    python3 validate-api-contract.py {PRODUCT_ROOT}/planning-mds/api/example-api.yaml
+    python3 validate-api-contract.py {NEBULA_PRODUCT_ROOT}/planning-mds/api/example-api.yaml
     python3 validate-api-contract.py /abs/path/to/openapi.yaml
 
-A leading `{PRODUCT_ROOT}/` placeholder in the path is expanded to the resolved
+A leading `{NEBULA_PRODUCT_ROOT}/` placeholder in the path is expanded to the resolved
 product root.
 """
 
@@ -282,13 +282,13 @@ def main():
     add_product_root_arg(parser)
     parser.add_argument(
         "file",
-        help="Path to openapi YAML (relative paths are resolved against {PRODUCT_ROOT})",
+        help="Path to openapi YAML (relative paths are resolved against {NEBULA_PRODUCT_ROOT})",
     )
     args = parser.parse_args()
 
     product_root = resolve_product_root(args.product_root)
     raw_path = args.file
-    if "{PRODUCT_ROOT}" in raw_path:
+    if "{NEBULA_PRODUCT_ROOT}" in raw_path:
         file_path = str(expand_product_root(raw_path, product_root))
     elif Path(raw_path).is_absolute():
         file_path = raw_path

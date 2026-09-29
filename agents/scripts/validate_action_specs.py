@@ -57,7 +57,7 @@ PLACEHOLDER_RE = re.compile(r"\{([^{}]+)\}")
 # implicitly knows its own declared input names, run_id var, and auto_resolved
 # keys (see _known_placeholders).
 BASE_PLACEHOLDERS = frozenset({
-    "PRODUCT_ROOT", "FEATURE_ID", "FEATURE_SLUG", "FEATURE_PATH",
+    "NEBULA_PRODUCT_ROOT", "FEATURE_ID", "FEATURE_SLUG", "FEATURE_PATH",
     "FEATURE_INDEX_ROOT", "RUN_ID", "RUN_FOLDER", "RUN_ID_PRIOR",
     "start_tier", "stage",
 })
@@ -65,7 +65,7 @@ BASE_PLACEHOLDERS = frozenset({
 # A path token in an argv must resolve under one of these roots. Run-relative
 # artifact names (expected_artifacts, produces, write.artifact) are checked only
 # for traversal/absolute escapes, not for a root prefix.
-ALLOWED_PATH_ROOTS = ("agents/", "{PRODUCT_ROOT}", "{FEATURE_PATH}",
+ALLOWED_PATH_ROOTS = ("agents/", "{NEBULA_PRODUCT_ROOT}", "{FEATURE_PATH}",
                       "{RUN_FOLDER}", "{FEATURE_INDEX_ROOT}")
 
 # Mutation classes an operation may declare in ``mutates``.
@@ -304,6 +304,11 @@ def _validate_action_semantics(name: str, spec: dict[str, Any], active_version: 
                                result: Result) -> None:
     src = f"{name}.yaml"
     known = _known_placeholders(spec)
+    for legacy in ("PRODUCT_ROOT", "NEBULA_AGENTS_PRODUCT_ROOT"):
+        if legacy in known:
+            result.add("legacy_product_root", src,
+                       f"{legacy} is not a supported root input; use NEBULA_PRODUCT_ROOT")
+            known.remove(legacy)
 
     contract = spec.get("contract", {})
     version = contract.get("version") if isinstance(contract, dict) else None

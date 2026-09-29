@@ -22,7 +22,7 @@ Scan the codebase to detect languages, frameworks, dependencies, and deployment 
 
 ---
 
-### 1.1 Backend Service Detection ({PRODUCT_ROOT}/engine/)
+### 1.1 Backend Service Detection ({NEBULA_PRODUCT_ROOT}/engine/)
 
 **Scan for:**
 
@@ -43,7 +43,7 @@ Scan the codebase to detect languages, frameworks, dependencies, and deployment 
 
 **Example detection:**
 ```
-✓ {PRODUCT_ROOT}/engine/ detected
+✓ {NEBULA_PRODUCT_ROOT}/engine/ detected
   - Language: C#
   - Framework: ASP.NET Core 10
   - Database: PostgreSQL (connection string: postgres://...)
@@ -103,7 +103,7 @@ Scan the codebase to detect languages, frameworks, dependencies, and deployment 
 
 ---
 
-### 1.2 Frontend Service Detection ({PRODUCT_ROOT}/experience/)
+### 1.2 Frontend Service Detection ({NEBULA_PRODUCT_ROOT}/experience/)
 
 #### React / Vite SPA
 ```bash
@@ -156,12 +156,12 @@ Scan the codebase to detect languages, frameworks, dependencies, and deployment 
 
 ---
 
-### 1.3 AI Layer Detection ({PRODUCT_ROOT}/neuron/)
+### 1.3 AI Layer Detection ({NEBULA_PRODUCT_ROOT}/neuron/)
 
 #### Python / FastAPI (AI Layer)
 ```bash
 # Detection signals
-- {PRODUCT_ROOT}/neuron/ directory exists
+- {NEBULA_PRODUCT_ROOT}/neuron/ directory exists
 - requirements.txt with fastapi, LLM provider SDKs
 - mcp/ or domain_agents/ directories
 - Presence of prompt templates
@@ -169,8 +169,8 @@ Scan the codebase to detect languages, frameworks, dependencies, and deployment 
 # Extract information
 - LLM Provider: Check for anthropic, openai, ollama in requirements
 - Port: 8000 (FastAPI default)
-- MCP servers: Check {PRODUCT_ROOT}/neuron/mcp/ directory
-- Dependencies on {PRODUCT_ROOT}/engine/: Look for httpx calls to internal API
+- MCP servers: Check {NEBULA_PRODUCT_ROOT}/neuron/mcp/ directory
+- Dependencies on {NEBULA_PRODUCT_ROOT}/engine/: Look for httpx calls to internal API
 ```
 
 ---
@@ -263,24 +263,24 @@ os.getenv("VAR_NAME") in code
 ## Code Inspection Results
 
 ### Services Detected
-1. **Backend API ({PRODUCT_ROOT}/engine/)**
+1. **Backend API ({NEBULA_PRODUCT_ROOT}/engine/)**
    - Language: C# / .NET 10
    - Framework: ASP.NET Core
    - Database: PostgreSQL
    - Auth: Keycloak (JWT)
    - Port: 5000
 
-2. **Frontend ({PRODUCT_ROOT}/experience/)**
+2. **Frontend ({NEBULA_PRODUCT_ROOT}/experience/)**
    - Language: TypeScript / React 18
    - Build: Vite
    - Runtime: Static files (Nginx for prod)
    - Port: 3000 (dev), 80 (prod)
 
-3. **AI Layer ({PRODUCT_ROOT}/neuron/)**
+3. **AI Layer ({NEBULA_PRODUCT_ROOT}/neuron/)**
    - Language: Python 3.11
    - Framework: FastAPI
    - Port: 8000
-   - Dependencies: {PRODUCT_ROOT}/engine/ internal API
+   - Dependencies: {NEBULA_PRODUCT_ROOT}/engine/ internal API
 
 ### Infrastructure Requirements
 - PostgreSQL 16 (persistent storage needed)
@@ -290,9 +290,9 @@ os.getenv("VAR_NAME") in code
 
 ### Service Dependencies
 ```
-{PRODUCT_ROOT}/neuron/ ──┐
-          ├──> {PRODUCT_ROOT}/engine/ ──> postgres
-{PRODUCT_ROOT}/experience/ ┘
+{NEBULA_PRODUCT_ROOT}/neuron/ ──┐
+          ├──> {NEBULA_PRODUCT_ROOT}/engine/ ──> postgres
+{NEBULA_PRODUCT_ROOT}/experience/ ┘
 ```
 
 ### Environment Variables Required
@@ -300,7 +300,7 @@ os.getenv("VAR_NAME") in code
 - DB_NAME, DB_USER, DB_PASSWORD
 - KEYCLOAK_URL, JWT_SECRET
 - LLM_PROVIDER, LLM_API_KEY
-- API_URL (for {PRODUCT_ROOT}/experience/)
+- API_URL (for {NEBULA_PRODUCT_ROOT}/experience/)
 ```
 
 ---
@@ -316,7 +316,7 @@ Based on code inspection, design the deployment architecture and create a soluti
 
 #### Pattern 1: API-Only (Backend + Database)
 **Use when:**
-- No frontend detected ({PRODUCT_ROOT}/experience/ doesn't exist)
+- No frontend detected ({NEBULA_PRODUCT_ROOT}/experience/ doesn't exist)
 - Building pure API service
 - Frontend hosted separately
 
@@ -334,14 +334,14 @@ Based on code inspection, design the deployment architecture and create a soluti
 
 **Services needed:**
 - Database (postgres/mysql/mongodb)
-- API ({PRODUCT_ROOT}/engine/)
+- API ({NEBULA_PRODUCT_ROOT}/engine/)
 
 ---
 
 #### Pattern 2: Traditional 3-Tier (API + SPA + Database)
 **Use when:**
-- Backend ({PRODUCT_ROOT}/engine/) + Frontend ({PRODUCT_ROOT}/experience/) both exist
-- No AI layer ({PRODUCT_ROOT}/neuron/ doesn't exist)
+- Backend ({NEBULA_PRODUCT_ROOT}/engine/) + Frontend ({NEBULA_PRODUCT_ROOT}/experience/) both exist
+- No AI layer ({NEBULA_PRODUCT_ROOT}/neuron/ doesn't exist)
 - Standard web application
 
 **Architecture:**
@@ -363,14 +363,14 @@ Based on code inspection, design the deployment architecture and create a soluti
 
 **Services needed:**
 - Database
-- API ({PRODUCT_ROOT}/engine/)
-- Web ({PRODUCT_ROOT}/experience/)
+- API ({NEBULA_PRODUCT_ROOT}/engine/)
+- Web ({NEBULA_PRODUCT_ROOT}/experience/)
 
 ---
 
 #### Pattern 3: AI-Enabled 3-Tier (API + SPA + AI + Database)
 **Use when:**
-- All three layers exist: {PRODUCT_ROOT}/engine/, {PRODUCT_ROOT}/experience/, {PRODUCT_ROOT}/neuron/
+- All three layers exist: {NEBULA_PRODUCT_ROOT}/engine/, {NEBULA_PRODUCT_ROOT}/experience/, {NEBULA_PRODUCT_ROOT}/neuron/
 - AI features integrated
 - Application uses LLM capabilities
 
@@ -383,7 +383,7 @@ Based on code inspection, design the deployment architecture and create a soluti
        ↓
 ┌──────────────┐     ┌────────────┐
 │ Backend API  │<────│ AI Layer   │ :8000
-│    :5000     │     │ ({PRODUCT_ROOT}/neuron/)  │
+│    :5000     │     │ ({NEBULA_PRODUCT_ROOT}/neuron/)  │
 └──────┬───────┘     └────────────┘
        │
        ↓
@@ -394,9 +394,9 @@ Based on code inspection, design the deployment architecture and create a soluti
 
 **Services needed:**
 - Database
-- API ({PRODUCT_ROOT}/engine/)
-- Web ({PRODUCT_ROOT}/experience/)
-- Neuron ({PRODUCT_ROOT}/neuron/)
+- API ({NEBULA_PRODUCT_ROOT}/engine/)
+- Web ({NEBULA_PRODUCT_ROOT}/experience/)
+- Neuron ({NEBULA_PRODUCT_ROOT}/neuron/)
 
 ---
 
@@ -429,7 +429,7 @@ Based on code inspection, design the deployment architecture and create a soluti
 - Multiple databases (one per service)
 - Multiple APIs
 - API Gateway (optional)
-- Web ({PRODUCT_ROOT}/experience/)
+- Web ({NEBULA_PRODUCT_ROOT}/experience/)
 
 ---
 
@@ -452,7 +452,7 @@ Health check: pg_isready
 
 #### Backend API Service
 ```yaml
-Service: api ({PRODUCT_ROOT}/engine/)
+Service: api ({NEBULA_PRODUCT_ROOT}/engine/)
 Build: ./engine/Dockerfile (to be created)
 Runtime: .NET 10 / Java 17 / Python 3.11 / Node 20
 Ports: 5000:5000 (or framework default)
@@ -465,7 +465,7 @@ Health check: HTTP GET /health or /api/health
 
 #### Frontend Service
 ```yaml
-Service: web ({PRODUCT_ROOT}/experience/)
+Service: web ({NEBULA_PRODUCT_ROOT}/experience/)
 Build: ./experience/Dockerfile (multi-stage with nginx)
 Runtime: Nginx (production) or Vite dev server (dev)
 Ports: 3000:3000 (dev), 80:80 (prod)
@@ -477,7 +477,7 @@ Health check: HTTP GET /
 
 #### AI Layer Service
 ```yaml
-Service: neuron ({PRODUCT_ROOT}/neuron/)
+Service: neuron ({NEBULA_PRODUCT_ROOT}/neuron/)
 Build: ./neuron/Dockerfile
 Runtime: Python 3.11 with FastAPI
 Ports: 8000:8000
@@ -494,9 +494,9 @@ Health check: HTTP GET /health
 ### 2.3 Consult Architect
 
 **Read architectural decisions:**
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Established patterns
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 - NFRs (performance, scalability, availability)
-- `{PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` - ADRs
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Established patterns
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 - NFRs (performance, scalability, availability)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` - ADRs
 
 **Questions to answer:**
 1. **Scalability:** Does this need to scale horizontally? (Multiple replicas)
@@ -520,7 +520,7 @@ DevOps: "Understood. Designing for single-node with easy migration path."
 
 ### 2.4 Create Deployment Architecture Template
 
-**File:** `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
+**File:** `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
 
 **Use template:** `agents/templates/deployment-architecture-template.md`
 
@@ -746,7 +746,7 @@ JWT_SECRET=change_me_in_production_use_long_random_string
 # API Configuration
 API_URL=http://localhost:5000
 
-# AI Configuration (if {PRODUCT_ROOT}/neuron/ exists)
+# AI Configuration (if {NEBULA_PRODUCT_ROOT}/neuron/ exists)
 LLM_PROVIDER=anthropic
 LLM_API_KEY=your_api_key_here
 
@@ -1078,7 +1078,7 @@ services:
 
 **Framework Documentation:**
 - `agents/templates/deployment-architecture-template.md` - Template structure
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific patterns
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific patterns
 
 ---
 

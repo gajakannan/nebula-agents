@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import runpy
 import shutil
 import sys
@@ -71,6 +72,7 @@ def test_first_authorized_launch_initializes_owner_only_runtime_state(
         def build_interactive_argv(self, workspace_root, prompt_text):
             assert workspace_root == workspace.resolve()
             assert "FEATURE_ID=F0001" in prompt_text
+            assert prompt_text.startswith(f"NEBULA_PRODUCT_ROOT={json.dumps(str(workspace.resolve()))}\n")
             return (str(Path(sys.executable).resolve()), "-c", "pass")
 
     class Tmux:

@@ -92,9 +92,9 @@ You do not invent product behavior. You document what is implemented and explici
 ## Required Inputs
 
 Always gather these before drafting:
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` (if present)
-- Relevant architecture decisions under `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` (if present)
+- Relevant architecture decisions under `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`
 - Relevant source code and config files
 - Existing docs in `docs/`
 
@@ -111,14 +111,14 @@ When documenting operations, include:
 Use writing guidance from:
 - `agents/technical-writer/references/writing-best-practices.md`
 
-When ontology coverage exists for the target subject, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` and `lookup.py --callers-only <symbol-id>` on the central canonical node to discover related capabilities, endpoints, and consumers the doc should reference. Raw source, ADRs, and API contracts still win on conflict.
+When ontology coverage exists for the target subject, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --defines <name>` and `lookup.py --callers-only <symbol-id>` on the central canonical node to discover related capabilities, endpoints, and consumers the doc should reference. Raw source, ADRs, and API contracts still win on conflict.
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
+Before broad reads or searches in `{NEBULA_PRODUCT_ROOT}`, load
+`{NEBULA_PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
 patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
 evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
 read only exact evidence files required for audit, validation, closeout, failure
 triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
@@ -320,8 +320,8 @@ Use this checklist before finalizing:
 
 Primary output locations:
 - `docs/`
-- `{PRODUCT_ROOT}/planning-mds/api/`
-- `{PRODUCT_ROOT}/planning-mds/operations/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/api/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/`
 
 Recommended organization:
 - `docs/api/` for endpoint-level references
@@ -345,7 +345,7 @@ cat agents/technical-writer/SKILL.md
 cat agents/actions/document.md
 
 # 2) Read planning and architecture context
-cat {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+cat {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
 
 # 3) Inspect current docs and impacted code
 rg --files docs planning-mds | sort
