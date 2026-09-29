@@ -19,15 +19,15 @@ FEATURE_CONTRACT_SOURCES = (
     PROMPT_SOURCE_DIR / "feature-automation-safe.md",
     PROMPT_SOURCE_DIR / "feature-operator-friendly.md",
 )
-TRACKER_PRODUCT_ROOT_COMMAND = "validate-trackers.py --product-root {PRODUCT_ROOT}"
+TRACKER_PRODUCT_ROOT_COMMAND = "validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT}"
 PLAN_TRACKER_COMMAND = f"{TRACKER_PRODUCT_ROOT_COMMAND} --skip-feature-evidence"
 FEATURE_TRACKER_COMMAND = f"{TRACKER_PRODUCT_ROOT_COMMAND} --feature {{FEATURE_ID}} --run-id {{RUN_ID}}"
 FEATURE_STAGE_COMMAND = (
-    "validate-feature-evidence.py --product-root {PRODUCT_ROOT} "
+    "validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} "
     "--feature {FEATURE_ID} --run-id {RUN_ID} --stage {stage}"
 )
 FEATURE_CLOSEOUT_COMMAND = (
-    "validate-feature-evidence.py --product-root {PRODUCT_ROOT} "
+    "validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} "
     "--feature {FEATURE_ID} --stage closeout"
 )
 

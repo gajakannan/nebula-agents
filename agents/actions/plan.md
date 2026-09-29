@@ -42,7 +42,7 @@ inside `{FEATURE_PATH}` plus a base-run evidence package (do NOT call
 `validate-feature-evidence.py` at plan). Run gates through
 `python3 agents/scripts/run-gate.py --action plan --stage <G1..G5> ...` (`--list` prints
 the runbook). The exit-validation sequence and the tracker-only closeout contract
-(`validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`) are the
+(`validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence`) are the
 G5 operations in the spec.
 
 ### Gate flow
@@ -64,9 +64,9 @@ Per-step judgment follows below.
 1. **Activate Product Manager agent** by reading `agents/product-manager/SKILL.md`
 
 2. **Read required context:**
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Sections 0-2 for baseline context)
-   - `{PRODUCT_ROOT}/planning-mds/domain/` (domain glossary, if exists)
-   - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` (shared ontology context, if present)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Sections 0-2 for baseline context)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` (domain glossary, if exists)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` (shared ontology context, if present)
 
 3. **Execute Product Manager responsibilities:**
    - Define vision and explicit non-goals
@@ -76,17 +76,17 @@ Per-step judgment follows below.
    - Specify screen list and responsibilities
    - Map key workflows across screens
    - Produce ASCII screen layouts in the PRD `## Screen Layouts (ASCII)` section whenever the feature introduces or materially modifies a user-visible screen or multi-step flow (Desktop + one narrow variant minimum). Skip only when the feature has no UI surface; record the reason in the section.
-   - Seed a minimal feature mapping stub in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` for any new or materially changed feature in scope
+   - Seed a minimal feature mapping stub in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` for any new or materially changed feature in scope
 
 4. **Produce outputs:**
-   - Update `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (complete, no TODOs)
-   - Create `{PRODUCT_ROOT}/planning-mds/examples/personas/*.md` (if detailed personas needed)
-   - Create feature folders at `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` with PRD.md, README.md, STATUS.md, GETTING-STARTED.md
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (complete, no TODOs)
+   - Create `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/*.md` (if detailed personas needed)
+   - Create feature folders at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` with PRD.md, README.md, STATUS.md, GETTING-STARTED.md
    - Create stories colocated in feature folders as `F{NNNN}-S{NNNN}-{slug}.md`
-   - Create or update a minimal feature mapping stub in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-   - Ensure `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (copy from `agents/templates/tracker-governance-template.md` if missing)
-   - Update `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` with new features
-   - Update `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` with sequence changes (`Now / Next / Later / Completed`)
+   - Create or update a minimal feature mapping stub in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+   - Ensure `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (copy from `agents/templates/tracker-governance-template.md` if missing)
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` with new features
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` with sequence changes (`Now / Next / Later / Completed`)
 
 5. **Validate Phase A outputs:**
    - [ ] Vision and non-goals documented
@@ -101,12 +101,12 @@ Per-step judgment follows below.
    - [ ] No TODOs remain in Section 3
 
 **Phase A Outputs:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (complete)
-- `{PRODUCT_ROOT}/planning-mds/examples/personas/` (optional)
-- `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` (feature folders with PRD, README, STATUS, GETTING-STARTED, and story files)
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` (minimal feature/story stub for touched scope)
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature index)
-- `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (prioritization/sequence view)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 3 (complete)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/` (optional)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` (feature folders with PRD, README, STATUS, GETTING-STARTED, and story files)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` (minimal feature/story stub for touched scope)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature index)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (prioritization/sequence view)
 
 ---
 
@@ -279,18 +279,18 @@ Replace with:
 Before Phase A approval, synchronize and validate planning trackers:
 
 1. Ensure tracker updates are complete:
-   - `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists and reflects required signoff governance
-   - `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` reflects feature inventory and paths
-   - `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` reflects current sequencing
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` feature/story status links resolve
-   - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` contains a minimal stub for each touched feature
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists and reflects required signoff governance
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` reflects feature inventory and paths
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` reflects current sequencing
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` feature/story status links resolve
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` contains a minimal stub for each touched feature
 
 2. Regenerate generated tracker:
-   - Run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
+   - Run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`
 
 3. Validate trackers and stories:
-   - Run `python3 agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` for each touched feature
-   - Run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {PRODUCT_ROOT} --skip-feature-evidence`
+   - Run `python3 agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/` for each touched feature
+   - Run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence`
 
 4. Prepare dependency evidence audit:
    - Identify direct or impacted feature dependencies from the PRD, architecture notes, `feature-mappings.yaml`, and KG lookup output
@@ -345,10 +345,10 @@ Before Phase A approval, synchronize and validate planning trackers:
 
    ═══════════════════════════════════════════════════════════
    Review the following files:
-   - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (Section 3)
-   - {PRODUCT_ROOT}/planning-mds/examples/personas/ (if created)
-   - {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md (feature index)
-   - {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/ (feature folders with PRDs and stories)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (Section 3)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/ (if created)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md (feature index)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/ (feature folders with PRDs and stories)
    ═══════════════════════════════════════════════════════════
    ```
 
@@ -418,10 +418,10 @@ state is durable outside the window.
 1. **Activate Architect agent** by reading `agents/architect/SKILL.md`
 
 2. **Read required context:**
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Sections 0-3 (especially Section 3 - approved requirements)
-   - `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` (project-specific patterns to follow)
-   - `{PRODUCT_ROOT}/planning-mds/domain/` (domain knowledge)
-   - `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`, `canonical-nodes.yaml`, and `feature-mappings.yaml` (if present)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Sections 0-3 (especially Section 3 - approved requirements)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` (project-specific patterns to follow)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` (domain knowledge)
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml`, `canonical-nodes.yaml`, and `feature-mappings.yaml` (if present)
    - `agents/architect/references/` (generic architecture best practices)
 
 3. **Execute Architect responsibilities:**
@@ -433,9 +433,9 @@ state is durable outside the window.
    - Specify workflow state machines and business rules
    - Document architectural decisions (ADRs)
    - Define non-functional requirements (performance, security, scalability)
-   - Complete the target feature's ontology mapping in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-   - Add or update canonical shared nodes in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` when Phase B introduces reusable solution semantics
-   - Update `{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` only if the ontology vocabulary itself must change
+   - Complete the target feature's ontology mapping in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+   - Add or update canonical shared nodes in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` when Phase B introduces reusable solution semantics
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml` only if the ontology vocabulary itself must change
 
 4. **Validate against SOLUTION-PATTERNS.md:**
    - [ ] Authorization follows Casbin ABAC pattern
@@ -447,12 +447,12 @@ state is durable outside the window.
    - [ ] All mutations create timeline events
 
 5. **Produce outputs:**
-   - Update `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (complete, no TODOs)
-   - Create `{PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` (ADRs for key decisions)
-   - Create `{PRODUCT_ROOT}/planning-mds/architecture/data-model.md` (if detailed ERD needed)
-   - Create `{PRODUCT_ROOT}/planning-mds/api/*.yaml` (OpenAPI contracts for implementation)
-   - Complete ontology bindings in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
-   - Add canonical shared nodes in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` when needed
+   - Update `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (complete, no TODOs)
+   - Create `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` (ADRs for key decisions)
+   - Create `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/data-model.md` (if detailed ERD needed)
+   - Create `{NEBULA_PRODUCT_ROOT}/planning-mds/api/*.yaml` (OpenAPI contracts for implementation)
+   - Complete ontology bindings in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+   - Add canonical shared nodes in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` when needed
 
 6. **Validate Phase B outputs:**
    - [ ] Service boundaries clear
@@ -469,12 +469,12 @@ state is durable outside the window.
    - [ ] No TODOs remain in Section 4
 
 **Phase B Outputs:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (complete)
-- `{PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` (ADRs)
-- `{PRODUCT_ROOT}/planning-mds/architecture/data-model.md` (optional)
-- `{PRODUCT_ROOT}/planning-mds/api/*.yaml` (OpenAPI contracts)
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` (completed feature/story bindings)
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` (when new shared semantics were introduced)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 (complete)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/*.md` (ADRs)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/data-model.md` (optional)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/api/*.yaml` (OpenAPI contracts)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml` (completed feature/story bindings)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml` (when new shared semantics were introduced)
 
 ---
 
@@ -486,13 +486,13 @@ Before Phase B approval, synchronize and validate the solution ontology for the
 touched planning scope:
 
 1. Ensure feature mapping completion:
-   - The target feature exists in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
+   - The target feature exists in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`
    - Story mappings exist when architecture decisions materially depend on canonical workflow, schema, or ADR links
    - `status`, `path`, and dependency references align with the feature folder and trackers
 
 2. Ensure canonical shared semantics are captured correctly:
    - If the feature only reuses existing shared semantics, reference existing canonical nodes
-   - If the feature introduces a new reusable workflow, workflow state, entity, schema grouping, or capability, add it to `{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
+   - If the feature introduces a new reusable workflow, workflow state, entity, schema grouping, or capability, add it to `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml`
    - Do not add new canonical nodes for feature-local details that remain owned by the PRD alone
 
 3. Validate source precedence and ownership boundaries:
@@ -505,8 +505,8 @@ touched planning scope:
    - Referenced IDs exist
    - Referenced paths exist
    - No stale or contradictory bindings remain for the touched feature
-   - Refresh the coverage report: `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
-   - Run `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` — it MUST exit 0 before the gate passes (stale `coverage-report.yaml`, missing paths, unknown refs, or uncovered feature dirs will fail the gate)
+   - Refresh the coverage report: `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report`
+   - Run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` — it MUST exit 0 before the gate passes (stale `coverage-report.yaml`, missing paths, unknown refs, or uncovered feature dirs will fail the gate)
 
 **Gate Criteria:**
 - [ ] Target feature has a completed ontology mapping
@@ -514,7 +514,7 @@ touched planning scope:
 - [ ] Mapping references resolve to real IDs and paths
 - [ ] Ontology does not contradict raw planning/architecture artifacts
 - [ ] Architect has finished ontology updates before plan closeout
-- [ ] `python3 {PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 (coverage report fresh, no integrity errors)
+- [ ] `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` exits 0 (coverage report fresh, no integrity errors)
 
 ---
 
@@ -567,11 +567,11 @@ touched planning scope:
 
    ═══════════════════════════════════════════════════════════
    Review the following files:
-   - {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (Section 4)
-   - {PRODUCT_ROOT}/planning-mds/architecture/decisions/ (ADRs)
-   - {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md (patterns followed)
-   - {PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
-   - {PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml (if changed)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md (Section 4)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/ (ADRs)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md (patterns followed)
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml
+   - {NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml (if changed)
    ═══════════════════════════════════════════════════════════
    ```
 
@@ -677,7 +677,7 @@ Example: "Run the feature action for [specific feature name]"
 **Overall Plan Action Success:**
 - [ ] Phase A completed and approved by user
 - [ ] Phase B completed and approved by user
-- [ ] All outputs exist in {PRODUCT_ROOT}/planning-mds/
+- [ ] All outputs exist in {NEBULA_PRODUCT_ROOT}/planning-mds/
 - [ ] No TODOs remain in BLUEPRINT.md Sections 3-4
 - [ ] SOLUTION-PATTERNS.md patterns documented and followed
 - [ ] Ontology mapping synchronized for touched feature scope
@@ -688,9 +688,9 @@ Example: "Run the feature action for [specific feature name]"
 ## Prerequisites
 
 Before running plan action:
-- [ ] `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists with Sections 0-2 (baseline context)
-- [ ] `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (or will be created from `agents/templates/tracker-governance-template.md` during this run)
-- [ ] `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` exists or can be created during this run
+- [ ] `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists with Sections 0-2 (baseline context)
+- [ ] `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (or will be created from `agents/templates/tracker-governance-template.md` during this run)
+- [ ] `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` exists or can be created during this run
 - [ ] Domain glossary exists or can be created
 - [ ] User is available to provide approvals at gates
 - [ ] User has clarified business requirements

@@ -1,6 +1,6 @@
 # Symbol-Index Guide
 
-`{PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` is the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/symbol-index.yaml` is the
 symbol-level layer of the knowledge graph. It binds individual methods,
 classes, functions, and properties to the canonical nodes already declared in
 `code-index.yaml`, so retrieval can jump straight to a definition instead of
@@ -16,7 +16,7 @@ the symbol, get its callers/callees, edit narrowly."
 ## When to use it
 
 - Before editing a bound method body — call
-  `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --symbol <name>` to get the
+  `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --symbol <name>` to get the
   symbol record plus its caller/callee neighbourhood.
 - When only one slice of that neighbourhood is needed, the narrow
   projections are cheaper than `--symbol`:
@@ -236,19 +236,19 @@ escape hatch.
 
 ```bash
 # Full regeneration (uses .kg-state/symbols-cache.json for incremental parsing)
-python3 {PRODUCT_ROOT}/scripts/kg/symbols.py
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py
 
 # Force a full re-parse (ignore cache)
-python3 {PRODUCT_ROOT}/scripts/kg/symbols.py --force
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py --force
 
 # Restrict to a single canonical node
-python3 {PRODUCT_ROOT}/scripts/kg/symbols.py --node entity:customer
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py --node entity:customer
 
 # Restrict to a single language
-python3 {PRODUCT_ROOT}/scripts/kg/symbols.py --language typescript
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/symbols.py --language typescript
 
 # Regenerate as part of validation (delegates to symbols.py)
-python3 {PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --regenerate-symbols --check-symbols
 ```
 
 ### Cadence
@@ -273,8 +273,8 @@ symbols:
 
 ```bash
 # Once per checkout (or after dependency changes)
-(cd {PRODUCT_ROOT}/scripts/kg/ts-symbols && npm install)
-(cd {PRODUCT_ROOT}/scripts/kg/csharp-symbols && dotnet build --configuration Release)
+(cd {NEBULA_PRODUCT_ROOT}/scripts/kg/ts-symbols && npm install)
+(cd {NEBULA_PRODUCT_ROOT}/scripts/kg/csharp-symbols && dotnet build --configuration Release)
 ```
 
 `symbols.py` detects missing extractors and skips those languages with a

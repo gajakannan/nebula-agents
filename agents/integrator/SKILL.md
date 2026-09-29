@@ -60,7 +60,7 @@ review yourself.
 
 ### In Scope
 - Determining the merge base and merging code via git in a dedicated worktree
-- Semantic merge of curated KG files via `{PRODUCT_ROOT}/scripts/kg/merge3.py`
+- Semantic merge of curated KG files via `{NEBULA_PRODUCT_ROOT}/scripts/kg/merge3.py`
 - Tracker-row merge of `REGISTRY.md` / `ROADMAP.md` via the same CLI
 - Unconditional regeneration of every generated projection on the merged result
 - Full validation (`validate.py` suite, tracker validators, story-index zero-diff)

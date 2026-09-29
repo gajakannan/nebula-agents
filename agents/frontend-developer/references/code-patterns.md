@@ -704,7 +704,7 @@ describe('CustomerForm accessibility', () => {
 <input className="border-surface-border bg-surface-card text-text-primary" />
 ```
 
-### Feature-First Vertical Slice Organization (Preferred in `{PRODUCT_ROOT}/experience/src`)
+### Feature-First Vertical Slice Organization (Preferred in `{NEBULA_PRODUCT_ROOT}/experience/src`)
 
 - Co-locate feature-specific UI behavior to reduce cognitive drift and ownership ambiguity.
 - Default placement for new feature work:

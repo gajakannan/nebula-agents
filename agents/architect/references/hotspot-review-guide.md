@@ -1,8 +1,8 @@
 # Hotspot Review Guide
 
-`{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` rolls
+`{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` rolls
 behavioral signals (git activity, ownership, knowledge-silo risk) onto each
-canonical node. These signals come from `{PRODUCT_ROOT}/scripts/kg/hotspots.py`
+canonical node. These signals come from `{NEBULA_PRODUCT_ROOT}/scripts/kg/hotspots.py`
 and feed reviewer, architect, and security workflows so risk decisions stop
 being guesswork.
 
@@ -110,10 +110,10 @@ Reviewer interpretation:
 
 ```bash
 # Recompute hotspot/ownership signals into coverage-report.yaml
-python3 {PRODUCT_ROOT}/scripts/kg/hotspots.py
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hotspots.py
 
 # Or as part of standard validation closeout
-python3 {PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report
 ```
 
 Cadence:

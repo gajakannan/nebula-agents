@@ -211,7 +211,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--components-dir",
         default=None,
-        help="Base components directory (default: {PRODUCT_ROOT}/experience/src/components)",
+        help="Base components directory (default: {NEBULA_PRODUCT_ROOT}/experience/src/components)",
     )
     parser.add_argument(
         "--subdir",

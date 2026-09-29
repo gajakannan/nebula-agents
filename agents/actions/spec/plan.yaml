@@ -21,25 +21,25 @@ inputs:
     - {name: PHASE, enum: [A, B, "A+B"]}
     - {name: FEATURE_MODE, enum: [new, existing]}
   optional:
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
   FEATURE_SLUG: "kebab-case slug for {FEATURE_ID} from REGISTRY.md"
-  FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
-  FEATURE_INDEX_ROOT: "{PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}"
-  PLAN_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}"
+  FEATURE_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  FEATURE_INDEX_ROOT: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  PLAN_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_RUN_ID}"
 
 context_load:
   - "agents/ROUTER.md"
   - "agents/agent-map.yaml"
   - "agents/docs/AGENT-USE.md"
   - "agents/actions/plan.md"
-  - "{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md"
-  - "{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md"
-  - "{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md"
-  - "{PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml"
-  - "{PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml"
-  - "{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/solution-ontology.yaml"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/canonical-nodes.yaml"
+  - "{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml"
 
 ownership:
   product-manager: [PRD.md, "persona files", acceptance-criteria-checklist.md, "story breakdown", "STATUS.md skeleton"]
@@ -82,13 +82,13 @@ gates:
     operations:
       - run:
           id: kg-compile
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py"]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-source, kg-projection]
       - run:
           id: kg-check-drift
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
     judgment: |
@@ -113,30 +113,30 @@ gates:
       - run:
           id: generate-story-index
           argv: [python3, agents/product-manager/scripts/generate-story-index.py,
-                 "{PRODUCT_ROOT}/planning-mds/features/"]
+                 "{NEBULA_PRODUCT_ROOT}/planning-mds/features/"]
           cwd: framework
           timeout_seconds: 120
           mutates: [trackers]
       - run:
           id: validate-trackers
           argv: [python3, agents/product-manager/scripts/validate-trackers.py,
-                 --product-root, "{PRODUCT_ROOT}", --skip-feature-evidence]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --skip-feature-evidence]
           cwd: framework
           timeout_seconds: 300
       - run:
           id: kg-write-coverage
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-projection]
       - run:
           id: kg-check-drift-exit
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
       - run:
           id: kg-check-reproducible
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-reproducible]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-reproducible]
           cwd: product
           timeout_seconds: 300
       - run:
@@ -187,8 +187,8 @@ conflict_resolution:
 
 notes:
   session_setup: |
-    Resolve {PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
-    `python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {PRODUCT_ROOT}`.
+    Resolve {NEBULA_PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
+    `python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`.
     It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
     creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
     variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run

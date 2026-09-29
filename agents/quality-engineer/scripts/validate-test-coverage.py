@@ -10,7 +10,7 @@ Usage:
     python validate-test-coverage.py --auto [--min 80]
     python validate-test-coverage.py --auto --product-root ../my-product
 
-Auto-detect mode searches {PRODUCT_ROOT} for common coverage artifacts.
+Auto-detect mode searches {NEBULA_PRODUCT_ROOT} for common coverage artifacts.
 """
 
 import argparse
@@ -85,7 +85,7 @@ def main() -> int:
     parser.add_argument("--min-from-contract", action="store_true",
                         help="Resolve the minimum from the shared contract (coverage_min_pct) "
                              "instead of hardcoding it. Fails closed if it cannot be resolved.")
-    parser.add_argument("--auto", action="store_true", help="Auto-detect coverage file under {PRODUCT_ROOT}")
+    parser.add_argument("--auto", action="store_true", help="Auto-detect coverage file under {NEBULA_PRODUCT_ROOT}")
     args = parser.parse_args()
 
     if args.min_from_contract:

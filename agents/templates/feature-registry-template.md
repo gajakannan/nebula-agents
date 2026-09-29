@@ -6,7 +6,7 @@ applies_to: product-manager
 
 # Feature Registry Template
 
-Tracks all features by ID, name, and status. Place as `REGISTRY.md` at `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`. In a compiled-projection repo (F0006), the feature **tables** are generated from `kg-source/features/**` into fenced `<!-- generated:begin … -->` regions by `scripts/kg/tracker_gen.py` — edit the feature shard, not the table; surrounding prose stays authored.
+Tracks all features by ID, name, and status. Place as `REGISTRY.md` at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`. In a compiled-projection repo (F0006), the feature **tables** are generated from `kg-source/features/**` into fenced `<!-- generated:begin … -->` regions by `scripts/kg/tracker_gen.py` — edit the feature shard, not the table; surrounding prose stays authored.
 
 ---
 
@@ -15,9 +15,9 @@ Tracks all features by ID, name, and status. Place as `REGISTRY.md` at `{PRODUCT
 **Next Available Feature Number:** F{NNNN}
 
 **Planning Views:**
-- Roadmap sequencing (`Now / Next / Later`): `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-- Story rollup index: `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`
-- Governance contract: `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`
+- Roadmap sequencing (`Now / Next / Later`): `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+- Story rollup index: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md`
+- Governance contract: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`
 
 ## Active Features
 
@@ -68,5 +68,5 @@ Per §6, the optional `Evidence Reentry Date` column flags a pre-contract archiv
 
 - Update REGISTRY whenever a feature is created, renamed, re-scoped, marked done, or archived.
 - Keep folder paths exact and valid (`F{NNNN}-{slug}/` for active, `archive/F{NNNN}-{slug}/` for archived).
-- Ensure `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (seed from `agents/templates/tracker-governance-template.md` when initializing a new repo).
+- Ensure `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` exists (seed from `agents/templates/tracker-governance-template.md` when initializing a new repo).
 - After registry edits, regenerate story index and run tracker validation.

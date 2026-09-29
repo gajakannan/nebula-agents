@@ -1,6 +1,6 @@
 # Risk Scoring Guide
 
-`{PRODUCT_ROOT}/scripts/kg/risk.py` collapses the structural and behavioral KG
+`{NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py` collapses the structural and behavioral KG
 signals from Phases 1–3 into a single integer risk score (0–10) plus reviewer
 recommendations. It is a **pre-flight check**, not a gate of record. Per
 `solution-ontology.yaml.authority.precedence`, raw artifacts and human review
@@ -90,16 +90,16 @@ The reviewer gate is enforced by `agents/code-reviewer/SKILL.md` and
 
 ```bash
 # By canonical node
-python3 {PRODUCT_ROOT}/scripts/kg/risk.py entity:customer
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py entity:customer
 
 # By file (resolves to all bound nodes; primary node = highest score)
-python3 {PRODUCT_ROOT}/scripts/kg/risk.py --file backend/src/Application/Services/CustomerService.cs
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py --file backend/src/Application/Services/CustomerService.cs
 
 # By symbol (requires symbol-index.yaml)
-python3 {PRODUCT_ROOT}/scripts/kg/risk.py --symbol CancelAsync --node entity:customer
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py --symbol CancelAsync --node entity:customer
 
 # Narrative
-python3 {PRODUCT_ROOT}/scripts/kg/risk.py entity:customer --reason
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/risk.py entity:customer --reason
 ```
 
 JSON output (default):
@@ -152,7 +152,7 @@ For the critical case the engineer must record an explicit decision before
 merge, e.g.:
 
 ```bash
-python3 {PRODUCT_ROOT}/scripts/kg/workstate.py \
+python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/workstate.py \
   --state-file .kg-state/workstate.yaml \
   decision "Approved policy_rule:order-approver scope broadening" \
   --topic risk-acknowledgement \

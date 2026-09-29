@@ -8,8 +8,8 @@ It can be used with any agent runtime that can read markdown contracts and follo
 ## Operating Model
 
 - **Framework session root:** `nebula-agents`. Orchestrators load role definitions, actions, and templates from `agents/` here. They do not copy `agents/` into the product repo.
-- **Implementation target:** a sibling product repo resolved as `{PRODUCT_ROOT}` at session start (see `agents/docs/AGENT-USE.md` → Session Setup). All product-owned artifacts — `{PRODUCT_ROOT}/planning-mds/`, `{PRODUCT_ROOT}/engine/`, `{PRODUCT_ROOT}/experience/`, `{PRODUCT_ROOT}/neuron/`, and `{PRODUCT_ROOT}/scripts/kg/` — live under the product repo.
-- **No build-time or runtime coupling** exists between `nebula-agents` and `{PRODUCT_ROOT}`. The connection is entirely process-level — the orchestrator knows to look left for framework guidance and right for product artifacts.
+- **Implementation target:** a sibling product repo resolved as `{NEBULA_PRODUCT_ROOT}` at session start (see `agents/docs/AGENT-USE.md` → Session Setup). All product-owned artifacts — `{NEBULA_PRODUCT_ROOT}/planning-mds/`, `{NEBULA_PRODUCT_ROOT}/engine/`, `{NEBULA_PRODUCT_ROOT}/experience/`, `{NEBULA_PRODUCT_ROOT}/neuron/`, and `{NEBULA_PRODUCT_ROOT}/scripts/kg/` — live under the product repo.
+- **No build-time or runtime coupling** exists between `nebula-agents` and `{NEBULA_PRODUCT_ROOT}`. The connection is entirely process-level — the orchestrator knows to look left for framework guidance and right for product artifacts.
 - **Tool-specific config files are optional.** Orchestrators must not depend on `.claude/settings.json`, `CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or any vendor-specific bootstrap file. The durable contract is the repository content itself.
 
 ## 0. Execution Modes
@@ -45,7 +45,7 @@ It can be used with any agent runtime that can read markdown contracts and follo
 
 ## 4. Inputs and Outputs
 
-- Required planning inputs come from `{PRODUCT_ROOT}/planning-mds/`.
+- Required planning inputs come from `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 - Generic templates and references come from `agents/templates/` and `agents/**/references/`.
 - Output artifacts must be written to the paths defined by each action.
 
@@ -58,7 +58,7 @@ It can be used with any agent runtime that can read markdown contracts and follo
 ## 6. Boundary Enforcement
 
 - Treat `agents/` as generic framework content.
-- Treat `{PRODUCT_ROOT}/planning-mds/` as solution-specific content.
+- Treat `{NEBULA_PRODUCT_ROOT}/planning-mds/` as solution-specific content.
 - Do not introduce solution-specific requirements into `agents/`.
 
 ### 6.1 Generated knowledge-graph files — integrator is the sole mainline writer (F0006)
@@ -172,8 +172,8 @@ Orchestrators must distinguish between failure types and apply appropriate handl
 2. Report to user:
    ```
    Agent <role> completed but required artifacts missing:
-   - Expected: {PRODUCT_ROOT}/planning-mds/architecture/data-model.md
-   - Expected: {PRODUCT_ROOT}/planning-mds/api/customers.yaml
+   - Expected: {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/data-model.md
+   - Expected: {NEBULA_PRODUCT_ROOT}/planning-mds/api/customers.yaml
 
    This indicates an agent execution issue.
    ```
@@ -398,7 +398,7 @@ def retry_with_backoff(agent_fn, max_retries=3):
 
 **Implementation:**
 1. **Before each action execution:**
-   - Create snapshot of current `{PRODUCT_ROOT}/planning-mds/` state
+   - Create snapshot of current `{NEBULA_PRODUCT_ROOT}/planning-mds/` state
    - Store in `.snapshots/<action>-<timestamp>/`
    - Include manifest of all files
 
@@ -414,9 +414,9 @@ def retry_with_backoff(agent_fn, max_retries=3):
 .snapshots/
 ├── build-2026-02-07-10-30-00/
 │   ├── manifest.json            # List of files + checksums
-│   ├── {PRODUCT_ROOT}/planning-mds/            # Full snapshot
-│   ├── {PRODUCT_ROOT}/engine/                  # Generated code snapshot
-│   └── {PRODUCT_ROOT}/experience/
+│   ├── {NEBULA_PRODUCT_ROOT}/planning-mds/            # Full snapshot
+│   ├── {NEBULA_PRODUCT_ROOT}/engine/                  # Generated code snapshot
+│   └── {NEBULA_PRODUCT_ROOT}/experience/
 └── plan-2026-02-07-09-15-00/
     └── ...
 ```
@@ -446,7 +446,7 @@ def retry_with_backoff(agent_fn, max_retries=3):
 │ Message:      Generated code has syntax errors │
 ├─────────────────────────────────────────────┤
 │ Impacted Artifacts:                         │
-│ - {PRODUCT_ROOT}/experience/src/components/CustomerList.tsx │
+│ - {NEBULA_PRODUCT_ROOT}/experience/src/components/CustomerList.tsx │
 │   (syntax error at line 45)                │
 ├─────────────────────────────────────────────┤
 │ Suggested Remediation:                      │
@@ -545,14 +545,14 @@ At minimum, it must satisfy the following action-level I/O requirements:
 
 | Action | Contract Source | Required Inputs | Primary Outputs | Gate Handling |
 |---|---|---|---|---|
-| `init` | `agents/actions/init.md` | Project name, domain context, target users, initial entities | `{PRODUCT_ROOT}/planning-mds/` scaffold, `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, `{PRODUCT_ROOT}/planning-mds/domain/glossary.md`, `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` | No explicit approval gate; validate required artifacts exist |
-| `plan` | `agents/actions/plan.md` | Existing `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, domain/context inputs, user clarifications | Updated `BLUEPRINT.md`, planning artifacts (stories/personas/features/screens), architecture specs and contracts per action | Enforce all gates defined in action (including requirement and architecture approvals) |
+| `init` | `agents/actions/init.md` | Project name, domain context, target users, initial entities | `{NEBULA_PRODUCT_ROOT}/planning-mds/` scaffold, `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md`, `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` | No explicit approval gate; validate required artifacts exist |
+| `plan` | `agents/actions/plan.md` | Existing `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, domain/context inputs, user clarifications | Updated `BLUEPRINT.md`, planning artifacts (stories/personas/features/screens), architecture specs and contracts per action | Enforce all gates defined in action (including requirement and architecture approvals) |
 | `plan-review` | `agents/actions/plan-review.md` | Completed plan artifacts, trackers, KG bindings, architecture/API/security references | Read-only plan readiness findings and `plan-review-report.md` | Enforce readiness decision: critical findings mean not ready to build |
 | `build` | `agents/actions/build.md` | Approved planning + architecture artifacts, stories, API and pattern references | Production code, tests, deployment configs, build/review summaries | Enforce severity-based review/security gates (no critical override) and route on user decision |
 | `feature` | `agents/actions/feature.md` | Feature-scoped stories + architecture/API context | Feature-scoped backend/frontend/AI changes and tests, feature review output | Enforce severity-based feature gate outcome (critical blocks approval) |
 | `feature-review` | `agents/actions/feature-review.md` | Completed feature, feature evidence run, changed-file set, runtime/test/security evidence | Read-only completion findings and `feature-review-report.md` | Enforce done decision: failed evidence validation or critical findings mean not done |
 | `review` | `agents/actions/review.md` | Candidate implementation artifacts and applicable planning/architecture references | Code-quality and security review findings with remediation expectations | Enforce severity-based review gate outcome (critical blocks approval) |
-| `validate` | `agents/actions/validate.md` | `{PRODUCT_ROOT}/planning-mds/` artifacts and consistency context | Validation report, gaps, and corrective actions | No skip of required validation checklist steps |
+| `validate` | `agents/actions/validate.md` | `{NEBULA_PRODUCT_ROOT}/planning-mds/` artifacts and consistency context | Validation report, gaps, and corrective actions | No skip of required validation checklist steps |
 | `test` | `agents/actions/test.md` | Implemented code, story acceptance criteria, test strategy inputs | Test plan, executed results, defect reports, quality summary | Enforce stop/continue behavior specified by quality thresholds |
 | `document` | `agents/actions/document.md` | Implemented features, API/contracts, operational context | Documentation artifacts (README/API/runbook/usage docs as scoped by action) | Apply review gate if defined by action; otherwise require completeness checks |
 | `blog` | `agents/actions/blog.md` | Change context, release narrative inputs, evidence links | Dev log or technical blog artifacts | Apply quality checks defined in action before completion |
@@ -619,24 +619,24 @@ When activating an agent, load context in priority order. Each agent's `SKILL.md
 | Architect | `BLUEPRINT.md` §0-3, `SOLUTION-PATTERNS.md` | Feature stories and acceptance criteria | `agents/architect/references/`, implementation agent SKILL.md files |
 | Backend Developer | `SOLUTION-PATTERNS.md`, story file, `BLUEPRINT.md` §4 | Feature API endpoints, feature JSON schemas, feature ERD | `agents/backend-developer/references/` |
 | Frontend Developer | `SOLUTION-PATTERNS.md`, story file, screen spec | Feature API endpoints, feature JSON schemas, UX audit ruleset | `agents/frontend-developer/references/` |
-| AI Engineer | `SOLUTION-PATTERNS.md`, story file, `BLUEPRINT.md` §4 | Existing `{PRODUCT_ROOT}/neuron/` code for this feature | `agents/ai-engineer/references/` |
+| AI Engineer | `SOLUTION-PATTERNS.md`, story file, `BLUEPRINT.md` §4 | Existing `{NEBULA_PRODUCT_ROOT}/neuron/` code for this feature | `agents/ai-engineer/references/` |
 | Quality Engineer | Story file (acceptance criteria), `SOLUTION-PATTERNS.md` | Developer test code for this feature, runtime validation outputs | `agents/quality-engineer/references/` |
 | DevOps | `SOLUTION-PATTERNS.md`, `BLUEPRINT.md` §4 (NFRs) | Existing Dockerfiles, compose files, deployment scripts | `agents/devops/references/` |
 | Code Reviewer | Story file, `SOLUTION-PATTERNS.md`, code under review | Runtime validation outputs (build, test, lint, SAST), tracker docs (if planning changed) | `agents/code-reviewer/references/` |
-| Security | `SOLUTION-PATTERNS.md`, `BLUEPRINT.md` §4.5, code under review | `{PRODUCT_ROOT}/planning-mds/security/` (threat model, policies), runtime scan outputs | `agents/security/references/` |
+| Security | `SOLUTION-PATTERNS.md`, `BLUEPRINT.md` §4.5, code under review | `{NEBULA_PRODUCT_ROOT}/planning-mds/security/` (threat model, policies), runtime scan outputs | `agents/security/references/` |
 | Technical Writer | `BLUEPRINT.md`, `SOLUTION-PATTERNS.md` | Feature code and API contracts for docs scope | `agents/technical-writer/references/` |
 | Blogger | Feature context (stories, STATUS.md, evidence) | Relevant code changes and review outputs | `agents/blogger/references/` |
 
-All paths are relative to the repository root. `BLUEPRINT.md` refers to `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; `SOLUTION-PATTERNS.md` refers to `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`. Section numbers (§) refer to BLUEPRINT.md top-level sections.
+All paths are relative to the repository root. `BLUEPRINT.md` refers to `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; `SOLUTION-PATTERNS.md` refers to `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`. Section numbers (§) refer to BLUEPRINT.md top-level sections.
 
 ### 13.2 Feature-Scoped Narrowing
 
 When an agent operates on a specific feature or story, apply these filters to avoid loading unrelated content:
 
 - **BLUEPRINT.md:** Load only sections listed in the agent's tier-1 column, not the entire file.
-- **API contracts (`{PRODUCT_ROOT}/planning-mds/api/`):** Load only endpoints touched by the current feature.
-- **JSON schemas (`{PRODUCT_ROOT}/planning-mds/schemas/`):** Load only schemas for entities the current feature modifies.
-- **ADRs (`{PRODUCT_ROOT}/planning-mds/architecture/decisions/`):** Load only ADRs referenced in the feature README or story files.
+- **API contracts (`{NEBULA_PRODUCT_ROOT}/planning-mds/api/`):** Load only endpoints touched by the current feature.
+- **JSON schemas (`{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`):** Load only schemas for entities the current feature modifies.
+- **ADRs (`{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`):** Load only ADRs referenced in the feature README or story files.
 - **SOLUTION-PATTERNS.md:** Always load in full. This is institutional memory and must not be summarized or filtered.
 
 ### 13.3 Context Budget Guidance

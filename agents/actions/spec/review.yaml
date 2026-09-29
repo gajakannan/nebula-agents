@@ -28,13 +28,13 @@ inputs:
     - {name: PATHS, required_when: "SCOPE=path-set (auto from PR_URL)"}
     - {name: FEATURE_ID, format: "F####", required_when: "MODE=feature-scoped (from PR_URL when set)"}
     - {name: RUN_ID, format: "YYYY-MM-DD-[a-z0-9]{8}", required_when: "MODE=feature-scoped — the parent feature run ID"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
   FEATURE_SLUG: "kebab-case slug for {FEATURE_ID} from REGISTRY.md (feature-scoped only)"
-  FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)"
-  OUTPUT_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist, created by feature.md at G0)"
-  REVIEW_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{REVIEW_RUN_ID} (standalone only)"
+  FEATURE_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)"
+  OUTPUT_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist, created by feature.md at G0)"
+  REVIEW_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{REVIEW_RUN_ID} (standalone only)"
 
 context_load:
   - "agents/ROUTER.md"
@@ -94,7 +94,7 @@ gates:
       - run:
           id: r3-validate-g3
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G3]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G3]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -131,7 +131,7 @@ notes:
     produces NO feature evidence package and does NOT satisfy the per-feature review requirement — the
     corresponding feature.md run must still produce its own G3 evidence.
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate any run ID in
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Generate any run ID in
     contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4, never
     regenerate after start. feature-scoped: no run-folder creation. standalone: mkdir REVIEW_RUN_FOLDER and
     initialize the six §8 base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md,

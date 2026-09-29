@@ -37,7 +37,7 @@ operator/automation prompt pair at
 **Edit the spec, not this doc or the generated prompts.**
 
 - **Scope** — `read-only-audit`: writes a base run package with `plan-review-report.md` under
-  `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_REVIEW_RUN_ID}/`, and never creates or modifies
+  `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{PLAN_REVIEW_RUN_ID}/`, and never creates or modifies
   a feature evidence package (owned by `feature.md`/`build.md`) or any plan artifact.
 - **Ownership** — each role owns its `plan-review-report.md` section: PM → Product Readiness; architect →
   Architecture Readiness; code-reviewer → Buildability Challenge. Report sections and the validator list are

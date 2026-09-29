@@ -9,7 +9,7 @@ Work through these sections in order. The earlier sections provide context that 
 ## 1. Before You Read Code
 
 - [ ] Have I read the user story and its acceptance criteria?
-- [ ] Have I read `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` to know the conventions?
+- [ ] Have I read `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` to know the conventions?
 - [ ] Do I know which layers the changes touch (Domain, Application, Infrastructure, API, UI)?
 - [ ] Have I noted the scope? Is this a small feature, a refactor, a hotfix?
 

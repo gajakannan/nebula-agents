@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -13,6 +12,7 @@ from typing import Any
 
 import yaml
 from jsonschema import Draft202012Validator
+from _product_root import ProductRootError, resolve_product_root
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SPEC_DIR = SCRIPT_DIR.parent / "actions" / "spec"
@@ -31,13 +31,12 @@ def digest(value: Any) -> str:
 
 
 def explicit_root(value: str | None) -> Path:
-    raw = value or os.environ.get("NEBULA_PRODUCT_ROOT")
-    if not raw:
-        raise ProjectError("product_root_required", "Pass --product-root or set NEBULA_PRODUCT_ROOT; no product is selected by default.")
-    root = Path(raw).expanduser().resolve()
+    try:
+        root = resolve_product_root(value)
+    except ProductRootError as exc:
+        raise ProjectError("product_root_required", str(exc)) from exc
     if not root.is_dir():
         raise ProjectError("product_root_missing", f"Product directory is missing: {root}")
-    print(f"[product-root] {root}", file=sys.stderr)
     return root
 
 

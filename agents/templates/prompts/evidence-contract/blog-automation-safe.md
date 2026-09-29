@@ -4,22 +4,24 @@
 
 CONTRACT: Feature Evidence Contract | SCOPE: base-run-only | POLICY: 2026-07-11
 
+NEBULA_PRODUCT_ROOT_BINDING: Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 REQUIRED_INPUTS:
 - POST_TYPE enum:[devlog|technical-article|release-post|retrospective|other]
 - TARGET_PATH [path to where the post will be written]
 OPTIONAL_INPUTS:
 - AMPLIFICATION enum:[none|phase-2] =default:none
 - FEATURE_REF
-- PRODUCT_ROOT =default:sister-repo
+- NEBULA_PRODUCT_ROOT =default:environment; required if unset
 AUTO_RESOLVED:
-- BLOG_RUN_FOLDER = {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}
-- FEATURE_REF_PATH = {PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)
+- BLOG_RUN_FOLDER = {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{BLOG_RUN_ID}
+- FEATURE_REF_PATH = {NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)
 - FEATURE_REF_SLUG = kebab-case slug for {FEATURE_REF} from REGISTRY.md (only when FEATURE_REF is set)
 
 RUN_ID: var=BLOG_RUN_ID format=YYYY-MM-DD-[a-z0-9]{8} method=python3 -c import secrets; print(secrets.token_hex(4)) forbidden=uuid4
-SESSION_SETUP: init-run.py -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
+SESSION_SETUP: init-run.py --product-root {NEBULA_PRODUCT_ROOT} -> planning-mds/operations/evidence/... manifest=draft base_files=[README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log] artifacts=[coverage, diffs, test-results, security, screenshots]
 CONTEXT: agents/ROUTER.md -> agents/agent-map.yaml -> agents/docs/AGENT-USE.md -> agents/docs/PROJECT-EXTENSIONS.md -> agents/actions/blog.md -> agents/blogger/SKILL.md -> for FEATURE_REF (read-only context): {FEATURE_REF_PATH}/README.md, PRD.md, feature-assembly-plan.md; if archived, that feature's pm-closeout.md
-PRODUCT_CONTEXT: resolve PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action blog`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
+PRODUCT_CONTEXT: resolve NEBULA_PRODUCT_ROOT explicitly; run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action blog`; read returned instructions before work and after resume; context error blocks action; absent manifest preserves existing procedure.
 
 GATES:
 - B0 role=blogger artifacts=[]
@@ -55,7 +57,7 @@ channel derivative paths); gate-decisions.md (B0..B5, or B0..B4 when AMPLIFICATI
 post and its derivatives land at TARGET_PATH and the amplification destinations.
 NOTE[exit_validation]: No validators are required — blog content is not gated by feature evidence validators. Confirm
 gate-decisions.md records all B0..B5 (or B0..B4 when AMPLIFICATION=none).
-NOTE[session_setup]: Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Mint BLOG_RUN_ID once in contract format (an
+NOTE[session_setup]: Echo the resolved absolute {NEBULA_PRODUCT_ROOT} on the first turn. Mint BLOG_RUN_ID once in contract format (an
 ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Create {BLOG_RUN_FOLDER} and
 initialize the six §8 base run files.
 NOTE[telemetry]: Append every shell command to {BLOG_RUN_FOLDER}/commands.log per the §13 JSONL schema (schema_version,

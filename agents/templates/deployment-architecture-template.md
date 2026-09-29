@@ -1,7 +1,7 @@
 # Deployment Architecture
 
 > **Template:** Use this template to document deployment architecture for your application.
-> **Location:** Copy to `{PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
+> **Location:** Copy to `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/deployment-architecture.md`
 > **Created by:** DevOps agent during Phase 3 of build action
 > **Purpose:** Single source of truth for deployment configuration
 
@@ -23,7 +23,7 @@
 
 ### Services Detected
 
-#### 1. Backend API ({PRODUCT_ROOT}/engine/)
+#### 1. Backend API ({NEBULA_PRODUCT_ROOT}/engine/)
 - **Language:** [e.g., C# / .NET 10]
 - **Framework:** [e.g., ASP.NET Core]
 - **Database:** [e.g., PostgreSQL]
@@ -32,7 +32,7 @@
 - **Dependencies:** [List NuGet packages or key dependencies]
 - **Configuration Files:** [e.g., appsettings.json, launchSettings.json]
 
-#### 2. Frontend ({PRODUCT_ROOT}/experience/)
+#### 2. Frontend ({NEBULA_PRODUCT_ROOT}/experience/)
 - **Language:** [e.g., TypeScript / React 18]
 - **Build Tool:** [e.g., Vite]
 - **Runtime:** [e.g., Static files served by Nginx]
@@ -40,15 +40,15 @@
 - **API Endpoint:** [e.g., http://api:5000]
 - **Configuration Files:** [e.g., vite.config.ts, .env]
 
-#### 3. AI Layer ({PRODUCT_ROOT}/neuron/)
-**[If {PRODUCT_ROOT}/neuron/ exists]**
+#### 3. AI Layer ({NEBULA_PRODUCT_ROOT}/neuron/)
+**[If {NEBULA_PRODUCT_ROOT}/neuron/ exists]**
 - **Language:** [e.g., Python 3.11]
 - **Framework:** [e.g., FastAPI]
 - **Port:** [e.g., 8000]
 - **LLM Provider:** [e.g., Detected from requirements.txt]
 - **MCP Servers:** [Yes/No - list if yes]
 - **Dependencies:** [List from requirements.txt]
-- **Integration:** [Calls {PRODUCT_ROOT}/engine/ internal API]
+- **Integration:** [Calls {NEBULA_PRODUCT_ROOT}/engine/ internal API]
 
 ---
 
@@ -75,13 +75,13 @@
 Example:
 ┌──────────────┐
 │   Frontend   │ :3000
-│ ({PRODUCT_ROOT}/experience/)│
+│ ({NEBULA_PRODUCT_ROOT}/experience/)│
 └──────┬───────┘
        │
        ↓
 ┌──────────────┐     ┌────────────┐
 │ Backend API  │<────│ AI Layer   │ :8000
-│  ({PRODUCT_ROOT}/engine/)   │     │  ({PRODUCT_ROOT}/neuron/) │
+│  ({NEBULA_PRODUCT_ROOT}/engine/)   │     │  ({NEBULA_PRODUCT_ROOT}/neuron/) │
 │    :5000     │     └────────────┘
 └──────┬───────┘
        │
@@ -92,9 +92,9 @@ Example:
 ```
 
 **Dependency List:**
-- `{PRODUCT_ROOT}/experience/` → `{PRODUCT_ROOT}/engine/` (API calls)
-- `{PRODUCT_ROOT}/neuron/` → `{PRODUCT_ROOT}/engine/` (internal API for data access)
-- `{PRODUCT_ROOT}/engine/` → `postgres` (database connection)
+- `{NEBULA_PRODUCT_ROOT}/experience/` → `{NEBULA_PRODUCT_ROOT}/engine/` (API calls)
+- `{NEBULA_PRODUCT_ROOT}/neuron/` → `{NEBULA_PRODUCT_ROOT}/engine/` (internal API for data access)
+- `{NEBULA_PRODUCT_ROOT}/engine/` → `postgres` (database connection)
 
 ---
 
@@ -130,7 +130,7 @@ Initialization:
 
 ---
 
-### Backend API Service ({PRODUCT_ROOT}/engine/)
+### Backend API Service ({NEBULA_PRODUCT_ROOT}/engine/)
 
 ```yaml
 Service Name: api
@@ -172,7 +172,7 @@ Resource Limits: [Optional]
 
 ---
 
-### Frontend Service ({PRODUCT_ROOT}/experience/)
+### Frontend Service ({NEBULA_PRODUCT_ROOT}/experience/)
 
 ```yaml
 Service Name: web
@@ -208,9 +208,9 @@ Restart Policy: unless-stopped
 
 ---
 
-### AI Layer Service ({PRODUCT_ROOT}/neuron/)
+### AI Layer Service ({NEBULA_PRODUCT_ROOT}/neuron/)
 
-**[Only if {PRODUCT_ROOT}/neuron/ exists]**
+**[Only if {NEBULA_PRODUCT_ROOT}/neuron/ exists]**
 
 ```yaml
 Service Name: neuron
@@ -306,11 +306,11 @@ DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${PO
 
 ### Application Variables
 ```bash
-# Backend ({PRODUCT_ROOT}/engine/)
+# Backend ({NEBULA_PRODUCT_ROOT}/engine/)
 ASPNETCORE_ENVIRONMENT=Development|Staging|Production
 ASPNETCORE_URLS=http://+:5000
 
-# Frontend ({PRODUCT_ROOT}/experience/)
+# Frontend ({NEBULA_PRODUCT_ROOT}/experience/)
 API_URL=http://localhost:5000  # Dev
 # API_URL=https://api.domain.com  # Prod
 
@@ -326,7 +326,7 @@ JWT_ISSUER=<issuer>
 JWT_AUDIENCE=<audience>
 ```
 
-### AI Variables (if {PRODUCT_ROOT}/neuron/ exists)
+### AI Variables (if {NEBULA_PRODUCT_ROOT}/neuron/ exists)
 ```bash
 LLM_PROVIDER=anthropic|openai|azure|ollama
 LLM_API_KEY=<secret>
@@ -645,8 +645,8 @@ Implement [Pattern Name] deployment architecture with [orchestration choice].
 
 **Framework Documentation:**
 - `agents/devops/references/containerization-guide.md` - Detailed containerization patterns
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific patterns
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 - NFRs and architecture decisions
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Solution-specific patterns
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` Section 4 - NFRs and architecture decisions
 
 **External Resources:**
 - [Docker Compose Documentation](https://docs.docker.com/compose/)

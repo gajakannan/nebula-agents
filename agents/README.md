@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This directory contains **generic, reusable** agent role definitions for building software using an agent-driven builder methodology. The `agents/` tree is consumed *in place* from the `nebula-agents` repo — it is **not** copied into downstream product repos. A session rooted in `nebula-agents` reads these roles, actions, and templates, and performs implementation work in a sibling product repo at `{PRODUCT_ROOT}`.
+This directory contains **generic, reusable** agent role definitions for building software using an agent-driven builder methodology. The `agents/` tree is consumed *in place* from the `nebula-agents` repo — it is **not** copied into downstream product repos. A session rooted in `nebula-agents` reads these roles, actions, and templates, and performs implementation work in a sibling product repo at `{NEBULA_PRODUCT_ROOT}`.
 
 See the framework root `README.md` and `CONSUMER-CONTRACT.md` for the full consumption model.
 
@@ -18,7 +18,7 @@ See the framework root `README.md` and `CONSUMER-CONTRACT.md` for the full consu
 │  ACTION FLOW (User-Facing Compositions)                                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  init       │ Bootstrap product structure in {PRODUCT_ROOT}                 │
+│  init       │ Bootstrap product structure in {NEBULA_PRODUCT_ROOT}                 │
 │  plan       │ Phase A (PM) → Phase B (Architect) [2 approval gates]         │
 │  build      │ Backend + Frontend + AI* + QA + DevOps → Review [2 gates]     │
 │  feature    │ Single vertical slice (Backend + Frontend + AI* + QA + DevOps) │
@@ -42,9 +42,9 @@ See the framework root `README.md` and `CONSUMER-CONTRACT.md` for the full consu
 │  └─ architect          │ Design, data model, API contracts, patterns        │
 │                                                                              │
 │  Implementation Phase (Phase C)                                             │
-│  ├─ backend-developer  │ Backend services, domain logic ({PRODUCT_ROOT}/engine/)       │
-│  ├─ frontend-developer │ UI, forms, API wiring ({PRODUCT_ROOT}/experience/)            │
-│  ├─ ai-engineer        │ LLMs, agents, MCP, workflows ({PRODUCT_ROOT}/neuron/) 🧠       │
+│  ├─ backend-developer  │ Backend services, domain logic ({NEBULA_PRODUCT_ROOT}/engine/)       │
+│  ├─ frontend-developer │ UI, forms, API wiring ({NEBULA_PRODUCT_ROOT}/experience/)            │
+│  ├─ ai-engineer        │ LLMs, agents, MCP, workflows ({NEBULA_PRODUCT_ROOT}/neuron/) 🧠       │
 │  ├─ quality-engineer   │ Unit, integration, E2E tests                       │
 │  └─ devops             │ Docker, docker-compose, deployment                 │
 │                                                                              │
@@ -59,7 +59,7 @@ See the framework root `README.md` and `CONSUMER-CONTRACT.md` for the full consu
                         Agents read from & write to
                                         ↓
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  SOLUTION-SPECIFIC CONTENT ({PRODUCT_ROOT}/planning-mds/)                  │
+│  SOLUTION-SPECIFIC CONTENT ({NEBULA_PRODUCT_ROOT}/planning-mds/)                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  Single Source of Truth                                                     │
@@ -88,7 +88,7 @@ See the framework root `README.md` and `CONSUMER-CONTRACT.md` for the full consu
 
   9 Actions · 11 Agents · 1 Source of Truth (BLUEPRINT.md)
   SOLUTION-PATTERNS.md for institutional knowledge
-  {PRODUCT_ROOT}/neuron/ for AI intelligence layer 🧠
+  {NEBULA_PRODUCT_ROOT}/neuron/ for AI intelligence layer 🧠
 ```
 
 ## Framework Files
@@ -103,19 +103,19 @@ All framework files live under `nebula-agents/` and are consumed in place from t
 | `agents/templates/` | Reusable artifact templates (stories, features, ADRs, lifecycle config, CI workflows) |
 | `agents/scripts/` | Framework-level validation and gate scripts |
 
-The `init` action scaffolds product-level files **into `{PRODUCT_ROOT}`** (the sibling product repo), not into `nebula-agents`:
+The `init` action scaffolds product-level files **into `{NEBULA_PRODUCT_ROOT}`** (the sibling product repo), not into `nebula-agents`:
 
-| Scaffolded File (at {PRODUCT_ROOT}) | Template Source (in nebula-agents) |
+| Scaffolded File (at {NEBULA_PRODUCT_ROOT}) | Template Source (in nebula-agents) |
 |-------------------------------------|------------------------------------|
-| `{PRODUCT_ROOT}/lifecycle-stage.yaml` | `agents/templates/lifecycle-stage-template.yaml` |
-| `{PRODUCT_ROOT}/CONTRIBUTING.md` | `agents/templates/contributing-template.md` |
-| `{PRODUCT_ROOT}/.github/workflows/ci-gates.yml` | `agents/templates/ci-gates-template.yml` |
+| `{NEBULA_PRODUCT_ROOT}/lifecycle-stage.yaml` | `agents/templates/lifecycle-stage-template.yaml` |
+| `{NEBULA_PRODUCT_ROOT}/CONTRIBUTING.md` | `agents/templates/contributing-template.md` |
+| `{NEBULA_PRODUCT_ROOT}/.github/workflows/ci-gates.yml` | `agents/templates/ci-gates-template.yml` |
 
 Framework-repo-level files that stay in `nebula-agents` and apply to the framework itself:
 
 | File (in nebula-agents) | Purpose |
 |-------------------------|---------|
-| `BOUNDARY-POLICY.md` | Separation rules between generic (`agents/`) and solution-specific (`{PRODUCT_ROOT}/planning-mds/`) content |
+| `BOUNDARY-POLICY.md` | Separation rules between generic (`agents/`) and solution-specific (`{NEBULA_PRODUCT_ROOT}/planning-mds/`) content |
 | `lifecycle-stage.yaml` | Framework-local lifecycle stage and gate matrix (framework-only gates) |
 | `CONTRIBUTING.md` | Framework contribution guidelines |
 | `CONSUMER-CONTRACT.md` | Formal interface with downstream product repos |
@@ -145,7 +145,7 @@ role. Start with the strategy doc; the others are the mechanisms it relies on.
 ## How to Use
 
 ### For Users
-1) Open a session rooted in `nebula-agents` with `{PRODUCT_ROOT}` resolved (see `agents/docs/AGENT-USE.md` → Session Setup).
+1) Open a session rooted in `nebula-agents` with `{NEBULA_PRODUCT_ROOT}` resolved (see `agents/docs/AGENT-USE.md` → Session Setup).
 2) Use **[Action Flow](./actions/README.md)** to compose agents for common workflows (init, plan, build, review, etc.).
 3) Actions provide user-friendly entry points that orchestrate agents automatically.
 4) Example: `"Run the plan action"` → PM (Phase A) → Architect (Phase B) with approval gates.
@@ -153,20 +153,20 @@ role. Start with the strategy doc; the others are the mechanisms it relies on.
 
 ### For New Products
 1) Clone `nebula-agents` and your product repo as siblings under a shared workspace root.
-2) Resolve `{PRODUCT_ROOT}` via `NEBULA_PRODUCT_ROOT` / operator input / default `../<product-repo>`.
-3) Run the **[init action](./actions/init.md)** from a `nebula-agents` session to scaffold product-level files and `{PRODUCT_ROOT}/planning-mds/`.
-4) Use the agents in place from `nebula-agents`; all solution-specific content must live under `{PRODUCT_ROOT}/planning-mds/`.
+2) Resolve `{NEBULA_PRODUCT_ROOT}` via explicit `NEBULA_PRODUCT_ROOT` prompt input or the environment; resolve once to an absolute path. Missing selection is an error.
+3) Run the **[init action](./actions/init.md)** from a `nebula-agents` session to scaffold product-level files and `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
+4) Use the agents in place from `nebula-agents`; all solution-specific content must live under `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 5) For the full bootstrap-to-first-feature workflow, see `agents/docs/FORK-AND-BUILD-APP.md`.
 
 ## Single Source of Truth
 
-All agents read requirements from `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and related planning artifacts.
+All agents read requirements from `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` and related planning artifacts.
 
 ## Agent Action Flow
 
 The **[Action Flow](./actions/README.md)** provides a user-friendly interface for composing agents to accomplish complete workflows:
 
-- **[init](./actions/init.md)** - Bootstrap a new product in `{PRODUCT_ROOT}`
+- **[init](./actions/init.md)** - Bootstrap a new product in `{NEBULA_PRODUCT_ROOT}`
 - **[plan](./actions/plan.md)** - Complete planning (Phase A + B)
 - **[build](./actions/build.md)** - Full implementation workflow
 - **[feature](./actions/feature.md)** - Single vertical slice
@@ -184,4 +184,4 @@ The framework is opinionated about delivery practices and provides stack-specifi
 
 ---
 
-If you're starting a new product, see the framework root `README.md` and `CONSUMER-CONTRACT.md` for setup instructions, and `{PRODUCT_ROOT}/planning-mds/README.md` (after `init`) for a minimal setup checklist.
+If you're starting a new product, see the framework root `README.md` and `CONSUMER-CONTRACT.md` for setup instructions, and `{NEBULA_PRODUCT_ROOT}/planning-mds/README.md` (after `init`) for a minimal setup checklist.

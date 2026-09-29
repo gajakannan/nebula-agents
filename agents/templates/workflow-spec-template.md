@@ -6,7 +6,7 @@ applies_to: architect
 
 # Workflow Specification Template
 
-Use this template to define a workflow/state machine for any domain process. Project-specific workflows live in `{PRODUCT_ROOT}/planning-mds/workflows/`.
+Use this template to define a workflow/state machine for any domain process. Project-specific workflows live in `{NEBULA_PRODUCT_ROOT}/planning-mds/workflows/`.
 
 ## 1) Workflow Overview
 
@@ -73,4 +73,4 @@ Use this template to define a workflow/state machine for any domain process. Pro
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/workflows/` for project-specific workflow definitions.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/workflows/` for project-specific workflow definitions.

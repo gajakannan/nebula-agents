@@ -71,6 +71,15 @@ def test_render_is_byte_stable():
     assert a == b
 
 
+def test_both_variants_bind_prompt_root_before_setup_or_resume():
+    for text in rp.render_action(mk_spec(), SHARED, "2026-07-11").values():
+        assert text.index("bind the product root once") < text.index("init-run.py")
+        assert "A value supplied in this prompt is valid" in text
+        assert "session's starting directory" in text
+        assert "every agent handoff" in text
+        assert "no value is supplied" in text
+
+
 def test_operator_only_action_renders_one_variant():
     outputs = rp.render_action(mk_spec(variants=["operator-friendly"]), SHARED, "2026-07-11")
     assert set(outputs) == {"operator-friendly"}

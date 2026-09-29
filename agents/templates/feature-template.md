@@ -6,7 +6,7 @@ applies_to: product-manager
 
 # Product Requirements Document (PRD) Template
 
-Use this template to define a feature as a comprehensive PRD. Each feature lives in its own folder at `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/PRD.md`.
+Use this template to define a feature as a comprehensive PRD. Each feature lives in its own folder at `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/PRD.md`.
 
 ## Feature Header
 
@@ -96,7 +96,7 @@ Conventions:
 └──────────────────────┘
 ```
 
-Cross-reference: detailed per-screen specs (components, states, validation, accessibility) live in `{PRODUCT_ROOT}/planning-mds/screens/S-*.md`.
+Cross-reference: detailed per-screen specs (components, states, validation, accessibility) live in `{NEBULA_PRODUCT_ROOT}/planning-mds/screens/S-*.md`.
 
 ## Data Requirements
 
@@ -148,4 +148,4 @@ Stories are colocated in this feature folder as `F{NNNN}-S{NNNN}-{slug}.md`.
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/features/` for project-specific feature examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/features/` for project-specific feature examples.

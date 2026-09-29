@@ -979,10 +979,10 @@ Architects should define frontend module boundaries early enough that implementa
 - Reserve shared/global folders for primitives, app shell, and truly cross-feature utilities.
 
 **Handoff example (good)**
-- `{PRODUCT_ROOT}/experience/src/features/orders/components/*` for list cards/status badges/popovers
-- `{PRODUCT_ROOT}/experience/src/features/orders/hooks/*` for fetch/mutation query hooks
-- `{PRODUCT_ROOT}/experience/src/features/orders/types/*` for feature DTOs not shared elsewhere
-- `{PRODUCT_ROOT}/experience/src/components/ui/*` only for reusable primitives
+- `{NEBULA_PRODUCT_ROOT}/experience/src/features/orders/components/*` for list cards/status badges/popovers
+- `{NEBULA_PRODUCT_ROOT}/experience/src/features/orders/hooks/*` for fetch/mutation query hooks
+- `{NEBULA_PRODUCT_ROOT}/experience/src/features/orders/types/*` for feature DTOs not shared elsewhere
+- `{NEBULA_PRODUCT_ROOT}/experience/src/components/ui/*` only for reusable primitives
 
 **Anti-pattern to call out explicitly**
 - Adding new feature-only hooks/types/components to global `src/hooks`, `src/types`, or `src/components` because it is faster in the moment. This increases cognitive drift and weakens ownership boundaries.

@@ -24,12 +24,12 @@ inputs:
   optional:
     - {name: SOURCE_CODE, format: "[path, ...] source-code basis; default derived from TARGETS"}
     - {name: FEATURE_REF, format: "F#### — optional context ref; does NOT make this a feature-scoped run"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
-  DOC_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}"
+  DOC_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}"
   FEATURE_REF_SLUG: "kebab-case slug for {FEATURE_REF} from REGISTRY.md (only when FEATURE_REF is set)"
-  FEATURE_REF_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)"
+  FEATURE_REF_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_REF}-{FEATURE_REF_SLUG} (only when FEATURE_REF is set)"
 
 context_load:
   - "agents/ROUTER.md"
@@ -83,7 +83,7 @@ gates:
           cwd: framework
           timeout_seconds: 300
     judgment: |
-      After approval, run validate_templates.py (exit 0). Run `{PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
+      After approval, run validate_templates.py (exit 0). Run `{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
       ONLY when KG references changed. DO NOT call validate-feature-evidence.py — there is no feature evidence
       package for this run.
 
@@ -110,7 +110,7 @@ conflict_resolution:
 
 notes:
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} on the first turn. Mint DOC_RUN_ID once in contract format (an ISO
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} on the first turn. Mint DOC_RUN_ID once in contract format (an ISO
     YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4. Create {DOC_RUN_FOLDER} and initialize the
     six §8 base run files.
   evidence_outputs: |

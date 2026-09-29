@@ -31,7 +31,7 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 FRAMEWORK_ROOT = SCRIPT_DIR.parents[1]
 FRAMEWORK_TELEMETRY_LABEL = "nebula-agents"
-PRODUCT_TELEMETRY_LABEL = "{PRODUCT_ROOT}"
+PRODUCT_TELEMETRY_LABEL = "{NEBULA_PRODUCT_ROOT}"
 PLACEHOLDER_RE = re.compile(r"\{([^{}]+)\}")
 
 sys.path.insert(0, str(SCRIPT_DIR))

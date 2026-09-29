@@ -44,4 +44,4 @@ Keep unchanged:
 
 - Prefer adding new stack-specific reference files over renaming existing ones to avoid breaking links.
 - If you need a new stack, add a small “stack pack” under each role’s `references/` folder.
-- Keep solution-specific examples in `{PRODUCT_ROOT}/planning-mds/`, never in `agents/`.
+- Keep solution-specific examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/`, never in `agents/`.

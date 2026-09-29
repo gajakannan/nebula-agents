@@ -5,7 +5,7 @@
 > these patterns. See `BOUNDARY-POLICY.md` -> "Standard Example Entities" for
 > the full convention and field mapping.**
 
-Use this template to create `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` for a new project.
+Use this template to create `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` for a new project.
 This file captures project-level implementation conventions all agents must follow.
 
 ## Metadata
@@ -142,8 +142,8 @@ GET /api/customers?page=1&pageSize=20
 - Why this structure is used:
 
 ### Applied In
-- `{PRODUCT_ROOT}/engine/`:
-- `{PRODUCT_ROOT}/experience/`:
+- `{NEBULA_PRODUCT_ROOT}/engine/`:
+- `{NEBULA_PRODUCT_ROOT}/experience/`:
 
 ### Enforcement Level
 - `MUST` / `SHOULD` / `MAY`
@@ -171,7 +171,7 @@ Domain -> Application -> Infrastructure -> API
 - Why this frontend stack and pattern set is used:
 
 ### Applied In
-- `{PRODUCT_ROOT}/experience/` pages/components:
+- `{NEBULA_PRODUCT_ROOT}/experience/` pages/components:
 
 ### Enforcement Level
 - `MUST` / `SHOULD` / `MAY`

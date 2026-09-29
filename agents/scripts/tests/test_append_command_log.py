@@ -53,7 +53,7 @@ class AppendCommandLogTests(unittest.TestCase):
 
             self.assertEqual(
                 acl.normalize_artifact(
-                    "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/run-1/artifacts/out.log",
+                    "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/run-1/artifacts/out.log",
                     product_root,
                 ),
                 "planning-mds/operations/evidence/runs/run-1/artifacts/out.log",
@@ -77,11 +77,11 @@ class AppendCommandLogTests(unittest.TestCase):
 
             self.assertEqual(
                 acl.normalize_cwd(str(product_root), product_root, framework_root),
-                "{PRODUCT_ROOT}",
+                "{NEBULA_PRODUCT_ROOT}",
             )
             self.assertEqual(
                 acl.normalize_cwd(str(product_root / "engine"), product_root, framework_root),
-                "{PRODUCT_ROOT}/engine",
+                "{NEBULA_PRODUCT_ROOT}/engine",
             )
 
     def test_cwd_under_framework_root_normalizes_to_framework_label(self) -> None:
@@ -157,7 +157,7 @@ class AppendCommandLogTests(unittest.TestCase):
             self.assertEqual(len(lines), 1)
             entry = json.loads(lines[0])
             self.assertEqual(entry["schema_version"], 1)
-            self.assertEqual(entry["cwd"], "{PRODUCT_ROOT}/engine")
+            self.assertEqual(entry["cwd"], "{NEBULA_PRODUCT_ROOT}/engine")
             self.assertEqual(entry["command"], "python3 scripts/check.py")
             self.assertEqual(entry["exit_code"], 0)
             self.assertEqual(entry["artifacts"], ["planning-mds/operations/evidence/runs/run-1/artifacts/out.log"])

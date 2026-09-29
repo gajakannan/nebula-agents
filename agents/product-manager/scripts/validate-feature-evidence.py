@@ -62,6 +62,9 @@ TERMINAL_ACTIVE_STATES = {"done", "complete", "completed", "archived"}
 MANIFEST_STATUSES = {"draft", "in-progress", "approved", "superseded"}
 SUPPORTED_MANIFEST_SCHEMA_VERSIONS = {1}
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(FRAMEWORK_ROOT / "agents" / "scripts"))
+from _product_root import ProductRootError, resolve_product_root  # noqa: E402
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 TERMINAL_FEATURE_STATES = {"done", "completed", "archived"}
 RETIRED_FEATURE_STATES = {"abandoned", "superseded"}
@@ -742,8 +745,12 @@ def resolve_artifact_reference(product_root: Path, run_folder: Path | None, valu
     if _is_url_reference(cleaned):
         return ArtifactResolution(value, None, cleaned, True, is_url=True)
 
-    if cleaned.startswith("{PRODUCT_ROOT}"):
-        suffix = cleaned[len("{PRODUCT_ROOT}") :].lstrip("/\\")
+    # Read archived evidence without rewriting it. Only the canonical name is
+    # emitted by current tools; the old label is not a product-selection input.
+    root_label = next((label for label in ("{NEBULA_PRODUCT_ROOT}", "{PRODUCT_ROOT}")
+                       if cleaned.startswith(label)), None)
+    if root_label is not None:
+        suffix = cleaned[len(root_label) :].lstrip("/\\")
         target = product_root / _path_from_reference(suffix)
         exists = _path_exists(target)
         return ArtifactResolution(
@@ -865,7 +872,7 @@ def validate_artifact_reference(
 
 def artifact_references(content: str, relative_prefix: str) -> list[str]:
     prefix = re.escape(relative_prefix)
-    pattern = re.compile(rf"(?:\{{PRODUCT_ROOT\}}[\\/]|[A-Za-z]:[\\/]|/)?[^\s)\]]*{prefix}[^\s)\]]+")
+    pattern = re.compile(rf"(?:\{{(?:NEBULA_PRODUCT_ROOT|PRODUCT_ROOT)\}}[\\/]|[A-Za-z]:[\\/]|/)?[^\s)\]]*{prefix}[^\s)\]]+")
     return pattern.findall(content)
 
 
@@ -1153,14 +1160,6 @@ def print_human(result: Result) -> None:
 # --------------------------------------------------------------------------- #
 # Config resolution
 # --------------------------------------------------------------------------- #
-
-
-def resolve_product_root(raw: str | None) -> Path:
-    if raw:
-        return Path(raw).expanduser().resolve()
-    if os.environ.get("NEBULA_PRODUCT_ROOT"):
-        return Path(os.environ["NEBULA_PRODUCT_ROOT"]).expanduser().resolve()
-    return (FRAMEWORK_ROOT / ".." / "nebula-insurance-crm").resolve()
 
 
 def parse_effective_date(raw: str | None) -> date:
@@ -3801,7 +3800,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    product_root = resolve_product_root(args.product_root)
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        parser.error(str(exc))
     effective_date = parse_effective_date(args.evidence_effective_date)
 
     if args.json and args.json_out:

@@ -117,12 +117,12 @@ async def processing_workflow(record: dict):
 
 ### Backend-Neuron Integration
 
-When implementing AI features using **AI-Embedded (Pattern 2)** or **AI-Centric (Pattern 3)**, you must define clear contracts between {PRODUCT_ROOT}/neuron/ and {PRODUCT_ROOT}/engine/:
+When implementing AI features using **AI-Embedded (Pattern 2)** or **AI-Centric (Pattern 3)**, you must define clear contracts between {NEBULA_PRODUCT_ROOT}/neuron/ and {NEBULA_PRODUCT_ROOT}/engine/:
 
 **Your Responsibilities:**
 1. **Define API Endpoints** - RESTful endpoints for AI features
-2. **Document Request/Response Schemas** - OpenAPI specs in `{PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`
-3. **Implement Data Fetching** - Call {PRODUCT_ROOT}/engine/ internal APIs to get CRM data
+2. **Document Request/Response Schemas** - OpenAPI specs in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml`
+3. **Implement Data Fetching** - Call {NEBULA_PRODUCT_ROOT}/engine/ internal APIs to get CRM data
 4. **Handle Auth Mode** - Use the architecture-approved auth mode. For
    user-scoped companion/chat actions, forward the user's token so backend
    authorization remains authoritative. Use service identity only for
@@ -172,7 +172,7 @@ interactions, prefer forwarded user tokens so the backend enforces its normal
 RBAC/ABAC policy:
 
 ```python
-# {PRODUCT_ROOT}/neuron/services/data_service.py
+# {NEBULA_PRODUCT_ROOT}/neuron/services/data_service.py
 import httpx
 
 class DataService:
@@ -344,7 +344,7 @@ For **AI-Centric (Pattern 3)** with real-time streaming:
 **WebSocket Endpoint Example:**
 
 ```python
-# {PRODUCT_ROOT}/neuron/api/streaming.py
+# {NEBULA_PRODUCT_ROOT}/neuron/api/streaming.py
 from fastapi import WebSocket, WebSocketDisconnect
 from anthropic import AsyncAnthropic
 
@@ -399,12 +399,12 @@ For **AI-Centric (Pattern 3)** with MCP servers:
 1. **Implement MCP Tools** - Expose CRM data/operations as tools
 2. **Define Tool Schemas** - Input/output schemas for each tool
 3. **Handle Tool Authorization** - Verify scoped permissions
-4. **Document MCP Server** - OpenAPI-style spec in `{PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
+4. **Document MCP Server** - OpenAPI-style spec in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
 
 **MCP Server Example:**
 
 ```python
-# {PRODUCT_ROOT}/neuron/mcp/crm_data_server.py
+# {NEBULA_PRODUCT_ROOT}/neuron/mcp/crm_data_server.py
 from mcp import Server, Tool
 
 server = Server("crm-data-mcp")
@@ -510,7 +510,7 @@ logger.error(
 **Implement These Metrics:**
 
 ```python
-# {PRODUCT_ROOT}/neuron/services/metrics_service.py
+# {NEBULA_PRODUCT_ROOT}/neuron/services/metrics_service.py
 from prometheus_client import Counter, Histogram, Gauge
 
 # Request metrics
@@ -561,7 +561,7 @@ ai_cost_usd_total.labels(model='claude-sonnet-4', feature='risk-assessment').inc
 **Track Costs Per Feature:**
 
 ```python
-# {PRODUCT_ROOT}/neuron/services/cost_tracker.py
+# {NEBULA_PRODUCT_ROOT}/neuron/services/cost_tracker.py
 import asyncio
 from datetime import datetime
 from decimal import Decimal
@@ -721,9 +721,9 @@ async def assess_risk(request: RiskAssessmentRequest):
 
 ## Example Agent Implementation
 
-`{PRODUCT_ROOT}/neuron/domain_agents/` is the generic default location for
+`{NEBULA_PRODUCT_ROOT}/neuron/domain_agents/` is the generic default location for
 agent implementations. If the architecture specifies a product-specific package
-such as `{PRODUCT_ROOT}/neuron/crm_agents/`, use that import-safe package
+such as `{NEBULA_PRODUCT_ROOT}/neuron/crm_agents/`, use that import-safe package
 instead. Populate agent packages with:
 - Agent definition
 - Prompt templates

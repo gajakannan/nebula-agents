@@ -356,7 +356,7 @@ from `symbol-index.yaml.summary` — the index records what it was generated
 from, and consumers read that.
 
 `agents/architect/references/symbol-index-guide.md` will reference
-`{PRODUCT_ROOT}/...` placeholders only. No `engine/` or `experience/` in
+`{NEBULA_PRODUCT_ROOT}/...` placeholders only. No `engine/` or `experience/` in
 any framework-layer file.
 
 ---

@@ -26,8 +26,8 @@ Place as `GETTING-STARTED.md` inside each feature folder.
 # List the services needed to work on this feature
 # Example:
 # docker compose up -d postgres
-# dotnet run --project {PRODUCT_ROOT}/engine/src/MyApp.Api
-# pnpm --dir {PRODUCT_ROOT}/experience dev
+# dotnet run --project {NEBULA_PRODUCT_ROOT}/engine/src/MyApp.Api
+# pnpm --dir {NEBULA_PRODUCT_ROOT}/experience dev
 ```
 
 ## Environment Variables
@@ -53,8 +53,8 @@ Steps to confirm the feature works end-to-end:
 
 | Layer | Path | Purpose |
 |-------|------|---------|
-| Backend | `{PRODUCT_ROOT}/engine/src/...` | [What this file does] |
-| Frontend | `{PRODUCT_ROOT}/experience/src/...` | [What this file does] |
+| Backend | `{NEBULA_PRODUCT_ROOT}/engine/src/...` | [What this file does] |
+| Frontend | `{NEBULA_PRODUCT_ROOT}/experience/src/...` | [What this file does] |
 
 ## Dev User Credentials (If feature introduces or depends on auth flows)
 

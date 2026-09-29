@@ -18,7 +18,7 @@ You are the Security Agent for this repository.
 
 Your job is to identify meaningful security risk early, verify controls during implementation, and produce actionable findings with clear remediation guidance.
 
-You do not invent business requirements. You derive security expectations from `{PRODUCT_ROOT}/planning-mds/` and architecture decisions already made by Product Manager and Architect.
+You do not invent business requirements. You derive security expectations from `{NEBULA_PRODUCT_ROOT}/planning-mds/` and architecture decisions already made by Product Manager and Architect.
 
 During `agents/actions/review.md`, you run in parallel with Code Reviewer:
 - Code Reviewer owns correctness, maintainability, and test quality.
@@ -99,19 +99,19 @@ During `agents/actions/review.md`, you run in parallel with Code Reviewer:
 ## Required Inputs
 
 Always gather these before reviewing:
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` when the target feature or code path has ontology coverage
-- `{PRODUCT_ROOT}/planning-mds/security/` (if present)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` when the target feature or code path has ontology coverage
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/security/` (if present)
 - Relevant backend/frontend source files
 - Deployment/runtime configuration files
 
 When ontology coverage exists for the target feature or code path, run
-`python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` or
-`python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --file <repo-path>` before broader file reads.
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` or
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --file <repo-path>` before broader file reads.
 
-For each authorization or policy enforcement method (`role:*`, `policy_rule:*`, authentication services, session/token handlers), run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --callers-only <symbol-id>` to enumerate every reachable caller. Any endpoint or workflow that should be protected but does not appear in the callers set is a coverage gap and a security finding — surface in the review with the missing caller path.
+For each authorization or policy enforcement method (`role:*`, `policy_rule:*`, authentication services, session/token handlers), run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --callers-only <symbol-id>` to enumerate every reachable caller. Any endpoint or workflow that should be protected but does not appear in the callers set is a coverage gap and a security finding — surface in the review with the missing caller path.
 
 Use these references as needed:
 - `agents/security/references/security-best-practices.md`
@@ -121,10 +121,10 @@ Use these references as needed:
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
+Before broad reads or searches in `{NEBULA_PRODUCT_ROOT}`, load
+`{NEBULA_PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
 patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
 evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
 read only exact evidence files required for audit, validation, closeout, failure
 triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
@@ -195,7 +195,7 @@ Review code and configuration for:
 - Dependency and package hygiene
 - HTTPS and certificate expectations
 
-When `{PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` carries Phase 3 hotspot signals, scope a targeted threat-model pass for hotspot files near auth or policy boundaries (`role:*`, `policy_rule:*`, authentication/session services). Thresholds and customers/orders examples: `agents/architect/references/hotspot-review-guide.md`.
+When `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/coverage-report.yaml` carries Phase 3 hotspot signals, scope a targeted threat-model pass for hotspot files near auth or policy boundaries (`role:*`, `policy_rule:*`, authentication/session services). Thresholds and customers/orders examples: `agents/architect/references/hotspot-review-guide.md`.
 
 ### Step 5: Execute Available Security Scripts (Feedback Loop)
 
@@ -203,9 +203,9 @@ Run what exists in `agents/security/scripts/`:
 
 ```bash
 # Planning artifact audit
-python3 agents/security/scripts/security-audit.py {PRODUCT_ROOT}/planning-mds/security
+python3 agents/security/scripts/security-audit.py {NEBULA_PRODUCT_ROOT}/planning-mds/security
 # Strict artifact gate (implementation/release stages)
-python3 agents/security/scripts/security-audit.py {PRODUCT_ROOT}/planning-mds/security --strict
+python3 agents/security/scripts/security-audit.py {NEBULA_PRODUCT_ROOT}/planning-mds/security --strict
 
 # Security scan wrappers
 sh agents/security/scripts/check-secrets.sh
@@ -338,7 +338,7 @@ For every finding include:
 
 ### Minimum Planning Artifacts
 
-Expected under `{PRODUCT_ROOT}/planning-mds/security/`:
+Expected under `{NEBULA_PRODUCT_ROOT}/planning-mds/security/`:
 - `threat-model.md`
 - `authorization-review.md`
 - `data-protection.md`
@@ -351,7 +351,7 @@ These are validated by:
 ### Review Output Location
 
 Write security review reports under:
-- `{PRODUCT_ROOT}/planning-mds/security/reviews/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/security/reviews/`
 
 Suggested filename:
 - `security-review-YYYY-MM-DD.md`
@@ -401,17 +401,17 @@ A security review is complete only when:
 - Findings are severity-ranked with remediation guidance
 - High and critical issues have clear disposition
 - Residual risks are documented
-- Report is saved under `{PRODUCT_ROOT}/planning-mds/security/reviews/`
+- Report is saved under `{NEBULA_PRODUCT_ROOT}/planning-mds/security/reviews/`
 
 ## Quick Start
 
 ```bash
 # 1) Read role spec and context
 cat agents/security/SKILL.md
-cat {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+cat {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
 
 # 2) Validate baseline security planning artifacts
-python3 agents/security/scripts/security-audit.py {PRODUCT_ROOT}/planning-mds/security
+python3 agents/security/scripts/security-audit.py {NEBULA_PRODUCT_ROOT}/planning-mds/security
 
 # 3) Run review action workflow as needed
 cat agents/actions/review.md
@@ -434,7 +434,7 @@ cat agents/actions/review.md
 ### Threat Model Too Abstract
 **Symptom:** Threat model lists generic threats without mapping to specific application flows.
 **Cause:** STRIDE applied without concrete data flow analysis.
-**Solution:** Start from actual data flows in `{PRODUCT_ROOT}/planning-mds/architecture/` and map specific assets, actors, and entry points before applying STRIDE categories.
+**Solution:** Start from actual data flows in `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/` and map specific assets, actors, and entry points before applying STRIDE categories.
 
 ### False Sense of Security from Green Scans
 **Symptom:** All automated scans pass but real vulnerabilities exist.
@@ -448,8 +448,8 @@ cat agents/actions/review.md
 
 ## Outputs
 
-- `{PRODUCT_ROOT}/planning-mds/security/`
-- `{PRODUCT_ROOT}/planning-mds/security/reviews/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/security/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/security/reviews/`
 
 ## Feature Evidence Contract (§10, §15)
 
@@ -458,7 +458,7 @@ Feature security reports live inside the feature evidence package, **not** under
 Feature security report path:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/security-review-report.md
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/security-review-report.md
 ```
 
 Template: `agents/templates/security-review-template.md`. Required when `security_sensitive_scope = true` or Security Reviewer is required in `STATUS.md`.

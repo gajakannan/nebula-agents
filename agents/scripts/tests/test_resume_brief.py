@@ -214,6 +214,7 @@ class BriefOutputTests(unittest.TestCase):
             text = self._brief(product)
 
         self.assertIn("gates completed:** G0 G1", text)
+        self.assertIn(f"**NEBULA_PRODUCT_ROOT:** {product}", text)
         self.assertIn("next gate:** G2", text)
         self.assertIn("F0099-S0002", text)
         self.assertIn("Only the three F0099 stories are in scope", text)

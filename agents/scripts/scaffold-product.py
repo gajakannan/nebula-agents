@@ -2,8 +2,8 @@
 """Idempotent product scaffolding — the mechanical portion of init.md (F0007-S0003).
 
 Creates the planning-mds directory tree and copies each framework template to its
-{PRODUCT_ROOT} destination IFF the destination is missing. Product-owned files are
-never overwritten. Writes only inside {PRODUCT_ROOT} (asserted, not trusted). On
+{NEBULA_PRODUCT_ROOT} destination IFF the destination is missing. Product-owned files are
+never overwritten. Writes only inside {NEBULA_PRODUCT_ROOT} (asserted, not trusted). On
 any failure, files this run created are rolled back so no partial scaffold remains.
 The user-interview / blueprint-tailoring portion of init.md stays judgment work.
 
@@ -29,7 +29,7 @@ TEMPLATES_DIR = FRAMEWORK_ROOT / "agents" / "templates"
 DEFAULT_MAP = SCRIPT_DIR / "scaffold-map.yaml"
 
 sys.path.insert(0, str(SCRIPT_DIR))
-from _product_root import add_product_root_arg, resolve_product_root  # noqa: E402
+from _product_root import ProductRootError, add_product_root_arg, resolve_product_root  # noqa: E402
 
 
 def load_map(path: Path) -> dict[str, Any]:
@@ -137,7 +137,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    product_root = resolve_product_root(args.product_root)
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        return 2
     if not product_root.is_dir():
         sys.stderr.write(f"product root does not exist: {product_root}\n")
         return 2

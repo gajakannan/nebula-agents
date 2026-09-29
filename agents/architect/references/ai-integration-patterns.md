@@ -10,9 +10,9 @@
 
 The framework supports three distinct AI integration patterns, each suited for different use cases:
 
-1. **AI-Optional** - LLM calls embedded in backend services (no {PRODUCT_ROOT}/neuron/ layer)
-2. **AI-Embedded** - Dedicated {PRODUCT_ROOT}/neuron/ layer accessed via backend proxy
-3. **AI-Centric** - Full {PRODUCT_ROOT}/neuron/ intelligence layer with parallel access patterns
+1. **AI-Optional** - LLM calls embedded in backend services (no {NEBULA_PRODUCT_ROOT}/neuron/ layer)
+2. **AI-Embedded** - Dedicated {NEBULA_PRODUCT_ROOT}/neuron/ layer accessed via backend proxy
+3. **AI-Centric** - Full {NEBULA_PRODUCT_ROOT}/neuron/ intelligence layer with parallel access patterns
 
 Choose the pattern that matches your:
 - AI complexity and sophistication needs
@@ -37,13 +37,13 @@ Use this pattern when:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Frontend ({PRODUCT_ROOT}/experience/)                │
+│                        Frontend ({NEBULA_PRODUCT_ROOT}/experience/)                │
 │                     React + TypeScript                       │
 └────────────────────────────┬────────────────────────────────┘
                              │ HTTP/REST
                              ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                        Backend ({PRODUCT_ROOT}/engine/)                     │
+│                        Backend ({NEBULA_PRODUCT_ROOT}/engine/)                     │
 │                       .NET + C# API                          │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -72,7 +72,7 @@ Use this pattern when:
 
 **Backend Integration:**
 ```csharp
-// {PRODUCT_ROOT}/engine/Services/CustomerService.cs
+// {NEBULA_PRODUCT_ROOT}/engine/Services/CustomerService.cs
 public class CustomerService
 {
     private readonly IGenericLLMClient _genericLlmClient;
@@ -108,7 +108,7 @@ public class CustomerService
 **Directory Structure:**
 ```
 project/
-├── {PRODUCT_ROOT}/engine/               # Backend only
+├── {NEBULA_PRODUCT_ROOT}/engine/               # Backend only
 │   ├── Controllers/
 │   ├── Services/
 │   │   └── CustomerService.cs  ← LLM calls here
@@ -116,8 +116,8 @@ project/
 │   └── Infrastructure/
 │       └── LLM/
 │           └── LLMClient.cs  ← SDK wrapper
-├── {PRODUCT_ROOT}/experience/           # Frontend
-└── {PRODUCT_ROOT}/planning-mds/
+├── {NEBULA_PRODUCT_ROOT}/experience/           # Frontend
+└── {NEBULA_PRODUCT_ROOT}/planning-mds/
 ```
 
 ### Advantages
@@ -167,13 +167,13 @@ Use this pattern when:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Frontend ({PRODUCT_ROOT}/experience/)                │
+│                        Frontend ({NEBULA_PRODUCT_ROOT}/experience/)                │
 │                     React + TypeScript                       │
 └────────────────────────────┬────────────────────────────────┘
                              │ HTTP/REST
                              ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                        Backend ({PRODUCT_ROOT}/engine/)                     │
+│                        Backend ({NEBULA_PRODUCT_ROOT}/engine/)                     │
 │                       .NET + C# API                          │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -188,7 +188,7 @@ Use this pattern when:
 │             │                                                │
 │  ┌──────────▼───────────────────────────────────────────┐  │
 │  │ AI Proxy Service                                      │  │
-│  │   • Routes requests to {PRODUCT_ROOT}/neuron/                       │  │
+│  │   • Routes requests to {NEBULA_PRODUCT_ROOT}/neuron/                       │  │
 │  │   • Handles auth/rate limiting                       │  │
 │  │   • Aggregates AI responses                          │  │
 │  └──────────┬───────────────────────────────────────────┘  │
@@ -196,7 +196,7 @@ Use this pattern when:
               │ HTTP (internal service call)
               ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                     Intelligence ({PRODUCT_ROOT}/neuron/)                   │
+│                     Intelligence ({NEBULA_PRODUCT_ROOT}/neuron/)                   │
 │                        Python + FastAPI                      │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -229,9 +229,9 @@ Use this pattern when:
 
 ### Implementation Details
 
-**Backend Proxy ({PRODUCT_ROOT}/engine/):**
+**Backend Proxy ({NEBULA_PRODUCT_ROOT}/engine/):**
 ```csharp
-// {PRODUCT_ROOT}/engine/Services/AiProxyService.cs
+// {NEBULA_PRODUCT_ROOT}/engine/Services/AiProxyService.cs
 public class AiProxyService
 {
     private readonly HttpClient _neuronClient;
@@ -245,7 +245,7 @@ public class AiProxyService
         if (!await _authz.CanAccessAiFeatures(user))
             throw new UnauthorizedException();
 
-        // Forward to {PRODUCT_ROOT}/neuron/ with rate limiting
+        // Forward to {NEBULA_PRODUCT_ROOT}/neuron/ with rate limiting
         var request = new { customer_id = customerId };
         var response = await _neuronClient.PostAsJsonAsync(
             "http://neuron:8000/suggest-next-action",
@@ -258,9 +258,9 @@ public class AiProxyService
 }
 ```
 
-**AI Layer ({PRODUCT_ROOT}/neuron/):**
+**AI Layer ({NEBULA_PRODUCT_ROOT}/neuron/):**
 ```python
-# {PRODUCT_ROOT}/neuron/api/routes.py
+# {NEBULA_PRODUCT_ROOT}/neuron/api/routes.py
 from fastapi import APIRouter, HTTPException
 from neuron.domain_agents.recommendation_agent import RecommendationAgent
 
@@ -292,14 +292,14 @@ async def suggest_next_action(request: NextActionRequest):
 **Directory Structure:**
 ```
 project/
-├── {PRODUCT_ROOT}/engine/               # Backend (C# / .NET)
+├── {NEBULA_PRODUCT_ROOT}/engine/               # Backend (C# / .NET)
 │   ├── Controllers/
 │   ├── Services/
-│   │   └── AiProxyService.cs  ← Proxy to {PRODUCT_ROOT}/neuron/
+│   │   └── AiProxyService.cs  ← Proxy to {NEBULA_PRODUCT_ROOT}/neuron/
 │   └── Infrastructure/
 │       └── HttpClients/
 │           └── NeuronClient.cs
-├── {PRODUCT_ROOT}/neuron/               # AI Layer (Python)
+├── {NEBULA_PRODUCT_ROOT}/neuron/               # AI Layer (Python)
 │   ├── api/
 │   │   └── routes.py     ← FastAPI endpoints
 │   ├── domain_agents/
@@ -309,14 +309,14 @@ project/
 │   ├── prompts/
 │   ├── models/
 │   └── config/
-├── {PRODUCT_ROOT}/experience/           # Frontend
-└── {PRODUCT_ROOT}/planning-mds/
+├── {NEBULA_PRODUCT_ROOT}/experience/           # Frontend
+└── {NEBULA_PRODUCT_ROOT}/planning-mds/
 ```
 
 ### Advantages
 
 ✅ **Clear separation** - AI logic isolated from business logic
-✅ **Independent scaling** - Scale {PRODUCT_ROOT}/neuron/ separately from {PRODUCT_ROOT}/engine/
+✅ **Independent scaling** - Scale {NEBULA_PRODUCT_ROOT}/neuron/ separately from {NEBULA_PRODUCT_ROOT}/engine/
 ✅ **Testability** - Test AI agents independently
 ✅ **Reusability** - AI agents can be called from multiple backend services
 ✅ **Cost tracking** - Dedicated AI metrics and monitoring
@@ -326,21 +326,21 @@ project/
 ### Disadvantages
 
 ⚠️ **Added complexity** - Two services to deploy and manage
-⚠️ **Latency overhead** - Extra HTTP hop ({PRODUCT_ROOT}/engine/ → {PRODUCT_ROOT}/neuron/)
-⚠️ **Network dependency** - AI features fail if {PRODUCT_ROOT}/neuron/ is down
+⚠️ **Latency overhead** - Extra HTTP hop ({NEBULA_PRODUCT_ROOT}/engine/ → {NEBULA_PRODUCT_ROOT}/neuron/)
+⚠️ **Network dependency** - AI features fail if {NEBULA_PRODUCT_ROOT}/neuron/ is down
 ⚠️ **Authentication complexity** - Need service-to-service auth
 
 ### Agent Involvement
 
-- **Architect** - Defines {PRODUCT_ROOT}/engine/↔{PRODUCT_ROOT}/neuron/ API contract
+- **Architect** - Defines {NEBULA_PRODUCT_ROOT}/engine/↔{NEBULA_PRODUCT_ROOT}/neuron/ API contract
 - **Backend Developer** - Implements proxy service and integration
-- **AI Engineer** - Implements {PRODUCT_ROOT}/neuron/ agents, workflows, and API
+- **AI Engineer** - Implements {NEBULA_PRODUCT_ROOT}/neuron/ agents, workflows, and API
 - **DevOps** - Deploys and configures both services
 - **Security** - Reviews service-to-service authentication
 
-### API Contract Between {PRODUCT_ROOT}/engine/ and {PRODUCT_ROOT}/neuron/
+### API Contract Between {NEBULA_PRODUCT_ROOT}/engine/ and {NEBULA_PRODUCT_ROOT}/neuron/
 
-**Contract Location:** `{PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml` (OpenAPI spec)
+**Contract Location:** `{NEBULA_PRODUCT_ROOT}/planning-mds/api/neuron-api.yaml` (OpenAPI spec)
 
 **Example Contract:**
 ```yaml
@@ -357,7 +357,7 @@ Response:
 ```
 
 **Error Handling:**
-- Backend MUST handle {PRODUCT_ROOT}/neuron/ failures gracefully
+- Backend MUST handle {NEBULA_PRODUCT_ROOT}/neuron/ failures gracefully
 - Provide fallback behavior if AI is unavailable
 - Log failures for debugging
 - Return user-friendly error messages
@@ -388,7 +388,7 @@ Use this pattern when:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Frontend ({PRODUCT_ROOT}/experience/)                │
+│                        Frontend ({NEBULA_PRODUCT_ROOT}/experience/)                │
 │                     React + TypeScript                       │
 │                                                              │
 │  ┌───────────────────┐        ┌──────────────────────────┐ │
@@ -400,7 +400,7 @@ Use this pattern when:
              │ HTTP/REST                   │ WebSocket/SSE
              ↓                             ↓
 ┌────────────────────────┐    ┌───────────────────────────────┐
-│   Backend ({PRODUCT_ROOT}/engine/)    │    │   Intelligence ({PRODUCT_ROOT}/neuron/)      │
+│   Backend ({NEBULA_PRODUCT_ROOT}/engine/)    │    │   Intelligence ({NEBULA_PRODUCT_ROOT}/neuron/)      │
 │   .NET + C# API        │    │   Python + FastAPI            │
 │                        │    │                               │
 │  Business Services     │    │  ┌─────────────────────────┐ │
@@ -410,7 +410,7 @@ Use this pattern when:
 │                        │    │  │  • External Tools       │ │
 │  ┌──────────────────┐ │    │  └─────────────────────────┘ │
 │  │ Data API         │ │    │                               │
-│  │ (for {PRODUCT_ROOT}/neuron/)    │ │    │  ┌─────────────────────────┐ │
+│  │ (for {NEBULA_PRODUCT_ROOT}/neuron/)    │ │    │  ┌─────────────────────────┐ │
 │  └─────────┬────────┘ │    │  │ AI Agents               │ │
 └────────────┼───────────┘    │  │  • Conversational UI    │ │
              │                │  │  • Recommendation       │ │
@@ -436,12 +436,12 @@ Use this pattern when:
 
 **Frontend Direct AI Access:**
 ```typescript
-// {PRODUCT_ROOT}/experience/src/services/aiService.ts
+// {NEBULA_PRODUCT_ROOT}/experience/src/services/aiService.ts
 export class AiService {
   private neuronWs: WebSocket;
 
   async streamChatResponse(message: string): Promise<AsyncIterable<string>> {
-    // Direct WebSocket connection to {PRODUCT_ROOT}/neuron/
+    // Direct WebSocket connection to {NEBULA_PRODUCT_ROOT}/neuron/
     this.neuronWs = new WebSocket('ws://neuron:8000/chat/stream');
 
     this.neuronWs.send(JSON.stringify({
@@ -455,9 +455,9 @@ export class AiService {
 }
 ```
 
-**MCP Server ({PRODUCT_ROOT}/neuron/):**
+**MCP Server ({NEBULA_PRODUCT_ROOT}/neuron/):**
 ```python
-# {PRODUCT_ROOT}/neuron/mcp/crm_data_server.py
+# {NEBULA_PRODUCT_ROOT}/neuron/mcp/crm_data_server.py
 from mcp import Server, Tool, Resource
 
 server = Server("crm-data-mcp")
@@ -465,7 +465,7 @@ server = Server("crm-data-mcp")
 @server.tool()
 async def get_customer(customer_id: str) -> dict:
     """Fetch customer data from CRM backend."""
-    # Call {PRODUCT_ROOT}/engine/ API to get customer data
+    # Call {NEBULA_PRODUCT_ROOT}/engine/ API to get customer data
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"http://engine:5000/api/internal/customers/{customer_id}",
@@ -485,9 +485,9 @@ async def search_customers(query: str) -> list[dict]:
         return response.json()
 ```
 
-**Streaming AI Chat ({PRODUCT_ROOT}/neuron/):**
+**Streaming AI Chat ({NEBULA_PRODUCT_ROOT}/neuron/):**
 ```python
-# {PRODUCT_ROOT}/neuron/api/streaming.py
+# {NEBULA_PRODUCT_ROOT}/neuron/api/streaming.py
 from fastapi import WebSocket
 from llmmodel import AsyncLlmModel
 
@@ -515,13 +515,13 @@ async def chat_stream(websocket: WebSocket):
 **Directory Structure:**
 ```
 project/
-├── {PRODUCT_ROOT}/engine/               # Backend (C# / .NET)
+├── {NEBULA_PRODUCT_ROOT}/engine/               # Backend (C# / .NET)
 │   ├── Controllers/
-│   │   └── InternalController.cs  ← API for {PRODUCT_ROOT}/neuron/ MCP
+│   │   └── InternalController.cs  ← API for {NEBULA_PRODUCT_ROOT}/neuron/ MCP
 │   ├── Services/
 │   └── Authorization/
 │       └── ServiceAuthHandler.cs  ← Service-to-service auth
-├── {PRODUCT_ROOT}/neuron/               # AI Layer (Python)
+├── {NEBULA_PRODUCT_ROOT}/neuron/               # AI Layer (Python)
 │   ├── api/
 │   │   ├── routes.py
 │   │   └── streaming.py  ← WebSocket/SSE endpoints
@@ -536,14 +536,14 @@ project/
 │   ├── prompts/
 │   ├── models/
 │   └── config/
-├── {PRODUCT_ROOT}/experience/           # Frontend
+├── {NEBULA_PRODUCT_ROOT}/experience/           # Frontend
 │   └── src/
 │       ├── services/
-│       │   ├── apiService.ts      ← HTTP to {PRODUCT_ROOT}/engine/
-│       │   └── aiService.ts       ← WebSocket to {PRODUCT_ROOT}/neuron/
+│       │   ├── apiService.ts      ← HTTP to {NEBULA_PRODUCT_ROOT}/engine/
+│       │   └── aiService.ts       ← WebSocket to {NEBULA_PRODUCT_ROOT}/neuron/
 │       └── components/
 │           └── AiChat.tsx         ← Streaming AI chat UI
-└── {PRODUCT_ROOT}/planning-mds/
+└── {NEBULA_PRODUCT_ROOT}/planning-mds/
 ```
 
 ### Advantages
@@ -551,7 +551,7 @@ project/
 ✅ **Maximum AI sophistication** - Full agentic workflows, MCP, RAG
 ✅ **Real-time streaming** - Low-latency LLM responses to frontend
 ✅ **MCP tool integration** - AI agents can access CRM data via MCP
-✅ **Parallel data access** - Frontend calls {PRODUCT_ROOT}/engine/ and {PRODUCT_ROOT}/neuron/ independently
+✅ **Parallel data access** - Frontend calls {NEBULA_PRODUCT_ROOT}/engine/ and {NEBULA_PRODUCT_ROOT}/neuron/ independently
 ✅ **Advanced patterns** - Multi-agent collaboration, vector search, etc.
 ✅ **AI-first UX** - Native chat interfaces, live suggestions
 
@@ -559,13 +559,13 @@ project/
 
 ⚠️ **High complexity** - Three-tier architecture with multiple integration points
 ⚠️ **Security challenges** - Frontend-to-neuron auth, service-to-service auth
-⚠️ **Increased latency** - MCP calls from {PRODUCT_ROOT}/neuron/ back to {PRODUCT_ROOT}/engine/
+⚠️ **Increased latency** - MCP calls from {NEBULA_PRODUCT_ROOT}/neuron/ back to {NEBULA_PRODUCT_ROOT}/engine/
 ⚠️ **DevOps overhead** - WebSocket infrastructure, monitoring, scaling
 ⚠️ **Cost complexity** - AI usage from multiple sources
 
 ### Agent Involvement
 
-- **Architect** - Defines all integration contracts ({PRODUCT_ROOT}/engine/↔{PRODUCT_ROOT}/neuron/, {PRODUCT_ROOT}/experience/↔{PRODUCT_ROOT}/neuron/, MCP)
+- **Architect** - Defines all integration contracts ({NEBULA_PRODUCT_ROOT}/engine/↔{NEBULA_PRODUCT_ROOT}/neuron/, {NEBULA_PRODUCT_ROOT}/experience/↔{NEBULA_PRODUCT_ROOT}/neuron/, MCP)
 - **Backend Developer** - Implements internal API for MCP server, service auth
 - **Frontend Developer** - Implements WebSocket/SSE integration for streaming AI
 - **AI Engineer** - Implements MCP servers, streaming endpoints, advanced agents
@@ -574,7 +574,7 @@ project/
 
 ### MCP Integration Contract
 
-**MCP Server Specification:** `{PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
+**MCP Server Specification:** `{NEBULA_PRODUCT_ROOT}/planning-mds/api/mcp-servers.yaml`
 
 **Example MCP Server:**
 ```yaml
@@ -600,7 +600,7 @@ authentication:
 ```
 
 **Security:**
-- MCP servers MUST authenticate with {PRODUCT_ROOT}/engine/ using service tokens
+- MCP servers MUST authenticate with {NEBULA_PRODUCT_ROOT}/engine/ using service tokens
 - Tokens scoped to specific permissions (crm.read, crm.write, etc.)
 - Rate limiting on MCP endpoints
 - Audit log of all MCP tool calls
@@ -637,12 +637,12 @@ authentication:
 ### AI-Optional → AI-Embedded
 
 **Steps:**
-1. Create `{PRODUCT_ROOT}/neuron/` directory with FastAPI structure
-2. Extract LLM logic from backend services into {PRODUCT_ROOT}/neuron/ agents
-3. Implement proxy service in {PRODUCT_ROOT}/engine/
-4. Define API contract between {PRODUCT_ROOT}/engine/ and {PRODUCT_ROOT}/neuron/
-5. Deploy {PRODUCT_ROOT}/neuron/ as separate service
-6. Update {PRODUCT_ROOT}/engine/ to call {PRODUCT_ROOT}/neuron/ instead of LLM provider API directly
+1. Create `{NEBULA_PRODUCT_ROOT}/neuron/` directory with FastAPI structure
+2. Extract LLM logic from backend services into {NEBULA_PRODUCT_ROOT}/neuron/ agents
+3. Implement proxy service in {NEBULA_PRODUCT_ROOT}/engine/
+4. Define API contract between {NEBULA_PRODUCT_ROOT}/engine/ and {NEBULA_PRODUCT_ROOT}/neuron/
+5. Deploy {NEBULA_PRODUCT_ROOT}/neuron/ as separate service
+6. Update {NEBULA_PRODUCT_ROOT}/engine/ to call {NEBULA_PRODUCT_ROOT}/neuron/ instead of LLM provider API directly
 
 **Effort:** 1-2 weeks
 
@@ -651,10 +651,10 @@ authentication:
 ### AI-Embedded → AI-Centric
 
 **Steps:**
-1. Add WebSocket/SSE endpoints to {PRODUCT_ROOT}/neuron/
-2. Implement MCP servers in {PRODUCT_ROOT}/neuron/mcp/
-3. Create internal API in {PRODUCT_ROOT}/engine/ for MCP server data access
-4. Update frontend to call {PRODUCT_ROOT}/neuron/ directly for streaming features
+1. Add WebSocket/SSE endpoints to {NEBULA_PRODUCT_ROOT}/neuron/
+2. Implement MCP servers in {NEBULA_PRODUCT_ROOT}/neuron/mcp/
+3. Create internal API in {NEBULA_PRODUCT_ROOT}/engine/ for MCP server data access
+4. Update frontend to call {NEBULA_PRODUCT_ROOT}/neuron/ directly for streaming features
 5. Implement service-to-service authentication
 6. Set up WebSocket infrastructure (load balancing, monitoring)
 
@@ -721,7 +721,7 @@ The patterns reference generic model tiers. Map them to your provider:
 **SDK:** `anthropic` (Python), `@anthropic-ai/sdk` (TypeScript)
 
 ```python
-# {PRODUCT_ROOT}/neuron/models/llm_client.py
+# {NEBULA_PRODUCT_ROOT}/neuron/models/llm_client.py
 from anthropic import AsyncAnthropic
 
 class LLMClient:
@@ -762,7 +762,7 @@ async with self.client.messages.stream(
 **SDK:** `openai` (Python), `openai` (TypeScript)
 
 ```python
-# {PRODUCT_ROOT}/neuron/models/llm_client.py
+# {NEBULA_PRODUCT_ROOT}/neuron/models/llm_client.py
 from openai import AsyncOpenAI
 
 class LLMClient:
@@ -804,7 +804,7 @@ async for chunk in stream:
 **SDK:** `openai` with Azure configuration
 
 ```python
-# {PRODUCT_ROOT}/neuron/models/llm_client.py
+# {NEBULA_PRODUCT_ROOT}/neuron/models/llm_client.py
 from openai import AsyncAzureOpenAI
 
 class LLMClient:
@@ -838,7 +838,7 @@ class LLMClient:
 **SDK:** `ollama` (Python), HTTP API
 
 ```python
-# {PRODUCT_ROOT}/neuron/models/llm_client.py
+# {NEBULA_PRODUCT_ROOT}/neuron/models/llm_client.py
 import ollama
 
 class LLMClient:
@@ -880,7 +880,7 @@ async for chunk in stream:
 **SDK:** `langchain`, `langchain-anthropic`, `langchain-openai`
 
 ```python
-# {PRODUCT_ROOT}/neuron/models/llm_client.py
+# {NEBULA_PRODUCT_ROOT}/neuron/models/llm_client.py
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -945,7 +945,7 @@ class LLMClient:
 **Recommended: Environment-Based Configuration**
 
 ```python
-# {PRODUCT_ROOT}/neuron/config/llm_config.py
+# {NEBULA_PRODUCT_ROOT}/neuron/config/llm_config.py
 import os
 from enum import Enum
 
@@ -1001,7 +1001,7 @@ model = config.get_model("balanced")  # Returns "claude-3-5-sonnet-20241022"
 ### Related Documents
 - `agents/ai-engineer/SKILL.md` - AI Engineer responsibilities
 - `agents/architect/references/ai-architecture-patterns.md` - Architect AI patterns
-- `{PRODUCT_ROOT}/planning-mds/examples/stories/ai-story-example.md` - Example AI feature story
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/stories/ai-story-example.md` - Example AI feature story
 
 ### External Resources
 
@@ -1025,4 +1025,4 @@ model = config.get_model("balanced")  # Returns "claude-3-5-sonnet-20241022"
 
 ---
 
-**Questions?** Discuss with your Architect or reference the AI integration examples in `{PRODUCT_ROOT}/planning-mds/examples/`.
+**Questions?** Discuss with your Architect or reference the AI integration examples in `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`.

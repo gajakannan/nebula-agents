@@ -106,7 +106,7 @@ External consumers
 **What stays where:**
 
 - Domain entities and EF migrations are not data contracts.
-- JSON Schemas in `{PRODUCT_ROOT}/planning-mds/schemas/` remain the validation source for application API DTOs.
+- JSON Schemas in `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/` remain the validation source for application API DTOs.
 - Pact remains the consumer/provider behavioral check for application APIs.
 - ODCS does **not** replace OpenAPI. ODCS does **not** replace JSON Schema for in-process validation.
 - Server blocks in ODCS contracts must not contain real secrets — they describe location and access pattern, not credentials.
@@ -147,7 +147,7 @@ Strong signals:
 Data contracts are most often introduced *before* the runtime that produces or consumes them is built. This is fine — and arguably correct — but only with the right discipline.
 
 **Phase 1 — Lint-only (recommended starting point):**
-- Place ODCS / AsyncAPI files in a versioned location (e.g. `{PRODUCT_ROOT}/planning-mds/data-contracts/`).
+- Place ODCS / AsyncAPI files in a versioned location (e.g. `{NEBULA_PRODUCT_ROOT}/planning-mds/data-contracts/`).
 - CI validates syntax and cross-references (e.g. referenced schemas exist).
 - No runtime enforcement.
 - Cost: minimal. Value: forces explicit thinking about freshness, quality, ownership before code locks in assumptions.

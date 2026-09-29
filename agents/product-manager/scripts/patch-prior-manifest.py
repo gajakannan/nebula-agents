@@ -27,16 +27,11 @@ from pathlib import Path
 
 
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(FRAMEWORK_ROOT / "agents" / "scripts"))
+from _product_root import ProductRootError, resolve_product_root  # noqa: E402
+
 RUN_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-[a-z0-9]{8}$")
 FEATURE_ID_RE = re.compile(r"^F\d{4}$")
-
-
-def resolve_product_root(raw: str | None) -> Path:
-    if raw:
-        return Path(raw).expanduser().resolve()
-    if os.environ.get("NEBULA_PRODUCT_ROOT"):
-        return Path(os.environ["NEBULA_PRODUCT_ROOT"]).expanduser().resolve()
-    return (FRAMEWORK_ROOT / ".." / "nebula-insurance-crm").resolve()
 
 
 def evidence_runs_root(product_root: Path) -> Path:
@@ -64,7 +59,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: --new-run-id must match the run-ID regex (got {args.new_run_id!r})", file=sys.stderr)
         return 1
 
-    product_root = resolve_product_root(args.product_root)
+    try:
+        product_root = resolve_product_root(args.product_root)
+    except ProductRootError as exc:
+        parser.error(str(exc))
     if not product_root.exists() or not product_root.is_dir():
         print(f"error: --product-root {product_root} is not a directory", file=sys.stderr)
         return 1

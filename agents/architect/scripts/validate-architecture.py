@@ -11,8 +11,8 @@ Usage:
     python3 validate-architecture.py --product-root ../my-product
     python3 validate-architecture.py /path/to/BLUEPRINT.md /path/to/glossary.md
 
-Defaults resolve to {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md and
-{PRODUCT_ROOT}/planning-mds/domain/glossary.md.
+Defaults resolve to {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md and
+{NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md.
 """
 
 import argparse
@@ -285,13 +285,13 @@ def main():
         "blueprint",
         nargs="?",
         default=None,
-        help="Path to BLUEPRINT.md (default: {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md)",
+        help="Path to BLUEPRINT.md (default: {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md)",
     )
     parser.add_argument(
         "glossary",
         nargs="?",
         default=None,
-        help="Path to glossary.md (default: {PRODUCT_ROOT}/planning-mds/domain/glossary.md)",
+        help="Path to glossary.md (default: {NEBULA_PRODUCT_ROOT}/planning-mds/domain/glossary.md)",
     )
     args = parser.parse_args()
 

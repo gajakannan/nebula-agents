@@ -33,7 +33,7 @@ lifecycle gate fails if the committed prompts drift from the spec.
 
 - **Scope** — `base-run-only`, and **outside the feature evidence contract**: no role reports, not evidence
   for a completed feature. `DOC_SCOPE ∈ {api | readme | runbook | developer-guide | release-notes | mixed}`;
-  the run writes a base run package under `{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}/`
+  the run writes a base run package under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DOC_RUN_ID}/`
   and the docs themselves at the `TARGETS`.
 - **Exit validation** — after approval, `validate_templates.py` (exit 0); `kg/validate.py --check-drift` only
   when KG references changed; never `validate-feature-evidence.py`.
@@ -79,7 +79,7 @@ Prefer OpenAPI/Swagger and realistic field values over generic descriptions ("Ge
 ## Prerequisites
 
 - [ ] Implementation code exists (backend and/or frontend).
-- [ ] Architecture artifacts available in `{PRODUCT_ROOT}/planning-mds/`.
+- [ ] Architecture artifacts available in `{NEBULA_PRODUCT_ROOT}/planning-mds/`.
 - [ ] API endpoints are stable and tested (for API docs).
 - [ ] The application is deployable (for runbook verification).
 

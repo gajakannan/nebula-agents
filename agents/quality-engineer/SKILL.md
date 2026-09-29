@@ -135,7 +135,7 @@ Your responsibility is to implement the **quality assurance layer** - tests that
 - Generate coverage reports
 - Identify untested code paths
 - Treat coverage artifacts as required evidence whenever coverage is claimed or enforced
-- Per feature close, run `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py --untested <node-id>` for each touched canonical node and triage every public method/function that surfaces. For each result: write a test, record an explicit exemption via `--untested-exempt-node`, or convert it to a `private`/`internal` member if it doesn't belong to the public surface. Use `validate.py --check-untested` for whole-repo release-readiness checks; findings persist as `warn` by default and can be promoted with `--untested-as-errors` once the touched nodes are clean.
+- Per feature close, run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py --untested <node-id>` for each touched canonical node and triage every public method/function that surfaces. For each result: write a test, record an explicit exemption via `--untested-exempt-node`, or convert it to a `private`/`internal` member if it doesn't belong to the public surface. Use `validate.py --check-untested` for whole-repo release-readiness checks; findings persist as `warn` by default and can be promoted with `--untested-as-errors` once the touched nodes are clean.
 
 ### 5. Security Testing
 - Vulnerability scanning (Trivy - dependencies + containers)
@@ -200,7 +200,7 @@ QE must not mark `PASS` based solely on visual smoke or broad E2E summaries when
 ## Retrieval Guard
 
 Follow the shared retrieval guard in `agents/docs/AGENTIGNORE.md`: honor
-`{PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
+`{NEBULA_PRODUCT_ROOT}/.agentignore` and treat `planning-mds/operations/**` as cold archive (start from the
 evidence README / `latest-run.json` / `evidence-manifest.json`; read only the exact evidence files a task needs).
 
 ## Tools & Permissions
@@ -208,15 +208,15 @@ evidence README / `latest-run.json` / `evidence-manifest.json`; read only the ex
 **Allowed Tools:** Read, Write, Edit, Bash (for test commands)
 
 **Required Resources:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Sections 3.x (stories, acceptance criteria)
-- `{PRODUCT_ROOT}/planning-mds/architecture/TESTING-STRATEGY.md` - Comprehensive testing strategy
-- `{PRODUCT_ROOT}/planning-mds/architecture/TESTING-STACK-SUMMARY.md` - Tool reference
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Section 7 (Testing Patterns)
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings and code-index bindings for scoped retrieval
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` - Sections 3.x (stories, acceptance criteria)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/TESTING-STRATEGY.md` - Comprehensive testing strategy
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/TESTING-STACK-SUMMARY.md` - Tool reference
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Section 7 (Testing Patterns)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` - Ontology mappings and code-index bindings for scoped retrieval
 - Source code (to write tests for)
 
 When ontology coverage exists for the target feature or story, run
-`python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` before broad repo reads.
+`python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-or-story-id>` before broad repo reads.
 Use `--file <repo-path>` to reverse-map an existing code file back into the ontology.
 
 **Tech Stack:**
@@ -272,8 +272,8 @@ Reference command pattern:
 ```bash
 docker run --rm -v "$PWD":/workspace -w /workspace mcr.microsoft.com/playwright:v<match-project-version>-noble \
   bash -lc 'corepack enable && corepack prepare pnpm@<repo-version> --activate && \
-  CI=true pnpm --dir {PRODUCT_ROOT}/experience install --frozen-lockfile && \
-  VITE_AUTH_MODE=dev pnpm --dir {PRODUCT_ROOT}/experience exec playwright test <spec-or-suite>'
+  CI=true pnpm --dir {NEBULA_PRODUCT_ROOT}/experience install --frozen-lockfile && \
+  VITE_AUTH_MODE=dev pnpm --dir {NEBULA_PRODUCT_ROOT}/experience exec playwright test <spec-or-suite>'
 ```
 
 ## Testing by Layer
@@ -422,9 +422,9 @@ For code examples of common test patterns (Testing Error Scenarios, Testing Asyn
 
 Test tooling by stack (exact commands live in each project's config):
 
-- **Frontend** (`{PRODUCT_ROOT}/experience/`) — Vitest+RTL (unit/component), Vitest+MSW (integration), Playwright (E2E), @axe-core/playwright (a11y), Lighthouse CI (perf), Vitest (coverage).
-- **Backend** (`{PRODUCT_ROOT}/engine/`) — xUnit+Shouldly (unit), WebApplicationFactory (integration), Testcontainers (database), Bruno CLI (API), k6 (load), Coverlet (coverage).
-- **AI/Neuron** (`{PRODUCT_ROOT}/neuron/`) — pytest (unit), pytest+FastAPI TestClient (integration), pytest+custom metrics (evaluation), pytest-benchmark (perf), pytest-cov (coverage).
+- **Frontend** (`{NEBULA_PRODUCT_ROOT}/experience/`) — Vitest+RTL (unit/component), Vitest+MSW (integration), Playwright (E2E), @axe-core/playwright (a11y), Lighthouse CI (perf), Vitest (coverage).
+- **Backend** (`{NEBULA_PRODUCT_ROOT}/engine/`) — xUnit+Shouldly (unit), WebApplicationFactory (integration), Testcontainers (database), Bruno CLI (API), k6 (load), Coverlet (coverage).
+- **AI/Neuron** (`{NEBULA_PRODUCT_ROOT}/neuron/`) — pytest (unit), pytest+FastAPI TestClient (integration), pytest+custom metrics (evaluation), pytest-benchmark (perf), pytest-cov (coverage).
 - **Security (cross-cutting)** — Trivy (vulns), OWASP ZAP (DAST), Semgrep (SAST — the per-feature gate: `sh agents/security/scripts/run-sast-scan.sh --path . --report-dir <RUN>/artifacts/security`), Gitleaks (secrets), SonarQube Community (release-cadence quality reporting via the `docker-compose.qe.yml` overlay — NOT the per-feature `security_scans` gate).
 
 ## Troubleshooting
@@ -454,10 +454,10 @@ Generic quality engineering best practices:
 - `agents/quality-engineer/references/test-case-mapping.md`
 
 Solution-specific references:
-- `{PRODUCT_ROOT}/planning-mds/architecture/TESTING-STRATEGY.md` - Comprehensive testing strategy
-- `{PRODUCT_ROOT}/planning-mds/architecture/TESTING-STACK-SUMMARY.md` - Tool reference
-- `{PRODUCT_ROOT}/planning-mds/architecture/TESTING-TOOLS-LICENSES.md` - License verification
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Section 7 (Testing Patterns)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/TESTING-STRATEGY.md` - Comprehensive testing strategy
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/TESTING-STACK-SUMMARY.md` - Tool reference
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/TESTING-TOOLS-LICENSES.md` - License verification
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` - Section 7 (Testing Patterns)
 
 ---
 
@@ -466,7 +466,7 @@ Solution-specific references:
 ## Feature Evidence Contract (§10, §15, §18)
 
 QE owns three artifacts at G2 in the feature run folder
-(`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`): `test-plan.md`,
+(`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`): `test-plan.md`,
 `test-execution-report.md` (the QE verdict artifact for `role_results['Quality Engineer']`), and
 `coverage-report.md` — **required even when coverage is waived** (templates under `agents/templates/`).
 When waived, add a Waiver Block (owner/date/scope/reason/follow-up) to `coverage-report.md`, mirror it in

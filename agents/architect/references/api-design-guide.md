@@ -235,8 +235,8 @@ var response = new CustomerResponse
 Use RFC Problem Details with media type `application/problem+json`.
 
 Reference:
-- `{PRODUCT_ROOT}/planning-mds/architecture/api-guidelines-profile.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/error-codes.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/api-guidelines-profile.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/error-codes.md`
 
 **Example Error Response (403):**
 ```json

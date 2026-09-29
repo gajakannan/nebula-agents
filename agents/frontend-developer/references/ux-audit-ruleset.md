@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This document defines non-negotiable UX implementation and audit rules for all frontend work in `{PRODUCT_ROOT}/experience/`.
+This document defines non-negotiable UX implementation and audit rules for all frontend work in `{NEBULA_PRODUCT_ROOT}/experience/`.
 
 - Treat **P0/P1 rules** as release gates.
 - Treat **P2 rules** as improvement targets unless product scope says otherwise.
@@ -76,7 +76,7 @@ This document defines non-negotiable UX implementation and audit rules for all f
 
 ### 7. Component Pattern Requirements
 
-- **P0:** Prefer hardened primitives from `{PRODUCT_ROOT}/experience/src/components/ui/` for dialog, tabs, popover, menu.
+- **P0:** Prefer hardened primitives from `{NEBULA_PRODUCT_ROOT}/experience/src/components/ui/` for dialog, tabs, popover, menu.
 - **P0:** If building custom composite widgets, implement ARIA roles + keyboard behavior explicitly.
 - **P1:** Reuse established UI primitives before introducing new variants.
 
@@ -87,16 +87,16 @@ This document defines non-negotiable UX implementation and audit rules for all f
 Run these commands for frontend PRs:
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience lint
-pnpm --dir {PRODUCT_ROOT}/experience lint:theme
-pnpm --dir {PRODUCT_ROOT}/experience build
-pnpm --dir {PRODUCT_ROOT}/experience test
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience build
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test
 ```
 
 Run this additional command when styling, theming, or visual behavior changes:
 
 ```bash
-pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme
+pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme
 ```
 
 If a command is unavailable, use the nearest project-equivalent and document it in the PR.
@@ -113,7 +113,7 @@ Attach:
 
 Store audit evidence in:
 
-- `{PRODUCT_ROOT}/planning-mds/operations/evidence/frontend-ux/ux-audit-YYYY-MM-DD.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/frontend-ux/ux-audit-YYYY-MM-DD.md`
 
 CI validator:
 

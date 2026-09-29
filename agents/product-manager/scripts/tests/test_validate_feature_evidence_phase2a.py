@@ -306,7 +306,7 @@ def test_commands_log_missing_exit_code_fires(tmp_path: Path) -> None:
     write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
     run_folder = write_manifest_run(product, "F0001-new", "F0001")
     (run_folder / "commands.log").write_text(
-        json.dumps({"schema_version": 1, "timestamp": "2026-05-19T12:00:00Z", "cwd": "{PRODUCT_ROOT}", "command": "ok", "artifacts": [], "redactions": []}) + "\n",
+        json.dumps({"schema_version": 1, "timestamp": "2026-05-19T12:00:00Z", "cwd": "{NEBULA_PRODUCT_ROOT}", "command": "ok", "artifacts": [], "redactions": []}) + "\n",
         encoding="utf-8",
     )
 
@@ -346,7 +346,7 @@ def test_commands_log_secret_pattern_fires(tmp_path: Path) -> None:
         json.dumps({
             "schema_version": 1,
             "timestamp": "2026-05-19T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "curl -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.abc123def456'",
             "exit_code": 0,
             "artifacts": [],
@@ -368,7 +368,7 @@ def test_commands_log_secret_patterns_redacted_passes(tmp_path: Path) -> None:
         json.dumps({
             "schema_version": 1,
             "timestamp": "2026-05-19T12:00:00Z",
-            "cwd": "{PRODUCT_ROOT}",
+            "cwd": "{NEBULA_PRODUCT_ROOT}",
             "command": "curl -H 'Authorization: Bearer ***REDACTED***' --token=$BEARER_TOKEN",
             "exit_code": 0,
             "artifacts": [],

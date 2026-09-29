@@ -136,12 +136,12 @@ When any prioritization framework is used, include:
 
 ## Feature & Story Convention
 
-Every feature is a self-contained folder under `{PRODUCT_ROOT}/planning-mds/features/`. Stories are colocated inside the feature folder — there is no separate top-level stories directory.
+Every feature is a self-contained folder under `{NEBULA_PRODUCT_ROOT}/planning-mds/features/`. Stories are colocated inside the feature folder — there is no separate top-level stories directory.
 
 ### Folder Structure
 
 ```
-{PRODUCT_ROOT}/planning-mds/features/
+{NEBULA_PRODUCT_ROOT}/planning-mds/features/
   REGISTRY.md                              # Feature number tracker + index
   F0001-{slug}/
     PRD.md                                 # Full feature spec (why + what + how)
@@ -173,19 +173,19 @@ Every feature is a self-contained folder under `{PRODUCT_ROOT}/planning-mds/feat
 
 ### Registry
 
-`{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` tracks all features with their IDs, names, statuses, and folder paths. Update it whenever a feature is created or archived.
+`{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` tracks all features with their IDs, names, statuses, and folder paths. Update it whenever a feature is created or archived.
 
 ### Tracker Governance (Mandatory)
 
 Trackers must move with the work. When feature/story state changes, update tracker docs in the same change:
 
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (inventory + status + path)
-- `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (Now/Next/Later/Completed sequencing)
-- `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (generated rollup)
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (baseline feature/story status snapshot)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (inventory + status + path)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (Now/Next/Later/Completed sequencing)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (generated rollup)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (baseline feature/story status snapshot)
 - Per-feature `STATUS.md` (execution truth + deferred non-blocking follow-ups)
 
-Reference policy: `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`.
+Reference policy: `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md`.
 If missing, create it from `agents/templates/tracker-governance-template.md` before continuing.
 
 ### Archive Transition (Mandatory for Completed Features)
@@ -195,24 +195,24 @@ When a feature reaches final approved completion (`Done` with no remaining block
 1. **Apply Orphaned Story Rule** (per `TRACKER-GOVERNANCE.md`): verify all non-completed stories are either explicitly deferred in `STATUS.md` with a tracking link, or promoted to a new feature ID in `REGISTRY.md`. No story may be archived in `Not Started` or `In Progress` state without a rehoming decision.
 2. **Fill Closeout Summary** in `STATUS.md`: implementation date, test counts, defects found/fixed, residual risks, scope delivery, and phase 2 deferrals.
 3. Move feature folder from:
-   - `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`
-   - to `{PRODUCT_ROOT}/planning-mds/features/archive/F{NNNN}-{slug}/`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/`
+   - to `{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/F{NNNN}-{slug}/`
 4. Update tracker/docs links and status labels to archived paths/state:
-   - `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
-   - `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-   - `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+   - `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
    - feature `README.md` (set `**Archived:** [date]`) and `STATUS.md` (if path/status references changed)
 5. Re-run story index and tracker validation after move:
-   - `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
+   - `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`
    - `python3 agents/product-manager/scripts/validate-trackers.py`
 6. Do not declare closeout complete until archive transition validation passes.
 
 ## Retrieval Guard
 
-Before broad reads or searches in `{PRODUCT_ROOT}`, load
-`{PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
+Before broad reads or searches in `{NEBULA_PRODUCT_ROOT}`, load
+`{NEBULA_PRODUCT_ROOT}/.agentignore` when present and honor its gitignore-style
 patterns as agent retrieval exclusions. Treat
-`{PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/**` as cold archive: start from the
 evidence README, feature `latest-run.json`, and `evidence-manifest.json`, then
 read only exact evidence files required for audit, validation, closeout, failure
 triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
@@ -222,14 +222,14 @@ triage, or an explicit user request. See `agents/docs/AGENTIGNORE.md`.
 **Allowed Tools:** Read, Write, Edit, AskUserQuestion, Bash
 
 **Required Resources:**
-- `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (single source of truth)
-- `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature number tracker)
-- `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (feature sequencing tracker)
-- `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (auto-generated story tracker)
-- `{PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` (tracker sync contract)
-- `{PRODUCT_ROOT}/planning-mds/domain/` (solution-specific domain references)
-- `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` (ontology mappings, code-index bindings, coverage report)
-- `{PRODUCT_ROOT}/planning-mds/examples/` (solution-specific examples)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (single source of truth)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md` (feature number tracker)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md` (feature sequencing tracker)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (auto-generated story tracker)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md` (tracker sync contract)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/` (solution-specific domain references)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` (ontology mappings, code-index bindings, coverage report)
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/` (solution-specific examples)
 
 KG query/health semantics and source-precedence rules live in
 `agents/docs/KNOWLEDGE-GRAPH.md`. PM-specific usage: when ontology
@@ -270,19 +270,19 @@ Generic references (keep in agents/):
 - `agents/product-manager/references/prioritization-examples.md`
 
 Solution-specific references must live in:
-- `{PRODUCT_ROOT}/planning-mds/domain/`
-- `{PRODUCT_ROOT}/planning-mds/examples/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/domain/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/`
 
 ## Validation Scripts
 
-- `validate-stories.py` (per story file — scans `{PRODUCT_ROOT}/planning-mds/features/F*/F*-S*.md`)
-- `generate-story-index.py` (for `{PRODUCT_ROOT}/planning-mds/features/`)
+- `validate-stories.py` (per story file — scans `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F*/F*-S*.md`)
+- `generate-story-index.py` (for `{NEBULA_PRODUCT_ROOT}/planning-mds/features/`)
 - `validate-trackers.py` (cross-checks REGISTRY/ROADMAP/STORY-INDEX/BLUEPRINT consistency)
 
 ## Input Contract
 
 ### Receives From
-- Stakeholders or `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- Stakeholders or `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
 
 ### Required Context
 - Business problem statement
@@ -291,7 +291,7 @@ Solution-specific references must live in:
 - Phase scope (MVP vs future)
 
 ### Prerequisites
-- [ ] `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists
+- [ ] `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` exists
 - [ ] Core entities identified (baseline)
 - [ ] Target user roles known
 
@@ -302,22 +302,22 @@ Solution-specific references must live in:
 
 ### Deliverables
 
-- Vision & non-goals → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.1)
-- Personas → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.2) or `{PRODUCT_ROOT}/planning-mds/examples/personas/`
-- Epics/features → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.3) and `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/PRD.md`
-- Stories → colocated in feature folders as `{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`
-- Feature registry → `{PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
-- Roadmap sequencing → `{PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
-- Story rollup → `{PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (generated)
-- Screens → `{PRODUCT_ROOT}/planning-mds/screens/` or `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.5)
-- Workflows → `{PRODUCT_ROOT}/planning-mds/workflows/` or `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.5)
+- Vision & non-goals → `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.1)
+- Personas → `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.2) or `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/personas/`
+- Epics/features → `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.3) and `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/PRD.md`
+- Stories → colocated in feature folders as `{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md`
+- Feature registry → `{NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md`
+- Roadmap sequencing → `{NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md`
+- Story rollup → `{NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md` (generated)
+- Screens → `{NEBULA_PRODUCT_ROOT}/planning-mds/screens/` or `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.5)
+- Workflows → `{NEBULA_PRODUCT_ROOT}/planning-mds/workflows/` or `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md` (Section 3.5)
 
 ## Self-Validation (Feedback Loop)
 
 Before declaring work complete, verify deliverables:
 1. Run `python3 agents/product-manager/scripts/validate-stories.py` on each new/updated story file or touched feature folder
 2. If validation fails → fix story format, re-validate
-3. Run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
+3. Run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`
 4. Run `python3 agents/product-manager/scripts/validate-trackers.py`
 5. Walk through each story — does every story have measurable acceptance criteria?
 6. If any AC is vague or untestable → rewrite, re-check
@@ -337,7 +337,7 @@ Before declaring work complete, verify deliverables:
 - [ ] Mutation stories include interaction contracts and are not closable by render-only behavior unless explicitly read-only
 - [ ] Screens specified (with ASCII layouts in PRD `## Screen Layouts (ASCII)` for UI-bearing features, or explicit "No UI" justification)
 - [ ] REGISTRY/ROADMAP/STORY-INDEX/BLUEPRINT are in sync
-- [ ] Completed feature moved to `{PRODUCT_ROOT}/planning-mds/features/archive/` and links updated
+- [ ] Completed feature moved to `{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/` and links updated
 - [ ] Post-session knowledge capture completed (non-obvious decisions and gotchas saved to KG notes, feature docs, or STATUS.md)
 - [ ] No TODOs remain
 
@@ -360,7 +360,7 @@ Before declaring work complete, verify deliverables:
 
 ## Quick Start
 
-1. Read `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+1. Read `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
 2. Define vision, personas, epics/features
 3. Write stories and acceptance criteria
 4. Specify screens and workflows
@@ -368,7 +368,7 @@ Before declaring work complete, verify deliverables:
 
 ## Feature Evidence Contract (§16, §11, §22, §15)
 
-Product Manager owns the closeout artifacts. For every governed completed-terminal feature run produce, under `{PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/`:
+Product Manager owns the closeout artifacts. For every governed completed-terminal feature run produce, under `{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/F####-{slug}/{RUN_ID}/`:
 
 - `signoff-ledger.md` — strictly consistent with current `STATUS.md` story signoff (latest row per `(story, role)`). Template: `agents/templates/signoff-ledger-template.md`.
 - `pm-closeout.md` — final story status, archive decision, deferred follow-ups, recommendation acceptances, tracker updates, validator results. Template: `agents/templates/pm-closeout-template.md`.

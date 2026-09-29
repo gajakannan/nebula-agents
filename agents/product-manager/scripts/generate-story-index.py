@@ -6,7 +6,7 @@ Generates an index/table of contents for all user stories across feature folders
 Extracts story ID, title, priority, phase, and feature from each story file.
 
 Stories are colocated in feature folders:
-  {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md
+  {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}/F{NNNN}-S{NNNN}-{slug}.md
 
 Usage:
     python generate-story-index.py [--product-root PATH] [features-directory]
@@ -14,7 +14,7 @@ Usage:
     python generate-story-index.py /path/to/features
 
 If no features directory is supplied the script defaults to
-{PRODUCT_ROOT}/planning-mds/features.
+{NEBULA_PRODUCT_ROOT}/planning-mds/features.
 
 Output:
     Creates STORY-INDEX.md in the features directory
@@ -286,7 +286,7 @@ def main():
         "features_dir",
         nargs="?",
         default=None,
-        help="Path to planning features directory (default: {PRODUCT_ROOT}/planning-mds/features)",
+        help="Path to planning features directory (default: {NEBULA_PRODUCT_ROOT}/planning-mds/features)",
     )
     args = parser.parse_args()
 

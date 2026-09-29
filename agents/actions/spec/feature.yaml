@@ -22,14 +22,14 @@ inputs:
     - {name: MODE, enum: [clean, drift-reconcile], default: clean}
     - {name: SLICE_ORDER_SOURCE, enum: [assembly-plan, override], default: assembly-plan}
     - {name: SLICE_ORDER, required_when: "SLICE_ORDER_SOURCE=override"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
   FEATURE_SLUG: "kebab-case slug for {FEATURE_ID} from REGISTRY.md"
-  FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
-  ARCHIVE_FEATURE_PATH: "{PRODUCT_ROOT}/planning-mds/features/archive/{FEATURE_ID}-{FEATURE_SLUG}"
-  FEATURE_INDEX_ROOT: "{PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}"
-  RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}"
+  FEATURE_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  ARCHIVE_FEATURE_PATH: "{NEBULA_PRODUCT_ROOT}/planning-mds/features/archive/{FEATURE_ID}-{FEATURE_SLUG}"
+  FEATURE_INDEX_ROOT: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/features/{FEATURE_ID}-{FEATURE_SLUG}"
+  RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}"
   RUN_ID_PRIOR: "prior approved run_id from {FEATURE_INDEX_ROOT}/latest-run.json (null if absent)"
   RERUN_OF: "null, or {RUN_ID_PRIOR} when this run regenerates evidence only"
 
@@ -41,7 +41,7 @@ context_load:
   - "agents/agent-map.yaml"
   - "agents/docs/AGENT-USE.md"
   - "agents/actions/feature.md"
-  - "python3 {PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID}"
+  - "python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py {FEATURE_ID} --tier {start_tier} --run-id {RUN_ID}"
   - "{FEATURE_PATH}"
 
 ownership:
@@ -62,7 +62,7 @@ gates:
       - run:
           id: validate-g0
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G0]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G0]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -81,7 +81,7 @@ gates:
       - run:
           id: validate-g1
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G1]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G1]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -95,7 +95,7 @@ gates:
       - run:
           id: validate-g2
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G2]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G2]
           cwd: framework
           timeout_seconds: 600
     judgment: |
@@ -114,7 +114,7 @@ gates:
       - run:
           id: validate-g3
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G3]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G3]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -130,7 +130,7 @@ gates:
       - run:
           id: validate-g4
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G4]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G4]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -145,7 +145,7 @@ gates:
       - run:
           id: validate-g5
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G5]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G5]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -162,13 +162,13 @@ gates:
       - run:
           id: validate-g6
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G6]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}", --stage, G6]
           cwd: framework
           timeout_seconds: 300
       - run:
           id: validate-trackers-g6
           argv: [python3, agents/product-manager/scripts/validate-trackers.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -184,20 +184,20 @@ gates:
     operations:
       - run:
           id: kg-compile
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py"]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-source, kg-projection]
       - run:
           id: kg-symbols-decisions
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --regenerate-symbols, --check-symbols,
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --regenerate-symbols, --check-symbols,
                  --regenerate-decisions, --check-decisions]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-projection]
       - run:
           id: kg-check-drift
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
     constraints:
@@ -222,14 +222,14 @@ gates:
           produces: [archived-feature-folder]
       - run:
           id: kg-compile-closeout
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/compile.py"]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py"]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-source, kg-projection, trackers]
       - run:
           id: patch-prior-manifest
           argv: [python3, agents/product-manager/scripts/patch-prior-manifest.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --new-run-id, "{RUN_ID}"]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --new-run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 120
           mutates: [prior-manifest]
@@ -239,32 +239,32 @@ gates:
           mutates: [latest-run.json]
       - run:
           id: kg-write-coverage
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
           cwd: product
           timeout_seconds: 300
           mutates: [kg-projection]
       - run:
           id: kg-check-drift-closeout
-          argv: [python3, "{PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-drift]
           cwd: product
           timeout_seconds: 300
       - run:
           id: capture-run-telemetry
           argv: [python3, agents/scripts/capture-run-telemetry.py,
-                 --product-root, "{PRODUCT_ROOT}", --run-id, "{RUN_ID}"]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 120
           mutates: [run-folder, evidence-manifest]
       - run:
           id: validate-closeout
           argv: [python3, agents/product-manager/scripts/validate-feature-evidence.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --stage, closeout]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --stage, closeout]
           cwd: framework
           timeout_seconds: 300
       - run:
           id: validate-trackers-closeout
           argv: [python3, agents/product-manager/scripts/validate-trackers.py,
-                 --product-root, "{PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
+                 --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 300
     judgment: |
@@ -316,12 +316,12 @@ conflict_resolution:
 notes:
   concurrent_run_check: |
     Before starting, inspect only evidence-manifest.json files under
-    {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/*/ for any run other than RUN_FOLDER whose
+    {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/*/ for any run other than RUN_FOLDER whose
     manifest has feature_id={FEATURE_ID} and status draft or in-progress. If one exists, HALT and
     reconcile externally — the contract assumes serial feature actions per feature. Acceptable prior
     states: approved (superseded at G8), superseded, or no prior runs.
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Create
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Create
     FEATURE_INDEX_ROOT, RUN_FOLDER, and RUN_FOLDER/artifacts/{coverage,diffs,test-results,security,
     screenshots}. Initialize evidence-manifest.json (status draft, contract version stamped, all
     required keys, skeleton gate_results/role_results/files). Create the base run files and touch empty

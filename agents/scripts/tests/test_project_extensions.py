@@ -44,7 +44,7 @@ sys.exit(0 if ok else 1)
 ''')
     manifest = {"version": 1, "instructions": [{"path": "docs/instructions.md"}], "checks": [
         {"id": "example", "action": "plan-review", "stage": "PR2", "event": "before_stage_complete",
-         "argv": ["python3", "{PRODUCT_ROOT}/scripts/check.py"], "cwd": "product", "timeout_seconds": 2,
+         "argv": ["python3", "{NEBULA_PRODUCT_ROOT}/scripts/check.py"], "cwd": "product", "timeout_seconds": 2,
          "inputs": ["planning-mds/features/**/*.md", "scripts/*.py"]}]}
     write(root, ctx.MANIFEST, yaml.safe_dump(manifest))
     return root
@@ -274,6 +274,6 @@ def test_generated_variants_require_product_instruction_loading():
     shared = yaml.safe_load((ctx.SPEC_DIR / "_contract.yaml").read_text())["shared"]
     outputs = renderer.render_action(action, shared, "2026-07-11")
     for output in outputs.values():
-        assert "project_context.py --product-root {PRODUCT_ROOT} --action plan-review" in output
+        assert "project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action plan-review" in output
         assert "before_stage_complete" in output
         assert "resume" in output and "returned" in output

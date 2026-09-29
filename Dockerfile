@@ -25,6 +25,8 @@ WORKDIR /workspace
 
 COPY --chown=builder:builder LICENSE BOUNDARY-POLICY.md CONTRIBUTING.md README.md CONSUMER-CONTRACT.md lifecycle-stage.yaml /workspace/
 COPY --chown=builder:builder agents /workspace/agents
+# Framework scripts and the native runtime share product selection code.
+COPY --chown=builder:builder engine/src /workspace/engine/src
 COPY --chown=builder:builder blueprint-setup /workspace/blueprint-setup
 COPY --chown=builder:builder docker/agent-builder/entrypoint.sh /usr/local/bin/agent-builder
 

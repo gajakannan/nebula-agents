@@ -88,7 +88,7 @@ def test_run_operation_writes_normalized_telemetry(tmp_path):
     assert res["log_written"] and res["exit_code"] == 0
     entry = json.loads(log.read_text(encoding="utf-8").strip())
     assert entry["schema_version"] == 1
-    assert entry["cwd"] == "{PRODUCT_ROOT}"
+    assert entry["cwd"] == "{NEBULA_PRODUCT_ROOT}"
     assert entry["exit_code"] == 0
     assert entry["artifacts"] == ["art.txt"]  # normalized to product-relative
 

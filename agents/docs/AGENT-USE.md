@@ -4,7 +4,7 @@
 
 This guide shows how to invoke the framework in a fresh session:
 
-- how to set up the session so `{PRODUCT_ROOT}` resolves
+- how to set up the session so `{NEBULA_PRODUCT_ROOT}` resolves
 - when to use an **action** versus a direct **agent**
 - how to structure prompts so agents read the right artifacts
 - what each agent typically reads, updates, and validates
@@ -24,61 +24,91 @@ Use this guide with:
 The framework is consumed as a sibling repo. Every session runs with these two fixed ideas:
 
 - **Session working directory:** `nebula-agents` — the agent reads role definitions, actions, and templates from `agents/` here.
-- **Implementation target:** `{PRODUCT_ROOT}` — a sibling product repo. All product-owned artifacts — `{PRODUCT_ROOT}/planning-mds/`, `{PRODUCT_ROOT}/engine/`, `{PRODUCT_ROOT}/experience/`, `{PRODUCT_ROOT}/neuron/`, and `{PRODUCT_ROOT}/scripts/kg/` — live under the product repo.
+- **Implementation target:** `{NEBULA_PRODUCT_ROOT}` — a sibling product repo. All product-owned artifacts — `{NEBULA_PRODUCT_ROOT}/planning-mds/`, `{NEBULA_PRODUCT_ROOT}/engine/`, `{NEBULA_PRODUCT_ROOT}/experience/`, `{NEBULA_PRODUCT_ROOT}/neuron/`, and `{NEBULA_PRODUCT_ROOT}/scripts/kg/` — live under the product repo.
 
 ### Expected workspace layout
 
 ```
 WORKSPACE_ROOT/
   nebula-agents/          # session working directory (this repo)
-  <product-repo>/         # {PRODUCT_ROOT}, e.g. nebula-insurance-crm
+  <product-repo>/         # {NEBULA_PRODUCT_ROOT}, e.g. nebula-insurance-crm
 ```
 
 `WORKSPACE_ROOT` must be outside any source backup of `nebula-crm`.
 
-### Resolving `{PRODUCT_ROOT}`
+### Resolving `{NEBULA_PRODUCT_ROOT}`
 
-At session start, resolve `{PRODUCT_ROOT}` in this order:
+`NEBULA_PRODUCT_ROOT` is the canonical product selection, whether supplied in a
+pasted action prompt or exported in the shell. Normalize its value once to an
+absolute path, then use `{NEBULA_PRODUCT_ROOT}` throughout the action.
 
-1. Environment variable `NEBULA_PRODUCT_ROOT`, if set
-2. Operator-provided value at session start ("the product repo is at X")
-3. Default fallback: `../<product-repo>` relative to `nebula-agents` (for the reference insurance CRM consumer this is `../nebula-insurance-crm`)
+1. Explicit operator selection (prompt `NEBULA_PRODUCT_ROOT` or script
+   `--product-root`) wins over the environment. Conflicting explicit selections
+   require clarification; no alternate root variable is supported.
+2. Otherwise read the `NEBULA_PRODUCT_ROOT` environment variable.
+3. If neither is supplied, ask for a product path. Scripts fail with an error.
+   There is no default sibling product and no automatic selection of CWD.
 
-Echo the resolved absolute path back as the first agent turn's output before any shell command runs.
+A prompt value is valid even when the shell environment is empty. Pass that value
+explicitly to the resolver; do not discard it because an environment check is empty.
+Resolve `../` against the session's starting directory (normally `nebula-agents`)
+**once, before changing directories**, using:
+
+```sh
+python3 agents/scripts/_product_root.py --product-root ../my-product
+```
+
+Omit the flag only when reading the actual environment. The command prints the
+absolute path to stdout and its source to stderr. Echo that selection before
+product discovery or writes. Use this absolute value for every `{NEBULA_PRODUCT_ROOT}`
+reference, every `--product-root` argument (including init and resume), and every
+agent handoff. An export in one tool shell may not persist into the next shell.
+On resume, reuse the recorded absolute root and reject a conflicting selection.
+Never infer the product from a feature ID or choose among sibling repositories.
+
+Example pasted prompt (no shell export required):
+
+```text
+NEBULA_PRODUCT_ROOT = "../my-product"
+FEATURE_ID = "F0002"
+Follow agents/templates/prompts/evidence-contract/feature-operator-friendly.md.
+```
+
+Keep run-specific values in the invocation, rather than editing generated templates.
 
 ### Honoring `.agentignore`
 
 For an opted-in product, load its blueprint and declared instruction text before work and after resume with `python3 agents/scripts/project_context.py --product-root <absolute-product-root> --action <action>`. Resolve the root explicitly; extension commands do not use the legacy fallback. A context error blocks the action. See [Project extensions](PROJECT-EXTENSIONS.md) for gate/CI usage and the current native-launcher limitation.
 
-After resolving `{PRODUCT_ROOT}`, check for `{PRODUCT_ROOT}/.agentignore`
+After resolving `{NEBULA_PRODUCT_ROOT}`, check for `{NEBULA_PRODUCT_ROOT}/.agentignore`
 before broad product discovery. This file is a gitignore-style retrieval guard
 for agents, not a Git ignore file. Honor it for broad reads, globs, greps, and
 file-list operations. For product searches, prefer running from
-`{PRODUCT_ROOT}` with `rg --ignore-file .agentignore ...`.
+`{NEBULA_PRODUCT_ROOT}` with `rg --ignore-file .agentignore ...`.
 
 Bypass ignored paths only for explicit audit, validation, closeout, failure
 triage, or user-requested inspection, and then read exact files rather than
 whole folders. Full semantics live in `agents/docs/AGENTIGNORE.md`.
 
-### What `{PRODUCT_ROOT}` prefixes
+### What `{NEBULA_PRODUCT_ROOT}` prefixes
 
-Every reference from `agents/**` to product-owned paths uses the `{PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees: `{PRODUCT_ROOT}/scripts/kg/...`, `{PRODUCT_ROOT}/planning-mds/...`, `{PRODUCT_ROOT}/engine/...`, `{PRODUCT_ROOT}/experience/...`, `{PRODUCT_ROOT}/neuron/...`, and `{PRODUCT_ROOT}/bruno/...`.
+Every reference from `agents/**` to product-owned paths uses the `{NEBULA_PRODUCT_ROOT}` placeholder. At baseline the placeholder prefixes all product-owned trees: `{NEBULA_PRODUCT_ROOT}/scripts/kg/...`, `{NEBULA_PRODUCT_ROOT}/planning-mds/...`, `{NEBULA_PRODUCT_ROOT}/engine/...`, `{NEBULA_PRODUCT_ROOT}/experience/...`, `{NEBULA_PRODUCT_ROOT}/neuron/...`, and `{NEBULA_PRODUCT_ROOT}/bruno/...`.
 
 Examples:
 
-- `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` (product-owned KG tool)
-- `pnpm --dir {PRODUCT_ROOT}/experience lint` (product frontend)
-- Write scope: `{PRODUCT_ROOT}/engine/**` (product backend)
+- `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` (product-owned KG tool)
+- `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint` (product frontend)
+- Write scope: `{NEBULA_PRODUCT_ROOT}/engine/**` (product backend)
 
-Framework-owned scripts stay framework-relative (no `{PRODUCT_ROOT}` prefix): `python3 agents/scripts/validate-genericness.py`, `python3 agents/scripts/run-lifecycle-gates.py`, `python3 agents/scripts/validate_templates.py`.
+Framework-owned scripts stay framework-relative (no `{NEBULA_PRODUCT_ROOT}` prefix): `python3 agents/scripts/validate-genericness.py`, `python3 agents/scripts/run-lifecycle-gates.py`, `python3 agents/scripts/validate_templates.py`.
 
 ### Discovering product-specific concretes
 
 Framework docs and templates do not hardcode product namespaces, API filenames, or entity names. The agent discovers these at session time from the product repo:
 
-- **Tech stack** → `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
-- **Entity-to-file bindings** → `{PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` and `canonical-nodes.yaml`
-- **API spec location** → declared in `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; agents do not assume a filename
+- **Tech stack** → `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- **Entity-to-file bindings** → `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/code-index.yaml` and `canonical-nodes.yaml`
+- **API spec location** → declared in `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`; agents do not assume a filename
 
 ## Default Rule
 
@@ -132,18 +162,18 @@ When done:
 ### Ontology-Backed Addendum
 
 When the target feature or story exists in
-`{PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`, add this block before the
+`{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/feature-mappings.yaml`, add this block before the
 raw file list:
 
 ```text
 Ontology context:
 - target: <feature or story id>
 - retrieve via the CLIs (they join the KG yamls for you — do not load raw yamls into context):
-  - python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature or story id>   # feature/story slice
-  - python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path>                    # before any code search
-  - python3 {PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>          # impact radius before editing shared semantics
+  - python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature or story id>   # feature/story slice
+  - python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path>                    # before any code search
+  - python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>          # impact radius before editing shared semantics
 - use the returned slice (matching mapping entry + one hop) as the first-pass routing context
-- open raw yamls under {PRODUCT_ROOT}/planning-mds/knowledge-graph/ ONLY to verify a
+- open raw yamls under {NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/ ONLY to verify a
   detail or repair drift — never as the default retrieval path
 - source precedence: raw feature/ADR/schema/API artifacts win over ontology mappings
 - if ontology drift is found, repair the authoritative source first if needed,
@@ -168,11 +198,11 @@ Most-common session invocations:
 
 | When | Command |
 |------|---------|
-| Before any code search | `python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path>` |
-| Starting feature work | `python3 {PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` |
-| Before editing shared semantics | `python3 {PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>` |
-| Long session start | `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py --state-file <path> init --role <role> --scope <id> --run-id <uuid>` |
-| Post-compaction recovery | `python3 {PRODUCT_ROOT}/scripts/kg/workstate.py --state-file <path> dump --compact` |
+| Before any code search | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path>` |
+| Starting feature work | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/lookup.py <feature-id>` |
+| Before editing shared semantics | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/blast.py <node-or-file>` |
+| Long session start | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/workstate.py --state-file <path> init --role <role> --scope <id> --run-id <uuid>` |
+| Post-compaction recovery | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/workstate.py --state-file <path> dump --compact` |
 | Framework prompt-template check | `python3 agents/scripts/validate_templates.py` |
 
 Agent-specific hook adapters (e.g., `.claude/settings.json` for Claude
@@ -219,13 +249,13 @@ via `python3 agents/scripts/validate_templates.py`.
 Use these clauses when they apply:
 
 - `Before loading references, consult agents/ROUTER.md and load only the task-matched subset.`
-- `Before broad product discovery, load {PRODUCT_ROOT}/.agentignore if present and honor it as a gitignore-style agent retrieval guard.`
-- `Before searching code, run python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path> to get KG routing context.`
+- `Before broad product discovery, load {NEBULA_PRODUCT_ROOT}/.agentignore if present and honor it as a gitignore-style agent retrieval guard.`
+- `Before searching code, run python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path> to get KG routing context.`
 - `If ontology coverage exists, load the matching knowledge-graph entry before reading raw files.`
 - `Use ontology mappings as compressed retrieval context only; source artifacts win on conflict.`
-- `Treat {PRODUCT_ROOT}/planning-mds/operations/** as cold archive; start from evidence README, latest-run.json, and evidence-manifest.json, then read only exact files required by the task.`
+- `Treat {NEBULA_PRODUCT_ROOT}/planning-mds/operations/** as cold archive; start from evidence README, latest-run.json, and evidence-manifest.json, then read only exact files required by the task.`
 - `If shared solution semantics changed, repair ontology drift in the same change set.`
-- `Read the full feature folder at {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}.`
+- `Read the full feature folder at {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}.`
 - `Where the feature-assembly-plan conflicts with raw story text, follow the feature-assembly-plan.`
 - `Do not invent scope outside the current feature boundary.`
 - `Update STATUS.md before concluding.`
@@ -254,15 +284,15 @@ key), not by mutating or removing prior rows. The full signoff contract
 
 | Agent | Use When | Read First | Usually Updates | Typical Validation |
 |------|----------|------------|-----------------|--------------------|
-| `product-manager` | refining PRDs, stories, personas, MVP/future scope, tracker sync | `{PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, feature folder, dependency PRDs, `TRACKER-GOVERNANCE.md` | feature `PRD.md`, stories, `README.md`, `STATUS.md`, trackers | `python3 agents/product-manager/scripts/validate-stories.py`, `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`, `python3 agents/product-manager/scripts/validate-trackers.py` |
-| `architect` | data model, workflows, API contracts, ADRs, authorization, assembly plans | feature folder, `{PRODUCT_ROOT}/planning-mds/architecture/decisions/`, `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`, dependent PRDs | `{PRODUCT_ROOT}/planning-mds/architecture/**`, `{PRODUCT_ROOT}/planning-mds/api/*.yaml`, `{PRODUCT_ROOT}/planning-mds/schemas/*.json`, feature `feature-assembly-plan.md`, feature `STATUS.md` | `python3 agents/architect/scripts/validate-architecture.py {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, `python3 agents/architect/scripts/validate-api-contract.py <api-file>`, `python3 {PRODUCT_ROOT}/scripts/kg/blast.py <node>` before shared entity/workflow changes, `python3 {PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` after ontology changes, tracker validation if trackers changed |
-| `backend-developer` | implementing `{PRODUCT_ROOT}/engine/` changes from approved feature plans | feature folder, `feature-assembly-plan.md`, `{PRODUCT_ROOT}/planning-mds/api/`, `{PRODUCT_ROOT}/planning-mds/schemas/`, `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` | `{PRODUCT_ROOT}/engine/**`, feature `STATUS.md`, feature `GETTING-STARTED.md` | `python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path>` before searching, `sh agents/backend-developer/scripts/run-tests.sh --strict` or repo-standard backend test command |
-| `frontend-developer` | implementing `{PRODUCT_ROOT}/experience/` screens, forms, API wiring, UX fixes | feature folder, `feature-assembly-plan.md`, screen specs, `{PRODUCT_ROOT}/planning-mds/api/`, `{PRODUCT_ROOT}/planning-mds/schemas/`, `agents/frontend-developer/references/ux-audit-ruleset.md` | `{PRODUCT_ROOT}/experience/**`, feature `STATUS.md`, feature `GETTING-STARTED.md` | `python3 {PRODUCT_ROOT}/scripts/kg/hint.py <path>` before searching, `pnpm --dir {PRODUCT_ROOT}/experience lint`, `pnpm --dir {PRODUCT_ROOT}/experience lint:theme`, `pnpm --dir {PRODUCT_ROOT}/experience build`, `pnpm --dir {PRODUCT_ROOT}/experience test`, plus `pnpm --dir {PRODUCT_ROOT}/experience test:visual:theme` when theme/styling changed |
-| `ai-engineer` | implementing `{PRODUCT_ROOT}/neuron/`, LLM integrations, MCP servers, prompts, agent workflows | feature folder, architecture docs, AI requirements, backend integration contracts | `{PRODUCT_ROOT}/neuron/**`, feature `STATUS.md`, feature `GETTING-STARTED.md`, `{PRODUCT_ROOT}/neuron/README.md` | `pytest {PRODUCT_ROOT}/neuron/tests/` and project-standard AI integration/evaluation commands |
-| `quality-engineer` | test planning, automated tests, coverage checks, E2E, performance, accessibility | stories, acceptance criteria, `feature-assembly-plan.md`, changed code, quality strategy | `{PRODUCT_ROOT}/engine/tests/**`, `{PRODUCT_ROOT}/experience/tests/**`, `{PRODUCT_ROOT}/neuron/tests/**`, feature `STATUS.md` | tier-specific test commands plus coverage artifacts; require evidence-backed pass decisions |
+| `product-manager` | refining PRDs, stories, personas, MVP/future scope, tracker sync | `{NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, feature folder, dependency PRDs, `TRACKER-GOVERNANCE.md` | feature `PRD.md`, stories, `README.md`, `STATUS.md`, trackers | `python3 agents/product-manager/scripts/validate-stories.py`, `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`, `python3 agents/product-manager/scripts/validate-trackers.py` |
+| `architect` | data model, workflows, API contracts, ADRs, authorization, assembly plans | feature folder, `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/`, `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`, dependent PRDs | `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/**`, `{NEBULA_PRODUCT_ROOT}/planning-mds/api/*.yaml`, `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/*.json`, feature `feature-assembly-plan.md`, feature `STATUS.md` | `python3 agents/architect/scripts/validate-architecture.py {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`, `python3 agents/architect/scripts/validate-api-contract.py <api-file>`, `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/blast.py <node>` before shared entity/workflow changes, `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` after ontology changes, tracker validation if trackers changed |
+| `backend-developer` | implementing `{NEBULA_PRODUCT_ROOT}/engine/` changes from approved feature plans | feature folder, `feature-assembly-plan.md`, `{NEBULA_PRODUCT_ROOT}/planning-mds/api/`, `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`, `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md` | `{NEBULA_PRODUCT_ROOT}/engine/**`, feature `STATUS.md`, feature `GETTING-STARTED.md` | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path>` before searching, `sh agents/backend-developer/scripts/run-tests.sh --strict` or repo-standard backend test command |
+| `frontend-developer` | implementing `{NEBULA_PRODUCT_ROOT}/experience/` screens, forms, API wiring, UX fixes | feature folder, `feature-assembly-plan.md`, screen specs, `{NEBULA_PRODUCT_ROOT}/planning-mds/api/`, `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`, `agents/frontend-developer/references/ux-audit-ruleset.md` | `{NEBULA_PRODUCT_ROOT}/experience/**`, feature `STATUS.md`, feature `GETTING-STARTED.md` | `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/hint.py <path>` before searching, `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint`, `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience lint:theme`, `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience build`, `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test`, plus `pnpm --dir {NEBULA_PRODUCT_ROOT}/experience test:visual:theme` when theme/styling changed |
+| `ai-engineer` | implementing `{NEBULA_PRODUCT_ROOT}/neuron/`, LLM integrations, MCP servers, prompts, agent workflows | feature folder, architecture docs, AI requirements, backend integration contracts | `{NEBULA_PRODUCT_ROOT}/neuron/**`, feature `STATUS.md`, feature `GETTING-STARTED.md`, `{NEBULA_PRODUCT_ROOT}/neuron/README.md` | `pytest {NEBULA_PRODUCT_ROOT}/neuron/tests/` and project-standard AI integration/evaluation commands |
+| `quality-engineer` | test planning, automated tests, coverage checks, E2E, performance, accessibility | stories, acceptance criteria, `feature-assembly-plan.md`, changed code, quality strategy | `{NEBULA_PRODUCT_ROOT}/engine/tests/**`, `{NEBULA_PRODUCT_ROOT}/experience/tests/**`, `{NEBULA_PRODUCT_ROOT}/neuron/tests/**`, feature `STATUS.md` | tier-specific test commands plus coverage artifacts; require evidence-backed pass decisions |
 | `devops` | Docker, compose, CI/CD, env wiring, deployment architecture, ops scripts | architecture docs, changed app code, deployment requirements | `Dockerfile`, `docker-compose*.yml`, `.github/workflows/**`, `scripts/**`, deployment docs, feature `STATUS.md` | repo-standard container, CI, and health-check commands |
-| `code-reviewer` | code quality review, acceptance criteria coverage, architecture/pattern compliance | changed code, feature folder, `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`, review action doc | feature `STATUS.md` and review findings artifacts | `python3 agents/code-reviewer/scripts/check-code-quality.py <path>`, `sh agents/code-reviewer/scripts/check-lint.sh`, `sh agents/code-reviewer/scripts/check-test-coverage.sh --min 80 --auto` as applicable |
-| `security` | threat modeling, auth/authz review, OWASP review, security findings | feature folder, architecture/security artifacts, changed code | `{PRODUCT_ROOT}/planning-mds/security/**`, feature `STATUS.md` | `python3 agents/security/scripts/security-audit.py {PRODUCT_ROOT}/planning-mds/security`, plus available scan wrappers in `agents/security/scripts/` |
+| `code-reviewer` | code quality review, acceptance criteria coverage, architecture/pattern compliance | changed code, feature folder, `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`, review action doc | feature `STATUS.md` and review findings artifacts | `python3 agents/code-reviewer/scripts/check-code-quality.py <path>`, `sh agents/code-reviewer/scripts/check-lint.sh`, `sh agents/code-reviewer/scripts/check-test-coverage.sh --min 80 --auto` as applicable |
+| `security` | threat modeling, auth/authz review, OWASP review, security findings | feature folder, architecture/security artifacts, changed code | `{NEBULA_PRODUCT_ROOT}/planning-mds/security/**`, feature `STATUS.md` | `python3 agents/security/scripts/security-audit.py {NEBULA_PRODUCT_ROOT}/planning-mds/security`, plus available scan wrappers in `agents/security/scripts/` |
 | `technical-writer` | API docs, runbooks, READMEs, developer guides, operator docs | implemented code, planning artifacts, architecture docs, existing docs | `docs/**`, `README.md` files, operator docs | validate commands/paths/links or mark them unverified |
 | `blogger` | devlogs, release notes, technical posts, retrospectives | completed work, ADRs, feature docs, evidence artifacts | `docs/blog/**` or `blog/**` | technical accuracy review, redaction review, audience/objective check |
 
@@ -289,17 +319,17 @@ Use these as starting lines in fresh sessions:
 ```text
 Switch to Product Manager agent mode (agents/product-manager/SKILL.md).
 
-Refine F{NNNN} <feature slug> workflow ({PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}).
+Refine F{NNNN} <feature slug> workflow ({NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}).
 
 The PRD currently has a high-level feature statement, scope, architecture hints,
 and traceability but zero user stories, no persona references, no screen specs,
 and no workflows. The feature is in Draft status.
 
 Read:
-- {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
-- {PRODUCT_ROOT}/planning-mds/COMMERCIAL-PC-CRM-RELEASE-PLAN.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/COMMERCIAL-PC-CRM-RELEASE-PLAN.md
 - the PRDs for F0006 dependency features
-- {PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/features/TRACKER-GOVERNANCE.md
 
 Deliverables:
 1. Refine the target feature PRD and sharpen scope boundaries.
@@ -313,8 +343,8 @@ Constraints:
 - Determine applicable rules and document them within the appropriate stories.
 
 When done:
-- run `python3 agents/product-manager/scripts/validate-stories.py {PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}`
-- run `python3 agents/product-manager/scripts/generate-story-index.py {PRODUCT_ROOT}/planning-mds/features/`
+- run `python3 agents/product-manager/scripts/validate-stories.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}`
+- run `python3 agents/product-manager/scripts/generate-story-index.py {NEBULA_PRODUCT_ROOT}/planning-mds/features/`
 - run `python3 agents/product-manager/scripts/validate-trackers.py`
 ```
 
@@ -324,15 +354,15 @@ When done:
 Switch to Architect agent mode (agents/architect/SKILL.md).
 
 Design the technical solution for F{NNNN} <feature slug> at
-{PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}.
+{NEBULA_PRODUCT_ROOT}/planning-mds/features/F{NNNN}-{slug}.
 
 The Product Manager has completed story breakdown. Read the full feature folder
 for PRD, stories, and acceptance criteria.
 
 Also read:
-- ontology files in `{PRODUCT_ROOT}/planning-mds/knowledge-graph/` first when the target feature has coverage
-- {PRODUCT_ROOT}/planning-mds/architecture/decisions/
-- {PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
+- ontology files in `{NEBULA_PRODUCT_ROOT}/planning-mds/knowledge-graph/` first when the target feature has coverage
+- {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/decisions/
+- {NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md
 - dependent feature PRDs
 
 Deliverables as applicable:
@@ -353,7 +383,7 @@ Constraints:
 
 When done:
 - update feature `STATUS.md`
-- run `python3 agents/architect/scripts/validate-architecture.py {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
+- run `python3 agents/architect/scripts/validate-architecture.py {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md`
 - run `python3 agents/architect/scripts/validate-api-contract.py <api-file>` for each changed contract
 - run `python3 agents/product-manager/scripts/validate-trackers.py` if planning trackers changed
 ```
@@ -363,17 +393,17 @@ When done:
 ```text
 Switch to Backend Developer agent mode (agents/backend-developer/SKILL.md).
 
-Implement the backend slice for <feature> in `{PRODUCT_ROOT}/engine/`.
+Implement the backend slice for <feature> in `{NEBULA_PRODUCT_ROOT}/engine/`.
 
 Read:
 - the full feature folder
-- `{PRODUCT_ROOT}/planning-mds/features/<feature>/feature-assembly-plan.md`
-- `{PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
-- relevant files in `{PRODUCT_ROOT}/planning-mds/api/` and `{PRODUCT_ROOT}/planning-mds/schemas/`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/features/<feature>/feature-assembly-plan.md`
+- `{NEBULA_PRODUCT_ROOT}/planning-mds/architecture/SOLUTION-PATTERNS.md`
+- relevant files in `{NEBULA_PRODUCT_ROOT}/planning-mds/api/` and `{NEBULA_PRODUCT_ROOT}/planning-mds/schemas/`
 
 Deliverables:
-1. Implement the planned `{PRODUCT_ROOT}/engine/` changes.
-2. Add or update backend tests in `{PRODUCT_ROOT}/engine/tests/`.
+1. Implement the planned `{NEBULA_PRODUCT_ROOT}/engine/` changes.
+2. Add or update backend tests in `{NEBULA_PRODUCT_ROOT}/engine/tests/`.
 3. Update feature `STATUS.md` and `GETTING-STARTED.md` with evidence and key paths.
 
 Constraints:
@@ -424,7 +454,7 @@ verdicts, validation, eligibility, waivers — lives in
 Roles producing feature-evidence artifacts write into the canonical feature run folder:
 
 ```text
-{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
+{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/
 ```
 
 | Role | Required artifact(s) at the canonical run folder | Verdict artifact |

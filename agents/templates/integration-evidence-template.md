@@ -1,7 +1,7 @@
 # Integration Evidence Run — Template
 
 Integration runs use the **base run** profile at
-`{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`
+`{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID}/`
 (`RUN_ID` = `integrate-YYYYMMDD-HHMMSS`, UTC) plus the integration-specific
 artifacts below. Runs are append-only: a re-run after a bounce, conflict
 resolution, or failed gate-2 validation is a **new** run that references the

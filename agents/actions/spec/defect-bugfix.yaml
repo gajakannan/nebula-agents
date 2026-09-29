@@ -29,10 +29,10 @@ inputs:
     - {name: AGENT_ROLES, format: "[architect, frontend-developer, ...] — add product-manager/backend-developer/quality-engineer/security only when relevant", default: "architect,frontend-developer"}
     - {name: FEATURE_REFS, format: "[F####, ...] read-only context refs; does NOT make this feature-scoped evidence"}
     - {name: ALLOW_FEATURE_PROPOSAL, enum: ["false", "true"], default: "false"}
-    - {name: PRODUCT_ROOT, default: sister-repo}
+    - {name: NEBULA_PRODUCT_ROOT, default: "environment; required if unset"}
 
 auto_resolved:
-  DEFECT_RUN_FOLDER: "{PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DEFECT_RUN_ID}"
+  DEFECT_RUN_FOLDER: "{NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{DEFECT_RUN_ID}"
   FEATURE_REF_PATHS: "feature paths resolved from REGISTRY.md only when FEATURE_REFS is set"
 
 context_load:
@@ -130,8 +130,7 @@ conflict_resolution:
 
 notes:
   session_setup: |
-    Echo the resolved absolute {PRODUCT_ROOT} and the generated {DEFECT_RUN_ID} on the first turn before any
-    command. Mint DEFECT_RUN_ID once in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
+    Echo the resolved absolute {NEBULA_PRODUCT_ROOT} and the generated {DEFECT_RUN_ID} after root binding, before product discovery or writes. Mint DEFECT_RUN_ID once in contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4)
     suffix); never uuid4, never regenerate, and pass the same id + {DEFECT_RUN_FOLDER} to every activated agent.
     Create {DEFECT_RUN_FOLDER} with the six §8 base run files and an artifacts/ folder (logs, screenshots, diffs,
     traces, test output).

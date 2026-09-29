@@ -400,7 +400,11 @@ class RunService:
             )
         except (OSError, UnicodeDecodeError) as exc:
             raise error(ErrorCode.PROMPT_NOT_FOUND, "Prompt contract cannot be read", "preflight", "Restore the committed prompt contract.") from exc
-        provider_argv = provider.build_interactive_argv(self._workspace, bind_prompt(prompt_text, request))
+        bound_prompt = (
+            f"NEBULA_PRODUCT_ROOT={json.dumps(str(self._workspace.resolve()))}\n\n"
+            + bind_prompt(prompt_text, request)
+        )
+        provider_argv = provider.build_interactive_argv(self._workspace, bound_prompt)
         executable = str(Path(provider_argv[0]).resolve(strict=True))
         if executable != provider_argv[0]:
             provider_argv = (executable, *provider_argv[1:])

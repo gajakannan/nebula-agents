@@ -3,15 +3,15 @@
 Tracker Validation Script
 
 Validates planning tracker consistency across:
-- {PRODUCT_ROOT}/planning-mds/features/REGISTRY.md
-- {PRODUCT_ROOT}/planning-mds/features/ROADMAP.md
-- {PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md
-- {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/features/REGISTRY.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/features/ROADMAP.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/features/STORY-INDEX.md
+- {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
 - feature STATUS closeout signoff governance for Done/Archived features
 
 Usage:
     python3 agents/product-manager/scripts/validate-trackers.py
-    python3 agents/product-manager/scripts/validate-trackers.py --features-dir {PRODUCT_ROOT}/planning-mds/features --blueprint {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+    python3 agents/product-manager/scripts/validate-trackers.py --features-dir {NEBULA_PRODUCT_ROOT}/planning-mds/features --blueprint {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
     python3 agents/product-manager/scripts/validate-trackers.py --feature F0038 --run-id 2026-06-30-dbc93ab5
     python3 agents/product-manager/scripts/validate-trackers.py --all-feature-evidence
 """
@@ -218,8 +218,8 @@ class TrackerValidator:
         if not cleaned or cleaned.upper() == "TBD":
             return None
 
-        if cleaned.startswith("{PRODUCT_ROOT}/planning-mds/features/"):
-            rel = cleaned[len("{PRODUCT_ROOT}/planning-mds/features/") :]
+        if cleaned.startswith("{NEBULA_PRODUCT_ROOT}/planning-mds/features/"):
+            rel = cleaned[len("{NEBULA_PRODUCT_ROOT}/planning-mds/features/") :]
             return self.features_dir / rel
         if cleaned.startswith("./"):
             return self.features_dir / cleaned[2:]
@@ -435,7 +435,7 @@ class TrackerValidator:
                         str(status_file),
                         (
                             f"Story provenance PASS row for {story_id} role '{role}' references "
-                            "agents/ in evidence; use solution artifacts ({PRODUCT_ROOT}/planning-mds/, code, tests, CI outputs)"
+                            "agents/ in evidence; use solution artifacts ({NEBULA_PRODUCT_ROOT}/planning-mds/, code, tests, CI outputs)"
                         ),
                     )
                     continue
@@ -841,12 +841,12 @@ def main() -> int:
     parser.add_argument(
         "--features-dir",
         default=None,
-        help="Path to planning feature directory (default: {PRODUCT_ROOT}/planning-mds/features)",
+        help="Path to planning feature directory (default: {NEBULA_PRODUCT_ROOT}/planning-mds/features)",
     )
     parser.add_argument(
         "--blueprint",
         default=None,
-        help="Path to blueprint file (default: {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md)",
+        help="Path to blueprint file (default: {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md)",
     )
     parser.add_argument(
         "--feature",

@@ -5,13 +5,13 @@ Generic validation scripts.
 ## validate-architecture.py
 
 ```bash
-python3 agents/architect/scripts/validate-architecture.py {PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
+python3 agents/architect/scripts/validate-architecture.py {NEBULA_PRODUCT_ROOT}/planning-mds/BLUEPRINT.md
 ```
 
 ## validate-api-contract.py
 
 ```bash
-python3 agents/architect/scripts/validate-api-contract.py {PRODUCT_ROOT}/planning-mds/api/example-api.yaml
+python3 agents/architect/scripts/validate-api-contract.py {NEBULA_PRODUCT_ROOT}/planning-mds/api/example-api.yaml
 ```
 
 Validation scope includes:

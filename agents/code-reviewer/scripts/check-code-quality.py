@@ -11,7 +11,7 @@ Usage:
     python check-code-quality.py [path] [--max-line 120] [--max-file-kb 500] [--todo-limit 0]
     python check-code-quality.py --product-root ../my-product
 
-If no path is supplied the script scans {PRODUCT_ROOT}.
+If no path is supplied the script scans {NEBULA_PRODUCT_ROOT}.
 """
 
 import argparse
@@ -69,7 +69,7 @@ def iter_files(root: Path):
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run lightweight code quality checks.")
     add_product_root_arg(parser)
-    parser.add_argument("path", nargs="?", default=None, help="Root path to scan (default: {PRODUCT_ROOT})")
+    parser.add_argument("path", nargs="?", default=None, help="Root path to scan (default: {NEBULA_PRODUCT_ROOT})")
     parser.add_argument("--max-line", type=int, default=120, help="Maximum line length")
     parser.add_argument("--max-file-kb", type=int, default=500, help="Max file size in KB")
     parser.add_argument("--todo-limit", type=int, default=0, help="Allowed TODO/FIXME count")

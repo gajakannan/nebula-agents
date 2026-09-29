@@ -1,6 +1,6 @@
 version: 1
 # Framework-local lifecycle for nebula-agents itself.
-# Distinct from any downstream product's {PRODUCT_ROOT}/lifecycle-stage.yaml.
+# Distinct from any downstream product's {NEBULA_PRODUCT_ROOT}/lifecycle-stage.yaml.
 # Consumed only by nebula-agents local validation and CI.
 current_stage: framework-bootstrap
 release_posture:

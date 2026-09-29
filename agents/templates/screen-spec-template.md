@@ -6,7 +6,7 @@ applies_to: product-manager
 
 # Screen Specification Template
 
-Use this template to describe UI screens in a domain-neutral way. Project-specific screens live in `{PRODUCT_ROOT}/planning-mds/screens/`.
+Use this template to describe UI screens in a domain-neutral way. Project-specific screens live in `{NEBULA_PRODUCT_ROOT}/planning-mds/screens/`.
 
 ## Screen Header
 
@@ -93,4 +93,4 @@ Add footnotes below the diagram for any non-obvious interaction (e.g. sticky hea
 
 ## Example Library
 
-See `{PRODUCT_ROOT}/planning-mds/examples/screens/` for project-specific screen examples.
+See `{NEBULA_PRODUCT_ROOT}/planning-mds/examples/screens/` for project-specific screen examples.

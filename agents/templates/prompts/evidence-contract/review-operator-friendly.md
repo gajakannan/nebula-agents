@@ -4,6 +4,8 @@
 
 This prompt encodes the **Feature Evidence Contract** (scope `base-run-only`, policy `2026-07-11`).
 
+Before setup, discovery, or resume, bind the product root once. NEBULA_PRODUCT_ROOT is the canonical input in both a pasted prompt and the shell environment. An explicit operator value wins over the environment; stop for clarification if explicit selections disagree. Use only NEBULA_PRODUCT_ROOT for the input and all root placeholders. A value supplied in this prompt is valid even when the shell environment is empty; pass it explicitly to the resolver. Resolve relative paths (including ../) against the session's starting directory, normally nebula-agents, before changing directories: run `python3 agents/scripts/_product_root.py --product-root "<supplied path>"` from that directory, or omit the flag to read the environment. Replace the input value with the returned absolute NEBULA_PRODUCT_ROOT and echo it with its source. Pass that same absolute path as --product-root to every product-aware script, including init-run.py and resume-brief.py, and include it in every agent handoff. Do not rely on an export persisting between shell calls. On resume, reuse the recorded absolute root and reject a conflicting selection. If no value is supplied, ask for the product path; never infer it from a feature ID, scan siblings to choose a product, or default to a particular repository.
+
 Required inputs:
 - `MODE` — one of `feature-scoped` | `standalone`
 
@@ -13,22 +15,22 @@ Optional inputs (defaults apply when omitted):
 - `PATHS` — required when SCOPE=path-set (auto from PR_URL)
 - `FEATURE_ID` — required when MODE=feature-scoped (from PR_URL when set)
 - `RUN_ID` — required when MODE=feature-scoped — the parent feature run ID
-- `PRODUCT_ROOT` — default `sister-repo`
+- `NEBULA_PRODUCT_ROOT` — default `environment; required if unset`
 
 Auto-resolved (do not set; SESSION_SETUP / the orchestrator compute these):
-- `FEATURE_PATH` — {PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)
+- `FEATURE_PATH` — {NEBULA_PRODUCT_ROOT}/planning-mds/features/{FEATURE_ID}-{FEATURE_SLUG} (feature-scoped only)
 - `FEATURE_SLUG` — kebab-case slug for {FEATURE_ID} from REGISTRY.md (feature-scoped only)
-- `OUTPUT_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist, created by feature.md at G0)
-- `REVIEW_RUN_FOLDER` — {PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{REVIEW_RUN_ID} (standalone only)
+- `OUTPUT_FOLDER` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{RUN_ID} (feature-scoped only; MUST already exist, created by feature.md at G0)
+- `REVIEW_RUN_FOLDER` — {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/{REVIEW_RUN_ID} (standalone only)
 
 Generate `REVIEW_RUN_ID` once per run — not per session — in the contract format `YYYY-MM-DD-[a-z0-9]{8}` using `python3 -c import secrets; print(secrets.token_hex(4))`. Do not use: uuid4.
 
-Resuming an in-flight run in a new session: do NOT generate a new `REVIEW_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --run-id <REVIEW_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
+Resuming an in-flight run in a new session: do NOT generate a new `REVIEW_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <REVIEW_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT}` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
-First resolve PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {PRODUCT_ROOT} --action review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
+First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action review` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
 1. `agents/ROUTER.md`
 2. `agents/agent-map.yaml`
 3. `agents/docs/AGENT-USE.md`
@@ -58,7 +60,7 @@ RECOMMENDATIONS (APPROVED family for change-set review, PASS family for codebase
 code-reviewer/SKILL.md); blocking verdicts are REQUEST CHANGES or REJECTED. security-review-report.md
 Result is PASS, PASS WITH RECOMMENDATIONS, or FAIL.
 - **R3 — Stage validation (feature-scoped only)** (role: code-reviewer; artifacts: none)
-    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G3` (cwd: framework, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID} --stage G3` (cwd: framework, timeout: 300s)
     - judgment: Run the op above ONLY in feature-scoped mode (it validates the parent feature run's G3 evidence).
 In standalone mode there is no feature scope: confirm the six §8 base run files are complete and apply
 no feature-stage validation.
@@ -104,7 +106,7 @@ Note (pr_target): PR_URL is the usual target. `gh pr checkout <PR#>`, then
 files[].path, DIFF_RANGE=origin/<baseRefName>..<headRefName>, and (feature-scoped) FEATURE_ID from the
 F#### token in the title or headRefName. Explicit inputs always override values derived from PR_URL.
 
-Note (session_setup): Echo the resolved absolute {PRODUCT_ROOT} on the first turn before any command. Generate any run ID in
+Note (session_setup): Echo the resolved absolute {NEBULA_PRODUCT_ROOT} after root binding, before product discovery or writes. Generate any run ID in
 contract format (an ISO YYYY-MM-DD date plus a secrets.token_hex(4) suffix); never uuid4, never
 regenerate after start. feature-scoped: no run-folder creation. standalone: mkdir REVIEW_RUN_FOLDER and
 initialize the six §8 base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md,
