@@ -96,6 +96,25 @@ One decision remains open.
    check for an Active non-terminal feature, so a gate's own validator exits 0 having
    checked nothing mid-flight. Forcing it by hand caught real failures at **seven of the
    nine gates**. That is a finding about the gate model, not a bug report.
+
+   **A second governed run adds more input (2026-09-28).** nebula-insurance-brain F0002 ran
+   G0–G8 through `run-gate.py` (run `2026-09-27-bb7c8d1d`, archived). Its framework findings
+   are recorded in that run's `gate-decisions.md` ("G8 process notes"), `pm-closeout.md`
+   ("Framework Findings", "Deferred Follow-ups") and `README.md` ("Open Follow-ups"):
+   - **run-gate has no re-attest path.** Editing an attested checkpoint output (`pm-closeout.md`)
+     trips `checkpoint_output_changed` permanently; `--force` keeps attestations. The final G8
+     validators had to run outside the driver, leaving the G8 journal `failed`.
+   - **Verdict-set mismatch.** `validate-trackers` accepts only `PASS`/`APPROVED` story
+     provenance; `validate-feature-evidence` accepts `PASS WITH RECOMMENDATIONS` with PM
+     acceptance. Worked around with appended closeout PASS rows.
+   - **Recommendation acceptances must quote the exact recommendation text** (or use
+     `F####-S####-role`), which is undocumented; `- [x]` and severity-tagged "fixed" bullets are
+     parsed as open recommendations; artifact-path capture swallows trailing commas.
+   - **Repeats of F0003 findings:** `feature.yaml` names `g2-deployability-check.md` but the
+     validator wants `deployability-check.md`; required-role enforcement reads only a STATUS
+     heading titled exactly `Required Role Matrix` and is silently off otherwise.
+   - **Other:** setting `security_sensitive_scope` at G1 demands all four scan classes before
+     any code exists; `resume-brief.py` reported "all gates complete" after G4.
 2. **Five role signoffs** — Architect, Quality Engineer, Code Reviewer, DevOps, Security Reviewer; every row in *Story Signoff Provenance* is still `TBD`.
 3. **Semantic-equivalence review of the generated prompts** (S0006) — the cutover shipped; role-owner acceptance that generated output preserves the accepted semantics has not been recorded.
 4. **Private-constant removal decision** (S0007/S0008) — see *Open Decisions*.
