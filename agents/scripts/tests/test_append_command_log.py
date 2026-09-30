@@ -105,8 +105,8 @@ class AppendCommandLogTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw_tmp:
             product_root, framework_root = product_tree(Path(raw_tmp))
             cases = {
-                "product": "{PRODUCT_ROOT}",
-                "product/engine": "{PRODUCT_ROOT}/engine",
+                "product": "{NEBULA_PRODUCT_ROOT}",
+                "product/engine": "{NEBULA_PRODUCT_ROOT}/engine",
                 "framework": "nebula-agents",
                 "framework/agents/scripts": "nebula-agents/agents/scripts",
             }

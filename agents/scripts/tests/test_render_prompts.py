@@ -219,7 +219,7 @@ def _session_line(spec):
 def test_feature_bound_session_setup_initializes_manifest():
     line = _session_line(mk_spec())
     assert "initialize `evidence-manifest.json`" in line
-    assert "init-run.py --action t --feature {FEATURE_ID}" in line
+    assert "init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action t --feature {FEATURE_ID}" in line
 
 
 def test_base_run_session_setup_creates_no_manifest():
@@ -228,7 +228,7 @@ def test_base_run_session_setup_creates_no_manifest():
     line = _session_line(spec)
     assert "creates no `evidence-manifest.json`" in line
     assert "initialize `evidence-manifest.json`" not in line
-    assert "init-run.py --action t [--feature {FEATURE_ID}]" in line
+    assert "init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action t [--feature {FEATURE_ID}]" in line
 
 
 def test_integrate_scheme_session_setup_does_not_use_init_run():
@@ -244,7 +244,7 @@ def test_committed_validate_prompt_matches_its_contract():
     text = (REPO_ROOT / "agents" / "templates" / "prompts" / "evidence-contract"
             / "validate-operator-friendly.md").read_text()
     assert "initialize `evidence-manifest.json`" not in text
-    assert "init-run.py --action validate [--feature {FEATURE_ID}]" in text
+    assert "init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action validate [--feature {FEATURE_ID}]" in text
 
 
 def test_conditionally_required_inputs_render_under_required():
