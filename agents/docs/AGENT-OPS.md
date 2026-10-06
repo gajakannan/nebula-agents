@@ -419,6 +419,22 @@ the `latest-run.json` schema above, minus `feature_id`; UX audits match
 | `signoff_ledger_disagrees_fails` | ledger summarizes stale rows | recompute from the latest `STATUS.md` rows |
 | `two_approved_runs_without_supersession_fails` | closeout didn't patch prior manifest | run `patch-prior-manifest.py`, then re-validate |
 | `blocking_language_with_pass_fails` | high/critical recommendation not mitigated | add a PM Acceptance Line with `mitigation:` or downgrade the verdict |
+| `checkpoint_output_changed` | evidence changed after a manual checkpoint was attested | re-verify the checkpoint and use the audited re-attestation procedure below; do not edit `gate-state.json` |
+
+### Recovering a stale checkpoint attestation
+
+When a manual checkpoint's evidence must be corrected after attestation, keep the
+original journal entry and append a superseding record with
+`run-gate.py --reattest-checkpoint <checkpoint-id>`. This operation requires an
+incomplete stage (`failed` or `pending-checkpoint`), an existing attestation,
+the same evidence path set, and explicit `--actor`, `--role`, and `--note`
+values. The new record stores the previous timestamp and hashes under
+`supersedes`; the prior attestation remains in the journal.
+
+After re-attestation, resume the stage normally without `--force`. The runner
+reuses completed operations and re-runs the remaining gate checks. Do not hand
+edit `gate-state.json`, remove the earlier attestation, or use `--force` as a
+checkpoint repair; `--force` replays the stage's operations.
 
 On conflict, **raw artifacts win** (code, `STATUS.md`, trackers, ADRs).
 Fix the source first, then the evidence record in the same change set.

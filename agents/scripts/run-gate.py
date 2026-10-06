@@ -148,7 +148,9 @@ def is_artifact_ref(token: str) -> bool:
 
 
 def _find_attestation(stage_state: dict[str, Any], checkpoint_id: str) -> dict[str, Any] | None:
-    for att in stage_state.get("attestations", []):
+    # Re-attestations append a superseding record so the original verification
+    # remains in the audit trail. The newest record is the operative one.
+    for att in reversed(stage_state.get("attestations", [])):
         if att.get("checkpoint_id") == checkpoint_id:
             return att
     return None
@@ -285,6 +287,90 @@ def attest_checkpoint(*, spec_dir: Path, action: str, stage: str, product_root: 
         stage_state["pending_checkpoint"] = None
         _atomic_write_json(run_folder / JOURNAL_NAME, journal)
         return {"ok": True, "stage": stage, "attested": checkpoint_id, "evidence": recorded}
+    finally:
+        release_lock(lock)
+
+
+def reattest_checkpoint(*, spec_dir: Path, action: str, stage: str, product_root: Path,
+                        run_id: str, run_folder: Path, checkpoint_id: str,
+                        evidence: list[str], actor: str, role: str, note: str,
+                        lock_timeout: float = DEFAULT_LOCK_TIMEOUT) -> dict[str, Any]:
+    """Append a superseding attestation after checkpoint evidence was corrected.
+
+    The checkpoint and evidence path set stay fixed. This is only available while
+    the stage is incomplete, and records the prior attestation inline rather than
+    rewriting the existing audit entry.
+    """
+    policy, spec = _load_spec(spec_dir, action)
+    gate = _find_gate(spec, stage)
+    declared = any(
+        op_kind(op)[0] == "checkpoint" and op_kind(op)[1].get("id") == checkpoint_id
+        for op in (gate.get("operations", []) or [])
+    )
+    if not declared:
+        raise GateDriverError("unknown_checkpoint",
+                              f"checkpoint {checkpoint_id!r} is not declared in {stage}")
+    if not actor.strip() or not role.strip() or not note.strip():
+        raise GateDriverError("missing_reattestation_audit_fields",
+                              "re-attestation requires --actor, --role, and a non-empty --note")
+
+    contract_version = str(policy.contract.get("active_version"))
+    lock = run_folder / LOCK_NAME
+    acquire_lock(lock, lock_timeout)
+    try:
+        journal = load_journal(run_folder, run_id=run_id, action=action,
+                              contract_version=contract_version)
+        stage_state = _stage_state(journal, stage)
+        if stage_state.get("status") not in {"failed", "pending-checkpoint"}:
+            raise GateDriverError(
+                "stage_not_recoverable",
+                f"{stage} must be failed or paused at a checkpoint before re-attestation",
+            )
+        previous = _find_attestation(stage_state, checkpoint_id)
+        if previous is None:
+            raise GateDriverError("missing_checkpoint_attestation",
+                                  f"checkpoint {checkpoint_id!r} has no prior attestation to supersede")
+
+        prior_evidence = previous.get("evidence", [])
+        prior_paths = [str(item["path"]) for item in prior_evidence]
+        requested_paths = list(dict.fromkeys(evidence or prior_paths))
+        if (not prior_paths or len(prior_paths) != len(set(prior_paths))
+                or set(requested_paths) != set(prior_paths)
+                or len(requested_paths) != len(prior_paths)):
+            raise GateDriverError(
+                "checkpoint_evidence_scope_changed",
+                "re-attestation must name exactly the artifact paths in the prior attestation",
+            )
+
+        recorded = []
+        for rel in prior_paths:
+            path = _resolve_evidence(run_folder, rel)
+            if not path.exists():
+                raise GateDriverError("checkpoint_output_missing", f"checkpoint output missing: {rel}")
+            recorded.append({"path": rel, "sha256": sha256_file(path)})
+        old_hashes = {item["path"]: item["sha256"] for item in prior_evidence}
+        new_hashes = {item["path"]: item["sha256"] for item in recorded}
+        if old_hashes == new_hashes:
+            raise GateDriverError("checkpoint_attestation_unchanged",
+                                  "current checkpoint evidence matches the latest attestation")
+
+        attestation = {
+            "checkpoint_id": checkpoint_id,
+            "actor": actor,
+            "role": role,
+            "timestamp": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "evidence": recorded,
+            "note": note,
+            "acknowledged_preconditions": list(previous.get("acknowledged_preconditions", [])),
+            "supersedes": {
+                "timestamp": previous.get("timestamp"),
+                "evidence": prior_evidence,
+            },
+        }
+        stage_state.setdefault("attestations", []).append(attestation)
+        _atomic_write_json(run_folder / JOURNAL_NAME, journal)
+        return {"ok": True, "stage": stage, "reattested": checkpoint_id,
+                "supersedes": attestation["supersedes"], "evidence": recorded}
     finally:
         release_lock(lock)
 
@@ -545,7 +631,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--from", dest="from_op", help="Resume from an operation id (cannot skip an unattested checkpoint).")
     parser.add_argument("--force", action="store_true", help="Re-run a completed stage (non-idempotent replay).")
     parser.add_argument("--list", action="store_true")
-    parser.add_argument("--attest-checkpoint", dest="attest")
+    checkpoint_group = parser.add_mutually_exclusive_group()
+    checkpoint_group.add_argument("--attest-checkpoint", dest="attest")
+    checkpoint_group.add_argument("--reattest-checkpoint", dest="reattest",
+                                  help="Append an audited replacement for a stale attestation on an incomplete stage.")
     parser.add_argument("--evidence", action="append", default=[])
     parser.add_argument("--actor", default="")
     parser.add_argument("--role", default="")
@@ -578,6 +667,14 @@ def main(argv: list[str] | None = None) -> int:
                 spec_dir=args.spec_dir, action=args.action, stage=args.stage,
                 product_root=product_root, run_id=args.run_id, run_folder=run_folder,
                 checkpoint_id=args.attest, evidence=args.evidence, actor=args.actor,
+                role=args.role, note=args.note)
+            print(json.dumps(record, indent=2, sort_keys=True))
+            return 0
+        if args.reattest:
+            record = reattest_checkpoint(
+                spec_dir=args.spec_dir, action=args.action, stage=args.stage,
+                product_root=product_root, run_id=args.run_id, run_folder=run_folder,
+                checkpoint_id=args.reattest, evidence=args.evidence, actor=args.actor,
                 role=args.role, note=args.note)
             print(json.dumps(record, indent=2, sort_keys=True))
             return 0
