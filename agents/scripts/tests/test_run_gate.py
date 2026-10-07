@@ -114,6 +114,44 @@ def test_tampered_checkpoint_evidence_rejected(env):
     assert exc.value.code == "checkpoint_output_changed"
 
 
+def test_reattest_checkpoint_supersedes_changed_evidence_and_resumes(env):
+    product, rf = env
+    run(product, rf, "G2")
+    (rf / "note.md").write_text("initially reviewed")
+    rg.attest_checkpoint(spec_dir=DRIVER_SPEC, action="drive", stage="G2", product_root=product,
+                         run_id=RUN_ID, run_folder=rf, checkpoint_id="cp-review", evidence=[],
+                         actor="pat", role="product-manager", note="Initial review")
+    (rf / "note.md").write_text("corrected review evidence")
+
+    with pytest.raises(rg.GateDriverError) as exc:
+        run(product, rf, "G2")
+    assert exc.value.code == "checkpoint_output_changed"
+
+    refreshed = rg.reattest_checkpoint(
+        spec_dir=DRIVER_SPEC, action="drive", stage="G2", product_root=product,
+        run_id=RUN_ID, run_folder=rf, checkpoint_id="cp-review", evidence=["note.md"],
+        actor="pat", role="product-manager", note="Reverified corrected review evidence",
+    )
+    attestations = journal(rf)["stages"]["G2"]["attestations"]
+    assert refreshed["ok"] and len(attestations) == 2
+    assert attestations[1]["supersedes"]["timestamp"] == attestations[0]["timestamp"]
+    assert attestations[1]["evidence"][0]["sha256"] != attestations[0]["evidence"][0]["sha256"]
+    assert run(product, rf, "G2")["status"] == "pass"
+
+
+def test_reattest_requires_an_existing_attestation(env):
+    product, rf = env
+    run(product, rf, "G2")
+    (rf / "note.md").write_text("reviewed")
+    with pytest.raises(rg.GateDriverError) as exc:
+        rg.reattest_checkpoint(
+            spec_dir=DRIVER_SPEC, action="drive", stage="G2", product_root=product,
+            run_id=RUN_ID, run_folder=rf, checkpoint_id="cp-review", evidence=["note.md"],
+            actor="pat", role="product-manager", note="Must have existing record",
+        )
+    assert exc.value.code == "missing_checkpoint_attestation"
+
+
 def test_attest_missing_output_rejected(env):
     product, rf = env
     run(product, rf, "G2")                                # note.md not created
