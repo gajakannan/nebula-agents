@@ -102,6 +102,7 @@ projection trio + tracker regions — never hand-edit knowledge-graph/*.yaml. CO
     - run `python3 agents/scripts/capture-run-telemetry.py --product-root {NEBULA_PRODUCT_ROOT} --run-id {RUN_ID}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - judgment: MUST switch role (read agents/product-manager/SKILL.md). Manifest status becomes `approved` only
 here, when latest-run.json is written — and only after patch-prior-manifest.py exits 0. Run
 --write-coverage-report ONLY after the archive move (path-sensitive). Finalize the manifest
@@ -109,6 +110,10 @@ here, when latest-run.json is written — and only after patch-prior-manifest.py
 capture-run-telemetry.py records token cost from the agent CLI's session transcript into
 token-usage.json and mirrors headline totals into manifest.token_usage — advisory evidence
 only; a missing transcript records nothing and never blocks closeout.
+kg-validate-closeout runs the plain validate.py last: it is the product CI's knowledge_graph_sync gate
+and the only check of coverage-report.yaml freshness (--check-drift does not check it). Make every
+tracker/STATUS edit at the archive-move checkpoint; any planning edit after G8 completes needs
+--write-coverage-report and the plain validate.py again before committing.
 
 Severity gate profile: `standard` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

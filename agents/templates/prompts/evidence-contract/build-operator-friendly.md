@@ -86,12 +86,15 @@ STATUS/REGISTRY/ROADMAP/BLUEPRINT + KG mappings; move the feature folder to arch
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - judgment: Update {BUILD_RUN_FOLDER}/README.md, action-context.md, artifact-trace.md, and gate-decisions.md
 with the build-level summary; gate-decisions.md carries one row per feature pointing to that
 feature's pm-closeout.md. Then run the exit validation sweep IN ORDER, all exit 0: per-feature
 closeout validation for each FEATURE_ID (the first op's per-feature form), then the build-once
 tracker / story-index / KG symbols+decisions / coverage / drift / templates checks. --write-coverage-report
 is path-sensitive and safe here because every feature's archive move already completed at B4.
+b5-kg-validate runs the plain validate.py last (the product CI's knowledge_graph_sync gate and the only
+coverage-freshness check).
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

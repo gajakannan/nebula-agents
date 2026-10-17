@@ -61,7 +61,7 @@ MSG
   echo "pre-commit: KG reproducibility OK."
 fi
 
-# 2. Integrity and coverage freshness: every commit (about a second), because any planning
+# 2. Integrity and coverage freshness: every commit (a few seconds), because any planning
 #    doc or bound code path can stale coverage-report.yaml.
 if ! output="$(python3 scripts/kg/validate.py 2>&1)"; then
   printf '%s\n' "$output" | sed -n '/^Errors:/,$p' >&2

@@ -97,10 +97,25 @@ gates:
   - id: D5
     title: Review and closeout
     role: architect
+    operations:
+      - run:
+          id: d5-kg-write-coverage
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
+          cwd: product
+          timeout_seconds: 300
+          mutates: [kg-projection]
+      - run:
+          id: d5-kg-validate
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
+          cwd: product
+          timeout_seconds: 300
     judgment: |
       Each activated role writes its report; README.md summarizes root cause / fix / validation / open
       follow-ups; gate-decisions.md records the final defect-run verdict. Close when the bug is fixed and
       validated, explicitly not reproducible with evidence, or intentionally escalated.
+      A fix to bound code or mapped planning docs changes coverage-report.yaml source hashes, so after the
+      last edit rewrite the report and run the plain validate.py (the product CI's knowledge_graph_sync gate).
+      Regenerate symbols/decisions first (validate.py --regenerate-symbols --check-symbols) when bound code changed.
 
 severity_gate: none
 

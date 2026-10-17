@@ -165,13 +165,13 @@ gates:
           timeout_seconds: 300
           mutates: [kg-projection]
       - run:
-          id: kg-validate-post-approval
-          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
+          id: kg-check-reproducible-post-approval
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-reproducible]
           cwd: product
           timeout_seconds: 300
       - run:
-          id: kg-check-reproducible-post-approval
-          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --check-reproducible]
+          id: kg-validate-post-approval
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
           cwd: product
           timeout_seconds: 300
       - run:
@@ -184,7 +184,7 @@ gates:
       Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
       After the operator's approval token: record it in gate-decisions.md, make every approval-status
       edit to planning artifacts, attest the checkpoint, then re-run G5. The post-approval operations
-      recompile, rewrite coverage-report.yaml and run the plain validate.py (the product CI's
+      recompile, rewrite coverage-report.yaml and finish KG checks with the plain validate.py (the product CI's
       knowledge_graph_sync gate; --check-drift and --check-reproducible do not check coverage
       freshness). Make no planning edit after that re-run. If one is unavoidable, run compile.py,
       validate.py --write-coverage-report and the plain validate.py again before committing (the

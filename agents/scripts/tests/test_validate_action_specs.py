@@ -78,6 +78,32 @@ def test_plan_g5_refreshes_kg_after_phase_b_approval():
     assert after.index(["--write-coverage-report"]) < after.index([])
 
 
+# Actions that edit product planning docs or bound code must end with a fresh coverage report
+# and the plain validate.py (the product CI's knowledge_graph_sync gate).
+PRODUCT_MUTATING_ACTIONS = ("plan", "feature", "build", "init", "defect-bugfix", "document")
+
+
+def _kg_validate_ops(action: str) -> list[list[str]]:
+    spec = yaml.safe_load((REAL_SPEC_DIR / f"{action}.yaml").read_text(encoding="utf-8"))
+    found = []
+    for gate in spec["gates"]:
+        for op in gate.get("operations") or []:
+            kind, body = next(iter(op.items()))
+            argv = [str(x) for x in body.get("argv", [])] if kind == "run" else []
+            if len(argv) > 1 and argv[1].endswith("scripts/kg/validate.py"):
+                found.append(argv[2:])
+    return found
+
+
+@pytest.mark.parametrize("action", PRODUCT_MUTATING_ACTIONS)
+def test_product_mutating_actions_finish_with_fresh_coverage(action):
+    ops = _kg_validate_ops(action)
+    assert ["--write-coverage-report"] in ops, f"{action} never writes coverage-report.yaml"
+    last_write = max(i for i, args in enumerate(ops) if args == ["--write-coverage-report"])
+    assert [] in ops[last_write + 1:], f"{action} has no plain validate.py after its last coverage write"
+    assert ops[-1] == [], f"{action}'s last validate.py call is {ops[-1]}, not the plain check"
+
+
 def test_fixture_policy_validates(tmp_path):
     result = validate(make_policy(tmp_path))
     assert result.ok, [f.as_dict() for f in result.sorted_findings()]

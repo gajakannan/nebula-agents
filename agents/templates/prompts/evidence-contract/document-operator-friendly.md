@@ -52,9 +52,13 @@ doc would mislead users.
 - **D3 — Approval gate** (role: technical-writer; artifacts: none)
     - MANUAL checkpoint `doc-approval`: The user reviews the documentation and approves or requests changes. (requires: the TARGETS drafted at D1; produces: doc approval recorded in gate-decisions.md)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - judgment: After approval, run validate_templates.py (exit 0). Run `{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
 ONLY when KG references changed. DO NOT call validate-feature-evidence.py — there is no feature evidence
-package for this run.
+package for this run. Edited TARGETS that are mapped source docs change coverage-report.yaml hashes, so
+d3-kg-write-coverage rewrites the report after approval and d3-kg-validate runs the plain validate.py
+(the product CI's knowledge_graph_sync gate).
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

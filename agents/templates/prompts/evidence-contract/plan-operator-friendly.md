@@ -71,13 +71,13 @@ must exit 0. Only the Architect edits the kg-source shards feeding canonical-nod
     - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. Make any approval-status edits to planning artifacts (STATUS/README/PRD/assembly plan/ADR/kg-source shard), attest, then re-run G5 so the post-approval operations refresh the KG. (requires: gate-decisions.md; produces: phase-b-approved)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
-    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
     - judgment: Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
 After the operator's approval token: record it in gate-decisions.md, make every approval-status
 edit to planning artifacts, attest the checkpoint, then re-run G5. The post-approval operations
-recompile, rewrite coverage-report.yaml and run the plain validate.py (the product CI's
+recompile, rewrite coverage-report.yaml and finish KG checks with the plain validate.py (the product CI's
 knowledge_graph_sync gate; --check-drift and --check-reproducible do not check coverage
 freshness). Make no planning edit after that re-run. If one is unavoidable, run compile.py,
 validate.py --write-coverage-report and the plain validate.py again before committing (the

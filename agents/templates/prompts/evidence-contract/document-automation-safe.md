@@ -30,6 +30,8 @@ GATES:
 - D3 role=technical-writer artifacts=[]
     - MANUAL checkpoint `doc-approval`: The user reviews the documentation and approves or requests changes. (requires: the TARGETS drafted at D1; produces: doc approval recorded in gate-decisions.md)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
 OWNERSHIP:

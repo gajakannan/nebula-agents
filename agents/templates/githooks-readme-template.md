@@ -21,7 +21,7 @@ the regenerated files you intend to commit.
    `scripts/kg/compile.py` and must **never be hand-edited**. To fix: edit the shards, run
    `python3 scripts/kg/compile.py` (+ `validate.py --write-coverage-report`, + the framework
    `generate-story-index.py`), and re-stage.
-2. **`knowledge_graph_sync`** — the plain `scripts/kg/validate.py`, on every commit (about a second).
+2. **`knowledge_graph_sync`** — the plain `scripts/kg/validate.py`, on every commit (a few seconds; the same check CI runs).
    `coverage-report.yaml` stores a hash of each mapped feature folder, source doc and bound code path, so
    editing any of them after the last `--write-coverage-report` makes it stale. `--check-drift` and
    `--check-reproducible` do not catch this. To fix: `python3 scripts/kg/validate.py --write-coverage-report`
