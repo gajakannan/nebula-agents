@@ -604,6 +604,7 @@ touched planning scope:
 4. **Handle user response:**
    - **If "approve":**
      - Log approval with timestamp
+     - Make any approval-status edits (STATUS, README, PRD, assembly plan, ADR, kg-source shard), attest `approve-phase-b`, then re-run G5. Its post-approval operations recompile the KG, rewrite `coverage-report.yaml` and run the plain `validate.py`, because the approval edits change coverage source hashes.
      - Proceed to Step 5 (Plan Complete)
 
    - **If "reject" or "request changes":**

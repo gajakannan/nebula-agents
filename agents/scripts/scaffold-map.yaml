@@ -22,6 +22,7 @@ directories:
   - planning-mds/security
   - planning-mds/operations/evidence
   - .github/workflows
+  - .githooks
 
 files:
   - template: lifecycle-stage-template.yaml
@@ -39,3 +40,10 @@ files:
   - template: solution-patterns-template.md
     destination: planning-mds/architecture/SOLUTION-PATTERNS.md
     required: true
+  - template: githooks-pre-commit-template.sh
+    destination: .githooks/pre-commit
+    required: false
+    executable: true
+  - template: githooks-readme-template.md
+    destination: .githooks/README.md
+    required: false

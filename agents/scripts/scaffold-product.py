@@ -92,6 +92,8 @@ def scaffold_write(product_root: Path, scaffold: dict[str, Any]) -> dict[str, An
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(template, dest)
+            if entry.get("executable"):
+                dest.chmod(dest.stat().st_mode | 0o111)
             created_files.append(dest_rel)
     except Exception as exc:  # roll back only what this run created
         for rel in created_files:

@@ -62,6 +62,22 @@ def test_real_policy_validates():
     assert result.ok, [f.as_dict() for f in result.sorted_findings()]
 
 
+def test_plan_g5_refreshes_kg_after_phase_b_approval():
+    """Approval-status edits land after the pre-approval coverage write, so G5 must
+    rewrite coverage and run the plain validate.py (coverage freshness) after the
+    checkpoint. --check-drift/--check-reproducible do not check freshness."""
+    spec = yaml.safe_load((REAL_SPEC_DIR / "plan.yaml").read_text(encoding="utf-8"))
+    g5 = next(g for g in spec["gates"] if g["id"] == "G5")
+    ops = [(next(iter(op)), next(iter(op.values()))) for op in g5["operations"]]
+    checkpoint = next(i for i, (kind, body) in enumerate(ops)
+                      if kind == "checkpoint" and body["id"] == "approve-phase-b")
+    after = [body["argv"][2:] for kind, body in ops[checkpoint + 1:]
+             if kind == "run" and body["argv"][1].endswith("scripts/kg/validate.py")]
+    assert ["--write-coverage-report"] in after
+    assert [] in after
+    assert after.index(["--write-coverage-report"]) < after.index([])
+
+
 def test_fixture_policy_validates(tmp_path):
     result = validate(make_policy(tmp_path))
     assert result.ok, [f.as_dict() for f in result.sorted_findings()]
