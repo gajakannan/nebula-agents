@@ -82,10 +82,23 @@ gates:
           argv: [python3, agents/scripts/validate_templates.py]
           cwd: framework
           timeout_seconds: 300
+      - run:
+          id: d3-kg-write-coverage
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py", --write-coverage-report]
+          cwd: product
+          timeout_seconds: 300
+          mutates: [kg-projection]
+      - run:
+          id: d3-kg-validate
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
+          cwd: product
+          timeout_seconds: 300
     judgment: |
       After approval, run validate_templates.py (exit 0). Run `{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift`
       ONLY when KG references changed. DO NOT call validate-feature-evidence.py — there is no feature evidence
-      package for this run.
+      package for this run. Edited TARGETS that are mapped source docs change coverage-report.yaml hashes, so
+      d3-kg-write-coverage rewrites the report after approval and d3-kg-validate runs the plain validate.py
+      (the product CI's knowledge_graph_sync gate).
 
 severity_gate: none
 

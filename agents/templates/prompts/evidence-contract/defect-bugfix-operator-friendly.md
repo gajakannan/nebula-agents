@@ -61,9 +61,14 @@ where practical. Each implementing role writes its fix report (frontend-fix-repo
 exit codes, and artifacts. QE (when activated) owns quality-report.md with reproduction confirmation,
 regression tests, and the validation matrix.
 - **D5 — Review and closeout** (role: architect; artifacts: none)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - judgment: Each activated role writes its report; README.md summarizes root cause / fix / validation / open
 follow-ups; gate-decisions.md records the final defect-run verdict. Close when the bug is fixed and
 validated, explicitly not reproducible with evidence, or intentionally escalated.
+A fix to bound code or mapped planning docs changes coverage-report.yaml source hashes, so after the
+last edit rewrite the report and run the plain validate.py (the product CI's knowledge_graph_sync gate).
+Regenerate symbols/decisions first (validate.py --regenerate-symbols --check-symbols) when bound code changed.
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

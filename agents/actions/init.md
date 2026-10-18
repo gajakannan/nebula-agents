@@ -60,7 +60,11 @@ product (existing files are skipped; structure is validated).
   lifecycle-stage.yaml              # from agents/templates/lifecycle-stage-template.yaml (current_stage: framework-bootstrap)
   CONTRIBUTING.md                   # from agents/templates/contributing-template.md
   .github/workflows/ci-gates.yml    # from agents/templates/ci-gates-template.yml
+  .githooks/pre-commit              # from agents/templates/githooks-pre-commit-template.sh (KG reproducibility + coverage freshness)
+  .githooks/README.md               # from agents/templates/githooks-readme-template.md
 ```
+
+Activate the hook once per clone with `git config core.hooksPath .githooks`. It exits quietly until the product installs `scripts/kg/validate.py`.
 
 Boundary policy is framework-owned in `nebula-agents/BOUNDARY-POLICY.md` and applies across all consuming products; `init` does not scaffold a per-product copy.
 

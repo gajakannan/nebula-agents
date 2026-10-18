@@ -204,6 +204,11 @@ gates:
           argv: [python3, agents/scripts/validate_templates.py]
           cwd: framework
           timeout_seconds: 300
+      - run:
+          id: b5-kg-validate
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
+          cwd: product
+          timeout_seconds: 300
     judgment: |
       Update {BUILD_RUN_FOLDER}/README.md, action-context.md, artifact-trace.md, and gate-decisions.md
       with the build-level summary; gate-decisions.md carries one row per feature pointing to that
@@ -211,6 +216,8 @@ gates:
       closeout validation for each FEATURE_ID (the first op's per-feature form), then the build-once
       tracker / story-index / KG symbols+decisions / coverage / drift / templates checks. --write-coverage-report
       is path-sensitive and safe here because every feature's archive move already completed at B4.
+      b5-kg-validate runs the plain validate.py last (the product CI's knowledge_graph_sync gate and the only
+      coverage-freshness check).
 
 severity_gate: none
 

@@ -39,7 +39,12 @@ GATES:
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
-    - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. (requires: gate-decisions.md; produces: phase-b-approved)
+    - MANUAL checkpoint `approve-phase-b`: User reviews architecture; the Architect records the explicit approval token in gate-decisions.md after exit validation is green. Make any approval-status edits to planning artifacts (STATUS/README/PRD/assembly plan/ADR/kg-source shard), attest, then re-run G5 so the post-approval operations refresh the KG. (requires: gate-decisions.md; produces: phase-b-approved)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
+    - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
 OWNERSHIP:

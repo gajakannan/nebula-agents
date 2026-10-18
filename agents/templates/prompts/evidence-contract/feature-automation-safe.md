@@ -59,6 +59,7 @@ GATES:
     - run `python3 agents/scripts/capture-run-telemetry.py --product-root {NEBULA_PRODUCT_ROOT} --run-id {RUN_ID}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --stage closeout` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {RUN_ID}` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
 
 SEVERITY_GATE: profile=standard tool=gate_policy.py coverage_min_pct=80
 OWNERSHIP:

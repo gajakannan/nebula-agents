@@ -61,11 +61,15 @@ feature-mappings.yaml, and code-index.yaml.
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-feature-evidence.py --product-root {NEBULA_PRODUCT_ROOT}` (cwd: framework, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-symbols` (cwd: product, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --write-coverage-report` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
     - run `python3 agents/scripts/validate_templates.py` (cwd: framework, timeout: 300s)
+    - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - judgment: Run all validators against the freshly-scaffolded empty product; each must exit 0 (this is also the exit
 validation sweep). The registry-wide validate-feature-evidence scan should report 0 governed features and
 0 retired records. Any non-zero exit means the root cause must be fixed before init can complete.
+i6-kg-write-coverage creates coverage-report.yaml (the plain validate.py, which the product CI's
+knowledge_graph_sync gate runs, errors when it is missing), and i6-kg-validate runs that plain check last.
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 

@@ -72,3 +72,55 @@ def test_path_escape_rolls_back(tmp_path):
     assert not (tmp_path / "CONTRIBUTING.md").exists()
     assert not (tmp_path.parent / "escape.md").exists()
     assert report["rolled_back"] == ["CONTRIBUTING.md"]
+
+
+def test_pre_commit_hook_is_scaffolded_executable(tmp_path):
+    written = sp.scaffold_write(tmp_path, SCAFFOLD_MAP)
+    hook = tmp_path / ".githooks" / "pre-commit"
+    assert ".githooks/pre-commit" in written["created"]
+    assert hook.stat().st_mode & 0o111
+    assert (tmp_path / ".githooks" / "README.md").is_file()
+
+
+def _hook_repo(tmp_path: Path, validate_body: str) -> Path:
+    import shutil
+    import subprocess
+
+    shutil.copy(REPO_ROOT / "agents" / "templates" / "githooks-pre-commit-template.sh",
+                tmp_path / "pre-commit")
+    (tmp_path / "scripts" / "kg").mkdir(parents=True)
+    (tmp_path / "scripts" / "kg" / "validate.py").write_text(validate_body, encoding="utf-8")
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    (tmp_path / "planning-mds").mkdir()
+    (tmp_path / "planning-mds" / "doc.md").write_text("x\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(tmp_path), "add", "planning-mds/doc.md"], check=True)
+    return tmp_path
+
+
+STUB = """import sys
+if '--check-reproducible' in sys.argv:
+    sys.exit(0)
+print('Errors:')
+print('- coverage-report.yaml is stale')
+sys.exit({code})
+"""
+
+
+def test_pre_commit_hook_blocks_stale_coverage(tmp_path):
+    import subprocess
+
+    repo = _hook_repo(tmp_path, STUB.format(code=1))
+    result = subprocess.run(["bash", str(repo / "pre-commit")], cwd=repo,
+                            capture_output=True, text=True)
+    assert result.returncode == 1
+    assert "coverage-report.yaml is stale" in result.stderr
+    assert "--write-coverage-report" in result.stderr
+
+
+def test_pre_commit_hook_passes_fresh_tree(tmp_path):
+    import subprocess
+
+    repo = _hook_repo(tmp_path, STUB.format(code=0))
+    result = subprocess.run(["bash", str(repo / "pre-commit")], cwd=repo,
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr

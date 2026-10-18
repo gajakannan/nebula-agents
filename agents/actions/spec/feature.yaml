@@ -267,6 +267,11 @@ gates:
                  --product-root, "{NEBULA_PRODUCT_ROOT}", --feature, "{FEATURE_ID}", --run-id, "{RUN_ID}"]
           cwd: framework
           timeout_seconds: 300
+      - run:
+          id: kg-validate-closeout
+          argv: [python3, "{NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py"]
+          cwd: product
+          timeout_seconds: 300
     judgment: |
       MUST switch role (read agents/product-manager/SKILL.md). Manifest status becomes `approved` only
       here, when latest-run.json is written — and only after patch-prior-manifest.py exits 0. Run
@@ -275,6 +280,10 @@ gates:
       capture-run-telemetry.py records token cost from the agent CLI's session transcript into
       token-usage.json and mirrors headline totals into manifest.token_usage — advisory evidence
       only; a missing transcript records nothing and never blocks closeout.
+      kg-validate-closeout runs the plain validate.py last: it is the product CI's knowledge_graph_sync gate
+      and the only check of coverage-report.yaml freshness (--check-drift does not check it). Make every
+      tracker/STATUS edit at the archive-move checkpoint; any planning edit after G8 completes needs
+      --write-coverage-report and the plain validate.py again before committing.
 
 severity_gate: standard
 
