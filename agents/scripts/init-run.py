@@ -173,13 +173,14 @@ def scan_active_runs(runs_root: Path, feature_id: str, exclude_run_id: str,
 # --------------------------------------------------------------------------- #
 def _write_manifest(run_folder: Path, *, feature_id: str, slug: str, run_id: str,
                     contract_version: str, effective_date: str, rerun_of: str | None,
-                    scope: str | None = None) -> None:
+                    scope: str | None = None, action: str = "feature", phase: str | None = None) -> None:
     manifest = _strip_comments(json.loads(MANIFEST_TEMPLATE.read_text(encoding="utf-8")))
     feature_path = f"planning-mds/features/{feature_id}-{slug}"
     manifest.update({
         "feature_id": feature_id,
         "feature_slug": slug,
         "run_id": run_id,
+        "action": action,
         "status": "draft",
         "recorded_on": date.today().isoformat(),
         "contract_version": contract_version,
@@ -192,6 +193,8 @@ def _write_manifest(run_folder: Path, *, feature_id: str, slug: str, run_id: str
         "rerun_of": rerun_of,
         "changed_paths": [feature_path],
     })
+    if action == "plan":
+        manifest["plan_phase"] = phase or "A+B"
     _atomic_write(run_folder / "evidence-manifest.json", json.dumps(manifest, indent=2) + "\n")
 
 
@@ -251,9 +254,11 @@ def create_skeleton(run_folder: Path, *, base_run_files: list[str], artifacts_su
 # --------------------------------------------------------------------------- #
 def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: str,
              feature_slug: str | None, run_id: str | None, rerun_of: str | None,
-             resume: bool, force_unlock: bool, spec_dir: Path) -> dict[str, Any]:
+             resume: bool, force_unlock: bool, spec_dir: Path, phase: str | None = None) -> dict[str, Any]:
     if feature_id is not None and not FEATURE_ID_RE.match(feature_id):
         raise InitError(5, f"malformed feature id {feature_id!r} (expected F####)")
+    if phase is not None and (action != "plan" or phase not in {"A", "B", "A+B"}):
+        raise InitError(5, "--phase is only valid for plan (A, B, A+B)")
 
     result = vas.Result()
     policy = vas.load_policy(spec_dir, result)
@@ -322,6 +327,15 @@ def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: s
 
         if run_folder.exists() and any(run_folder.iterdir()) and not resume:
             raise InitError(4, f"run folder {run_folder.name} already exists (use --resume)")
+        if action == "plan" and (run_folder / "evidence-manifest.json").exists():
+            recorded = json.loads((run_folder / "evidence-manifest.json").read_text())
+            if (recorded.get("feature_id") != feature_id or recorded.get("run_scope") != "base-run-only"
+                    or recorded.get("action", "plan") != "plan"):
+                raise InitError(5, "resume selection conflicts with the recorded planning run identity")
+            recorded_phase = recorded.get("plan_phase", "A+B")
+            if phase is not None and phase != recorded_phase:
+                raise InitError(5, "--phase conflicts with the recorded planning phase")
+            phase = recorded_phase
 
         variables = {
             "action": action, "feature_id": feature_id, "feature_slug": slug,
@@ -332,6 +346,8 @@ def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: s
             "feature_index_root": str(index_root) if index_root is not None else None,
             "run_folder": str(run_folder),
         }
+        if action == "plan":
+            variables["phase"] = phase or "A+B"
         created, preserved = create_skeleton(
             run_folder, base_run_files=base_run_files, artifacts_subdirs=artifacts_subdirs,
             variables=variables, resume=resume)
@@ -343,7 +359,7 @@ def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: s
         else:
             _write_manifest(run_folder, feature_id=feature_id, slug=slug, run_id=run_id,
                             contract_version=contract_version, effective_date=effective_date,
-                            rerun_of=rerun_of, scope=action_scope)
+                            rerun_of=rerun_of, scope=action_scope, action=action, phase=phase)
             created.append("evidence-manifest.json")
     except Exception:
         if created_run_folder and run_folder.exists():
@@ -369,6 +385,7 @@ def init_run(*, product_root: Path, feature_id: str | None, action: str, mode: s
         "manifest": writes_manifest,
         "created": sorted(created),
         "preserved": sorted(preserved),
+        **({"phase": phase or "A+B"} if action == "plan" else {}),
     }
 
 
@@ -381,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
                              "required in the action spec); optional scope for any other action.")
     parser.add_argument("--feature-slug", default=None)
     parser.add_argument("--mode", default="clean", choices=["clean", "drift-reconcile"])
+    parser.add_argument("--phase", choices=["A", "B", "A+B"], help="Planning phase; defaults to A+B for plan. Recorded once and preserved on resume.")
     parser.add_argument("--run-id", default=None, help="Reuse a specific run id (with --resume).")
     parser.add_argument("--rerun-of", default=None)
     parser.add_argument("--resume", action="store_true")
@@ -403,7 +421,7 @@ def main(argv: list[str] | None = None) -> int:
             product_root=product_root, feature_id=args.feature, action=args.action,
             mode=args.mode, feature_slug=args.feature_slug, run_id=args.run_id,
             rerun_of=args.rerun_of, resume=args.resume, force_unlock=args.force_unlock,
-            spec_dir=args.spec_dir)
+            spec_dir=args.spec_dir, phase=args.phase)
     except InitError as exc:
         print(json.dumps({"ok": False, "error": exc.message, "code": exc.code}))
         return exc.code

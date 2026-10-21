@@ -69,7 +69,7 @@ STOP_CONDITIONS:
 - Any feature in BUILD_SCOPE fails G6 candidate validation and the cause is not addressable in this build.
 - Tracker validation fails and cannot be auto-repaired.
 - A feature's prior approved manifest cannot be patched to superseded (write fails or schema rejects).
-- Two approved manifests are detected for the same feature after B4 (two_approved_runs_without_supersession_fails).
+- Two approved feature-completion manifests are detected for the same feature after B4 (two_approved_runs_without_supersession_fails); base-run-only planning approvals are independent.
 - INSUFFICIENT_CONTEXT occurs for any feature in BUILD_SCOPE.
 - validate.py or --check-drift fails after one repair cycle.
 CONFLICT_RESOLUTION:

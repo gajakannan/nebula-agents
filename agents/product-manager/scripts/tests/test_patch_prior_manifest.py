@@ -141,3 +141,36 @@ def test_missing_feature_evidence_root_exits_one(tmp_path: Path) -> None:
     result = run_patch(tmp_path / "product", "F9999", RUN_NEW)
     assert result.returncode == 1
     assert "not found" in result.stderr
+
+
+def test_completion_closeout_preserves_planning_approval(tmp_path: Path) -> None:
+    root = make_evidence_root(tmp_path)
+    write_manifest(root / RUN_PRIOR_A, "F0036", RUN_PRIOR_A, "approved")
+    plan = root / RUN_PRIOR_A / "evidence-manifest.json"
+    data = json.loads(plan.read_text()); data["run_scope"] = "base-run-only"
+    plan.write_text(json.dumps(data))
+    before = plan.read_bytes()
+    write_manifest(root / RUN_PRIOR_B, "F0036", RUN_PRIOR_B, "approved")
+    write_manifest(root / RUN_NEW, "F0036", RUN_NEW, "in-progress")
+    result = run_patch(tmp_path / "product", "F0036", RUN_NEW)
+    assert result.returncode == 0, result.stderr
+    assert plan.read_bytes() == before
+    assert status_of(root, RUN_PRIOR_B) == "superseded"
+    current = json.loads((root / RUN_NEW / "evidence-manifest.json").read_text())
+    prior = json.loads((root / RUN_PRIOR_B / "evidence-manifest.json").read_text())
+    assert current["status"] == "in-progress"  # approval/pointer publication remains the caller's job
+    assert current["supersedes"] == [RUN_PRIOR_B]
+    assert prior["superseded_by"] == RUN_NEW
+
+
+def test_completion_helper_rejects_planning_successor_without_mutation(tmp_path: Path) -> None:
+    root = make_evidence_root(tmp_path)
+    write_manifest(root / RUN_PRIOR_A, "F0036", RUN_PRIOR_A, "approved")
+    write_manifest(root / RUN_NEW, "F0036", RUN_NEW, "approved")
+    path = root / RUN_NEW / "evidence-manifest.json"
+    data = json.loads(path.read_text()); data["run_scope"] = "base-run-only"
+    path.write_text(json.dumps(data))
+    result = run_patch(tmp_path / "product", "F0036", RUN_NEW)
+    assert result.returncode == 1
+    assert "feature-completion scope" in result.stderr
+    assert status_of(root, RUN_PRIOR_A) == "approved"

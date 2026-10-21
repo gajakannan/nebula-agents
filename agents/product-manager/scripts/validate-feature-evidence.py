@@ -64,6 +64,7 @@ SUPPORTED_MANIFEST_SCHEMA_VERSIONS = {1}
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(FRAMEWORK_ROOT / "agents" / "scripts"))
 from _product_root import ProductRootError, resolve_product_root  # noqa: E402
+from approval_history import FEATURE_SCOPE, manifest_scope  # noqa: E402
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 TERMINAL_FEATURE_STATES = {"done", "completed", "archived"}
@@ -1286,7 +1287,7 @@ def feature_manifests(product_root: Path, feature_id: str) -> list[Path]:
         loaded, error = load_json_file(manifest_path)
         if error or not isinstance(loaded, dict):
             continue
-        if str(loaded.get("feature_id", "")) == feature_id:
+        if str(loaded.get("feature_id", "")) == feature_id and manifest_scope(loaded) == FEATURE_SCOPE:
             manifests.append(manifest_path)
     return manifests
 
@@ -3654,6 +3655,10 @@ def validate_manifest(
     elif run_id and manifest_run_id != run_id:
         result.add_error("manifest_bad_run_id_fails", "Manifest run_id does not match selected run folder", feature=row.feature_id, run_id=manifest_run_id, path=str(manifest_path))
     status_value = str(loaded.get("status", ""))
+    if manifest_scope(loaded) != FEATURE_SCOPE:
+        result.add_error("manifest_wrong_run_scope_fails",
+                         "Feature evidence requires a feature-completion run, not a planning approval", **common)
+        return None
     if status_value and status_value not in MANIFEST_STATUSES:
         result.add_error("manifest_bad_status_fails", "Manifest status is not a supported value", **common)
     if stage == "closeout" and status_value and status_value != "approved":

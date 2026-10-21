@@ -71,9 +71,18 @@ gates:
           description: "User reviews requirements; PM records the explicit approval token in gate-decisions.md."
           requires: [gate-decisions.md]
           produces: [phase-a-approved]
+      - run:
+          id: approve-plan-phase-a
+          argv: [python3, agents/scripts/approve-plan.py, --product-root, "{NEBULA_PRODUCT_ROOT}",
+                 --feature, "{FEATURE_ID}", --run-id, "{PLAN_RUN_ID}", --stage, G3]
+          cwd: framework
+          timeout_seconds: 120
+          mutates: [evidence-manifest, prior-manifest]
     judgment: |
       Step 2 Phase A review. No gate may be passed without an explicit approval token recorded in
-      gate-decisions.md.
+      gate-decisions.md. approve-plan.py publishes a PHASE=A planning approval after the attestation,
+      superseding earlier planning approvals only. PHASE=A+B remains pending until G5; never manually
+      set the manifest approved at the Phase A checkpoint.
 
   - id: G4
     title: Ontology sync (Phase B)
@@ -180,6 +189,13 @@ gates:
                  --product-root, "{NEBULA_PRODUCT_ROOT}", --skip-feature-evidence]
           cwd: framework
           timeout_seconds: 300
+      - run:
+          id: approve-plan
+          argv: [python3, agents/scripts/approve-plan.py, --product-root, "{NEBULA_PRODUCT_ROOT}",
+                 --feature, "{FEATURE_ID}", --run-id, "{PLAN_RUN_ID}", --stage, G5]
+          cwd: framework
+          timeout_seconds: 120
+          mutates: [evidence-manifest, prior-manifest]
     judgment: |
       Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
       After the operator's approval token: record it in gate-decisions.md, make every approval-status
@@ -195,6 +211,10 @@ gates:
       compile.py, never by editing the generated file.
       Do NOT call validate-feature-evidence.py at plan — there is no feature evidence package yet.
       Do NOT run validate-trackers.py --all-feature-evidence as plan closeout; repo-wide feature-evidence validation is an explicit health/audit action.
+      The final approve-plan.py operation verifies the attested approval and completed exit operations,
+      records supersedes/superseded_by links, supersedes prior base-run-only planning approvals, and
+      publishes this manifest approved last. It is idempotent and never changes feature-completion
+      approvals or creates latest-run.json. If interrupted, resume this run; do not manually approve it.
 
 severity_gate: none
 
@@ -210,6 +230,7 @@ forbidden:
   - "Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files)."
   - "Treat lookup/KG mappings as authoritative over raw artifacts."
   - "Climb past max_auto_tier without recording a workstate.py escalate event."
+  - "Mark a plan manifest approved manually or supersede feature-completion approvals during plan closeout."
 
 stop_conditions:
   - "PRD approval refused by user."
@@ -226,7 +247,7 @@ conflict_resolution:
 notes:
   session_setup: |
     Resolve {NEBULA_PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
-    `python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`.
+    `python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --phase {PHASE} --product-root {NEBULA_PRODUCT_ROOT}`.
     It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
     creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
     variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run

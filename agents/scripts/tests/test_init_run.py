@@ -63,6 +63,27 @@ def test_plan_base_run_does_not_create_feature_index(tmp_path):
     assert not (Path(report["run_folder"]).parent / ".F0007.init.lock").exists()
 
 
+@pytest.mark.parametrize("phase", ["A", "B", "A+B"])
+def test_plan_phase_is_bound_once_and_preserved_on_resume(tmp_path, phase):
+    report = do_init(tmp_path, action="plan", phase=phase)
+    manifest_path = Path(report["run_folder"]) / "evidence-manifest.json"
+    before = manifest_path.read_bytes()
+    data = json.loads(before)
+    assert data["action"] == "plan" and data["plan_phase"] == phase
+    resumed = do_init(tmp_path, action="plan", run_id=report["run_id"], resume=True)
+    assert resumed["phase"] == phase
+    assert manifest_path.read_bytes() == before
+    with pytest.raises(ir.InitError, match="conflicts"):
+        do_init(tmp_path, action="plan", run_id=report["run_id"], resume=True,
+                phase="B" if phase == "A" else "A")
+    assert manifest_path.read_bytes() == before
+
+
+def test_feature_init_rejects_planning_phase(tmp_path):
+    with pytest.raises(ir.InitError, match="only valid for plan"):
+        do_init(tmp_path, phase="A")
+
+
 def test_rerun_linkage_recorded(tmp_path):
     report = do_init(tmp_path, rerun_of="2026-01-01-abcdef12")
     manifest = json.loads((Path(report["run_folder"]) / "evidence-manifest.json").read_text())

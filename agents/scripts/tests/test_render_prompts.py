@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SCRIPTS_DIR = REPO_ROOT / "agents" / "scripts"
@@ -143,6 +144,14 @@ def test_generate_check_drift_and_extra(tmp_path, monkeypatch):
 def test_committed_feature_pair_matches_policy():
     # The real committed generated pair must be in sync (this is the CI gate too).
     assert rp.check(REAL_SPEC_DIR, "feature")["ok"]
+
+
+def test_plan_setup_binds_requested_phase_in_both_variants():
+    spec = yaml.safe_load((REAL_SPEC_DIR / "plan.yaml").read_text())
+    shared = yaml.safe_load((REAL_SPEC_DIR / "_contract.yaml").read_text())["shared"]
+    outputs = rp.render_action(spec, shared, "2026-07-11")
+    for output in outputs.values():
+        assert "--action plan --feature {FEATURE_ID} --phase {PHASE}" in output
 
 
 def test_cli_check_exit_zero():

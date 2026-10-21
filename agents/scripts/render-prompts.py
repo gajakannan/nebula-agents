@@ -112,9 +112,10 @@ def _session_setup_line(action: str, spec: dict[str, Any], facts: dict[str, Any]
         return (base + files + ". This action creates no `evidence-manifest.json`; its run id "
                 "follows the integrate scheme and is not minted by `agents/scripts/init-run.py`.")
     if vas.is_feature_bound(spec):
+        phase_arg = " --phase {PHASE}" if action == "plan" else ""
         return (base + "initialize `evidence-manifest.json` (status `draft`) with the active "
                 "contract version stamped, " + files + ". Run "
-                f"`agents/scripts/init-run.py --product-root {{NEBULA_PRODUCT_ROOT}} --action {action} --feature {{FEATURE_ID}}` to perform this.")
+                f"`agents/scripts/init-run.py --product-root {{NEBULA_PRODUCT_ROOT}} --action {action} --feature {{FEATURE_ID}}{phase_arg}` to perform this.")
     optional = [i.get("name") for i in (spec.get("inputs", {}) or {}).get("optional", []) or []]
     feature_arg = " [--feature {FEATURE_ID}]" if "FEATURE_ID" in optional else ""
     return (base + files + ". This action creates no `evidence-manifest.json` (only feature-bound "

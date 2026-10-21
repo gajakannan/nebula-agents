@@ -26,6 +26,7 @@ GATES:
 - PR0 role=product-manager artifacts=[action-context.md]
 - PR1 role=product-manager artifacts=[plan-review-report.md]
 - PR2 role=product-manager artifacts=[]
+    - run `python3 agents/scripts/check-plan-approvals.py --product-root {NEBULA_PRODUCT_ROOT} --plan-scope {PLAN_SCOPE} --target {TARGET}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)

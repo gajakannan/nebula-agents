@@ -71,6 +71,12 @@ gates:
     project_checks: [before_stage_complete]
     operations:
       - run:
+          id: pr2-check-plan-approvals
+          argv: [python3, agents/scripts/check-plan-approvals.py, --product-root, "{NEBULA_PRODUCT_ROOT}",
+                 --plan-scope, "{PLAN_SCOPE}", --target, "{TARGET}"]
+          cwd: framework
+          timeout_seconds: 120
+      - run:
           id: pr2-validate-stories
           argv: [python3, agents/product-manager/scripts/validate-stories.py, "{FEATURE_PATH}"]
           cwd: framework
@@ -100,6 +106,10 @@ gates:
       skip it (record why) for legacy project scope. With declared project checks, project scope iterates all
       active or PRD-bearing nonarchived features resolved from the product registry. All PR2 validators are read-only. Record exit code, summary, and
       artifact path for each command in lifecycle-gates.log.
+      check-plan-approvals.py requires one current base-run-only planning approval per reviewed feature,
+      no active planning rework, and valid explicit supersession chains. Completion approvals are
+      independent. Report missing/ambiguous approval history as blocking and route repair to plan
+      closeout; reviewers never edit approvals. Legacy superseded plans without links remain readable.
 
   - id: PR3
     title: Self-review gate

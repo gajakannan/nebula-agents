@@ -60,6 +60,7 @@ scope.
 - Reviewers inspect source artifacts **directly** — never approve from a summary, chat transcript, or generated checklist alone, or from `plan.md`'s prior approval tokens.
 - The action is read-only except for writing the review report under the base run evidence folder.
 - Findings route back to `plan.md` or a targeted owning-role rework prompt. Reviewers do not silently repair planning artifacts while reviewing.
+- PR2 checks planning approval history with `check-plan-approvals.py`. A missing or ambiguous current planning approval, active planning rework, or broken explicit supersession chain blocks readiness and routes to plan closeout. Completion approvals are independent; the review never supersedes either kind of approval.
 
 ## Reviewer judgment — per-role readiness checks
 

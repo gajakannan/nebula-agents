@@ -73,7 +73,7 @@ in-progress run must pass candidate validation before any tracker sync at B3.
     - judgment: MUST switch to the PM role (read agents/product-manager/SKILL.md). For EACH FEATURE_ID in
 BUILD_SCOPE being closed, execute the feature G8 PM CLOSEOUT CHECKLIST: write {RUN_FOLDER}/pm-closeout.md;
 finalize that feature's manifest (status=approved, feature_state, feature_path_at_closeout); run
-patch-prior-manifest.py (idempotent — patches all prior approved manifests for the feature to
+patch-prior-manifest.py (idempotent — patches prior approved feature-completion manifests only to
 superseded); write {FEATURE_INDEX_ROOT}/latest-run.json ONLY after the patch script exits 0; update
 STATUS/REGISTRY/ROADMAP/BLUEPRINT + KG mappings; move the feature folder to archive/ when Done/Completed.
 - **B4.5 — Build-level approval gate** (role: product-manager; artifacts: none)
@@ -116,7 +116,7 @@ Stop conditions:
 - Any feature in BUILD_SCOPE fails G6 candidate validation and the cause is not addressable in this build.
 - Tracker validation fails and cannot be auto-repaired.
 - A feature's prior approved manifest cannot be patched to superseded (write fails or schema rejects).
-- Two approved manifests are detected for the same feature after B4 (two_approved_runs_without_supersession_fails).
+- Two approved feature-completion manifests are detected for the same feature after B4 (two_approved_runs_without_supersession_fails); base-run-only planning approvals are independent.
 - INSUFFICIENT_CONTEXT occurs for any feature in BUILD_SCOPE.
 - validate.py or --check-drift fails after one repair cycle.
 

@@ -73,7 +73,7 @@ FORBIDDEN:
 - Generate RUN_ID with uuid4 or any non-contract format.
 - Write or consume current-run.json.
 - Write latest-run.json before G8 final validation passes.
-- Leave a prior approved manifest at status approved after writing a new approval.
+- Leave a prior approved feature-completion manifest at status approved after writing a new completion approval; planning approvals are independent.
 - Skip per-gate validate-feature-evidence.py --stage calls.
 - Write terminal-feature role reports into FEATURE_PATH instead of RUN_FOLDER.
 - Cite the global frontend evidence lane as a substitute for a feature-level role report.
@@ -90,7 +90,7 @@ STOP_CONDITIONS:
 - Scope drifts outside FEATURE_ID.
 - validate.py or validate.py --check-drift cannot be auto-repaired.
 - validate-feature-evidence.py at any stage exits non-zero and the cause is not addressable in this run.
-- Two approved manifests are detected for the same feature without supersession.
+- Two approved feature-completion manifests are detected for the same feature without supersession (missing run_scope defaults to feature-completion; base-run-only planning approvals are independent).
 - INSUFFICIENT_CONTEXT occurs — escalate, open raw artifacts, do not proceed on weak matches.
 CONFLICT_RESOLUTION:
 - raw artifact vs KG mapping -> raw wins; repair KG in the same change set.
@@ -101,7 +101,8 @@ CONFLICT_RESOLUTION:
 - manifest conditional boolean false but changed_paths has a forced path class -> set the boolean true and add the required role/artifact.
 NOTE[concurrent_run_check]: Before starting, inspect only evidence-manifest.json files under
 {NEBULA_PRODUCT_ROOT}/planning-mds/operations/evidence/runs/*/ for any run other than RUN_FOLDER whose
-manifest has feature_id={FEATURE_ID} and status draft or in-progress. If one exists, HALT and
+manifest has feature_id={FEATURE_ID}, run_scope=feature-completion (the default when absent),
+and status draft or in-progress. Ignore base-run-only planning manifests. If one exists, HALT and
 reconcile externally — the contract assumes serial feature actions per feature. Acceptable prior
 states: approved (superseded at G8), superseded, or no prior runs.
 NOTE[scope_booleans]: At G2 set frontend_in_scope=true when any changed_paths[] entry matches experience/** frontend

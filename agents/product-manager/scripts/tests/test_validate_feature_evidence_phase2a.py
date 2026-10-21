@@ -476,6 +476,28 @@ def test_two_approved_runs_without_supersession_fires(tmp_path: Path) -> None:
     assert "two_approved_runs_without_supersession_fails" in rules
 
 
+def test_planning_approval_does_not_conflict_with_completion_approval(tmp_path: Path) -> None:
+    product = tmp_path / "product"
+    write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
+    plan = write_manifest_run(product, "F0001-new", "F0001", run_id="2026-05-19-aaaa1111",
+                              status="approved", manifest_updates={"run_scope": "base-run-only"})
+    before = (plan / "evidence-manifest.json").read_bytes()
+    write_manifest_run(product, "F0001-new", "F0001", status="approved", latest=True, stage="closeout",
+                       manifest_updates={"feature_state": "Archived", "feature_path_at_closeout": "planning-mds/features/archive/F0001-new"})
+    result = run_validator(product, "--feature", "F0001", "--stage", "closeout", "--json")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (plan / "evidence-manifest.json").read_bytes() == before
+
+
+def test_explicit_planning_run_rejected_as_completion_evidence(tmp_path: Path) -> None:
+    product = tmp_path / "product"
+    write_registry(product, active="| F0001 | New Feature | Done | MVP | `F0001-new/` |")
+    write_manifest_run(product, "F0001-new", "F0001", manifest_updates={"run_scope": "base-run-only"})
+    result = run_validator(product, "--feature", "F0001", "--run-id", RUN_ID, "--stage", "G0", "--json")
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "manifest_wrong_run_scope_fails" in {e["rule_id"] for e in json_result(result)["errors"]}
+
+
 def test_manifest_final_approved_with_non_terminal_state_fires(tmp_path: Path) -> None:
     product = tmp_path / "product"
     write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")

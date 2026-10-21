@@ -24,7 +24,7 @@ Generate `PLAN_RUN_ID` once per run — not per session — in the contract form
 
 Resuming an in-flight run in a new session: do NOT generate a new `PLAN_RUN_ID` and do NOT re-create the run. Run `python3 agents/scripts/resume-brief.py --product-root {NEBULA_PRODUCT_ROOT} --run-id <PLAN_RUN_ID>` first — it reports position, next gate, recorded decisions, current story, and scope in one read, so the session does not re-derive them. `init-run.py --resume` reuses the existing run folder.
 
-Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action plan --feature {FEATURE_ID}` to perform this.
+Session setup (first session of the run only): create the run under `planning-mds/operations/evidence/`, initialize `evidence-manifest.json` (status `draft`) with the active contract version stamped, create the base run files (README.md, action-context.md, artifact-trace.md, gate-decisions.md, commands.log, lifecycle-gates.log) and artifact subdirs (coverage, diffs, test-results, security, screenshots). Run `agents/scripts/init-run.py --product-root {NEBULA_PRODUCT_ROOT} --action plan --feature {FEATURE_ID} --phase {PHASE}` to perform this.
 
 Load context in this order, then navigate rather than eager-load:
 First resolve NEBULA_PRODUCT_ROOT explicitly. Run `python3 agents/scripts/project_context.py --product-root {NEBULA_PRODUCT_ROOT} --action plan` and read the returned product instructions before action work, including after resume. A context error blocks the action; an absent project manifest preserves the existing context procedure.
@@ -48,8 +48,11 @@ Gates (run each stage through `agents/scripts/run-gate.py`, in order):
 STORY-INDEX.md) before Phase A approval.
 - **G3 — Phase A approval** (role: product-manager; artifacts: gate-decisions.md)
     - MANUAL checkpoint `approve-phase-a`: User reviews requirements; PM records the explicit approval token in gate-decisions.md. (requires: gate-decisions.md; produces: phase-a-approved)
+    - run `python3 agents/scripts/approve-plan.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {PLAN_RUN_ID} --stage G3` (cwd: framework, timeout: 120s)
     - judgment: Step 2 Phase A review. No gate may be passed without an explicit approval token recorded in
-gate-decisions.md.
+gate-decisions.md. approve-plan.py publishes a PHASE=A planning approval after the attestation,
+superseding earlier planning approvals only. PHASE=A+B remains pending until G5; never manually
+set the manifest approved at the Phase A checkpoint.
 - **G4 — Ontology sync (Phase B)** (role: architect; artifacts: none)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
@@ -74,6 +77,7 @@ must exit 0. Only the Architect edits the kg-source shards feeding canonical-nod
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
+    - run `python3 agents/scripts/approve-plan.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {PLAN_RUN_ID} --stage G5` (cwd: framework, timeout: 120s)
     - judgment: Step 4 Phase B review. Exit-validation commands run in order and all exit 0 before approval.
 After the operator's approval token: record it in gate-decisions.md, make every approval-status
 edit to planning artifacts, attest the checkpoint, then re-run G5. The post-approval operations
@@ -88,6 +92,10 @@ here (mirrors the product's kg-reproducibility CI gate) — fix by editing kg-so
 compile.py, never by editing the generated file.
 Do NOT call validate-feature-evidence.py at plan — there is no feature evidence package yet.
 Do NOT run validate-trackers.py --all-feature-evidence as plan closeout; repo-wide feature-evidence validation is an explicit health/audit action.
+The final approve-plan.py operation verifies the attested approval and completed exit operations,
+records supersedes/superseded_by links, supersedes prior base-run-only planning approvals, and
+publishes this manifest approved last. It is idempotent and never changes feature-completion
+approvals or creates latest-run.json. If interrupted, resume this run; do not manually approve it.
 
 Severity gate profile: `none` (compute allowed outcomes with `agents/scripts/gate_policy.py`; coverage floor is 80%).
 
@@ -105,6 +113,7 @@ Forbidden:
 - Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files).
 - Treat lookup/KG mappings as authoritative over raw artifacts.
 - Climb past max_auto_tier without recording a workstate.py escalate event.
+- Mark a plan manifest approved manually or supersede feature-completion approvals during plan closeout.
 
 Stop conditions:
 - PRD approval refused by user.
@@ -146,7 +155,7 @@ PHASE=B,existing -> update feature-assembly-plan.md + ontology bindings.
 PHASE=A+B -> Phase A then Phase B.
 
 Note (session_setup): Resolve {NEBULA_PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
-`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`.
+`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --phase {PHASE} --product-root {NEBULA_PRODUCT_ROOT}`.
 It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
 creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
 variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run
