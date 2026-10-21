@@ -45,6 +45,13 @@ the runbook). The exit-validation sequence and the tracker-only closeout contrac
 (`validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence`) are the
 G5 operations in the spec.
 
+Planning approval publication is automated by `approve-plan.py` in the action spec. Initialize with
+`init-run.py --action plan --phase A|B|A+B` to bind the phase once. A Phase A-only approval publishes
+at G3; A+B and Phase B approval publish after G5 exit checks. The helper preserves approval history,
+supersedes earlier planning approvals only, and never creates feature-completion evidence or its
+latest-run pointer. Do not manually mark a plan manifest approved. Resume the same run after a failed
+publication; `check-plan-approvals.py` supplies plan-review's read-only history check.
+
 ### Gate flow
 
 G1 Clarification → G2 Tracker sync (Phase A) → G3 Phase A approval

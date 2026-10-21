@@ -49,6 +49,7 @@ KG/ontology alignment; Code Reviewer — vertical-slice buildability, role hando
 dependencies, risk hotspots. Do NOT require feature-assembly-plan.md as a plan deliverable. Reviewers do
 not repair plan artifacts during review.
 - **PR2 — Validator pass** (role: product-manager; artifacts: none)
+    - run `python3 agents/scripts/check-plan-approvals.py --product-root {NEBULA_PRODUCT_ROOT} --plan-scope {PLAN_SCOPE} --target {TARGET}` (cwd: framework, timeout: 120s)
     - run `python3 agents/product-manager/scripts/validate-stories.py {FEATURE_PATH}` (cwd: framework, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py` (cwd: framework, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
@@ -59,6 +60,10 @@ not repair plan artifacts during review.
 skip it (record why) for legacy project scope. With declared project checks, project scope iterates all
 active or PRD-bearing nonarchived features resolved from the product registry. All PR2 validators are read-only. Record exit code, summary, and
 artifact path for each command in lifecycle-gates.log.
+check-plan-approvals.py requires one current base-run-only planning approval per reviewed feature,
+no active planning rework, and valid explicit supersession chains. Completion approvals are
+independent. Report missing/ambiguous approval history as blocking and route repair to plan
+closeout; reviewers never edit approvals. Legacy superseded plans without links remain readable.
 - **PR3 — Self-review gate** (role: product-manager; artifacts: none)
     - judgment: Each reviewer verifies that its findings cite exact files/sections and that any skipped item is
 explicitly justified. Do not downgrade missing build-critical detail to low severity.

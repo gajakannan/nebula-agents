@@ -394,8 +394,12 @@ high-value invariants:
 - **Closeout path:** registry folder matches manifest `feature_path_at_closeout`.
 - **Changed paths:** no material changed path omitted from the manifest
   where machine-checkable (cross-checked vs `scm.diff_artifact`, trace, reports).
-- **Supersession:** exactly one `approved` manifest per feature in steady
-  state; two fire `two_approved_runs_without_supersession_fails`.
+- **Supersession:** exactly one `approved` manifest per feature **within each scope** in steady
+  state. Completion validation counts `feature-completion` manifests only (the legacy default when
+  `run_scope` is absent); two fire `two_approved_runs_without_supersession_fails`. Planning approvals
+  use `base-run-only` and are independently published by plan G3/G5 `approve-plan.py`, with explicit
+  successor/predecessor links. Plan-review PR2 checks their history without changing it. Neither
+  closeout supersedes the other scope's approvals. Resume a failed publication before starting a new one.
 
 ## Frontend Global Lanes
 

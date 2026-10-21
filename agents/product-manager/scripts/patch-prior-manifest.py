@@ -5,7 +5,8 @@ Invoked by `agents/actions/feature.md` and `agents/actions/build.md` per §17
 step 4 before writing a new `latest-run.json`. Scans canonical run folders
 under `planning-mds/operations/evidence/runs/`, reads each manifest for the
 requested feature, and rewrites `status: approved` to `superseded` for every
-run other than `--new-run-id`. Idempotent: re-running over a state where all
+feature-completion run other than `--new-run-id`. Planning approvals are
+independent and untouched. Idempotent: re-running over a state where all
 prior approved manifests are already superseded is a no-op.
 
 Exit codes:
@@ -19,8 +20,6 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -29,6 +28,8 @@ from pathlib import Path
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(FRAMEWORK_ROOT / "agents" / "scripts"))
 from _product_root import ProductRootError, resolve_product_root  # noqa: E402
+from approval_history import (FEATURE_SCOPE, approval_lock, manifests_for,
+                              manifest_scope, supersede_prior)  # noqa: E402
 
 RUN_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-[a-z0-9]{8}$")
 FEATURE_ID_RE = re.compile(r"^F\d{4}$")
@@ -36,13 +37,6 @@ FEATURE_ID_RE = re.compile(r"^F\d{4}$")
 
 def evidence_runs_root(product_root: Path) -> Path:
     return product_root / "planning-mds" / "operations" / "evidence" / "runs"
-
-
-def atomic_write_json(target: Path, data: dict) -> None:
-    """Write JSON atomically via temp file + rename in the same directory."""
-    temp = target.with_suffix(target.suffix + ".tmp")
-    temp.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-    os.replace(temp, target)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -77,39 +71,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: new run manifest missing: {new_manifest_path}", file=sys.stderr)
         return 1
     try:
-        new_manifest = json.loads(new_manifest_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as exc:
-        print(f"error: cannot parse new run manifest {new_manifest_path}: {exc}", file=sys.stderr)
+        with approval_lock(product_root, args.feature, FEATURE_SCOPE):
+            manifests = manifests_for(product_root, args.feature)
+            new_manifest = manifests.get(new_manifest_path)
+            if not new_manifest or manifest_scope(new_manifest) != FEATURE_SCOPE:
+                raise ValueError(f"new run must belong to {args.feature} in feature-completion scope")
+            patched = supersede_prior(manifests, new_manifest_path)
+    except (OSError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return 1
-    if not isinstance(new_manifest, dict) or new_manifest.get("feature_id") != args.feature:
-        print(f"error: new run manifest {new_manifest_path} does not belong to {args.feature}", file=sys.stderr)
-        return 1
-
-    patched: list[str] = []
-    for run_folder in sorted(runs_root.iterdir()):
-        if not run_folder.is_dir():
-            continue
-        if not RUN_ID_RE.fullmatch(run_folder.name):
-            continue
-        if run_folder.name == args.new_run_id:
-            continue
-        manifest_path = run_folder / "evidence-manifest.json"
-        if not manifest_path.exists():
-            continue
-        try:
-            data = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as exc:
-            print(f"error: cannot parse prior manifest {manifest_path}: {exc}", file=sys.stderr)
-            return 1
-        if not isinstance(data, dict) or data.get("feature_id") != args.feature or data.get("status") != "approved":
-            continue
-        data["status"] = "superseded"
-        try:
-            atomic_write_json(manifest_path, data)
-        except OSError as exc:
-            print(f"error: failed to write {manifest_path}: {exc}", file=sys.stderr)
-            return 1
-        patched.append(str(manifest_path))
 
     if patched:
         print(f"patched {len(patched)} prior approved manifest(s) to superseded:")

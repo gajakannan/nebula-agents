@@ -28,6 +28,7 @@ GATES:
 - G2 role=product-manager artifacts=[]
 - G3 role=product-manager artifacts=[gate-decisions.md]
     - MANUAL checkpoint `approve-phase-a`: User reviews requirements; PM records the explicit approval token in gate-decisions.md. (requires: gate-decisions.md; produces: phase-a-approved)
+    - run `python3 agents/scripts/approve-plan.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {PLAN_RUN_ID} --stage G3` (cwd: framework, timeout: 120s)
 - G4 role=architect artifacts=[]
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/compile.py` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-drift` (cwd: product, timeout: 300s)
@@ -45,6 +46,7 @@ GATES:
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py --check-reproducible` (cwd: product, timeout: 300s)
     - run `python3 {NEBULA_PRODUCT_ROOT}/scripts/kg/validate.py` (cwd: product, timeout: 300s)
     - run `python3 agents/product-manager/scripts/validate-trackers.py --product-root {NEBULA_PRODUCT_ROOT} --skip-feature-evidence` (cwd: framework, timeout: 300s)
+    - run `python3 agents/scripts/approve-plan.py --product-root {NEBULA_PRODUCT_ROOT} --feature {FEATURE_ID} --run-id {PLAN_RUN_ID} --stage G5` (cwd: framework, timeout: 120s)
 
 SEVERITY_GATE: profile=none tool=gate_policy.py coverage_min_pct=80
 OWNERSHIP:
@@ -60,6 +62,7 @@ FORBIDDEN:
 - Hand-edit the compiled KG projections (canonical-nodes/feature-mappings/code-index/solution-ontology.yaml) or the REGISTRY/ROADMAP/STORY-INDEX generated regions — edit kg-source/** shards and run compile.py (the kg-reproducibility CI gate rejects hand-edited generated files).
 - Treat lookup/KG mappings as authoritative over raw artifacts.
 - Climb past max_auto_tier without recording a workstate.py escalate event.
+- Mark a plan manifest approved manually or supersede feature-completion approvals during plan closeout.
 STOP_CONDITIONS:
 - PRD approval refused by user.
 - Architecture approval refused by user.
@@ -94,7 +97,7 @@ append-only. PHASE=B,new -> REJECT (run architecture only after requirements exi
 PHASE=B,existing -> update feature-assembly-plan.md + ontology bindings.
 PHASE=A+B -> Phase A then Phase B.
 NOTE[session_setup]: Resolve {NEBULA_PRODUCT_ROOT} and echo the absolute path on the first turn, THEN run
-`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --product-root {NEBULA_PRODUCT_ROOT}`.
+`python3 agents/scripts/init-run.py --action plan --feature {FEATURE_ID} --phase {PHASE} --product-root {NEBULA_PRODUCT_ROOT}`.
 It mints {PLAN_RUN_ID}, resolves {FEATURE_SLUG}/{FEATURE_PATH}/{PLAN_RUN_FOLDER} from REGISTRY.md, and
 creates the base-run skeleton (base run files under runs/{PLAN_RUN_ID}/). Use its JSON output for every
 variable below — resolve {FEATURE_SLUG} now, at session setup, not on demand at a later gate. init-run

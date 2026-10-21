@@ -388,6 +388,8 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
     gate = _find_gate(spec, stage)
     variables = build_variables(product_root=product_root, feature_id=feature_id, slug=slug,
                                 run_id=run_id, run_folder=run_folder, stage=stage)
+    variables[str(spec.get("run_id", {}).get("var", "RUN_ID"))] = run_id
+    variables.update(PLAN_SCOPE=plan_scope, TARGET=target or feature_id)
     ops = gate.get("operations", []) or []
     context, checks = pc.prepare(product_root.resolve(), action, plan_scope=plan_scope,
                                  target=target or feature_id or "", spec_dir=spec_dir)
@@ -395,7 +397,6 @@ def run_stage(*, spec_dir: Path, action: str, stage: str, product_root: Path, fe
     if context["checks"]:
         if plan_scope == "feature" and feature_id and target and feature_id != target:
             raise ProjectError("conflicting_target", "--feature and --target must identify the same feature.")
-        variables.update(PLAN_SCOPE=plan_scope, TARGET=target or feature_id)
         if plan_scope == "feature":
             variables["FEATURE_ID"] = context["scope"]["features"][0]["id"]
             variables["FEATURE_PATH"] = context["scope"]["features"][0]["path"]
