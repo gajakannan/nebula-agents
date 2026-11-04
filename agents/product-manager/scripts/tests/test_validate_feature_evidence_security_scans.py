@@ -22,8 +22,8 @@ from test_validate_feature_evidence import (
 LATE_DATE = "2026-05-25"
 
 
-def _error_ids(product: Path) -> set[str]:
-    result = run_validator(product, "--feature", "F0001", "--run-id", RUN_ID, "--stage", "G0", "--json")
+def _error_ids(product: Path, stage: str = "G2") -> set[str]:
+    result = run_validator(product, "--feature", "F0001", "--run-id", RUN_ID, "--stage", stage, "--json")
     return {entry["rule_id"] for entry in json_result(result)["errors"]}
 
 
@@ -131,3 +131,18 @@ def test_pre_effective_date_run_is_exempt(tmp_path: Path) -> None:
         manifest_updates={"security_sensitive_scope": True, "contract_effective_date": "2026-05-19"},
     )
     assert "security_scans_missing_fails" not in _error_ids(product)
+
+
+def test_security_scans_are_not_required_before_qe_handoff(tmp_path: Path) -> None:
+    """Security scope can be known at setup without fabricating scan waivers."""
+    product = tmp_path / "product"
+    write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
+    write_manifest_run(
+        product, "F0001-new", "F0001",
+        latest=True,
+        manifest_updates={"security_sensitive_scope": True, "contract_effective_date": LATE_DATE},
+    )
+    for stage in ("G0", "G1"):
+        assert not any(rule.startswith("security_scan") for rule in _error_ids(product, stage))
+    for stage in ("G2", "G3", "G4", "G5", "G6", "closeout"):
+        assert "security_scans_missing_fails" in _error_ids(product, stage)
