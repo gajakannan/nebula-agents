@@ -873,8 +873,15 @@ def validate_artifact_reference(
 
 def artifact_references(content: str, relative_prefix: str) -> list[str]:
     prefix = re.escape(relative_prefix)
-    pattern = re.compile(rf"(?:\{{(?:NEBULA_PRODUCT_ROOT|PRODUCT_ROOT)\}}[\\/]|[A-Za-z]:[\\/]|/)?[^\s)\]]*{prefix}[^\s)\]]+")
-    return pattern.findall(content)
+    # Markdown delimiters surround paths; they are not part of the filesystem
+    # reference. Keep absolute/placeholder prefixes and traversal components so
+    # the resolver still performs the existing containment checks.
+    token = r"[^\s`<>\[\]()\"']"
+    pattern = re.compile(
+        rf"(?:\{{(?:NEBULA_PRODUCT_ROOT|PRODUCT_ROOT)\}}[\\/]|[A-Za-z]:[\\/]|/)?"
+        rf"{token}*{prefix}{token}+"
+    )
+    return list(dict.fromkeys(value.rstrip(".,;:") for value in pattern.findall(content)))
 
 
 # --------------------------------------------------------------------------- #
@@ -1626,10 +1633,13 @@ def validate_manifest_deep(
     # output under artifacts/security/; Security is Accountable for the verdict.
     # A Security PASS is only defensible when every class either ran with a
     # resolvable artifact or carries a complete in-line waiver. Gated on the
-    # run's own contract_effective_date so earlier packages stay valid.
+    # run's own contract_effective_date so earlier packages stay valid. Scans
+    # are produced by QE at G2: G0/G1 validate setup and runtime readiness,
+    # before the implementation and scan handoff exist.
     manifest_effective = parse_iso_date(str(manifest.get("contract_effective_date", "")))
     if (
         manifest.get("security_sensitive_scope") is True
+        and stage not in {"G0", "G1"}
         and manifest_effective is not None
         and manifest_effective >= SECURITY_SCANS_EFFECTIVE_DATE
     ):

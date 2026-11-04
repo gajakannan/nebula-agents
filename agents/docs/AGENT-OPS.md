@@ -256,7 +256,9 @@ classes to be backed-or-waived. A scanner that is unavailable is recorded as a
 waiver (never silently skipped). Rules: `security_scans_missing_fails`,
 `security_scan_class_missing_fails`, `security_scan_unbacked_fails` (claimed
 `ran` with no resolvable artifact), `security_scan_unwaived_skip_fails` (did not
-run, no complete waiver). Runs on earlier contract dates are exempt.
+run, no complete waiver). Runs on earlier contract dates are exempt. The
+requirement applies from G2 (QE scan handoff) onward; G0/G1 validations do not
+require scans, so setup never needs placeholder waivers.
 
 ## Telemetry: the Command Log
 
