@@ -88,7 +88,14 @@ def _is_required_flag(value: str) -> bool:
 
 def _is_pass_verdict(value: str) -> bool:
     normalized = value.strip().casefold()
-    return normalized in {"pass", "approved"}
+    # WHY: recommendation verdicts are passing forms; feature-evidence validation
+    # still owns their recommendation and PM acceptance requirements.
+    return normalized in {
+        "pass",
+        "approved",
+        "pass with recommendations",
+        "approved with recommendations",
+    }
 
 
 def _has_meaningful_value(value: str) -> bool:

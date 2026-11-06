@@ -200,7 +200,8 @@ class StoryValidator:
 
         # Check for at least one Given/When/Then or checklist item
         has_given_when_then = bool(re.search(r"(Given|When|Then)", section))
-        has_checklist = bool(re.search(r"- \[ \]", section))
+        # WHY: completing a checkbox preserves its acceptance criterion; empty markers do not.
+        has_checklist = bool(re.search(r"^[ \t]*- \[[ xX]\][ \t]+\S", section, re.MULTILINE))
 
         if not has_given_when_then and not has_checklist:
             self.errors.append("Acceptance criteria section exists but has no criteria (use Given/When/Then or checklist)")
