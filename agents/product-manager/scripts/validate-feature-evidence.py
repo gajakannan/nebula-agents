@@ -1473,6 +1473,48 @@ def validate_latest_run(
     return LatestRunResolution(latest_run_id, manifest_path)
 
 
+REENTRY_CANDIDATE_STATUSES = {"draft", "in-progress"}
+
+
+def _is_reentry_candidate(row: RegistryRow, result: Result, latest_path: Path, run_id: str) -> bool:
+    """True when `run_id` is an in-flight feature-completion run for this feature and
+    latest-run.json points at a different, approved feature-completion run of the
+    same feature (the prior completion that G8 supersedes).
+
+    Any other mismatch keeps `stage_g6_run_id_mismatch_with_latest_run_fails`. This
+    only selects which manifest G6/G7 validate; every candidate check still runs."""
+    loaded, error = load_json_file(latest_path)
+    if error or not isinstance(loaded, dict):
+        return False
+    latest_run_id = str(loaded.get("run_id", ""))
+    if not RUN_ID_RE.fullmatch(latest_run_id) or latest_run_id == run_id:
+        return False
+    manifest_value = str(loaded.get("manifest_path", ""))
+    prior_path = relative_json_path(result.product_root, manifest_value) if manifest_value else None
+    candidate_path = run_folder_for(result.product_root, run_id) / "evidence-manifest.json"
+    if prior_path is None or not prior_path.exists() or not candidate_path.exists():
+        return False
+    prior, prior_error = load_json_file(prior_path)
+    candidate, candidate_error = load_json_file(candidate_path)
+    if prior_error or candidate_error or not isinstance(prior, dict) or not isinstance(candidate, dict):
+        return False
+
+    def completion(manifest: dict[str, Any]) -> bool:
+        return (
+            manifest.get("feature_id") == row.feature_id
+            and (manifest.get("run_scope") or "feature-completion") == "feature-completion"
+        )
+
+    return (
+        completion(prior)
+        and completion(candidate)
+        and prior.get("run_id") == latest_run_id
+        and prior.get("status") == "approved"
+        and candidate.get("run_id") == run_id
+        and candidate.get("status") in REENTRY_CANDIDATE_STATUSES
+    )
+
+
 def resolve_run(row: RegistryRow, stage: str, run_id: str | None, result: Result) -> tuple[str | None, Path | None, bool]:
     root = feature_index_root_for(result.product_root, row)
     latest_path = root / "latest-run.json"
@@ -1489,7 +1531,13 @@ def resolve_run(row: RegistryRow, stage: str, run_id: str | None, result: Result
     if stage in {"G6", "G7"}:
         if run_id:
             if latest_path.exists():
-                resolution = validate_latest_run(row, result, latest_path, run_id, "stage_g6_run_id_mismatch_with_latest_run_fails")
+                mismatch_rule: str | None = "stage_g6_run_id_mismatch_with_latest_run_fails"
+                if _is_reentry_candidate(row, result, latest_path, run_id):
+                    # A remediation/reentry run is validated before G8 may move the
+                    # pointer, so latest-run.json legitimately still names the older
+                    # approved run that this candidate will supersede.
+                    mismatch_rule = None
+                resolution = validate_latest_run(row, result, latest_path, run_id, mismatch_rule)
                 if resolution.mismatch or resolution.unloadable:
                     return run_id, None, False
             run_folder = run_folder_for(result.product_root, run_id)
