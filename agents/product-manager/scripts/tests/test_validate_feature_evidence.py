@@ -5,6 +5,8 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 VALIDATOR = REPO_ROOT / "agents" / "product-manager" / "scripts" / "validate-feature-evidence.py"
@@ -759,3 +761,66 @@ def test_section_23_inventory_has_no_typos() -> None:
     allowed_suffixes = ("_passes", "_fails", "_warns", "_info")
     bad = [name for name in SECTION_23_REQUIRED_FIXTURES if not name.endswith(allowed_suffixes)]
     assert not bad, f"Fixture names with non-canonical suffix: {bad!r}"
+
+
+REENTRY_RUN_ID = "2026-05-20-bbbbbbbb"
+
+
+def _reentry_rules(product: Path, run_id: str = REENTRY_RUN_ID) -> list[str]:
+    result = run_validator(product, "--feature", "F0001", "--stage", "G6", "--run-id", run_id, "--json")
+    return [item["rule_id"] for item in json_result(result)["errors"]]
+
+
+def test_g6_accepts_reentry_candidate_while_latest_names_prior_approved_run(tmp_path: Path) -> None:
+    """A remediation run is validated at G6/G7 before G8 may move latest-run.json,
+    so the pointer still names the prior approved completion it will supersede."""
+    product = tmp_path / "product"
+    write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
+    write_manifest_run(product, "F0001-new", "F0001", status="approved", latest=True, stage="G6")
+    write_manifest_run(product, "F0001-new", "F0001", run_id=REENTRY_RUN_ID, status="in-progress", stage="G6")
+    assert "stage_g6_run_id_mismatch_with_latest_run_fails" not in _reentry_rules(product)
+    result = run_validator(product, "--feature", "F0001", "--stage", "G7", "--run-id", REENTRY_RUN_ID, "--json")
+    assert "stage_g6_run_id_mismatch_with_latest_run_fails" not in [
+        item["rule_id"] for item in json_result(result)["errors"]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("prior_status", "candidate_status", "candidate_feature"),
+    [
+        ("in-progress", "in-progress", "F0001"),  # pointer target not approved
+        ("approved", "approved", "F0001"),  # candidate is not in flight
+        ("approved", "in-progress", "F0002"),  # candidate belongs to another feature
+    ],
+)
+def test_g6_reentry_exception_is_narrow(
+    tmp_path: Path, prior_status: str, candidate_status: str, candidate_feature: str
+) -> None:
+    product = tmp_path / "product"
+    write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
+    write_manifest_run(product, "F0001-new", "F0001", status=prior_status, latest=True, stage="G6")
+    write_manifest_run(
+        product,
+        "F0001-new",
+        "F0001",
+        run_id=REENTRY_RUN_ID,
+        status=candidate_status,
+        stage="G6",
+        manifest_updates={"feature_id": candidate_feature},
+    )
+    assert "stage_g6_run_id_mismatch_with_latest_run_fails" in _reentry_rules(product)
+
+
+def test_g6_reentry_exception_rejects_a_planning_scope_candidate(tmp_path: Path) -> None:
+    product = tmp_path / "product"
+    write_registry(product, archived="| F0001 | New Feature | 2026-05-19 |  | `archive/F0001-new/` |")
+    write_manifest_run(product, "F0001-new", "F0001", status="approved", latest=True, stage="G6")
+    write_manifest_run(
+        product,
+        "F0001-new",
+        "F0001",
+        run_id=REENTRY_RUN_ID,
+        stage="G6",
+        manifest_updates={"run_scope": "base-run-only"},
+    )
+    assert "stage_g6_run_id_mismatch_with_latest_run_fails" in _reentry_rules(product)
